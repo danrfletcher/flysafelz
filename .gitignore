@@ -7,3 +7,4 @@ dist/
 .langgraph_api/
 *.sqlite
 .DS_Store
+.coverage
