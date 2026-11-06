@@ -31,6 +31,11 @@ EXPECTED = [
     ("verdict_horizon_day", 3, "day", "="),
     ("outlook_horizon_day", 7, "day", "="),
     ("pib_stale_hours", 3, "h", "="),
+    ("uk_bounds_lat_min", 49.8, "deg", "<"),
+    ("uk_bounds_lat_max", 61.0, "deg", ">"),
+    ("uk_bounds_lon_min", -8.7, "deg", "<"),
+    ("uk_bounds_lon_max", 2.0, "deg", ">"),
+    ("civil_twilight_depression", 6, "deg", "="),
 ]
 
 
