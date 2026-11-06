@@ -204,6 +204,38 @@ class Contact(BaseModel):
     value: str | None = None
 
 
+class AppliesTo(StrEnum):
+    """Which aircraft a NOTAM is addressed to. UAS_ONLY and AERODROME_USERS never concern a paramotor."""
+
+    ALL_AIRCRAFT = "ALL_AIRCRAFT"
+    UAS_ONLY = "UAS_ONLY"
+    AERODROME_USERS = "AERODROME_USERS"
+    NAMED_CLASSES = "NAMED_CLASSES"
+
+
+class ExemptionCovers(StrEnum):
+    """Who an exemption lets off.
+
+    PARAMOTOR_CLASS: paramotors, paragliders, microlights, SSDR, foot-launched, or all light /
+    non-transponder aircraft, judged on meaning not wording. CONDITIONAL: only on a condition (in
+    contact with ATC, with permission, "exceptions in the AIC", emergency services): never drops
+    the NOTAM. OTHER: some other class of aircraft.
+    """
+
+    PARAMOTOR_CLASS = "PARAMOTOR_CLASS"
+    CONDITIONAL = "CONDITIONAL"
+    OTHER = "OTHER"
+
+
+class Exemption(BaseModel):
+    """One exemption in the E text. quote is the sentence from the E text, word for word (it is checked)."""
+
+    model_config = STRICT
+
+    quote: str
+    covers: ExemptionCovers
+
+
 class NotamReading(BaseModel):
     """The semantic fields a reader fills (ticket 3), or a fixture writes by hand."""
 
@@ -216,7 +248,8 @@ class NotamReading(BaseModel):
     floor: Limit
     ceiling: Limit
     schedule: str  # D-item text, normalised
-    exempts_paramotors: bool = False
+    applies_to: AppliesTo = AppliesTo.ALL_AIRCRAFT
+    exemptions: list[Exemption] = Field(default_factory=list)
     contact: Contact
     activates_designators: list[str] = Field(default_factory=list)  # e.g. ["EGD496A"]
     prohibitive_reason: ProhibitiveReason = ProhibitiveReason.NONE
