@@ -119,6 +119,16 @@ class Rules(BaseModel):
     uk_bounds_lon_min: Rule
     uk_bounds_lon_max: Rule
     civil_twilight_depression: Rule
+    notam_max_lower_fl: Rule
+    notam_ignore_subject_letters: Rule
+    notam_keep_subjects: Rule
+    notam_wide_ignore_subjects: Rule
+    notam_ignore_traffic: Rule
+    notam_ignore_purpose: Rule
+    notam_ignore_security_subjects: Rule
+    notam_restriction_subjects: Rule
+    notam_awareness_subjects: Rule
+    notam_area_wide_nm: Rule
 
     def all(self) -> list[Rule]:
         """Every rule, in file order."""

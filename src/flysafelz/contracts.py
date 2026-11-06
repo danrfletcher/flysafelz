@@ -4,12 +4,14 @@ The verdict has three values and no bare "go" verdict exists
 (display_verdict builds the strings). Models forbid extra fields.
 """
 
+import re
 from enum import StrEnum
 from typing import Annotated, Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
 STRICT = ConfigDict(extra="forbid")
+_Q_CODE = re.compile(r"Q?(?P<subject>..)(?P<condition>..)")
 
 
 # --- verdicts and tiers ---------------------------------------------------
@@ -70,7 +72,7 @@ class SourceState(StrEnum):
 
 
 class SourceStatus(BaseModel):
-    """Health of one data source. Weather and airspace set fetched_at; NOTAMs set issued_at (PIB Issued)."""
+    """Health of one data source. Weather and airspace set fetched_at; NOTAMs set issued_at (PIB Issued) and, from the archive, sha."""
 
     model_config = STRICT
 
@@ -79,6 +81,7 @@ class SourceStatus(BaseModel):
     reason: str = ""
     fetched_at: AwareDatetime | None = None
     issued_at: AwareDatetime | None = None
+    sha: str | None = None  # NOTAMs from the archive: the commit the PIB came from; None for live and other sources
 
 
 # --- NOTAMs ----------------------------------------------------------------
@@ -103,7 +106,7 @@ class ParsedNotam(BaseModel):
     replaces: str | None = None  # id replaced (R) or cancelled (C)
     nof: str  # originating office
     fir: str
-    q_code: str
+    q_code: str  # five letters, e.g. "QRDCA": Q, subject (RD), condition (CA)
     traffic: str
     purpose: str
     scope: str
@@ -116,11 +119,25 @@ class ParsedNotam(BaseModel):
     valid_from: AwareDatetime
     valid_to: AwareDatetime | None = None  # None when permanent
     permanent: bool = False
+    est: bool = False  # the end time is an estimate (EST)
     item_d: str | None = None  # schedule text
     item_e: str
     item_f: str | None = None
     item_g: str | None = None
-    section: str
+    section: str  # the PIB section it was first seen in
+    sections: list[str] = Field(default_factory=list)  # every section it appears in, first seen first
+
+    @property
+    def subject(self) -> str:
+        """The two-letter subject of the Q code (RD in QRDCA); empty when the code is too short."""
+        match = _Q_CODE.match(self.q_code)
+        return match.group("subject") if match else ""
+
+    @property
+    def condition(self) -> str:
+        """The two-letter condition of the Q code (CA in QRDCA); empty when the code is too short."""
+        match = _Q_CODE.match(self.q_code)
+        return match.group("condition") if match else ""
 
 
 class Category(StrEnum):
