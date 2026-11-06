@@ -171,6 +171,14 @@ local_area:
   confidence: educated guess
   note: "Radius of the local flying area around the landing zone. Not user-adjustable."
 
+airspace_box_nm:
+  value: 10
+  unit: NM
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 G7 (wider than the 2 NM local area so the map has context)"
+  confidence: educated guess
+  note: "Half-width of the box around the LZ that the openAIP query asks for. Every airspace touching the box is fetched."
+
 band_low:
   value: 5000
   unit: ft
