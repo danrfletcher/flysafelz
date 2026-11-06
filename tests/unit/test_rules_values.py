@@ -36,6 +36,16 @@ EXPECTED = [
     ("uk_bounds_lon_min", -8.7, "deg", "<"),
     ("uk_bounds_lon_max", 2.0, "deg", ">"),
     ("civil_twilight_depression", 6, "deg", "="),
+    ("notam_max_lower_fl", 195, "FL", ">"),
+    ("notam_ignore_subject_letters", ["L", "F", "M", "N", "I", "C", "S", "O"], "subject first letter", "in"),
+    ("notam_keep_subjects", ["FA", "OB", "OL"], "subject", "in"),
+    ("notam_wide_ignore_subjects", ["AF"], "subject", "in"),
+    ("notam_ignore_traffic", ["I"], "Q-line traffic", "in"),
+    ("notam_ignore_purpose", ["K"], "Q-line purpose", "in"),
+    ("notam_ignore_security_subjects", ["RO"], "subject", "in"),
+    ("notam_restriction_subjects", ["RD", "RR", "RP", "RT"], "subject", "in"),
+    ("notam_awareness_subjects", ["GW"], "subject", "in"),
+    ("notam_area_wide_nm", 50, "NM", ">="),
 ]
 
 

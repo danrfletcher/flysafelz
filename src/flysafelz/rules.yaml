@@ -250,3 +250,87 @@ civil_twilight_depression:
   source: "Standard definition of civil twilight: sun centre 6 degrees below the horizon; Plan 2 G6"
   confidence: sourced
   note: "Angle below the horizon for civil dawn and civil dusk. Outside civil twilight is night."
+
+# --- NOTAM prefilter (G13) and code-only sort (G23) ----------------------------
+# The sort lists below are matched against coded PIB fields only: the Q-line
+# subject (letters 2-3 of the five-letter code), traffic, purpose and radius.
+
+notam_max_lower_fl:
+  value: 195
+  unit: FL
+  comparison: ">"
+  source: "FlySafeLZ Spec s2, Plan 2 G13; Class G in the UK runs up to FL195"
+  confidence: educated guess
+  note: "A NOTAM whose Q-line lower limit is above this is dropped by the prefilter."
+
+notam_ignore_subject_letters:
+  value: [L, F, M, N, I, C, S, O]
+  unit: subject first letter
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Q-line subjects whose first letter cannot affect a paramotor (lighting, aerodrome facilities, movement area, nav aids, comms, ATS services, other). A, R and W are never in this list."
+
+notam_keep_subjects:
+  value: [FA, OB, OL]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Subjects kept although their first letter is in the ignore list: aerodrome warnings (drones, fireworks, lasers, live ordnance) and obstacles (cranes, rigs)."
+
+notam_wide_ignore_subjects:
+  value: [AF]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: educated guess
+  note: "FIR information subjects. At or above the area-wide radius they are FIR-wide AIS admin (e.g. MIL AIP checklists) and are ignored; below it (transponder mandatory zones) they are kept."
+
+notam_ignore_traffic:
+  value: [I]
+  unit: Q-line traffic
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Traffic exactly I (IFR only) cannot affect a paramotor. IV and V are kept."
+
+notam_ignore_purpose:
+  value: [K]
+  unit: Q-line purpose
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: sourced
+  note: "Purpose K marks a checklist or status NOTAM."
+
+notam_ignore_security_subjects:
+  value: [RO]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "In series V only: security advice to air operators. Series V with any other subject (e.g. volcanic ash) is kept."
+
+notam_restriction_subjects:
+  value: [RD, RR, RP, RT]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Danger, restricted, prohibited and temporary reserved airspace. With a designator in item E the NOTAM is handled through the airspace polygon; without one it goes to the reader."
+
+notam_awareness_subjects:
+  value: [GW]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "GNSS or radio-frequency jamming: awareness only, no reader."
+
+notam_area_wide_nm:
+  value: 50
+  unit: NM
+  comparison: ">="
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: educated guess
+  note: "A Q-line radius at or above this is an area-wide NOTAM: awareness only (and FIR-wide AIS admin for the subjects in notam_wide_ignore_subjects). A radius of 999 means the whole FIR."
