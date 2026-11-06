@@ -1,0 +1,212 @@
+# Every threshold and setting the verdict depends on. Python never holds a
+# limit of its own: it reads these. Each entry needs value, unit, comparison,
+# source, confidence and note.
+#
+# comparison: ">=", ">", "<", "<=" for a limit (a value breaches it when
+#   "value <comparison> limit" holds), "in" for a list, "=" for a plain setting.
+# confidence: "sourced" (a citable document), "best practice" (common
+#   practice that is not a single citation), "educated guess" (our own call).
+#
+# Most limits come from the FlySafeLZ Spec section 2 (Plan 2, settled with Dan,
+# Q3 and G22). None of the wind, cloud, rain or thermal numbers is quoted from
+# a regulation, so they are marked as best practice or educated guess.
+
+wind_10m_caution:
+  value: 12
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits"
+  confidence: best practice
+  note: "Mean wind at 10 m. Caution band below the 10 m NO_GO limit."
+
+wind_10m_no_go:
+  value: 16
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits"
+  confidence: best practice
+  note: "Mean wind at 10 m. 16.0 mph is NO_GO."
+
+gust_spread_caution:
+  value: 4
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Gust minus mean wind at 10 m, worst of the row's timestamps."
+
+gust_spread_no_go:
+  value: 6
+  unit: mph
+  comparison: ">"
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Gust minus mean wind at 10 m. Exactly 6.0 mph is not NO_GO; the comparison is strict."
+
+wind_aloft_caution:
+  value: 16
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3): same number as the 10 m NO_GO limit"
+  confidence: educated guess
+  note: "Wind at 80 m or 120 m. Caution only; the hard limits are at 10 m."
+
+gradient_caution:
+  value: 9
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Absolute difference between 120 m and 10 m wind."
+
+gradient_no_go:
+  value: 16
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Absolute difference between 120 m and 10 m wind."
+
+precipitation_no_go:
+  value: 0.1
+  unit: mm/h
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22"
+  confidence: educated guess
+  note: "Any measurable rain in the preceding hour. Applies to the hour's closing timestamp."
+
+rain_chance_caution:
+  value: 50
+  unit: "%"
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22"
+  confidence: educated guess
+  note: "Precipitation probability. Optional variable: skipped and noted when missing."
+
+visibility_caution:
+  value: 5000
+  unit: m
+  comparison: "<"
+  source: "Standard 5 km VFR visibility figure (UK SERA.5001 is the reference to check); Plan 2 G22"
+  confidence: best practice
+  note: "Not checked against the regulation text."
+
+visibility_no_go:
+  value: 1500
+  unit: m
+  comparison: "<"
+  source: "Plan 2 G22; compare the Class G flight-visibility minimum for slow aircraft in UK SERA.5001"
+  confidence: best practice
+  note: "Not checked against the regulation text; confirm before relying on it as sourced."
+
+low_cloud_caution:
+  value: 90
+  unit: "%"
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22"
+  confidence: educated guess
+  note: "Low cloud cover (Open-Meteo cloud_cover_low)."
+
+thermic_shortwave_caution:
+  value: 600
+  unit: W/m²
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G3/G22 (Dan, Q2)"
+  confidence: educated guess
+  note: "Thermic caution needs this AND the thermic CAPE limit together."
+
+thermic_cape_caution:
+  value: 300
+  unit: J/kg
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G3/G22 (Dan, Q2)"
+  confidence: educated guess
+  note: "Thermic caution needs this AND the shortwave limit together."
+
+cape_no_go:
+  value: 1000
+  unit: J/kg
+  comparison: ">="
+  source: "Common convention that CAPE of about 1,000 J/kg or more is meaningful convective instability; Plan 2 G22 (Dan, Q2)"
+  confidence: best practice
+  note: "Convective instability and thunderstorm risk."
+
+ceiling_left_no_go:
+  value: 300
+  unit: ft
+  comparison: "<"
+  source: "FlySafeLZ Spec s2, Plan 2 E15/G22"
+  confidence: educated guess
+  note: "Airspace ceiling (floor QNH minus the buffer) minus site elevation. Under this, no room to fly."
+
+ceiling_buffer:
+  value: 200
+  unit: ft
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives"
+  confidence: educated guess
+  note: "Margin kept below an airspace floor when stating 'stay below X ft QNH'."
+
+fl_ft_per_hpa:
+  value: 27
+  unit: ft/hPa
+  comparison: "="
+  source: "ICAO standard atmosphere: about 27 ft per hPa near sea level"
+  confidence: sourced
+  note: "Converts a flight level to feet against the forecast pressure_msl."
+
+fl_reference_hpa:
+  value: 1013.25
+  unit: hPa
+  comparison: "="
+  source: "ICAO standard atmosphere sea-level pressure"
+  confidence: sourced
+  note: "Flight levels are measured from this pressure."
+
+local_area:
+  value: 2
+  unit: NM
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives (Dan)"
+  confidence: educated guess
+  note: "Radius of the local flying area around the landing zone. Not user-adjustable."
+
+band_low:
+  value: 5000
+  unit: ft
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives (Dan)"
+  confidence: educated guess
+  note: "Airspace floors below this give a ceiling condition; above it, a warning."
+
+band_high:
+  value: 10000
+  unit: ft
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives (Dan)"
+  confidence: educated guess
+  note: "Airspace floors above this are awareness only (map and collapsed list)."
+
+verdict_horizon_day:
+  value: 3
+  unit: day
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 Q9 (Dan); day 0 is today in Europe/London"
+  confidence: educated guess
+  note: "Last day that can carry a verdict, if every required weather variable is present."
+
+outlook_horizon_day:
+  value: 7
+  unit: day
+  comparison: "="
+  source: "Vector check of Open-Meteo ukmo_seamless on 2026-11-06: 10 m wind, gust, CAPE and visibility run to day 7"
+  confidence: sourced
+  note: "Beyond this day nothing is fetched and the hour is TOO_FAR."
+
+pib_stale_hours:
+  value: 3
+  unit: h
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 E2"
+  confidence: educated guess
+  note: "A PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED."
