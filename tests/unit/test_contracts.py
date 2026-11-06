@@ -6,10 +6,12 @@ import pytest
 from pydantic import ValidationError
 
 from flysafelz.contracts import (
+    AppliesTo,
     Assessment,
     Blocker,
     Caution,
     Circle,
+    ExemptionCovers,
     FlyableWindow,
     HourAssessment,
     IgnoredNotam,
@@ -39,7 +41,8 @@ def h7171_reading() -> dict:
         "floor": {"value": 0, "unit": "ft", "datum": "SFC"},
         "ceiling": {"value": 700, "unit": "ft", "datum": "AGL"},
         "schedule": "DAILY 0800-1800",
-        "exempts_paramotors": False,
+        "applies_to": "ALL_AIRCRAFT",
+        "exemptions": [],
         "contact": {"kind": "phone", "value": "07784 546062"},
         "activates_designators": [],
         "prohibitive_reason": "none",
@@ -180,6 +183,23 @@ def test_parsed_notam_round_trips():
         section="Area",
     )
     assert ParsedNotam.model_validate_json(parsed.model_dump_json()) == parsed
+
+
+def test_notam_reading_applies_to_and_exemptions():
+    data = h7171_reading()
+    assert NotamReading.model_validate(data).applies_to == "ALL_AIRCRAFT"
+    assert NotamReading.model_validate(data).exemptions == []
+    data["applies_to"] = "UAS_ONLY"
+    data["exemptions"] = [{"quote": "PARAMOTORS EXEMPT.", "covers": "PARAMOTOR_CLASS"}, {"quote": "WITH PERMISSION", "covers": "CONDITIONAL"}]
+    reading = NotamReading.model_validate(data)
+    assert reading.applies_to is AppliesTo.UAS_ONLY
+    assert [e.covers for e in reading.exemptions] == [ExemptionCovers.PARAMOTOR_CLASS, ExemptionCovers.CONDITIONAL]
+    assert NotamReading.model_validate_json(reading.model_dump_json()) == reading
+    assert [a.name for a in AppliesTo] == ["ALL_AIRCRAFT", "UAS_ONLY", "AERODROME_USERS", "NAMED_CLASSES"]
+    assert [c.name for c in ExemptionCovers] == ["PARAMOTOR_CLASS", "CONDITIONAL", "OTHER"]
+    for bad in ({"exempts_paramotors": True}, {"applies_to": "EVERYONE"}, {"exemptions": [{"quote": "x", "covers": "NOBODY"}]}, {"exemptions": [{"quote": "x"}]}):
+        with pytest.raises(ValidationError):
+            NotamReading.model_validate({**h7171_reading(), **bad})
 
 
 def test_notam_action_covers_the_six_outcomes_and_the_no_reading_one():
