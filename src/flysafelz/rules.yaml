@@ -210,3 +210,43 @@ pib_stale_hours:
   source: "FlySafeLZ Spec s2, Plan 2 E2"
   confidence: educated guess
   note: "A PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED."
+
+uk_bounds_lat_min:
+  value: 49.8
+  unit: deg
+  comparison: "<"
+  source: "Plan 2 E16 (south of the Isles of Scilly)"
+  confidence: educated guess
+  note: "A latitude below this is outside UK coverage. Exactly this latitude is inside."
+
+uk_bounds_lat_max:
+  value: 61.0
+  unit: deg
+  comparison: ">"
+  source: "Plan 2 E16 (north of Shetland)"
+  confidence: educated guess
+  note: "A latitude above this is outside UK coverage. Exactly this latitude is inside."
+
+uk_bounds_lon_min:
+  value: -8.7
+  unit: deg
+  comparison: "<"
+  source: "Plan 2 E16 (west of Northern Ireland)"
+  confidence: educated guess
+  note: "A longitude (east positive) below this is outside UK coverage. Exactly this longitude is inside."
+
+uk_bounds_lon_max:
+  value: 2.0
+  unit: deg
+  comparison: ">"
+  source: "Plan 2 E16 (east of East Anglia)"
+  confidence: educated guess
+  note: "A longitude (east positive) above this is outside UK coverage. Exactly this longitude is inside."
+
+civil_twilight_depression:
+  value: 6
+  unit: deg
+  comparison: "="
+  source: "Standard definition of civil twilight: sun centre 6 degrees below the horizon; Plan 2 G6"
+  confidence: sourced
+  note: "Angle below the horizon for civil dawn and civil dusk. Outside civil twilight is night."

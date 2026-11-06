@@ -50,5 +50,10 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 | verdict_horizon_day | 3 | day | = | FlySafeLZ Spec s2, Plan 2 Q9 (Dan); day 0 is today in Europe/London | educated guess | Last day that can carry a verdict, if every required weather variable is present. |
 | outlook_horizon_day | 7 | day | = | Vector check of Open-Meteo ukmo_seamless on 2026-11-06: 10 m wind, gust, CAPE and visibility run to day 7 | sourced | Beyond this day nothing is fetched and the hour is TOO_FAR. |
 | pib_stale_hours | 3 | h | = | FlySafeLZ Spec s2, Plan 2 E2 | educated guess | A PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED. |
+| uk_bounds_lat_min | 49.8 | deg | < | Plan 2 E16 (south of the Isles of Scilly) | educated guess | A latitude below this is outside UK coverage. Exactly this latitude is inside. |
+| uk_bounds_lat_max | 61 | deg | > | Plan 2 E16 (north of Shetland) | educated guess | A latitude above this is outside UK coverage. Exactly this latitude is inside. |
+| uk_bounds_lon_min | -8.7 | deg | < | Plan 2 E16 (west of Northern Ireland) | educated guess | A longitude (east positive) below this is outside UK coverage. Exactly this longitude is inside. |
+| uk_bounds_lon_max | 2 | deg | > | Plan 2 E16 (east of East Anglia) | educated guess | A longitude (east positive) above this is outside UK coverage. Exactly this longitude is inside. |
+| civil_twilight_depression | 6 | deg | = | Standard definition of civil twilight: sun centre 6 degrees below the horizon; Plan 2 G6 | sourced | Angle below the horizon for civil dawn and civil dusk. Outside civil twilight is night. |
 
 Confidence is `sourced` (a citable document), `best practice` (common practice, not one citation) or `educated guess` (our own call). Limits cannot be changed by the user.

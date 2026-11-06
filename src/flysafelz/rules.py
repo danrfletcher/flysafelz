@@ -114,6 +114,11 @@ class Rules(BaseModel):
     verdict_horizon_day: Rule
     outlook_horizon_day: Rule
     pib_stale_hours: Rule
+    uk_bounds_lat_min: Rule
+    uk_bounds_lat_max: Rule
+    uk_bounds_lon_min: Rule
+    uk_bounds_lon_max: Rule
+    civil_twilight_depression: Rule
 
     def all(self) -> list[Rule]:
         """Every rule, in file order."""
