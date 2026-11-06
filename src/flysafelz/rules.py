@@ -109,6 +109,7 @@ class Rules(BaseModel):
     fl_ft_per_hpa: Rule
     fl_reference_hpa: Rule
     local_area: Rule
+    airspace_box_nm: Rule
     band_low: Rule
     band_high: Rule
     verdict_horizon_day: Rule

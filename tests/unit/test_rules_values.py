@@ -26,6 +26,7 @@ EXPECTED = [
     ("fl_ft_per_hpa", 27, "ft/hPa", "="),
     ("fl_reference_hpa", 1013.25, "hPa", "="),
     ("local_area", 2, "NM", "="),
+    ("airspace_box_nm", 10, "NM", "="),
     ("band_low", 5000, "ft", "="),
     ("band_high", 10000, "ft", "="),
     ("verdict_horizon_day", 3, "day", "="),
