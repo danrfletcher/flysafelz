@@ -6,7 +6,7 @@ from airspace_helpers import ELEVATION_FT, LZ, SEGMENT, agl, amsl, assess, fl, o
 from flysafelz.airspace import Outcome, limit_qnh_ft
 from flysafelz.rules import RULES, Comparison
 
-WEST_SLEEKBURN = (55.158, -1.570)
+WEST_SLEEKBURN = (55.1576, -1.5699)
 
 
 # --- E9: how a floor becomes QNH feet -----------------------------------------------------------------

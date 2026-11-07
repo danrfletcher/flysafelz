@@ -1,0 +1,56 @@
+$ make fixtures CASE=west_sleekburn_2026-10-31   # first run (recapture at the clear field)
+captured west_sleekburn_2026-10-31
+  weather.json: written
+  airspace.json: unchanged
+  pib.xml: unchanged
+  case.yaml: unchanged
+  readings.yaml: left untouched
+  archive SHA: bdab14658f0270dc41460eebcd03332abfb230ec
+  PIB issued: 2026-10-31T07:00:37Z
+  NOTAMs: 1683 before the trim, 51 after (within 25 NM)
+  airspace: 11 areas
+  danger areas: 1 (1 with byNotam or hoursOfOperation set, 0 empty)
+    EGD514: hours DAILY 0000-0000, MON 0000-0000, TUE 0000-0000, WED 0000-0000, THU 0000-0000, FRI 0000-0000, SAT 0000-0000
+  over the LZ: BORDERS CTA 12 (cta) 155 FL AMSL to 195 FL AMSL
+  over the LZ: NEWCASTLE CTA 2 (cta) 1500 ft AMSL to 105 FL AMSL
+  0.27 NM from the LZ: NEWCASTLE CTR (ctr) SFC to 105 FL AMSL
+  0.29 NM from the LZ: NSGA BORDERS (gliding) 100 FL AMSL to 195 FL AMSL
+(exit 0)
+
+$ make fixtures CASE=west_sleekburn_2026-10-31   # second run (determinism check)
+captured west_sleekburn_2026-10-31
+  weather.json: unchanged
+  airspace.json: unchanged
+  pib.xml: unchanged
+  case.yaml: unchanged
+  readings.yaml: left untouched
+  archive SHA: bdab14658f0270dc41460eebcd03332abfb230ec
+  PIB issued: 2026-10-31T07:00:37Z
+  NOTAMs: 1683 before the trim, 51 after (within 25 NM)
+  airspace: 11 areas
+  danger areas: 1 (1 with byNotam or hoursOfOperation set, 0 empty)
+    EGD514: hours DAILY 0000-0000, MON 0000-0000, TUE 0000-0000, WED 0000-0000, THU 0000-0000, FRI 0000-0000, SAT 0000-0000
+  over the LZ: BORDERS CTA 12 (cta) 155 FL AMSL to 195 FL AMSL
+  over the LZ: NEWCASTLE CTA 2 (cta) 1500 ft AMSL to 105 FL AMSL
+  0.27 NM from the LZ: NEWCASTLE CTR (ctr) SFC to 105 FL AMSL
+  0.29 NM from the LZ: NSGA BORDERS (gliding) 100 FL AMSL to 195 FL AMSL
+(exit 0)
+
+$ make fixtures CASE=west_sleekburn_2026-10-31   # third run (determinism re-check by the fix-up coder; git status --porcelain empty before and after)
+captured west_sleekburn_2026-10-31
+  weather.json: unchanged
+  airspace.json: unchanged
+  pib.xml: unchanged
+  case.yaml: unchanged
+  readings.yaml: left untouched
+  archive SHA: bdab14658f0270dc41460eebcd03332abfb230ec
+  PIB issued: 2026-10-31T07:00:37Z
+  NOTAMs: 1683 before the trim, 51 after (within 25 NM)
+  airspace: 11 areas
+  danger areas: 1 (1 with byNotam or hoursOfOperation set, 0 empty)
+    EGD514: hours DAILY 0000-0000, MON 0000-0000, TUE 0000-0000, WED 0000-0000, THU 0000-0000, FRI 0000-0000, SAT 0000-0000
+  over the LZ: BORDERS CTA 12 (cta) 155 FL AMSL to 195 FL AMSL
+  over the LZ: NEWCASTLE CTA 2 (cta) 1500 ft AMSL to 105 FL AMSL
+  0.27 NM from the LZ: NEWCASTLE CTR (ctr) SFC to 105 FL AMSL
+  0.29 NM from the LZ: NSGA BORDERS (gliding) 100 FL AMSL to 195 FL AMSL
+(exit 0)
