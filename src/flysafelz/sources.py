@@ -87,6 +87,24 @@ def _readings(path: Path, root: Path) -> dict[str, NotamReading]:
         raise SourceError(f"{_shown(path, root)}: not a list of valid NOTAM readings") from None
 
 
+def replay_files(case: Case, folder: Path, root: Path) -> tuple[Forecast, AirspaceFetch, PibResult, dict[str, NotamReading]]:
+    """Replay a case folder's weather.json, airspace.json, pib.xml and readings.yaml through the real client code.
+
+    Used by load_case_sources and by cases.load_case_inputs, so the two never differ. `root` only
+    shortens the paths in error messages. Raises SourceError, naming the file, for one that is
+    missing, unreadable or not valid. The PIB status keeps the sha the parser gave it (none, offline).
+    """
+    try:
+        forecast = open_meteo.parse_response(json.loads(_read(folder / "weather.json", root)), case.now)
+    except ValueError:
+        raise SourceError(f"{_shown(folder / 'weather.json', root)}: not valid JSON") from None
+    airspace = openaip.fetch_airspace(
+        case.lat, case.lon, api_key=REPLAY_KEY, client=_replay(_read(folder / "airspace.json", root)), now=case.now
+    )
+    notams = pib.load_pib("live", case.now, client=_replay(_read(folder / "pib.xml", root)))
+    return forecast, airspace, notams, _readings(folder / "readings.yaml", root)
+
+
 def load_case_sources(name: str, *, root: Path | None = None) -> CaseSources:
     """Load fixtures/<name>/. `now` is the case's own; the wall clock is never read.
 
@@ -101,18 +119,11 @@ def load_case_sources(name: str, *, root: Path | None = None) -> CaseSources:
         case, _raw = load_case(folder / "case.yaml", today=datetime.max.replace(tzinfo=UTC))
     except CaptureError as exc:
         raise SourceError(str(exc)) from None
-    try:
-        forecast = open_meteo.parse_response(json.loads(_read(folder / "weather.json", root)), case.now)
-    except ValueError:
-        raise SourceError(f"{_shown(folder / 'weather.json', root)}: not valid JSON") from None
-    airspace = openaip.fetch_airspace(
-        case.lat, case.lon, api_key=REPLAY_KEY, client=_replay(_read(folder / "airspace.json", root)), now=case.now
-    )
-    notams = pib.load_pib("live", case.now, client=_replay(_read(folder / "pib.xml", root)))
+    forecast, airspace, notams, readings = replay_files(case, folder, root)
     if case.capture is not None and notams.status.state is not SourceState.FAILED:
         # The replay has no archive request to learn the commit from; case.yaml recorded it at capture.
         notams = notams.model_copy(update={"status": notams.status.model_copy(update={"sha": case.capture.sha})})
-    return CaseSources(case, forecast, airspace, notams, _readings(folder / "readings.yaml", root))
+    return CaseSources(case, forecast, airspace, notams, readings)
 
 
 # --- live ---------------------------------------------------------------------------------
