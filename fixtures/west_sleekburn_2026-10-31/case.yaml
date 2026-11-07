@@ -2,8 +2,8 @@ archive_sha: bdab14658f0270dc41460eebcd03332abfb230ec
 capture:
   pib_issued: '2026-10-31T07:00:37Z'
   sha: bdab14658f0270dc41460eebcd03332abfb230ec
-lat: 55.155
-lon: -1.565
+lat: 55.1576
+lon: -1.5699
 now: '2026-10-31T07:30:00Z'
 window:
   end: '2026-10-31T18:00:00Z'

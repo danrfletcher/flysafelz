@@ -1,0 +1,4 @@
+$ <throwaway scrub script, uncommitted; reads the old point from dev at run time; names and counts only>
+fixtures/west_sleekburn_2026-10-31/airspace.json {'form5_lon': 2, 'form6_lat': 6}
+commit-message matches: 0
+0 pairs
