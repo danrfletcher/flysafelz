@@ -1,0 +1,13 @@
+# examples.yaml: reference.window end 18:00 -> 17:00, after the entry was written
+$ uv run python scripts/build_verdict_sheet.py --examples <tmp>/ex.yaml --out <tmp>/sheet.yaml
+example blue_mill_2026-10-31: stale (inputs); its entry is left as it is
+nothing written: 0 new, 0 unchanged, 1 stale, 0 skipped, 0 failed
+exit 0
+
+$ uv run python scripts/build_verdict_sheet.py --examples <tmp>/ex.yaml --out <tmp>/sheet.yaml --check
+blue_mill_2026-10-31 (blind): rows 13, labelled 0, unlabelled 13, unread left 0, actions done no (NOTAM actions not done), stale (inputs)
+1 entries checked: 0 errors, 1 stale, 0 orphans
+exit 0
+
+# sheet sha256 before: fb900b976ad9bb624a000c3e045bc0c5e9e09527d9bab87d5f2cb73f1367b20f
+# sheet sha256 after:  fb900b976ad9bb624a000c3e045bc0c5e9e09527d9bab87d5f2cb73f1367b20f

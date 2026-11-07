@@ -2,12 +2,13 @@
 
     make fixtures CASE=blue_mill_2026-10-31
 
-It reads fixtures/<case>/case.yaml (lat, lon, now, window, and optionally an
+It reads fixtures/<case>/case.yaml (lat, lon, now, window, and optionally `days` and an
 archive SHA) and calls the clients that already exist, directly:
 
     weather.json   fetch_historical_forecast  never the live forecast endpoint. The case day
                                               00:00-23:59 UTC plus the next day's 00:00, so the
-                                              23:00 row can be mapped (G4). Written in Open-Meteo's
+                                              23:00 row can be mapped (G4). With `days: N`, see below.
+                                              Written in Open-Meteo's
                                               own shape with exactly those hourly rows, so
                                               open_meteo.parse_response reads it. It is rebuilt from
                                               the parsed rows, not saved verbatim, so a rerun gives
@@ -26,6 +27,19 @@ archive SHA) and calls the clients that already exist, directly:
                                               pib.parse_pib reads the trimmed file unchanged.
 
 The resolved SHA and the PIB's Issued time are written back to case.yaml under `capture:`.
+
+Several days (`days: N`, G11). Without `days` a case is one UTC day and nothing below applies.
+With `days: N` (a whole number, 1 to 8: London day 7 is the last that can carry a verdict) the
+window may run from the start of `now`'s Europe/London day to the end of London day N-1. All day
+boundaries come from daylight.london_days_utc / london_day_utc, so a BST day starts at 23:00 UTC
+and the clock-change days are 23 or 25 hours. weather.json holds one hourly row for every UTC
+hour from the start of London day 0 to the end of London day N-1, plus the row at that end hour,
+from one historical-forecast request. pib.xml is still the one archive PIB at `now`. A case whose
+last London day has not ended yet is refused before any request: examples must be historical.
+
+A committed case is never recaptured or deleted (openAIP is live, so a recapture would change
+it). More days, or a different moment, go on a new case name, e.g. blue_mill_2026-10-31_3day.
+
 readings.yaml is never overwritten: an existing file is left byte-identical and a missing one
 is created as an empty list with a header comment.
 
@@ -58,6 +72,7 @@ from pydantic import (
     AwareDatetime,
     BaseModel,
     ConfigDict,
+    Field,
     ValidationError,
     ValidationInfo,
     field_validator,
@@ -73,6 +88,7 @@ from flysafelz.clients.openaip import KEY_VARIABLE, Airspace, fetch_airspace, it
 from flysafelz.clients.openaip import URL as AIRSPACE_URL
 from flysafelz.clients.pib_source import ARCHIVE_RAW_URL, fetch_pib, utc_text
 from flysafelz.contracts import Limit, SourceState
+from flysafelz.daylight import london_day_date, london_days_utc
 from flysafelz.geo import (
     OUTSIDE_UK_MESSAGE,
     circle_edge_distance_nm,
@@ -135,6 +151,9 @@ class Case(BaseModel):
     lat: float
     lon: float
     now: AwareDatetime
+    # Europe/London days to capture, counting the day `now` is in as day 1. Absent: the single UTC case day (G11).
+    # Declared before `window` so the window check can read it.
+    days: int | None = Field(default=None, strict=True)
     window: Window
     archive_sha: str | None = None  # pins the archive commit; without it the last commit at or before `now` is used
     capture: Captured | None = None
@@ -161,15 +180,43 @@ class Case(BaseModel):
             raise ValueError(f"{utc_text(now)} is in the future; a case replays the past")
         return now
 
+    @field_validator("days")
+    @classmethod
+    def _days_within_the_outlook(cls, days: int | None, info: ValidationInfo) -> int | None:
+        if days is None:
+            return days
+        last_day = int(RULES.outlook_horizon_day.value)  # type: ignore[arg-type]  # the last day that can carry a verdict
+        if days < 1:
+            raise ValueError("must be a whole number of 1 or more")
+        if days > last_day + 1:
+            now = info.data.get("now")
+            where = f" ({london_day_date(now, last_day)})" if now is not None else ""
+            raise ValueError(f"must be at most {last_day + 1}: London day {last_day}{where} is the last that can carry a verdict")
+        return days
+
     @field_validator("window")
     @classmethod
     def _inside_the_case_day(cls, window: Window, info: ValidationInfo) -> Window:
+        """Without `days`: the window stays inside the UTC case day. With `days` the London-day check applies instead."""
         now = info.data.get("now")
-        if now is None:  # `now` already failed; its error is the one to show
+        if now is None or info.data.get("days") is not None:  # `now` already failed, or the London days decide
             return window
         day_start, day_end = case_day(now)
         if not day_start <= window.start < window.end <= day_end:
             raise ValueError(f"must start before it ends and stay inside the case day {day_start.date()} (UTC)")
+        return window
+
+    @field_validator("window")
+    @classmethod
+    def _inside_the_london_days(cls, window: Window, info: ValidationInfo) -> Window:
+        """With `days`: the window stays inside London day 0 to London day days-1 (Europe/London, not UTC)."""
+        now, days = info.data.get("now"), info.data.get("days")
+        if now is None or days is None:  # no `days`, or `now` or `days` already failed: their error is the one to show
+            return window
+        first_start, last_end = london_days_utc(now, days)
+        if not first_start <= window.start < window.end <= last_end:
+            first, last = london_day_date(now, 0), london_day_date(now, days - 1)
+            raise ValueError(f"must start before it ends and stay inside the London days {first} to {last} (Europe/London)")
         return window
 
     @field_validator("archive_sha")
@@ -259,14 +306,18 @@ def dump_json(data: object) -> bytes:
     return (json.dumps(data, sort_keys=True, indent=INDENT) + "\n").encode("utf-8")
 
 
-def weather_json(forecast: Forecast, case: Case) -> bytes:
-    """weather.json: Open-Meteo's shape, with the case day's 00:00-23:00 rows plus the next day's 00:00."""
-    day_start, day_end = case_day(case.now)
+def _hours_through(first: datetime, last: datetime) -> list[datetime]:
+    """Every UTC hour stamp from first to last, both included."""
     stamps = []
-    stamp = day_start
-    while stamp <= day_end:
+    stamp = first
+    while stamp <= last:
         stamps.append(stamp)
         stamp += ONE_HOUR
+    return stamps
+
+
+def _weather_file(forecast: Forecast, case: Case, stamps: list[datetime]) -> bytes:
+    """weather.json in Open-Meteo's shape with exactly these hourly rows. A missing row is one line and nothing is written."""
     missing = [s for s in stamps if s not in forecast.samples]
     if missing:
         raise CaptureError(f"Open-Meteo: no hourly row for {utc_text(missing[0])} ({len(missing)} rows missing)")
@@ -285,7 +336,32 @@ def weather_json(forecast: Forecast, case: Case) -> bytes:
     return dump_json(body)
 
 
+def weather_json(forecast: Forecast, case: Case) -> bytes:
+    """weather.json: Open-Meteo's shape, with the case day's 00:00-23:00 rows plus the next day's 00:00."""
+    day_start, day_end = case_day(case.now)
+    return _weather_file(forecast, case, _hours_through(day_start, day_end))
+
+
+def weather_json_days(forecast: Forecast, case: Case, days: int) -> bytes:
+    """weather.json for `days` London days: one row per UTC hour from the start of London day 0 to the end
+    of London day days-1, plus the row at that end hour (the multi-day form of "plus the next 00:00 row")."""
+    first, end = london_days_utc(case.now, days)
+    return _weather_file(forecast, case, _hours_through(first, end))
+
+
+def _fetch_weather_days(case: Case, days: int, client: httpx.Client) -> bytes:
+    """One historical-forecast request for the whole span. The client takes the end date one hour past the
+    `end` it is given, so passing the hour before the end row asks for exactly the UTC dates the span covers."""
+    first, end = london_days_utc(case.now, days)
+    forecast = fetch_historical_forecast(case.lat, case.lon, first, end - ONE_HOUR, client=client, now=case.now)
+    if forecast.status.state is not SourceState.OK:
+        raise CaptureError(f"Open-Meteo: {forecast.status.reason}")
+    return weather_json_days(forecast, case, days)
+
+
 def _fetch_weather(case: Case, client: httpx.Client) -> bytes:
+    if case.days is not None:
+        return _fetch_weather_days(case, case.days, client)
     day_start, _ = case_day(case.now)
     forecast = fetch_historical_forecast(
         case.lat, case.lon, day_start, day_start + LAST_MINUTE, client=client, now=case.now
@@ -577,10 +653,21 @@ def refuse_leftover_backups(case_dir: Path) -> None:
         )
 
 
+def refuse_a_day_that_has_not_ended(path: Path, case: Case, today: datetime) -> None:
+    """E15: with `days`, the end of London day days-1 must not be after today. One line naming that London date."""
+    if case.days is None:
+        return
+    _, end = london_days_utc(case.now, case.days)
+    if end > today:
+        last = london_day_date(case.now, case.days - 1)
+        raise CaptureError(f"{path}: days: London day {last} has not ended yet (it ends {utc_text(end)}); a case replays the past")
+
+
 def capture(name: str, case_dir: Path, key: str, client: httpx.Client, *, today: datetime) -> list[str]:
     """Capture one case. Returns the summary lines. Raises CaptureError."""
     refuse_leftover_backups(case_dir)
     case, raw = load_case(case_dir / "case.yaml", today=today)
+    refuse_a_day_that_has_not_ended(case_dir / "case.yaml", case, today)  # before any request
     fetched = fetch_case(name, case, key, client)
     readings = case_dir / "readings.yaml"
     files = dict(fetched.files)

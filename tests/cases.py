@@ -1,22 +1,19 @@
-"""Load a committed fixture case (fixtures/<case>/) into what assess() takes. Offline: a mock transport serves the files.
+"""Load a committed fixture case (fixtures/<case>/) into what assess() takes. Offline: flysafelz.cases replays the files.
 
-Used by the integration tests. No network, no .env, no key (the airspace key is a made-up string the mock ignores).
+Used by the integration tests. No network, no .env, no key.
 """
 
-import json
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-import httpx
-import yaml
-
 from flysafelz.assess import assess
-from flysafelz.capture import Case, load_case
-from flysafelz.clients.open_meteo import Forecast, parse_response
-from flysafelz.clients.openaip import AirspaceFetch, fetch_airspace
+from flysafelz.capture import Case
+from flysafelz.cases import load_case_inputs
+from flysafelz.clients.open_meteo import Forecast
+from flysafelz.clients.openaip import AirspaceFetch
 from flysafelz.contracts import Assessment, NotamReading
-from flysafelz.pib import PibResult, load_pib
+from flysafelz.pib import PibResult
 
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 BLUE_MILL = "blue_mill_2026-10-31"
@@ -28,23 +25,8 @@ def case_dir(name: str) -> Path:
     return FIXTURES / name
 
 
-def _served(body: object) -> httpx.Client:
-    """A client whose every request is answered with this body, so nothing leaves the machine."""
-    content = body if isinstance(body, bytes) else json.dumps(body).encode()
-    return httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(200, content=content)))
-
-
 def load(name: str) -> tuple[Case, Forecast, AirspaceFetch, PibResult, dict[str, NotamReading]]:
-    folder = case_dir(name)
-    case, _raw = load_case(folder / "case.yaml", today=TODAY)
-    forecast = parse_response(json.loads((folder / "weather.json").read_text(encoding="utf-8")), case.now)
-    airspace = fetch_airspace(
-        case.lat, case.lon, api_key="not-a-real-key", client=_served(json.loads((folder / "airspace.json").read_text(encoding="utf-8"))), now=case.now
-    )
-    pib = load_pib("live", case.now, client=_served((folder / "pib.xml").read_bytes()))
-    entries = yaml.safe_load((folder / "readings.yaml").read_text(encoding="utf-8")) or []
-    readings = {r.id: r for r in (NotamReading.model_validate(item) for item in entries)}
-    return case, forecast, airspace, pib, readings
+    return load_case_inputs(case_dir(name))
 
 
 def run(name: str, *, readings: bool = True, **changes: Any) -> Assessment:
