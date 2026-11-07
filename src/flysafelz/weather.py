@@ -1,0 +1,271 @@
+"""Weather rows, checks and data tier. Plain functions over Pydantic models, no model call.
+
+Row mapping (G4). Row HH covers HH:00 to HH+1:00 and is built from the
+forecast's HH and HH+1 timestamps:
+
+    instantaneous  wind at every height, CAPE, cloud, visibility, pressure
+                   -> the worse of HH and HH+1 (highest, but lowest for
+                   visibility and pressure). Direction is not checked
+                   and just reads HH.
+    preceding hour gusts, precipitation, rain chance, shortwave
+                   -> the HH+1 value only (it describes HH..HH+1)
+    derived        gust spread (gust - 10 m wind) and gradient
+                   (|120 m wind - 10 m wind|)
+                   -> worked out at each timestamp first, then the worse of
+                   the two. max(gust) - max(wind) would be a different number.
+
+Nothing is interpolated or filled forward. A value that is missing at HH or at
+HH+1 (including a timestamp the response lacks) is missing for the row.
+
+Checks (G2, G3) compare against rules.yaml with each rule's own comparison, so
+a value exactly at a limit is decided by the rule. They return blockers first,
+then cautions, each in a fixed order. They never add up or weigh anything: the
+verdict is PR-8's job.
+
+Tier (G5, E3). The VERDICT tier needs every required variable and stops after
+the verdict horizon day (day 0 is today in Europe/London). An hour after the
+last complete hour is OUTLOOK. A required variable missing in an hour before it
+makes that hour UNVERIFIED (source weather), not OUTLOOK.
+"""
+
+from datetime import datetime
+from typing import Literal
+
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+
+from flysafelz.clients.open_meteo import ONE_HOUR, Forecast
+from flysafelz.contracts import Tier, WeatherValues
+from flysafelz.daylight import london_day_offset, utc_hours
+from flysafelz.rules import RULES, Rule
+
+# Variables an hour must have to carry a verdict, as WeatherValues fields.
+REQUIRED = (
+    "wind_10m",
+    "wind_80m",
+    "wind_120m",
+    "gust_10m",
+    "precipitation",
+    "cape",
+    "visibility",
+    "shortwave_radiation",
+    "cloud_cover_low",
+)
+
+# Optional variables: when one is missing its check is skipped and a note is added.
+OPTIONAL_NOTES = {
+    "precipitation_probability": "rain chance not available",
+    "cloud_cover": "total cloud not available",
+    "direction_10m": "wind direction not available",
+}
+
+# Instantaneous values: which of the HH and HH+1 values is the worse one.
+WORSE_OF_TWO = {
+    "wind_10m": max,
+    "wind_80m": max,
+    "wind_120m": max,
+    "cape": max,
+    "cloud_cover": max,
+    "cloud_cover_low": max,
+    "visibility": min,
+    "pressure_msl": min,
+}
+
+# Preceding-hour values: the HH+1 value describes the hour.
+FROM_CLOSING_HOUR = ("gust_10m", "precipitation", "precipitation_probability", "shortwave_radiation")
+
+
+class WeatherRow(BaseModel):
+    """One UTC hour of weather. values keeps the raw numbers, which OUTLOOK hours still print."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    hour: AwareDatetime
+    values: WeatherValues
+    gust_spread: float | None = None  # mph, worse of the two timestamps
+    gradient: float | None = None  # mph, worse of the two timestamps
+    missing_required: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+    # Set by build_rows from the whole response: this hour is after its last complete hour.
+    # False (a hole counts as UNVERIFIED) is the safe default for a row built by hand.
+    after_last_complete: bool = False
+
+
+class Finding(BaseModel):
+    """One weather result: a blocker or a caution, with its rule, value and limit."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: Literal["blocker", "caution"]
+    rule_id: str
+    text: str  # e.g. "gust spread 5 mph, limit 6"
+    value: float
+    limit: float
+
+
+class HourTier(BaseModel):
+    """The data tier of one hour. unverified is set for a hole inside the run (E3)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    tier: Tier
+    unverified: bool = False
+    missing: list[str] = Field(default_factory=list)
+    reason: str = ""
+
+
+# --- rows (G4, G5) ---------------------------------------------------------
+
+
+def _get(sample: WeatherValues | None, field: str) -> float | None:
+    return None if sample is None else getattr(sample, field)
+
+
+def _row(hour: datetime, forecast: Forecast) -> WeatherRow:
+    here = forecast.samples.get(hour)
+    closing = forecast.samples.get(hour + ONE_HOUR)
+
+    values = {}
+    for field, worse in WORSE_OF_TWO.items():
+        a, b = _get(here, field), _get(closing, field)
+        values[field] = None if a is None or b is None else worse(a, b)
+    for field in FROM_CLOSING_HOUR:
+        values[field] = _get(closing, field)
+    values["direction_10m"] = _get(here, "direction_10m")
+
+    # Derived values come from each timestamp's own numbers. Rounded to the data's 0.1 mph
+    # so that 12.3 - 6.3 is 6.0 and not 6.000000000000001 (which would break "> 6").
+    spreads, gradients = [], []
+    for sample in (here, closing):
+        if sample is None:
+            continue
+        if sample.gust_10m is not None and sample.wind_10m is not None:
+            spreads.append(round(sample.gust_10m - sample.wind_10m, 1))
+        if sample.wind_120m is not None and sample.wind_10m is not None:
+            gradients.append(round(abs(sample.wind_120m - sample.wind_10m), 1))
+
+    missing = [name for name in REQUIRED if values[name] is None]
+    notes = [text for name, text in OPTIONAL_NOTES.items() if values[name] is None]
+    return WeatherRow(
+        hour=hour,
+        values=WeatherValues(**values),
+        gust_spread=max(spreads, default=None),
+        gradient=max(gradients, default=None),
+        missing_required=missing,
+        notes=notes,
+    )
+
+
+def _last_complete_hour(forecast: Forecast) -> datetime | None:
+    """The last hour of the whole response that has every required variable (not just the window)."""
+    if not forecast.samples:
+        return None
+    first, last = min(forecast.samples), max(forecast.samples)
+    complete = [row.hour for row in (_row(hour, forecast) for hour in utc_hours(first, last)) if not row.missing_required]
+    return max(complete, default=None)
+
+
+def build_rows(forecast: Forecast, start: datetime, end: datetime) -> list[WeatherRow]:
+    """One row per UTC hour from start up to end (end excluded). An empty window gives [].
+
+    Each row is also told whether it lies after the last complete hour of the whole
+    response, so a hole in the last hours of the window is not mistaken for a tail.
+    """
+    last_complete = _last_complete_hour(forecast)
+    rows = []
+    for hour in utc_hours(start, end):
+        row = _row(hour, forecast)
+        row.after_last_complete = last_complete is None or hour > last_complete
+        rows.append(row)
+    return rows
+
+
+# --- checks (G2, G3) -------------------------------------------------------
+
+
+def _number(x: float) -> str:
+    return f"{x:.1f}".rstrip("0").rstrip(".")
+
+
+def _limit(rule: Rule) -> float:
+    """The number a limit rule holds (a list value belongs to a membership rule, not a limit)."""
+    if isinstance(rule.value, list):
+        raise TypeError(f"rule {rule.id} is not a numeric limit")
+    return rule.value
+
+
+def _finding(kind: Literal["blocker", "caution"], rule: Rule, label: str, value: float) -> Finding:
+    text = f"{label} {_number(value)} {rule.unit}, limit {_number(_limit(rule))}"
+    return Finding(kind=kind, rule_id=rule.id, text=text, value=value, limit=_limit(rule))
+
+
+def _band(value: float | None, label: str, no_go: Rule | None, caution: Rule | None) -> Finding | None:
+    """NO_GO if the value breaches the NO_GO rule, else a caution if it breaches the caution rule."""
+    if value is None:
+        return None
+    if no_go is not None and no_go.breached(value):
+        return _finding("blocker", no_go, label, value)
+    if caution is not None and caution.breached(value):
+        return _finding("caution", caution, label, value)
+    return None
+
+
+def check_row(row: WeatherRow) -> list[Finding]:
+    """Blockers first, then cautions; each group in the order of the table in rules.yaml.
+
+    A check whose value is missing is skipped. The row's missing variables are
+    reported by weather_tier, so a NO_GO from the values that are there still shows.
+    """
+    v = row.values
+    cape_no_go = v.cape is not None and RULES.cape_no_go.breached(v.cape)
+
+    found = [
+        _band(v.wind_10m, "wind at 10 m", RULES.wind_10m_no_go, RULES.wind_10m_caution),
+        _band(row.gust_spread, "gust spread", RULES.gust_spread_no_go, RULES.gust_spread_caution),
+        _band(v.wind_80m, "wind at 80 m", None, RULES.wind_aloft_caution),  # aloft: caution only
+        _band(v.wind_120m, "wind at 120 m", None, RULES.wind_aloft_caution),
+        _band(row.gradient, "gradient", RULES.gradient_no_go, RULES.gradient_caution),
+        _band(v.precipitation, "precipitation", RULES.precipitation_no_go, None),
+        _band(v.precipitation_probability, "rain chance", None, RULES.rain_chance_caution),
+        _band(v.visibility, "visibility", RULES.visibility_no_go, RULES.visibility_caution),
+        _band(v.cloud_cover_low, "low cloud", None, RULES.low_cloud_caution),
+        _band(v.cape, "CAPE", RULES.cape_no_go, None),
+    ]
+    # Thermic caution needs shortwave AND CAPE together. CAPE at its NO_GO limit is a blocker whatever the shortwave.
+    if (
+        not cape_no_go
+        and v.shortwave_radiation is not None
+        and v.cape is not None
+        and RULES.thermic_shortwave_caution.breached(v.shortwave_radiation)
+        and RULES.thermic_cape_caution.breached(v.cape)
+    ):
+        label = f"thermic: shortwave {_number(v.shortwave_radiation)} {RULES.thermic_shortwave_caution.unit} (limit {_number(_limit(RULES.thermic_shortwave_caution))}) and CAPE"
+        found.append(_finding("caution", RULES.thermic_cape_caution, label, v.cape))
+
+    found = [f for f in found if f is not None]
+    return [f for f in found if f.kind == "blocker"] + [f for f in found if f.kind == "caution"]
+
+
+# --- tier (G5, E3) -----------------------------------------------------------
+
+
+def weather_tier(hour: datetime, rows: list[WeatherRow], now: datetime) -> HourTier:
+    """The data tier of one hour. Only VERDICT and OUTLOOK come from the weather; TOO_FAR is PR-9's.
+
+    OUTLOOK: the hour is after the last hour of the whole response that has every required variable
+    (build_rows works that out from the full response, so the window edge does not matter), or it is
+    past the verdict horizon day. Otherwise VERDICT, and UNVERIFIED if this hour is missing a required
+    variable (a hole inside the run). An hour with no row at all is judged against the last complete row given.
+    """
+    row = next((r for r in rows if r.hour == hour), None)
+    if row is not None:
+        after_data = row.after_last_complete
+    else:
+        last_complete = max((r.hour for r in rows if not r.missing_required), default=None)
+        after_data = last_complete is None or hour > last_complete
+    if after_data or london_day_offset(hour, now) > _limit(RULES.verdict_horizon_day):
+        return HourTier(tier=Tier.OUTLOOK)
+
+    missing = list(REQUIRED) if row is None else list(row.missing_required)
+    if missing:
+        return HourTier(tier=Tier.VERDICT, unverified=True, missing=missing, reason=f"weather data missing: {', '.join(missing)}")
+    return HourTier(tier=Tier.VERDICT)

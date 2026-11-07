@@ -1,0 +1,226 @@
+{
+ "limit": 1000,
+ "totalCount": 10,
+ "totalPages": 2,
+ "page": 1,
+ "items": [
+  {
+   "_id": "aaa000000000000000000001",
+   "name": "EGD496A",
+   "type": 2,
+   "icaoClass": 8,
+   "byNotam": true,
+   "lowerLimit": {
+    "value": 0,
+    "unit": 1,
+    "referenceDatum": 0
+   },
+   "upperLimit": {
+    "value": 1300,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -0.09791859270533852,
+       53.79613033333333
+      ],
+      [
+       -0.07536940729466148,
+       53.79613033333333
+      ],
+      [
+       -0.07536940729466148,
+       53.809463666666666
+      ],
+      [
+       -0.09791859270533852,
+       53.809463666666666
+      ],
+      [
+       -0.09791859270533852,
+       53.79613033333333
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "aaa000000000000000000002",
+   "name": "NEWCASTLE CTA 3",
+   "type": 26,
+   "icaoClass": 3,
+   "lowerLimit": {
+    "value": 1500,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "upperLimit": {
+    "value": 4500,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -0.2557628905800778,
+       53.702797
+      ],
+      [
+       0.08247489058007779,
+       53.702797
+      ],
+      [
+       0.08247489058007779,
+       53.902797
+      ],
+      [
+       -0.2557628905800778,
+       53.902797
+      ],
+      [
+       -0.2557628905800778,
+       53.702797
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "aaa000000000000000000003",
+   "name": "HUMBERSIDE CTR",
+   "type": 4,
+   "icaoClass": 3,
+   "byNotam": false,
+   "lowerLimit": {
+    "value": 0,
+    "unit": 1,
+    "referenceDatum": 0
+   },
+   "upperLimit": {
+    "value": 3500,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -0.1712034452900389,
+       53.952797000000004
+      ],
+      [
+       -0.002084554709961106,
+       53.952797000000004
+      ],
+      [
+       -0.002084554709961106,
+       54.052797
+      ],
+      [
+       -0.1712034452900389,
+       54.052797
+      ],
+      [
+       -0.1712034452900389,
+       53.952797000000004
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "bbb000000000000000000007",
+   "name": "EDINBURGH CTR",
+   "type": 4,
+   "icaoClass": 3,
+   "lowerLimit": {
+    "value": 0,
+    "unit": 1,
+    "referenceDatum": 0
+   },
+   "upperLimit": {
+    "value": 2000,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -3.4,
+       55.9
+      ],
+      [
+       -3.2,
+       55.9
+      ],
+      [
+       -3.2,
+       56.0
+      ],
+      [
+       -3.4,
+       56.0
+      ],
+      [
+       -3.4,
+       55.9
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "bbb000000000000000000008",
+   "name": "JUST OUTSIDE TMA",
+   "type": 7,
+   "icaoClass": 3,
+   "lowerLimit": {
+    "value": 2000,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "upperLimit": {
+    "value": 4000,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -0.2,
+       54.0
+      ],
+      [
+       0.0,
+       54.0
+      ],
+      [
+       0.0,
+       54.2
+      ],
+      [
+       -0.2,
+       54.2
+      ],
+      [
+       -0.2,
+       54.0
+      ]
+     ]
+    ]
+   }
+  }
+ ],
+ "nextPage": 2
+}

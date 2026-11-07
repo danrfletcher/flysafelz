@@ -1,0 +1,533 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-trimmed from the NATS PIB (archive commit bdab14658f0270dc41460eebcd03332abfb230ec, issued 2026-10-31T07:00:37Z). Element shapes are the real ones. -->
+<Pib PIBType="F" PIBId="400000133019105" NewNOTAMDuration="250">
+    <AreaPIBHeader>
+        <ShortSystemTitle>EAD</ShortSystemTitle>
+        <AuthorityName>UNITED KINGDOM</AuthorityName>
+        <OrganisationName>NATS</OrganisationName>
+        <Traffic>IV</Traffic>
+        <Validity>
+            <ValidFrom>2026-10-31T07:00:37+00:00</ValidFrom>
+            <ValidTo>2026-11-07T07:00:00+00:00</ValidTo>
+        </Validity>
+        <ProfileName>All NOTAM</ProfileName>
+        <ServiceType>FULL</ServiceType>
+        <Issued>2026-10-31T07:00:37+00:00</Issued>
+        <PIBSubject>All NOTAM</PIBSubject>
+        <PibUid>EG712610310307</PibUid>
+        <FlightLevel>
+            <LowerFL>0</LowerFL>
+            <UpperFL>999</UpperFL>
+        </FlightLevel>
+    </AreaPIBHeader>
+    <FIRSection>
+        <ICAO>EGTT</ICAO>
+        <Name>EGTT FIR</Name>
+        <ADSection>
+            <Code>EGBB</Code>
+            <Name>BIRMINGHAM</Name>
+            <NotamList>
+            <Notam OriginalMessage="false" PIBSection="AD">
+                    <NOF>EGGN</NOF>
+                    <Series>J</Series>
+                    <Number>3377</Number>
+                    <Year>26</Year>
+                    <Type>R</Type>
+                    <ReferredSeries>J</ReferredSeries>
+                    <ReferredNumber>2265</ReferredNumber>
+                    <ReferredYear>26</ReferredYear>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>RD</Code23>
+                        <Code45>CS</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>BO</Purpose>
+                        <Scope>AW</Scope>
+                        <Lower>0</Lower>
+                        <Upper>9</Upper>
+                    </QLine>
+                    <Coordinates>5230N00153W</Coordinates>
+                    <Radius>3</Radius>
+                    <ItemA>EGBB</ItemA>
+                    <StartValidity>2609241021</StartValidity>
+                    <EndValidity>2610312300</EndValidity>
+                    <ItemD>SEP 24-OCT 24 0600-2200, OCT 25-31 0700-2300</ItemD>
+                    <ItemE>TEMPO DANGER AREA (TDA) EGD289A INSTALLED WI 1.65NM RADIUS OF
+523022N 0015244W (ASTON, BIRMINGHAM). BEYOND VISUAL LINE OF SIGHT
+(BVLOS) UAS OPS CONTAINED WHOLLY WI THE TDA. MAX HGT 400FT AGL.
+EMERG SERVICES ACFT MAY ENTER THE AIRSPACE IN ACCORDANCE WITH
+LOCAL DECONFLICTION AGREEMENTS. OPEN AND SPECIFIC CAT VISUAL LINE OF 
+SIGHT (VLOS) UAS OPS ARE PERMITTED WI THE TDA WITHOUT PRIOR APPROVAL 
+OR DECONFLICTION. OTHER NON-STANDARD FLIGHT, FLIGHT RESTRICTION ZONE
+OR CONTROLLED AIRSPACE APPROVALS MUST BE OBTAINED. OPERATORS ARE
+REMINDED OF THEIR RESPONSIBILITY UNDER CAP722 5.2.2.3 REGARDING
+OPR IN CLOSE PROXIMITY TO AN EMERG RESPONSE EFFORT. FOR INFO
+AROPS(AT)CAA.CO.UK. AR-2026-2313/06.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>900FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>240920261025</NotamStoreDate>
+                </Notam>
+            </NotamList>
+            <ObsoleteNotamList/>
+        </ADSection>
+        <ADSection>
+            <Code>EGLL</Code>
+            <Name>LONDON HEATHROW</Name>
+            <NotamList>
+            <Notam OriginalMessage="false" PIBSection="AD">
+                    <NOF>EGGN</NOF>
+                    <Series>A</Series>
+                    <Number>3857</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>WZ</Code23>
+                        <Code45>LW</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>M</Purpose>
+                        <Scope>AW</Scope>
+                        <Lower>0</Lower>
+                        <Upper>2</Upper>
+                    </QLine>
+                    <Coordinates>5129N00023W</Coordinates>
+                    <Radius>1</Radius>
+                    <ItemA>EGLL</ItemA>
+                    <StartValidity>2611051845</StartValidity>
+                    <EndValidity>2611051945</EndValidity>
+                    <ItemE>FIREWORKS WI 0.5NM RADIUS OF 512857N 0002311W (NORWOOD GREEN).
+FOR INFO 07903 933940 / 07899 693455. AR-2026-8560/01.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>150FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>011020261447</NotamStoreDate>
+                </Notam>
+            </NotamList>
+            <ObsoleteNotamList/>
+        </ADSection>
+        <ADSection>
+            <Code>EGNV</Code>
+            <Name>TEESSIDE INTERNATIONAL</Name>
+            <NotamList>
+            <Notam OriginalMessage="false" PIBSection="AD">
+                    <NOF>EGGN</NOF>
+                    <Series>C</Series>
+                    <Number>7072</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>FM</Code23>
+                        <Code45>LT</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>BO</Purpose>
+                        <Scope>A</Scope>
+                        <Lower>0</Lower>
+                        <Upper>999</Upper>
+                    </QLine>
+                    <Coordinates>5431N00126W</Coordinates>
+                    <Radius>5</Radius>
+                    <ItemA>EGNV</ItemA>
+                    <StartValidity>2610262042</StartValidity>
+                    <EndValidity>2611132200</EndValidity>
+                    <Estimation>EST</Estimation>
+                    <ItemE>RWY 23 TDZ ANEMOMETER U/S</ItemE>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>261020262042</NotamStoreDate>
+                </Notam>
+            </NotamList>
+            <ObsoleteNotamList/>
+        </ADSection>
+        <En-route>
+            <NotamList>
+            <Notam OriginalMessage="false" PIBSection="FIR">
+                    <NOF>EGGN</NOF>
+                    <Series>Q</Series>
+                    <Number>172</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGXX</FIR>
+                        <Code23>AF</Code23>
+                        <Code45>XX</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>NBO</Purpose>
+                        <Scope>E</Scope>
+                        <Lower>0</Lower>
+                        <Upper>999</Upper>
+                    </QLine>
+                    <Coordinates>5504N00500W</Coordinates>
+                    <Radius>999</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <ItemA>EGPX</ItemA>
+                    <StartValidity>2611010000</StartValidity>
+                    <EndValidity>2611252359</EndValidity>
+                    <ItemE>UK MIL AIP 1226 AMENDMENT RELEASED
+MIL SUP CHECKLIST 
+002/2022, 002/2023, 007/2023, 001/2024, 002/2024, 003/2024,
+012/2024, 013/2024, 001/2025, 002/2025, 003/2025, 004/2025,
+005/2025, 008/2025, 009/2025, 010/2025, 013/2025, 014/2025,
+015/2025, 001/2026, 007/2026, 008/2026, 009/2026, 010/2026,
+011/2026, 012/2026, 013/2026</ItemE>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>291020261200</NotamStoreDate>
+                </Notam>
+            </NotamList>
+            <ObsoleteNotamList/>
+        </En-route>
+        <Warnings>
+            <NotamList>
+            <Notam Reference="EGBB" OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>J</Series>
+                    <Number>3377</Number>
+                    <Year>26</Year>
+                    <Type>R</Type>
+                    <ReferredSeries>J</ReferredSeries>
+                    <ReferredNumber>2265</ReferredNumber>
+                    <ReferredYear>26</ReferredYear>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>RD</Code23>
+                        <Code45>CS</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>BO</Purpose>
+                        <Scope>AW</Scope>
+                        <Lower>0</Lower>
+                        <Upper>9</Upper>
+                    </QLine>
+                    <Coordinates>5230N00153W</Coordinates>
+                    <Radius>3</Radius>
+                    <ItemA>EGBB</ItemA>
+                    <StartValidity>2609241021</StartValidity>
+                    <EndValidity>2610312300</EndValidity>
+                    <ItemD>SEP 24-OCT 24 0600-2200, OCT 25-31 0700-2300</ItemD>
+                    <ItemE>TEMPO DANGER AREA (TDA) EGD289A INSTALLED WI 1.65NM RADIUS OF
+523022N 0015244W (ASTON, BIRMINGHAM). BEYOND VISUAL LINE OF SIGHT
+(BVLOS) UAS OPS CONTAINED WHOLLY WI THE TDA. MAX HGT 400FT AGL.
+EMERG SERVICES ACFT MAY ENTER THE AIRSPACE IN ACCORDANCE WITH
+LOCAL DECONFLICTION AGREEMENTS. OPEN AND SPECIFIC CAT VISUAL LINE OF 
+SIGHT (VLOS) UAS OPS ARE PERMITTED WI THE TDA WITHOUT PRIOR APPROVAL 
+OR DECONFLICTION. OTHER NON-STANDARD FLIGHT, FLIGHT RESTRICTION ZONE
+OR CONTROLLED AIRSPACE APPROVALS MUST BE OBTAINED. OPERATORS ARE
+REMINDED OF THEIR RESPONSIBILITY UNDER CAP722 5.2.2.3 REGARDING
+OPR IN CLOSE PROXIMITY TO AN EMERG RESPONSE EFFORT. FOR INFO
+AROPS(AT)CAA.CO.UK. AR-2026-2313/06.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>900FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>240920261025</NotamStoreDate>
+                </Notam>
+            <Notam OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>V</Series>
+                    <Number>34</Number>
+                    <Year>26</Year>
+                    <Type>R</Type>
+                    <ReferredSeries>V</ReferredSeries>
+                    <ReferredNumber>33</ReferredNumber>
+                    <ReferredYear>26</ReferredYear>
+                    <QLine>
+                        <FIR>EGXX</FIR>
+                        <Code23>RO</Code23>
+                        <Code45>XX</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>NBO</Purpose>
+                        <Scope>W</Scope>
+                        <Lower>0</Lower>
+                        <Upper>999</Upper>
+                    </QLine>
+                    <Coordinates>5218N01451W</Coordinates>
+                    <Radius>999</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <ItemA>EGGX</ItemA>
+                    <ItemA>EGPX</ItemA>
+                    <StartValidity>2610231431</StartValidity>
+                    <EndValidity>PERM</EndValidity>
+                    <ItemE>SECURITY - HAZARDOUS SITUATION IN LEBANON. UK REGISTERED AIR
+OPERATORS ARE RECOMMENDED NOT TO ENTER FIR BEIRUT (OLBB), EXCEPT
+FOR OPERATIONS TO/FROM OLBA WHICH COMMENCE ARRIVAL AND COMPLETE
+DEPARTURE OVER THE MEDITERRANEAN SEA. POTENTIAL RISK FROM
+HEIGHTENED MILITARY ACTIVITY. THIS SUPERCEDES THE INFORMATION
+CONTAINED IN THE UK CIVIL AIP ENR 1.1. AR-2026-3194/03.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>UNL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>231020261431</NotamStoreDate>
+                </Notam>
+            <Notam OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>H</Series>
+                    <Number>7171</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>WU</Code23>
+                        <Code45>LW</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>BO</Purpose>
+                        <Scope>W</Scope>
+                        <Lower>0</Lower>
+                        <Upper>8</Upper>
+                    </QLine>
+                    <Coordinates>5348N00005W</Coordinates>
+                    <Radius>1</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <StartValidity>2610290800</StartValidity>
+                    <EndValidity>2611101800</EndValidity>
+                    <ItemD>0800-1800</ItemD>
+                    <ItemE>UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 
+700FT AGL. FOR INFO 07784 546062. AR-2026-10264/01.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>800FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>261020261219</NotamStoreDate>
+                </Notam>
+            <Notam OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>J</Series>
+                    <Number>3857</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>RD</Code23>
+                        <Code45>CA</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>BO</Purpose>
+                        <Scope>W</Scope>
+                        <Lower>0</Lower>
+                        <Upper>13</Upper>
+                    </QLine>
+                    <Coordinates>5356N00001E</Coordinates>
+                    <Radius>10</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <StartValidity>2610310800</StartValidity>
+                    <EndValidity>2610311800</EndValidity>
+                    <ItemE>TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026
+REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI
+THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE
+(SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR
+LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC
+OPS(AT)FLYLOGIX.COM OR 07784 546062. SURVEYING CYGNUS.
+AR-2026-7404/05.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>1300FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>271020261151</NotamStoreDate>
+                </Notam>
+            <Notam OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>J</Series>
+                    <Number>3864</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>RD</Code23>
+                        <Code45>CA</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>BO</Purpose>
+                        <Scope>W</Scope>
+                        <Lower>0</Lower>
+                        <Upper>13</Upper>
+                    </QLine>
+                    <Coordinates>5356N00001E</Coordinates>
+                    <Radius>10</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <StartValidity>2611010800</StartValidity>
+                    <EndValidity>2611011800</EndValidity>
+                    <ItemE>TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026
+REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI
+THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE
+(SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR
+LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC
+OPS(AT)FLYLOGIX.COM OR 07784 546062. SURVEYING CYGNUS.
+AR-2026-7404/09.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>1300FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>271020261511</NotamStoreDate>
+                </Notam>
+            <Notam OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>H</Series>
+                    <Number>7297</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGXX</FIR>
+                        <Code23>WY</Code23>
+                        <Code45>LW</Code45>
+                        <Traffic>V</Traffic>
+                        <Purpose>M</Purpose>
+                        <Scope>W</Scope>
+                        <Lower>0</Lower>
+                        <Upper>65</Upper>
+                    </QLine>
+                    <Coordinates>5504N00500W</Coordinates>
+                    <Radius>999</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <ItemA>EGPX</ItemA>
+                    <StartValidity>2611020600</StartValidity>
+                    <EndValidity>2611021600</EndValidity>
+                    <ItemE>PIPELINE INSPECTION NOTIFICATION PROCEDURE SYSTEM (PINS) WILL
+TAKE PLACE IN THE FOLLOWING LOW FLYING AREAS -
+1, 2, 3, 4, 5, 6, 7S, 7N, 8, 9, 10, 11N, 11S, 12,18, 19, 
+THAMES VALLEY AVOIDANCE AREA. MAX HEIGHT 2000FT AGL. 
+26/10/199/LFC</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>6500FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>301020261502</NotamStoreDate>
+                </Notam>
+            <Notam Reference="EGLL" OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>A</Series>
+                    <Number>3857</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGTT</FIR>
+                        <Code23>WZ</Code23>
+                        <Code45>LW</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>M</Purpose>
+                        <Scope>AW</Scope>
+                        <Lower>0</Lower>
+                        <Upper>2</Upper>
+                    </QLine>
+                    <Coordinates>5129N00023W</Coordinates>
+                    <Radius>1</Radius>
+                    <ItemA>EGLL</ItemA>
+                    <StartValidity>2611051845</StartValidity>
+                    <EndValidity>2611051945</EndValidity>
+                    <ItemE>FIREWORKS WI 0.5NM RADIUS OF 512857N 0002311W (NORWOOD GREEN).
+FOR INFO 07903 933940 / 07899 693455. AR-2026-8560/01.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>150FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>011020261447</NotamStoreDate>
+                </Notam>
+            </NotamList>
+            <ObsoleteNotamList/>
+        </Warnings>
+    </FIRSection>
+    <FIRSection>
+        <ICAO>EGPX</ICAO>
+        <Name>EGPX FIR</Name>
+        <En-route>
+            <NotamList>
+            <Notam Reference="EGTT" OriginalMessage="false" PIBSection="FIR">
+                    <NOF>EGGN</NOF>
+                    <Series>Q</Series>
+                    <Number>172</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGXX</FIR>
+                        <Code23>AF</Code23>
+                        <Code45>XX</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>NBO</Purpose>
+                        <Scope>E</Scope>
+                        <Lower>0</Lower>
+                        <Upper>999</Upper>
+                    </QLine>
+                    <Coordinates>5504N00500W</Coordinates>
+                    <Radius>999</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <ItemA>EGPX</ItemA>
+                    <StartValidity>2611010000</StartValidity>
+                    <EndValidity>2611252359</EndValidity>
+                    <ItemE>UK MIL AIP 1226 AMENDMENT RELEASED
+MIL SUP CHECKLIST 
+002/2022, 002/2023, 007/2023, 001/2024, 002/2024, 003/2024,
+012/2024, 013/2024, 001/2025, 002/2025, 003/2025, 004/2025,
+005/2025, 008/2025, 009/2025, 010/2025, 013/2025, 014/2025,
+015/2025, 001/2026, 007/2026, 008/2026, 009/2026, 010/2026,
+011/2026, 012/2026, 013/2026</ItemE>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>291020261200</NotamStoreDate>
+                </Notam>
+            </NotamList>
+            <ObsoleteNotamList/>
+        </En-route>
+        <Warnings>
+            <NotamList>
+            <Notam Reference="EGTT" OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>V</Series>
+                    <Number>34</Number>
+                    <Year>26</Year>
+                    <Type>R</Type>
+                    <ReferredSeries>V</ReferredSeries>
+                    <ReferredNumber>33</ReferredNumber>
+                    <ReferredYear>26</ReferredYear>
+                    <QLine>
+                        <FIR>EGXX</FIR>
+                        <Code23>RO</Code23>
+                        <Code45>XX</Code45>
+                        <Traffic>IV</Traffic>
+                        <Purpose>NBO</Purpose>
+                        <Scope>W</Scope>
+                        <Lower>0</Lower>
+                        <Upper>999</Upper>
+                    </QLine>
+                    <Coordinates>5218N01451W</Coordinates>
+                    <Radius>999</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <ItemA>EGGX</ItemA>
+                    <ItemA>EGPX</ItemA>
+                    <StartValidity>2610231431</StartValidity>
+                    <EndValidity>PERM</EndValidity>
+                    <ItemE>SECURITY - HAZARDOUS SITUATION IN LEBANON. UK REGISTERED AIR
+OPERATORS ARE RECOMMENDED NOT TO ENTER FIR BEIRUT (OLBB), EXCEPT
+FOR OPERATIONS TO/FROM OLBA WHICH COMMENCE ARRIVAL AND COMPLETE
+DEPARTURE OVER THE MEDITERRANEAN SEA. POTENTIAL RISK FROM
+HEIGHTENED MILITARY ACTIVITY. THIS SUPERCEDES THE INFORMATION
+CONTAINED IN THE UK CIVIL AIP ENR 1.1. AR-2026-3194/03.</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>UNL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>231020261431</NotamStoreDate>
+                </Notam>
+            <Notam Reference="EGTT" OriginalMessage="false" PIBSection="WAR">
+                    <NOF>EGGN</NOF>
+                    <Series>H</Series>
+                    <Number>7297</Number>
+                    <Year>26</Year>
+                    <Type>N</Type>
+                    <QLine>
+                        <FIR>EGXX</FIR>
+                        <Code23>WY</Code23>
+                        <Code45>LW</Code45>
+                        <Traffic>V</Traffic>
+                        <Purpose>M</Purpose>
+                        <Scope>W</Scope>
+                        <Lower>0</Lower>
+                        <Upper>65</Upper>
+                    </QLine>
+                    <Coordinates>5504N00500W</Coordinates>
+                    <Radius>999</Radius>
+                    <ItemA>EGTT</ItemA>
+                    <ItemA>EGPX</ItemA>
+                    <StartValidity>2611020600</StartValidity>
+                    <EndValidity>2611021600</EndValidity>
+                    <ItemE>PIPELINE INSPECTION NOTIFICATION PROCEDURE SYSTEM (PINS) WILL
+TAKE PLACE IN THE FOLLOWING LOW FLYING AREAS -
+1, 2, 3, 4, 5, 6, 7S, 7N, 8, 9, 10, 11N, 11S, 12,18, 19, 
+THAMES VALLEY AVOIDANCE AREA. MAX HEIGHT 2000FT AGL. 
+26/10/199/LFC</ItemE>
+                    <ItemF>SFC</ItemF>
+                    <ItemG>6500FT AMSL</ItemG>
+                    <Marker>+</Marker>
+                    <NotamStoreDate>301020261502</NotamStoreDate>
+                </Notam>
+            </NotamList>
+            <ObsoleteNotamList/>
+        </Warnings>
+    </FIRSection>
+</Pib>

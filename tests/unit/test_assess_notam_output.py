@@ -1,0 +1,113 @@
+"""G15 and G17: the NOTAMs a segment lists against the debug list, and the order of the conditions."""
+
+from factories import (
+    airspace_fetch,
+    amsl,
+    circle_at,
+    exemption,
+    notam,
+    pib_result,
+    reading,
+    run_assess,
+    utc,
+)
+from airspace_helpers import volume
+
+from flysafelz.contracts import Category, NotamAction
+
+
+def only_segment(assessment):
+    segments = [s for h in assessment.hours for s in h.segments]
+    assert len(segments) == 1
+    return segments[0]
+
+
+def read_all(*specs):
+    """specs: (notam_id, circle, reading options). Returns the PIB and the readings."""
+    notams, readings = [], {}
+    for notam_id, circle, options in specs:
+        notams.append(notam(notam_id, circle=circle))
+        readings[notam_id] = reading(notam_id=notam_id, geometry=circle, **options)
+    return pib_result(*notams), readings
+
+
+def test_a_segment_lists_each_non_ignore_notam_with_its_action_and_a_one_line_reason():
+    pib, readings = read_all(
+        ("J1/26", circle_at(0), {"activity": "alpha contact"}),
+        ("J2/26", circle_at(1.0), {"activity": "charlie sector"}),
+    )
+    segment = only_segment(run_assess(window=(utc(9), utc(10)), pib=pib, readings=readings))
+    actions = {a.notam_id: a for a in segment.notam_actions}
+    assert set(actions) == {"J1/26", "J2/26"}
+    assert actions["J1/26"].action is NotamAction.CONTACT_FIRST
+    assert actions["J2/26"].action is NotamAction.AVOID_SECTOR and actions["J2/26"].bearing_deg is not None
+    assert all(a.reason and "\n" not in a.reason for a in segment.notam_actions)
+
+
+def test_ignored_notams_are_only_in_the_debug_list_each_with_its_reason():
+    far = notam("J1/26", circle=circle_at(5.0))  # well beyond the local area: dropped before any reading
+    exempted = notam("J2/26", circle=circle_at(0), item_e="UAS OPR WI 0.5NM. PARAMOTORS EXEMPT.")
+    exempt_reading = reading(notam_id="J2/26", geometry=circle_at(0), exemptions=[exemption("PARAMOTORS EXEMPT")])
+    shown = notam("J3/26", circle=circle_at(0))
+    shown_reading = reading(notam_id="J3/26", geometry=circle_at(0))
+    assessment = run_assess(
+        window=(utc(9), utc(10)),
+        pib=pib_result(far, exempted, shown),
+        readings={"J2/26": exempt_reading, "J3/26": shown_reading},
+    )
+    segment = only_segment(assessment)
+    assert [a.notam_id for a in segment.notam_actions] == ["J3/26"]
+    debug = {i.notam_id: i.reason for i in assessment.ignored_notams}
+    assert set(debug) == {"J1/26", "J2/26"}
+    assert all(debug.values())
+    assert "paramotors" in debug["J2/26"].lower()
+    assert not any(i.notam_id in {a.notam_id for a in segment.notam_actions} for i in assessment.ignored_notams)
+
+
+def test_every_notam_in_the_pib_is_either_in_a_segment_or_in_the_debug_list():
+    specs = [("J1/26", circle_at(0), {}), ("J2/26", circle_at(0.5), {}), ("J3/26", circle_at(6.0), {})]
+    pib, readings = read_all(*specs)
+    assessment = run_assess(window=(utc(9), utc(11)), pib=pib, readings=readings)
+    listed = {a.notam_id for h in assessment.hours for s in h.segments for a in s.notam_actions}
+    ignored = {i.notam_id for i in assessment.ignored_notams}
+    assert listed | ignored == {"J1/26", "J2/26", "J3/26"}
+    assert listed & ignored == set()
+
+
+def test_conditions_are_ordered_contact_permission_ceiling_sector_warning():
+    pib, readings = read_all(
+        # Written in the reverse of the expected order, so the sort has work to do.
+        ("J5/26", circle_at(0), {"activity": "echo warning", "category": Category.INFORMATIONAL}),
+        ("J4/26", circle_at(1.0), {"activity": "delta sector"}),
+        ("J3/26", circle_at(0), {"activity": "charlie ceiling", "floor": amsl(1000)}),
+        ("J1/26", circle_at(0), {"activity": "alpha contact"}),
+    )
+    atz = volume("atz")  # permission from the ATZ first
+    segment = only_segment(run_assess(window=(utc(9), utc(10)), pib=pib, readings=readings, airspace=airspace_fetch(atz)))
+    order = ["alpha contact", "permission from", "charlie ceiling", "delta sector", "echo warning"]
+    positions = [next(i for i, c in enumerate(segment.conditions) if key in c) for key in order]
+    assert positions == sorted(positions)
+    assert len(segment.conditions) == 5
+
+
+def test_the_order_is_stable_inside_a_group():
+    pib, readings = read_all(
+        ("J2/26", circle_at(0), {"activity": "second contact"}),
+        ("J1/26", circle_at(0), {"activity": "first contact"}),
+    )
+    segment = only_segment(run_assess(window=(utc(9), utc(10)), pib=pib, readings=readings))
+    first, second = (next(i for i, c in enumerate(segment.conditions) if key in c) for key in ("second contact", "first contact"))
+    assert first < second  # the order the NOTAMs are found in is kept
+
+
+def test_a_radio_condition_sits_with_permission_before_ceilings():
+    pib, readings = read_all(("J1/26", circle_at(0), {"activity": "charlie ceiling", "floor": amsl(1000)}))
+    segment = only_segment(run_assess(window=(utc(9), utc(10)), pib=pib, readings=readings, airspace=airspace_fetch(volume("rmz"))))
+    assert "radio contact" in segment.conditions[0]
+    assert "charlie ceiling" in segment.conditions[1]
+
+
+def test_a_condition_text_is_never_repeated():
+    pib, readings = read_all(("J1/26", circle_at(0), {}))
+    segment = only_segment(run_assess(window=(utc(9), utc(10)), pib=pib, readings=readings, airspace=airspace_fetch(volume("atz"), volume("atz", name="TEST ATZ"))))
+    assert len(segment.conditions) == len(set(segment.conditions))

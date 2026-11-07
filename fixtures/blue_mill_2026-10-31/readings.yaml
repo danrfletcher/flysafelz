@@ -1,0 +1,55 @@
+# Hand-written NotamReading entries for this case (see flysafelz.contracts.NotamReading).
+# make fixtures never overwrites this file.
+#
+# Only the two NOTAMs the plan reads for Blue Mill are here. The reader (ticket 3) will
+# produce these fields later; until then they are written by hand from the E text in pib.xml.
+
+# J3857/26: TDA EGD496A activated 0800-1800 (AIP SUP 108/2026). The LZ is inside the area,
+# which is active by NOTAM only. The E text gives a booking phone, so a pilot may ask
+# first (CONTACT_FIRST). Nothing in it forbids entry. The radio frequencies in the text
+# are not a contact. No geometry: the area's polygon (or, failing that, the NOTAM's Q-circle)
+# is used.
+- id: J3857/26
+  category: cooperative
+  activity: UAS BVLOS ops
+  geometry: null
+  floor:
+    value: 0
+    unit: ft
+    datum: SFC
+  ceiling:
+    value: 1300
+    unit: ft
+    datum: AMSL
+  schedule: 0800-1800
+  contact:
+    kind: phone
+    value: Flylogix 07784 546062
+  activates_designators: [EGD496A]
+  prohibitive_reason: none
+
+# H7171/26: drone operations within 0.5 NM of 534732N 0000459W (Garton), up to 700 ft AGL.
+# The coded Q-circle is 1 NM round 5348N00005W and covers the LZ; the circle in the E text
+# is the true one, and the LZ is about 0.15 NM outside it. The number in the text is "for
+# info", not a contact for permission.
+- id: H7171/26
+  category: cooperative
+  activity: drone ops
+  geometry:
+    kind: circle
+    lat: 53.79222222
+    lon: -0.08305556
+    radius_nm: 0.5
+  floor:
+    value: 0
+    unit: ft
+    datum: SFC
+  ceiling:
+    value: 700
+    unit: ft
+    datum: AGL
+  schedule: 0800-1800
+  contact:
+    kind: none
+  activates_designators: []
+  prohibitive_reason: none

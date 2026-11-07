@@ -1,0 +1,29 @@
+[project]
+name = "flysafelz"
+version = "0.1.0"
+description = "Deterministic go/no-go core for UK paramotor landing zones"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "astral>=3.2",
+    "httpx>=0.28.1",
+    "pydantic>=2",
+    "pyyaml",
+    "shapely>=2.2.0",
+    "tzdata>=2026.6",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-cov>=7.1.0",
+    "pytest-socket",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+addopts = "--disable-socket"
+testpaths = ["tests"]
