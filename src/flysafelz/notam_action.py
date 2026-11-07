@@ -2,6 +2,7 @@
 
     notam_action(parsed, reading | None, lz, segment) -> ActionResult
     active_intervals(parsed, reading, lz, start, end) -> list of (start, end) UTC spans
+    merged_limits(parsed, reading, lz, segment) -> (floor, ceiling) in ft QNH, as the table below uses them
 
 No network, no model, no state. Every reading is written by hand or by ticket 3's
 reader. Every number is a rules.yaml rule (local_area, band_low, band_high,
@@ -22,7 +23,7 @@ the unread path):
 
 An informational reading over the LZ from SFC is a warning, not a restriction (Q13): it
 is AWARENESS, shown in the answer, and never NO_FLY. With no reading (Q8), a NOTAM over
-the LZ from SFC is UNREAD_OVER_LZ with its E text; any other unread NOTAM gets its
+the LZ from SFC is UNREAD_OVER_LZ with its E text (phone numbers redacted to <PHONE_n>); any other unread NOTAM gets its
 code-only action (AVOID_SECTOR, AWARENESS, AWARENESS_MAP or IGNORE). An unread NOTAM is
 never NO_FLY or CONTACT_FIRST.
 
@@ -31,9 +32,10 @@ inside or exactly on the edge. "Within" is the distance to the edge being at mos
 local_area rule. A shape that cannot be used falls back to the Q-circle; with no usable
 shape the NOTAM is treated as over the LZ (fail closed) and the reason says so.
 
-Limits (E10): the reading's, else F/G, else the Q-line's lower and upper FL. When the
-reading and F/G both give a side and differ, the lower floor and the higher ceiling win
-and the reason says so. The E text is never read for limits. Floors are converted to
+Limits (E10): the reading's, else F/G, else the Q-line's lower and upper FL. A reading's
+floor or ceiling of None means its E text states none, so that side goes on to F/G and then
+the Q-line. When the reading and F/G both give a side and differ, the lower floor and the
+higher ceiling win and the reason says so. The E text is never read for limits. Floors are converted to
 feet QNH (AGL with the site elevation, FL with the segment's pressure_msl) and a floor at
 or below the site elevation is SFC. Bands are floor <= band_low, then <= band_high: a
 floor exactly on an edge belongs to the lower band, as in airspace.py (the band rules
@@ -84,6 +86,7 @@ from flysafelz.geo import (
     shape_from_points,
     shape_over,
 )
+from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import Schedule, parse_schedule
 
@@ -187,19 +190,35 @@ def _merge(side: str, reading: _Bound | None, fg: _Bound | None, q_line: _Bound,
 def _limits(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, pressure: float, rules: Rules, notes: list[str]) -> tuple[_Bound, _Bound]:
     floor = _merge(
         "floor",
-        _bound(reading.floor, lz, pressure, rules) if reading else None,
+        _bound(reading.floor, lz, pressure, rules) if reading and reading.floor is not None else None,
         _parse_fg(parsed.item_f, lz, pressure, rules),
         _q_floor(parsed, lz, pressure, rules),
         notes,
     )
     ceiling = _merge(
         "ceiling",
-        _bound(reading.ceiling, lz, pressure, rules) if reading else None,
+        _bound(reading.ceiling, lz, pressure, rules) if reading and reading.ceiling is not None else None,
         _parse_fg(parsed.item_g, lz, pressure, rules),
         _q_ceiling(parsed, lz, pressure, rules),
         notes,
     )
     return floor, ceiling
+
+
+def _pressure(segment: Segment | ActionSegment, rules: Rules) -> float:
+    """The segment's forecast pressure, else the reference pressure."""
+    pressure = segment.pressure_msl if isinstance(segment, ActionSegment) else None
+    return _number(rules.fl_reference_hpa) if pressure is None else pressure
+
+
+def merged_limits(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, segment: Segment | ActionSegment, *, rules: Rules | None = None) -> tuple[float, float]:
+    """The floor and ceiling notam_action() works with (the E10 merge), in feet QNH. A ceiling of no upper limit is infinity.
+
+    A wrapper over the same merge, so the reader eval compares heights as numbers (R3.12) without a second copy of the rule.
+    """
+    rules = RULES if rules is None else rules
+    floor, ceiling = _limits(parsed, reading, lz, _pressure(segment, rules), rules, [])
+    return floor.qnh, ceiling.qnh
 
 
 # --- geometry -----------------------------------------------------------------
@@ -308,8 +327,12 @@ def _prohibition(reading: NotamReading) -> str | None:
 
 
 def _checked(parsed: ParsedNotam, reading: NotamReading, debug: list[str]) -> list[Exemption]:
-    """The exemptions whose quote is really in the E text. An invented quote is dropped and logged (Q2)."""
-    e_text = _squash(parsed.item_e)
+    """The exemptions whose quote is really in the redacted E text. An invented quote is dropped and logged (Q2).
+
+    The quote is looked for in `redact_phones(parsed.item_e)`: the text the reader and the labelling sheet saw, so a quote that
+    holds a `<PHONE_n>` is kept and a real number in a quote no longer matches.
+    """
+    e_text = _squash(redact_phones(parsed.item_e)[0])
     kept = []
     for exemption in reading.exemptions:
         if exemption.covers is ExemptionCovers.OTHER:
@@ -367,9 +390,7 @@ def notam_action(
     rules = RULES if rules is None else rules
     debug: list[str] = []
     extras: list[str] = []
-    pressure = segment.pressure_msl if isinstance(segment, ActionSegment) else None
-    if pressure is None:
-        pressure = _number(rules.fl_reference_hpa)
+    pressure = _pressure(segment, rules)
 
     # Row 1: does it apply to a paramotor, is it active, is it near?
     exemptions = _checked(parsed, reading, debug) if reading else []
@@ -405,7 +426,7 @@ def notam_action(
 
     if where.over and sfc:
         if reading is None:
-            reason = f"NOTAM {parsed.id} is over the LZ from the surface and has not been read: {' '.join(parsed.item_e.split())}"
+            reason = f"NOTAM {parsed.id} is over the LZ from the surface and has not been read: {' '.join(redact_phones(parsed.item_e)[0].split())}"
             return _result(parsed, NotamAction.UNREAD_OVER_LZ, reason, debug, extras)
         return _over_lz_from_sfc(parsed, reading, label, bool(conditions), debug, extras, reading.schedule.strip())
 

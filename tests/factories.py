@@ -15,8 +15,8 @@ from flysafelz.assess import assess, default_window
 from flysafelz.clients.open_meteo import Forecast
 from flysafelz.clients.openaip import Airspace, AirspaceFetch
 from flysafelz.contracts import (
-    Assessment,
     AppliesTo,
+    Assessment,
     Category,
     Circle,
     Contact,
@@ -216,6 +216,7 @@ def run_assess(
     airspace: AirspaceFetch | None = None,
     pib: PibResult | None = None,
     readings: Mapping[str, NotamReading] | None = None,
+    reader_status: Mapping[str, str] | None = None,
     lat: float = LZ.lat,
     lon: float = LZ.lon,
     live: bool = False,
@@ -235,6 +236,7 @@ def run_assess(
         airspace=airspace or airspace_fetch(),
         pib=pib or pib_result(),
         readings=readings,
+        reader_status=reader_status,
         window=window,
         live=live,
     )

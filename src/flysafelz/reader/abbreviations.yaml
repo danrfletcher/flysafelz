@@ -1,0 +1,127 @@
+# Abbreviations the NOTAM reader is told about (G2): UK AIP GEN 2.2 and ICAO Doc 8400.
+#
+# A row goes into the prompt only when its abbreviation is a whole token of the NOTAM's E text, so a NOTAM is
+# shown the few rows it uses and a NOTAM that uses none gets no table (src/flysafelz/reader/prompt.py).
+#
+# Licence check (PyNotam, github.com/slavak/PyNotam, the table the plan named as a candidate): its LICENSE is
+# the GNU General Public License, version 2. Reusing its table would put this project under the GPL, so the rule
+# is "reused if the licence allows it, written by hand if not": it does not allow it, and this table is written by hand.
+# No PyNotam text or file is copied. The rows come from the two published lists named above, written from
+# knowledge of them and not copied or machine-checked against the AIP page. Spot-check a row against GEN 2.2 before
+# relying on one, and add rows here when a NOTAM turns up an abbreviation that is missing.
+#
+# Format: "ABBREVIATION": meaning. Keys are upper case, letters and digits only, at least two characters (a single
+# letter would match a stray N or E) and quoted (YAML reads an unquoted NO or ON as a boolean). Rows are shown in this
+# order.
+
+"ABV": above
+"ACFT": aircraft
+"ACT": active, activated
+"AD": aerodrome
+"AGL": above ground level
+"AIP": aeronautical information publication
+"AIRAC": aeronautical information regulation and control
+"ALT": altitude
+"AMSL": above mean sea level
+"APCH": approach
+"APRX": approximately
+"ATC": air traffic control
+"ATS": air traffic services
+"ATZ": aerodrome traffic zone
+"AVBL": available
+"BLW": below
+"BTN": between
+"CAT": category, clear air turbulence
+"CLSD": closed
+"CNL": cancel, cancelled
+"CTA": control area
+"CTC": contact
+"CTR": control zone
+"DEP": depart, departure
+"DLA": delay
+"ELEV": elevation
+"EMERG": emergency
+"EST": estimated
+"EXC": except
+"EXER": exercise
+"EXTD": extend, extended
+"FIR": flight information region
+"FL": flight level
+"FLT": flight
+"FM": from
+"FREQ": frequency
+"FRI": Friday
+"FT": feet
+"GND": ground
+"H24": continuous day and night service
+"HEL": helicopter
+"HGT": height
+"HR": hours
+"IFR": instrument flight rules
+"IMC": instrument meteorological conditions
+"INFO": information
+"INOP": inoperative
+"INTL": international
+"KM": kilometres
+"KT": knots
+"LGT": light, lighting
+"LTD": limited
+"MAINT": maintenance
+"MAX": maximum
+"MHZ": megahertz
+"MIL": military
+"MIN": minutes, minimum
+"MNM": minimum
+"MON": Monday
+"MOV": move, moving
+"MSL": mean sea level
+"NM": nautical miles
+"NOTAM": notice to airmen
+"OBST": obstacle
+"OBSC": obscured
+"OCNL": occasional
+"OPR": operator, operate, operating
+"OPS": operations
+"OVR": over
+"PERM": permanent
+"PJE": parachute jumping exercise
+"PLN": flight plan
+"PN": prior notice required
+"PPR": prior permission required
+"PROC": procedure
+"PSN": position
+"REF": reference
+"REQ": request, requested, required
+"RESTR": restriction, restricted
+"RMK": remark
+"RTE": route
+"RWY": runway
+"SAT": Saturday
+"SFC": surface
+"SR": sunrise
+"SS": sunset
+"SUN": Sunday
+"SUP": supplement
+"SVC": service
+"TDA": temporary danger area
+"TEMP": temperature
+"TEMPO": temporary
+"TFC": traffic
+"THR": threshold
+"THU": Thursday
+"TKOF": take-off
+"TMA": terminal control area
+"TMZ": transponder mandatory zone
+"TUE": Tuesday
+"TWR": aerodrome control tower
+"UAS": unmanned aircraft system
+"UFN": until further notice
+"UNL": unlimited
+"VFR": visual flight rules
+"VIS": visibility
+"VMC": visual meteorological conditions
+"WED": Wednesday
+"WEF": with effect from
+"WI": within
+"WIP": work in progress
+"WX": weather

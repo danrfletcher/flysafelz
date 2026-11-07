@@ -1,13 +1,13 @@
-.PHONY: setup test fixtures
+.PHONY: setup test fixtures eval-reader
 
 # Needs no API key: only installs the project and its dependencies.
 setup:
 	uv sync
 
 # Runs the whole suite with sockets disabled (see addopts in pyproject.toml).
-# The weather, NOTAM, airspace, NOTAM-action, assess and case-loader modules must stay at 90% line coverage or better (the modules together).
+# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader and reader-eval scoring modules must stay at 90% line coverage or better (the modules together).
 test:
-	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov-report=term-missing --cov-fail-under=90
+	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=evals.reader_eval --cov-report=term-missing --cov-fail-under=90
 
 # Capture a NEW case: make fixtures CASE=blue_mill_2026-10-31_3day
 # case.yaml takes an optional `days: N` (1 to 8, Europe/London days from the day of `now`) for a multi-day window.
@@ -17,3 +17,11 @@ test:
 # CASE reaches the program through the environment, so it is never parsed by the shell.
 fixtures:
 	@uv run python -m flysafelz.capture "$$CASE"
+
+# The reader eval, and the only target that calls the model: it needs the four READER_* settings (environment or .env) and
+# stops, naming the missing ones, when any is absent. It reads every fully labelled item in evals/reader/labels.yaml `runs`
+# times (src/flysafelz/reader/settings.yaml) with the real model and the cache bypassed, scores the runs, checks the live
+# Blue Mill case, and writes evals/reader/runs/<time>/report.md and report.json. `make test` never runs it. A harmful
+# downgrade does not fail it: it is a report, not a gate.
+eval-reader:
+	@uv run python -m evals.reader_eval.run
