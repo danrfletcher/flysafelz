@@ -93,6 +93,6 @@ def read_cached(parsed: ParsedNotam, llm: BaseChatModel, cache: Path | None, now
 
 
 def read_set(parsed_notams: Iterable[ParsedNotam], llm: BaseChatModel, cache: Path | None, now: datetime) -> ReadSet:
-    """Read each NOTAM in turn through the cache. The pool that runs them three at a time is read_for_lz's (PR-5)."""
+    """Read each NOTAM in turn through the cache. The pool that runs them `concurrency` at a time, after the prefilter and the sort, is read_for_lz's (reader_set.py)."""
     reads = {parsed.id: read_cached(parsed, llm, cache, now) for parsed in parsed_notams}
     return ReadSet(reads, sum(read.calls for read in reads.values()), sum(read.retry for read in reads.values()))

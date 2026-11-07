@@ -17,6 +17,7 @@ from fence_scan import (
     REVIEWED_NAMED_CONSTANTS,
     banned_words,
     hard_coded_rule_values,
+    llm_env_words,
     number,
     unreviewed_floats,
     unreviewed_literals,
@@ -413,7 +414,8 @@ def test_the_key_scan_catches_a_planted_reader_key_and_ignores_an_empty_one(tmp_
 def test_env_is_gitignored_and_example_is_empty():
     ignored = subprocess.run(["git", "check-ignore", ".env"], cwd=ROOT, capture_output=True, text=True)
     assert ignored.returncode == 0
-    assert (ROOT / ".env.example").read_text(encoding="utf-8").strip() == "OPENAIP_API_" + "KEY="  # split so this file never matches the F6 scan
+    expected = ["OPENAIP_API_" + "KEY=", "READER_PROVIDER=", "READER_BASE_URL=", "READER_API_" + "KEY=", "READER_MODEL="]  # split so this file never matches the F6 scan
+    assert (ROOT / ".env.example").read_text(encoding="utf-8").splitlines() == expected
 
 
 # F7: plain modules and functions.
@@ -453,12 +455,11 @@ def test_rules_module_and_cli_read_no_environment():
         assert not re.search(r"environ|getenv", text), name
 
 
-# F10: no LLM env vars, no /models dependency.
+# F10: no LLM env vars, no /models dependency. Narrowed for the reader (ticket 3 F2): only src/flysafelz/reader/ may name READER_*.
+# test_reader_fence.py shows a planted READER_ or /models string outside it is still caught.
 def test_no_llm_env_vars_or_models_endpoint_in_source():
-    pattern = re.compile(r"OPENAI(?!P_API_KEY)|ANTHROPIC|LLM_|MODEL_|/models")
     for path in PY_FILES:
-        match = pattern.search(path.read_text(encoding="utf-8"))
-        assert match is None, f"{path}: {match.group(0) if match else ''}"
+        assert llm_env_words(path, READER) == [], path
 
 
 # F4 / F7 / F1 (PR-4.F1): `# why` and the ignored block are comments only; no answer text; the draft is model-free.
