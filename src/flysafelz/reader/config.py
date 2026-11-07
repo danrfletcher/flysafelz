@@ -2,6 +2,7 @@
 
     reader_config()  -> ReaderConfig       the four READER_* values, or ReaderConfigError naming the missing ones
     build_llm()      -> ChatOpenAI         a client for that endpoint; nothing is sent until it is invoked
+    reading_store()  -> Path               data/readings.sqlite at the repository root, where the command line keeps readings (git-ignored; tests point it at tmp_path)
 
 Nothing is read on import. The values are read the first time `reader_config()` (or `build_llm()`) is called, so
 `import flysafelz.reader` has no side effect and a test can point the reader somewhere else first.
@@ -31,6 +32,7 @@ KEY = "READER_API_KEY"
 MODEL = "READER_MODEL"
 READER_VARIABLES = (PROVIDER, BASE_URL, KEY, MODEL)
 DOTENV_PATH = "READER_DOTENV_PATH"
+STORE_NAME = "data/readings.sqlite"  # the ticket plan's path; *.sqlite is in .gitignore
 _COMMENT = " #"  # an unquoted value ends at a space and a hash
 _EXPORT = "export "
 _QUOTES = "\"'"
@@ -117,3 +119,8 @@ def build_llm(config: ReaderConfig | None = None) -> ChatOpenAI:
     """
     config = reader_config() if config is None else config
     return ChatOpenAI(model=config.model, base_url=config.base_url, api_key=config.api_key, max_retries=0)
+
+
+def reading_store() -> Path:
+    """The file the command line keeps readings in: STORE_NAME (data/readings.sqlite) at the repository root. The file and data/ are made on the first write."""
+    return _repository_root() / STORE_NAME

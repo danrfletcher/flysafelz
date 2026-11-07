@@ -156,9 +156,15 @@ def test_cache_py_has_no_memoising_decorator_registry_or_provider_class():
     assert not re.search(r"lru_cache|functools|registry|Registry|Provider", CACHE_PY.read_text(encoding="utf-8"))
 
 
-@pytest.mark.parametrize("name", ["cli.py", "assess.py"])
-def test_the_cli_and_assess_gain_no_import_of_the_reader_cache(name):
-    assert not [m for m in imported(SRC / name) if m.startswith("flysafelz.reader")], name
+def test_assess_gains_no_import_of_the_reader_cache():
+    assert not [m for m in imported(SRC / "assess.py") if m.startswith("flysafelz.reader")]
+
+
+def test_the_cli_reaches_the_cache_only_through_read_for_lz_and_the_call_count():
+    """PR-6 connects the reader to the command line, the one file outside reader/ that may import it. It never imports the cache module itself."""
+    modules = {m for m in imported(SRC / "cli.py") if m.startswith("flysafelz.reader")}
+    assert modules
+    assert not [m for m in modules if m == "flysafelz.reader.cache" or m.startswith("flysafelz.reader.cache.")], modules
 
 
 # --- F5, F6 ------------------------------------------------------------------------------------------------------------

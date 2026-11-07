@@ -836,3 +836,32 @@ def test_the_result_is_a_pydantic_model_with_the_notam_id_action_and_one_line_re
     assert isinstance(result, ActionResult)
     assert result.notam_id == "H7171/26"
     assert ActionResult.model_validate_json(result.model_dump_json()) == result
+
+
+# --- ticket 3 PR-6 (R3.5): an exemption quote is looked for in the redacted E text ---------------------------------------------
+
+PHONE_E_TEXT = "UAS OPR WI 0.5NM. PARAMOTORS EXEMPT, PHONE 07700 900123 FIRST."
+
+
+def test_a_quote_holding_a_placeholder_is_found_in_the_redacted_e_text_and_kept():
+    parsed = notam(circle=circle_at(0), item_e=PHONE_E_TEXT, item_f="SFC")
+    quote = "PARAMOTORS EXEMPT, PHONE <PHONE_1> FIRST"
+    result = act(parsed, reading(geometry=circle_at(0), category=Category.PROHIBITIVE, exemptions=[exemption(quote)]))
+    assert result.action is A.IGNORE
+    assert f'exempts paramotors: "{quote}"' in result.reason
+    assert result.debug == []
+
+
+def test_a_quote_holding_the_real_number_no_longer_matches_and_is_dropped_and_logged():
+    parsed = notam(circle=circle_at(0), item_e=PHONE_E_TEXT, item_f="SFC")
+    quote = "PARAMOTORS EXEMPT, PHONE 07700 900123 FIRST"
+    result = act(parsed, reading(geometry=circle_at(0), category=Category.PROHIBITIVE, exemptions=[exemption(quote)]))
+    assert result.action is A.NO_FLY  # as if there were no exemption
+    assert f'exemption quote not found: "{quote}"' in result.debug
+    assert "07700" not in result.reason
+
+
+def test_a_quote_without_a_number_still_matches_a_text_that_has_one():
+    parsed = notam(circle=circle_at(0), item_e=PHONE_E_TEXT, item_f="SFC")
+    result = act(parsed, reading(geometry=circle_at(0), category=Category.PROHIBITIVE, exemptions=[exemption("PARAMOTORS EXEMPT")]))
+    assert result.action is A.IGNORE

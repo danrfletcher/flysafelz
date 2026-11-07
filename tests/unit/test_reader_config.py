@@ -369,3 +369,12 @@ def test_an_unknown_key_and_an_empty_file_fail_too(tmp_path):
         settings.load_settings(write_settings(tmp_path, settings_text() + "surprise: 1\n"))
     with pytest.raises(ValueError, match="concurrency"):
         settings.load_settings(write_settings(tmp_path, ""))
+
+
+def test_the_command_line_store_is_the_plans_git_ignored_data_readings_sqlite():
+    """conftest points reading_store() at tmp_path, so ask a fresh interpreter for the real one."""
+    asked = subprocess.run([sys.executable, "-c", "from flysafelz.reader.config import reading_store; print(reading_store())"], cwd=ROOT, capture_output=True, text=True, check=True)
+    store = Path(asked.stdout.strip())
+    assert store == ROOT / "data" / "readings.sqlite"
+    ignored = subprocess.run(["git", "check-ignore", str(store.relative_to(ROOT))], cwd=ROOT, capture_output=True, text=True, check=False)
+    assert ignored.returncode == 0

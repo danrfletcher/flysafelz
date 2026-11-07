@@ -161,11 +161,26 @@ def test_the_real_tree_uses_each_exemption_and_nothing_outside_reader_does():
             assert _agent_imports(path) + llm_env_words(path, READER) + banned_words(path, READER) == [], path
 
 
+CLI_READER_IMPORTS = {
+    "flysafelz.reader",
+    "flysafelz.reader.config",
+    "flysafelz.reader.cached_read",
+    "flysafelz.reader.cached_read.model_calls",
+    "flysafelz.reader.contract",
+    "flysafelz.reader.contract.ReaderResult",
+    "flysafelz.reader.contract.ReaderStatus",
+    "flysafelz.reader.reader_set",
+    "flysafelz.reader.reader_set.failed_before",
+    "flysafelz.reader.reader_set.read_for_lz",
+}
+
+
 def test_cli_py_passes_every_narrowed_scan_unchanged():
     cli = SRC / "cli.py"
     assert banned_words(cli, READER) == [] and llm_env_words(cli, READER) == [] and _agent_imports(cli) == []
     assert not re.search(r"environ|getenv", cli.read_text(encoding="utf-8"))
-    assert not [m for m in imports_of(cli) if m.startswith("flysafelz.reader")]
+    # PR-6: the command line is the one file outside reader/ that imports the reader, and only these modules of it.
+    assert {m for m in imports_of(cli) if m.startswith("flysafelz.reader")} <= CLI_READER_IMPORTS
 
 
 # --- F2: the environment is read in reader/config.py only (beside the reviewed openAIP key readers) -------------------------------------------
@@ -247,13 +262,22 @@ def closure(start: Path) -> set[Path]:
     return seen
 
 
-@pytest.mark.parametrize("name", ["notam_action.py", "assess.py", "cli.py", "pib.py", "airspace.py"])
+@pytest.mark.parametrize("name", ["notam_action.py", "assess.py", "pib.py", "airspace.py"])
 def test_the_sort_assess_and_notam_action_paths_import_nothing_from_the_reader_and_no_llm_client(name):
     files = closure(SRC / name)
     assert SRC / name in files
     assert [p for p in files if READER in p.parents] == []
     for path in files:
         assert not [m for m in imports_of(path) if m.split(".")[0] in LLM_PACKAGES], path
+
+
+def test_the_cli_reaches_the_reader_and_every_other_module_it_reaches_has_no_llm_client():
+    """PR-6: cli.py imports the reader on purpose. Outside reader/, nothing it reaches imports a model client."""
+    files = closure(SRC / "cli.py")
+    assert READER / "reader_set.py" in files and READER / "config.py" in files
+    for path in files:
+        if READER not in path.parents:
+            assert not [m for m in imports_of(path) if m.split(".")[0] in LLM_PACKAGES], path
 
 
 def test_the_closure_walk_finds_the_reader_when_a_module_imports_it(tmp_path):
