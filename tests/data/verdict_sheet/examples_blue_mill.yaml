@@ -1,0 +1,15 @@
+- id: blue_mill_2026-10-31
+  inputs:
+    lat: 53.802797
+    lon: -0.086644
+    now: 2026-10-31T07:30:00Z
+    question: Can I fly Blue Mill today?
+  fixtures:
+    case: blue_mill_2026-10-31
+  reference:
+    path: assess
+    window:
+      - 2026-10-31T07:00:00Z
+      - 2026-10-31T18:00:00Z
+  metadata:
+    blind: true
