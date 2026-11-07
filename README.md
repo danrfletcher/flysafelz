@@ -38,20 +38,20 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 | id | value | unit | comparison | source | confidence | note |
 | --- | --- | --- | --- | --- | --- | --- |
 | wind_10m_caution | 12 | mph | >= | FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits | best practice | Mean wind at 10 m. Caution band below the 10 m NO_GO limit. |
-| wind_10m_no_go | 16 | mph | >= | FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits | best practice | Mean wind at 10 m. 16.0 mph is NO_GO. |
+| wind_10m_no_go | 16 | mph | > | FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits | best practice | Mean wind at 10 m. 16.0 mph is APPROACHING LIMITS; NO_GO needs more than 16.0 mph. |
 | gust_spread_caution | 4 | mph | >= | FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3) | educated guess | Gust minus mean wind at 10 m, worst of the row's timestamps. |
 | gust_spread_no_go | 6 | mph | > | FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3) | educated guess | Gust minus mean wind at 10 m. Exactly 6.0 mph is not NO_GO; the comparison is strict. |
 | wind_aloft_caution | 16 | mph | >= | FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3): same number as the 10 m NO_GO limit | educated guess | Wind at 80 m or 120 m. Caution only; the hard limits are at 10 m. |
 | gradient_caution | 9 | mph | >= | FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3) | educated guess | Absolute difference between 120 m and 10 m wind. |
-| gradient_no_go | 16 | mph | >= | FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3) | educated guess | Absolute difference between 120 m and 10 m wind. |
-| precipitation_no_go | 0.1 | mm/h | >= | FlySafeLZ Spec s2, Plan 2 G22 | educated guess | Any measurable rain in the preceding hour. Applies to the hour's closing timestamp. |
+| gradient_no_go | 16 | mph | > | FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3) | educated guess | Absolute difference between 120 m and 10 m wind. Exactly 16.0 mph is APPROACHING LIMITS; NO_GO needs more than 16.0 mph; the comparison is strict. |
+| precipitation_no_go | 0.1 | mm/h | > | FlySafeLZ Spec s2, Plan 2 G22 | educated guess | Rain in the preceding hour, read at the hour's closing timestamp. 0.0 mm/h is GO; 0.1 mm/h (trace forecast rain) is APPROACHING LIMITS; 0.2 mm/h or more (sustained rain) is NO_GO because of wet-wing deep-stall risk and prop erosion. |
 | rain_chance_caution | 50 | % | >= | FlySafeLZ Spec s2, Plan 2 G22 | educated guess | Precipitation probability. Optional variable: skipped and noted when missing. |
-| visibility_caution | 5000 | m | < | Standard 5 km VFR visibility figure (UK SERA.5001 is the reference to check); Plan 2 G22 | best practice | Not checked against the regulation text. |
+| visibility_caution | 5000 | m | <= | Standard 5 km VFR visibility figure (UK SERA.5001 is the reference to check); Plan 2 G22 | best practice | Not checked against the regulation text. Exactly 5000 m is APPROACHING LIMITS; the comparison includes the limit. |
 | visibility_no_go | 1500 | m | < | Plan 2 G22; compare the Class G flight-visibility minimum for slow aircraft in UK SERA.5001 | best practice | Not checked against the regulation text; confirm before relying on it as sourced. |
 | low_cloud_caution | 90 | % | >= | FlySafeLZ Spec s2, Plan 2 G22 | educated guess | Low cloud cover (Open-Meteo cloud_cover_low). |
 | thermic_shortwave_caution | 600 | W/m² | >= | FlySafeLZ Spec s2, Plan 2 G3/G22 (Dan, Q2) | educated guess | Thermic caution needs this AND the thermic CAPE limit together. |
 | thermic_cape_caution | 300 | J/kg | >= | FlySafeLZ Spec s2, Plan 2 G3/G22 (Dan, Q2) | educated guess | Thermic caution needs this AND the shortwave limit together. |
-| cape_no_go | 1000 | J/kg | >= | Common convention that CAPE of about 1,000 J/kg or more is meaningful convective instability; Plan 2 G22 (Dan, Q2) | best practice | Convective instability and thunderstorm risk. |
+| cape_no_go | 1000 | J/kg | > | Common convention that CAPE of about 1,000 J/kg or more is meaningful convective instability; Plan 2 G22 (Dan, Q2) | best practice | Convective instability and thunderstorm risk. Exactly 1000 J/kg is APPROACHING LIMITS; NO_GO needs more than 1000 J/kg; the comparison is strict. |
 | ceiling_left_no_go | 300 | ft | < | FlySafeLZ Spec s2, Plan 2 E15/G22 | educated guess | Airspace ceiling (floor QNH minus the buffer) minus site elevation. Under this, no room to fly. |
 | ceiling_buffer | 200 | ft | = | FlySafeLZ Spec s2, Plan 2 primitives | educated guess | Margin kept below an airspace floor when stating 'stay below X ft QNH'. |
 | fl_ft_per_hpa | 27 | ft/hPa | = | ICAO standard atmosphere: about 27 ft per hPa near sea level | sourced | Converts a flight level to feet against the forecast pressure_msl. |
