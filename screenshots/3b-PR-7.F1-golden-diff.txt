@@ -1,0 +1,6 @@
+ tests/golden/assess_blue_mill_2026-10-31.json      |  2 +-
+ tests/golden/assess_west_sleekburn_2026-10-31.json |  2 +-
+ tests/golden/blue_mill_2026-10-31.txt              |  2 +-
+ tests/golden/stale_pib_constructed.txt             | 43 ++++++++++++++++++++++
+ tests/golden/west_sleekburn_2026-10-31.txt         |  2 +-
+ 5 files changed, 47 insertions(+), 4 deletions(-)

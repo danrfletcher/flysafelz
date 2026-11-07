@@ -80,7 +80,7 @@ def build(blocker: bool, source: str, unread: bool, condition: bool, window):
         pib = pib_result(*notams, issued=stale_issue)
     else:
         pib = pib_result(*notams)
-    return run_assess(window=window, forecast=forecast, airspace=airspace, pib=pib, readings=readings)
+    return run_assess(window=window, forecast=forecast, airspace=airspace, pib=pib, readings=readings, stale_rule=True)  # the live PIB-age rule
 
 
 @pytest.mark.parametrize(("blocker", "source", "unread", "caution", "condition"), cases())

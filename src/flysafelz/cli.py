@@ -282,12 +282,11 @@ def table_lines(assessment: Assessment, phones: PhoneBook | None = None) -> list
 def status_lines(status: SourceStatus) -> list[str]:
     """A source's state and reason and, when it is not ok, where to check it by hand."""
     line = f"  {SOURCE_LABELS[status.source]}: {status.state.value}"
+    issued = f" (PIB issued {utc_text(status.issued_at)})" if status.source is SourceName.NOTAMS and status.issued_at is not None else ""
     if status.state is SourceState.OK and status.reason:
-        line += f" ({status.reason})"
-    elif status.reason:
-        line += f" {DASH} {status.reason}"
-    if status.source is SourceName.NOTAMS and status.issued_at is not None:
-        line += f" (PIB issued {utc_text(status.issued_at)})"
+        line += f"{issued} ({status.reason})"  # the case-mode note reads after the issued time, so its real age shows
+    else:
+        line += (f" {DASH} {status.reason}" if status.reason else "") + issued
     lines = [line]
     if status.state is not SourceState.OK:
         lines.append(f"    check by hand: {CHECK_BY_HAND[status.source]}")

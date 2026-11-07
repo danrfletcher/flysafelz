@@ -1,0 +1,12 @@
+src/flysafelz/reader/contract.py         42      0   100%
+src/flysafelz/reader/prompt.py           62      0   100%
+src/flysafelz/reader/read.py            115      0   100%
+src/flysafelz/reader/reader_set.py       50      3    94%   99, 105-106
+src/flysafelz/reader/settings.py         14      0   100%
+src/flysafelz/redact.py                  38      0   100%
+src/flysafelz/sup_refs.py                10      0   100%
+src/flysafelz/weather.py                119      0   100%
+-------------------------------------------------------------------
+TOTAL                                  3288     38    99%
+Required test coverage of 90% reached. Total coverage: 98.84%
+================== 7269 passed, 7 xfailed in 69.21s (0:01:09) ==================

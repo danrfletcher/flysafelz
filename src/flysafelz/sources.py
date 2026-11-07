@@ -106,7 +106,9 @@ def replay_files(
     airspace = openaip.fetch_airspace(
         case.lat, case.lon, api_key=REPLAY_KEY, client=_replay(_read(folder / "airspace.json", root)), now=case.now
     )
-    notams = pib.load_pib("live", case.now, client=_replay(_read(folder / "pib.xml", root)))
+    # Case mode: the captured PIB is treated as current at the case's now (the archive snapshots it only about
+    # twice a day), unless case.yaml sets `stale_rule: live` (a constructed old-PIB case) to keep the live 3 h rule.
+    notams = pib.load_pib("live", case.now, client=_replay(_read(folder / "pib.xml", root)), stale_rule=case.stale_rule == "live")
     readings_path = folder / "readings.yaml"
     if readings_optional and not readings_path.exists():
         return forecast, airspace, notams, {}
