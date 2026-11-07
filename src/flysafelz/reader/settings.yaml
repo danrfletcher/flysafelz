@@ -1,0 +1,5 @@
+# Operational knobs of the NOTAM reader. None is a safety threshold (those live in rules.yaml).
+# Each is loaded by name in settings.py.
+
+# Seconds one model call may take before it counts as unavailable (G7). Sent with every call.
+timeout_s: 45

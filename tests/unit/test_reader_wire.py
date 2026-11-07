@@ -12,7 +12,7 @@ from langchain_openai import ChatOpenAI
 from reader_helpers import blue_mill_notams, reply_fields
 
 from flysafelz.contracts import Category
-from flysafelz.reader.contract import ReaderOutputError, ReaderStatus, TokenUsage
+from flysafelz.reader.contract import ReaderStatus, TokenUsage
 from flysafelz.reader.prompt import PROMPT_VERSION, render_prompt
 from flysafelz.reader.read import read_notam, response_format
 
@@ -48,7 +48,9 @@ class Bridge:
 
     def llm(self) -> ChatOpenAI:
         client = httpx.Client(transport=httpx.MockTransport(self))
-        return ChatOpenAI(model=MODEL, api_key="not-a-real-key", base_url=BASE_URL, http_client=client, max_retries=0, http_socket_options=())  # () skips the probe socket the client would otherwise open
+        return ChatOpenAI(
+            model=MODEL, api_key="not-a-real-key", base_url=BASE_URL, http_client=client, max_retries=0, http_socket_options=()
+        )  # () skips the probe socket the client would otherwise open
 
 
 def test_the_post_goes_to_chat_completions_with_a_strict_json_schema_and_the_two_messages():
@@ -92,18 +94,29 @@ def test_an_endpoint_that_sends_no_usage_gives_tokens_none():
     assert result.status is ReaderStatus.READ and result.tokens is None
 
 
-def test_a_body_that_is_not_a_valid_reading_raises_with_the_raw_text():
+def test_a_body_that_is_not_a_valid_reading_is_asked_again_once_then_failed():
     bridge = Bridge(completion('{"verdict": "IGNORE"}'))
-    with pytest.raises(ReaderOutputError) as raised:
-        read_notam(blue_mill_notams()["H7171/26"], bridge.llm())
-    assert raised.value.raw == '{"verdict": "IGNORE"}'
+    result = read_notam(blue_mill_notams()["H7171/26"], bridge.llm())
+    assert (result.status, result.reading) == (ReaderStatus.FAILED, None)
+    assert len(bridge.requests) == 2  # the first call and the one repair, never a third
+    repair = json.loads(bridge.requests[1].content)
+    assert "verdict" in repair["messages"][1]["content"] and repair["messages"][0] == json.loads(bridge.requests[0].content)["messages"][0]
+    assert json.loads(bridge.requests[1].content)["response_format"] == response_format()
+    assert result.tokens == TokenUsage(input_tokens=2400, output_tokens=300, total_tokens=2700)  # both calls, added up
+
+
+def test_a_truncated_body_is_unavailable_and_is_not_retried():
+    cut = json.dumps(reply_fields())[:40]
+    bridge = Bridge(completion(cut))
+    result = read_notam(blue_mill_notams()["J3857/26"], bridge.llm())
+    assert (result.status, result.reading) == (ReaderStatus.UNAVAILABLE, None)
     assert len(bridge.requests) == 1
 
 
-def test_a_truncated_body_raises_and_is_not_retried():
-    cut = json.dumps(reply_fields())[:40]
-    bridge = Bridge(completion(cut))
-    with pytest.raises(ReaderOutputError) as raised:
-        read_notam(blue_mill_notams()["J3857/26"], bridge.llm())
-    assert raised.value.raw == cut
+@pytest.mark.parametrize("status", [429, 500, 503, 400])
+def test_an_http_error_status_from_the_endpoint_is_unavailable(status):
+    bridge = Bridge({"error": {"message": "nope"}}, status=status)
+    result = read_notam(blue_mill_notams()["H7171/26"], bridge.llm())
+    assert (result.status, result.reading) == (ReaderStatus.UNAVAILABLE, None)
+    assert result.model == MODEL
     assert len(bridge.requests) == 1

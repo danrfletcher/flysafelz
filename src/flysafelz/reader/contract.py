@@ -37,20 +37,13 @@ class ReaderOutput(BaseModel):
     prohibitive_reason: ProhibitiveReason
 
 
-class ReaderOutputError(ValueError):
-    """The model's reply is not a valid ReaderOutput: not JSON, cut off, a wrong enum, or a field it may not fill.
-
-    `raw` is the reply text as received. Nothing in this package catches this or turns it into a reading.
-    """
-
-    def __init__(self, reason: str, raw: str):
-        super().__init__(reason)
-        self.reason = reason
-        self.raw = raw
-
-
 class ReaderStatus(StrEnum):
-    """How a read ended. This module produces READ; the later steps produce the others."""
+    """How a read ended. read_notam produces READ, REPAIRED, FAILED and UNAVAILABLE; STORED comes from a later step.
+
+    FAILED means the model answered but its answer was wrong twice. UNAVAILABLE means no usable answer came back at all.
+    Either way there is no reading and the NOTAM is unread. Their values, "failed" and "unavailable", are the two literals
+    the assessment takes as `reader_status`.
+    """
 
     READ = "read"
     REPAIRED = "repaired"
@@ -70,9 +63,12 @@ class TokenUsage(BaseModel):
 
 
 class ReaderResult(BaseModel):
-    """One NOTAM's read: the reading (None when there is none), how it ended, and what the call cost.
+    """One NOTAM's read: the reading (None when there is none), how it ended, and what the calls cost.
 
-    tokens is None when the endpoint returned no usage. latency_s is the time the model call took, in seconds.
+    reading is set for READ and REPAIRED only. failed_checks are plain sentences: empty for READ; for REPAIRED the checks
+    the first answer failed; for FAILED the checks the second answer failed; for UNAVAILABLE the checks the first answer
+    failed when the repair was the call that got no answer, else empty. latency_s is the seconds the model calls took, the
+    repair included. tokens is the usage of every answer added up, or None when any answer reported none.
     """
 
     model_config = STRICT
