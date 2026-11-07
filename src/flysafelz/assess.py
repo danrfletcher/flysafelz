@@ -55,7 +55,7 @@ from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Literal, get_args
 
-from flysafelz.airspace import Activation, Outcome, TimeSpan, assess_airspace
+from flysafelz.airspace import Activation, Outcome, TimeSpan, assess_airspace, find_item_e_contact
 from flysafelz.clients.open_meteo import Forecast
 from flysafelz.clients.openaip import AirspaceFetch, metres_to_feet
 from flysafelz.clients.pib_source import utc_text
@@ -112,6 +112,7 @@ INFORMATIONAL_OVER_LZ = "informational over the LZ from the surface"
 UNVERIFIED_PREFIX = "UNVERIFIED: "
 
 AIRSPACE_CONDITION_GROUP = {
+    Outcome.CHECK_SUP: "check_sup",
     Outcome.CONTACT_FIRST: "contact",
     Outcome.PERMISSION: "permission",
     Outcome.RADIO: "permission",
@@ -312,11 +313,14 @@ def _activations(
     """The NOTAMs that activate a danger area, one Activation for each designator and active span (G10).
 
     The designators come from the reading when there is one, else from item E of a restriction NOTAM. The E text kept
-    for an unread reason is the redacted one (no real phone number in an Assessment).
+    for an unread reason is the redacted one (no real phone number in an Assessment). Whether the NOTAM gives a phone or
+    email is found by code in the original item E and kept as a kind only (find_item_e_contact), with the SUP references.
     """
     activations = []
     for notam in notams:
         reading = readings.get(notam.id)
+        item_e_contact = find_item_e_contact(notam.item_e)
+        sup_references = notam.sup_references
         if reading is not None:
             found = reading.activates_designators
         else:
@@ -327,7 +331,17 @@ def _activations(
         for designator in dict.fromkeys(designators):
             for span_start, span_end in active_intervals(notam, reading, lz, start, end):
                 activations.append(
-                    Activation(designator=designator, notam_id=notam.id, reading=reading, e_text=" ".join(redact_phones(notam.item_e)[0].split()), start=span_start, end=span_end, circle=circle)
+                    Activation(
+                        designator=designator,
+                        notam_id=notam.id,
+                        reading=reading,
+                        e_text=" ".join(redact_phones(notam.item_e)[0].split()),
+                        start=span_start,
+                        end=span_end,
+                        circle=circle,
+                        item_e_contact=item_e_contact,
+                        sup_references=sup_references,
+                    )
                 )
     return activations
 

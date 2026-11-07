@@ -1,5 +1,6 @@
 """G15 and G17: the NOTAMs a segment lists against the debug list, and the order of the conditions."""
 
+from airspace_helpers import volume
 from factories import (
     LZ,
     airspace_fetch,
@@ -13,10 +14,9 @@ from factories import (
     segment,
     utc,
 )
-from airspace_helpers import volume
 
 from flysafelz.assess import CONDITION_ORDER, _notam_findings, display
-from flysafelz.contracts import Category, ContactKind, NotamAction, NotamActionResult, Verdict
+from flysafelz.contracts import Category, ContactKind, NotamAction, NotamActionResult, ProhibitiveReason, Verdict
 from flysafelz.notam_action import notam_action
 
 
@@ -207,3 +207,70 @@ def test_check_sup_maps_to_pilot_discretion_and_nothing_else():
     seg = segment_of(danger())
     assert seg.verdict is Verdict.PILOT_DISCRETION
     assert [v.name for v in Verdict] == ["NO_GO", "UNVERIFIED", "PILOT_DISCRETION"]
+
+
+# --- ticket 3b PR-4: a danger area the airspace path owns (G13) -------------------------------------------------------------
+
+
+def owned_danger(designator, item_e, *, contact=ContactKind.NONE, value=None, notam_id="J4/26", **options):
+    """An openAIP danger area over the LZ and the constructed QRD NOTAM that activates it, with its reading."""
+    circle = circle_at(0)
+    area = volume("danger", name=designator, designator=designator, by_notam=True)
+    parsed = notam(notam_id, circle=circle, subject="RD", item_f="SFC", item_e=item_e)
+    read = reading(notam_id=notam_id, geometry=circle, contact=contact, value=value, designators=[designator], activity="UAS BVLOS ops", **options)
+    return area, parsed, read
+
+
+def owned_segment(*triples):
+    areas = [a for a, _p, _r in triples]
+    return only_segment(
+        run_assess(
+            window=(utc(9), utc(10)),
+            airspace=airspace_fetch(*areas),
+            pib=pib_result(*[p for _a, p, _r in triples]),
+            readings={r.id: r for _a, _p, r in triples},
+        )
+    )
+
+
+OWNED_CHECK_SUP = owned_danger("EGD496A", DANGER_E)
+OWNED_CONTACT = owned_danger("EGD496B", "TEMPORARY DANGER AREA EGD496B ACTIVATED. BOOKING 01632 960123.", contact=ContactKind.PHONE, value="01632 960123", notam_id="J5/26")
+
+
+def test_g13_a_danger_area_with_no_contact_is_check_sup_from_the_airspace_path_with_the_designator_and_the_sup():
+    seg = owned_segment(OWNED_CHECK_SUP)
+    assert [a.action for a in seg.notam_actions] == [NotamAction.CHECK_SUP]
+    assert seg.verdict is Verdict.PILOT_DISCRETION and seg.blockers == []
+    assert seg.conditions == [GP4_CONDITION]  # once: the NOTAM path adds no second condition for an owned NOTAM
+    assert display(seg) == "PILOT DISCRETION \u2013 WITH CONDITIONS"
+
+
+def test_g13_the_airspace_check_sup_sits_in_its_slot_ahead_of_contact_whatever_the_order():
+    for triples in ((OWNED_CONTACT, OWNED_CHECK_SUP), (OWNED_CHECK_SUP, OWNED_CONTACT)):
+        seg = owned_segment(*triples)
+        assert len(seg.conditions) == 2, seg.conditions
+        assert seg.conditions[0] == GP4_CONDITION
+        assert seg.conditions[1].startswith("Danger area EGD496B active") and "fly only if they agree" in seg.conditions[1]
+        assert seg.verdict is Verdict.PILOT_DISCRETION and display(seg) == "PILOT DISCRETION \u2013 WITH CONDITIONS"
+
+
+def test_g13_an_owned_contact_notam_adds_no_second_condition_from_the_notam_path():
+    seg = owned_segment(OWNED_CONTACT)
+    assert [a.action for a in seg.notam_actions] == [NotamAction.CONTACT_FIRST]
+    assert len(seg.conditions) == 1 and "EGD496B" in seg.conditions[0]
+
+
+def test_g13_the_airspace_condition_names_the_sup_of_the_item_e_it_was_found_in():
+    area, parsed, read = owned_danger("EGD496A", "TEMPORARY DANGER AREA EGD496A ACTIVATED. UAS BVLOS OPS.")
+    assert owned_segment((area, parsed, read)).conditions == ["read the SUP / AIP ENR 5.1 entry for EGD496A before flight"]
+
+
+def test_g13_a_check_sup_beside_a_no_fly_activation_of_another_area_is_no_go_and_still_lists_the_condition():
+    byelaws = owned_danger(
+        "EGD496B", "TEMPORARY DANGER AREA EGD496B ACTIVATED. ENTRY PROHIBITED UNDER BYELAWS.", contact=ContactKind.PHONE, value="01632 960123", notam_id="J5/26",
+        reason=ProhibitiveReason.BYELAWS, quote="ENTRY PROHIBITED UNDER BYELAWS",
+    )
+    seg = owned_segment(OWNED_CHECK_SUP, byelaws)
+    assert seg.verdict is Verdict.NO_GO and display(seg) == "NO-GO"
+    assert any("EGD496B" in b.text and "J5/26" in b.text and "byelaws" in b.text for b in seg.blockers)
+    assert seg.conditions == [GP4_CONDITION]

@@ -13,6 +13,7 @@ import yaml
 
 from flysafelz import cli, sources
 from flysafelz.geo import compass16, shape_over
+from flysafelz.redact import redact_phones
 
 GOLDEN = Path(__file__).resolve().parents[1] / "golden"
 BLUE_MILL = cases.BLUE_MILL
@@ -21,7 +22,7 @@ BLUE_MILL_GP3 = ["assess", "--case", BLUE_MILL, "--start", "2026-10-31T07:00Z", 
 BARE_GO = re.compile(r"(?<![-\w])GO(?![-\w])")
 ROW = re.compile(r"^(\d\d):\d\d\u2013\d\d:\d\d(?:  (.*))?$")  # a top-level table row: no indent
 
-DANGER_AREA = "Danger area EGD496A active 08:00\u201318:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree"
+DANGER_AREA = "Danger area EGD496A active 08:00\u201318:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree; details in AIP SUP 108/2026"
 STAY_BELOW = "stay below 1,300 ft QNH"
 
 
@@ -367,11 +368,59 @@ def test_f11_a_prohibitive_reason_is_no_fly_and_never_contact_first(capsys, chan
 
 
 @pytest.mark.parametrize("contact", [{"kind": "radio-only", "value": "Anglia Radar 128.925 MHz"}, {"kind": "none"}])
-def test_f11_a_danger_area_with_a_radio_only_or_no_contact_is_check_sup_and_never_contact_first_or_ruled_in(capsys, changed_readings, contact):
+def test_f11_a_reading_with_no_contact_does_not_undo_the_phone_and_email_code_finds_in_item_e(capsys, changed_readings, contact):
+    """Contact detection is code on the original item E (CR1): the reading's contact does not decide the danger area."""
     text = changed_readings(capsys, contact=contact)
-    assert "CONTACT_FIRST" not in text
-    assert "NOTAM J3857/26 CHECK_SUP: read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026" in text
     assert "NOTAM J3857/26 NO_FLY" not in text
+    assert f"condition: {re.sub(r'phone Flylogix \d+ \d+', 'phone given in NOTAM J3857/26', DANGER_AREA)}" in text
+    assert "code finds a phone in item E but the reading gives no phone or email; code decides (CONTACT_FIRST)" in text
+
+
+@pytest.fixture
+def changed_pib(tmp_path, monkeypatch):
+    """Copy the Blue Mill case and rewrite J3857/26's item E in pib.xml (its reading gives no contact, so both paths agree).
+
+    Returns a function that does it and runs the CLI.
+    """
+    shutil.copytree(cases.case_dir(BLUE_MILL), tmp_path / "fixtures" / BLUE_MILL)
+    monkeypatch.setattr(sources, "ROOT", tmp_path)
+
+    def run(capsys, edit) -> str:
+        path = tmp_path / "fixtures" / BLUE_MILL / "pib.xml"
+        text = path.read_text(encoding="utf-8")
+        start = text.index("<Number>3857</Number>")
+        first, last = text.index("<ItemE>", start), text.index("</ItemE>", start)
+        edited = text[:first] + "<ItemE>" + edit(text[first + len("<ItemE>") : last]) + text[last:]
+        assert edited != text
+        path.write_text(edited, encoding="utf-8")
+        readings_path = tmp_path / "fixtures" / BLUE_MILL / "readings.yaml"
+        readings = yaml.safe_load(readings_path.read_text(encoding="utf-8"))
+        next(r for r in readings if r["id"] == "J3857/26")["contact"] = {"kind": "none"}
+        readings_path.write_text(yaml.safe_dump(readings), encoding="utf-8")
+        return run_cli(capsys, BLUE_MILL_GP3)
+
+    return run
+
+
+def without_contact(item_e: str) -> str:
+    """J3857/26's item E with its email and its number cut out; the radio frequencies, the AR reference and the SUP stay."""
+    cut = re.sub(r"\S*\(AT\)\S*", "", item_e)
+    cut = re.sub(r"\bOR\s+0[\d ]{9,13}\.", ".", cut)
+    assert redact_phones(cut)[1] == {} and "(AT)" not in cut
+    return cut
+
+
+def test_f11_the_item_e_with_no_phone_or_email_is_check_sup_in_every_segment_from_08(capsys, changed_pib):
+    text = changed_pib(capsys, without_contact)
+    check_sup = "read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026"
+    assert "CONTACT_FIRST" not in text and "NO_FLY" not in text
+    blocks = hour_blocks(text)
+    for hour in range(8, 18):
+        for segment in segments_of(blocks[f"{hour:02d}"]):
+            lines = [line.strip() for line in segment]
+            assert lines.count(f"condition: {check_sup}") == 1, (hour, segment)
+            assert any(line.startswith("NOTAM J3857/26 CHECK_SUP") for line in lines), (hour, segment)
+            assert not re.search(r"  PILOT DISCRETION$", segment[0]) and segment[0] != "PILOT DISCRETION", (hour, segment[0])
 
 
 # --- E13: the clock change prints continuous UTC rows ------------------------------------------------------
