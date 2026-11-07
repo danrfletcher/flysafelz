@@ -10,9 +10,23 @@ A numeric literal that equals a rules.yaml value is a hard-coded threshold, with
 """
 
 import ast
+import re
 from pathlib import Path
 
 STRUCTURAL = (0, 1)
+
+# F7/F2: no registry, DI, provider class or memoising decorator anywhere in src/. The word `cache` is banned too, except in
+# the reader package (ticket 3 F2): G9's SQLite cache is there, and the CLI says "stored reading", so cli.py still passes.
+BANNED_EVERYWHERE = re.compile(r"lru_cache|functools\.cache|registry|Registry|\binject\b|Provider\b")
+BANNED_OUTSIDE_THE_READER = re.compile(r"\bcache\b")
+
+
+def banned_words(path: Path, reader: Path) -> list[str]:
+    """The banned words in a source file. `reader` is the one directory where the word `cache` is allowed."""
+    text = path.read_text(encoding="utf-8")
+    pattern = BANNED_EVERYWHERE if reader in path.parents else re.compile(f"{BANNED_EVERYWHERE.pattern}|{BANNED_OUTSIDE_THE_READER.pattern}")
+    return [match.group(0) for match in pattern.finditer(text)]
+
 
 # The numeric literals the reader's modules may hold besides 0 and 1, per module, each with its reason (F6). None is a
 # threshold. This is the scan that catches a planted `slack = 1.5`: 1.5 is not a rules.yaml value, so the equals-a-rules-value
@@ -22,6 +36,8 @@ READER_REVIEWED_LITERALS = {
     "notam_area.py": {
         60: "minutes per degree and seconds per minute (unit): MINUTES_PER_DEGREE, SECONDS_PER_MINUTE",
     },
+    "reader/cache.py": {},  # the cache (G9) and its read: structural 0 and 1 only
+    "reader/cached_read.py": {},
     "build_reader_items.py": {
         40: "how many NOTAMs the sheet holds (structure): ITEM_COUNT, the selection's fixed size",
         8: "characters of a commit sha shown in an error message (display)",
