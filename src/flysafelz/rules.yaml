@@ -177,7 +177,7 @@ airspace_box_nm:
   comparison: "="
   source: "FlySafeLZ Spec s2, Plan 2 G7 (wider than the 2 NM local area so the map has context)"
   confidence: educated guess
-  note: "Half-width of the box around the LZ that the openAIP query asks for. Every airspace touching the box is fetched."
+  note: "Half-width of the box around the LZ that the airspaces are cut down to. openAIP is asked for all of country=GB (its firewall refuses a bbox) and every airspace touching the box is kept."
 
 band_low:
   value: 5000
@@ -342,3 +342,13 @@ notam_area_wide_nm:
   source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
   confidence: educated guess
   note: "A Q-line radius at or above this is an area-wide NOTAM: awareness only (and FIR-wide AIS admin for the subjects in notam_wide_ignore_subjects). A radius of 999 means the whole FIR."
+
+# --- fixture capture (G20) ------------------------------------------------------
+
+capture_trim_nm:
+  value: 25
+  unit: NM
+  comparison: ">"
+  source: "FlySafeLZ Spec s2, Plan 2 G20 (fixture PIBs are trimmed to 25 NM)"
+  confidence: educated guess
+  note: "make fixtures keeps a NOTAM only when its Q-circle edge is within this distance of the LZ, so a fixture stays small but covers well past the 2 NM local area. A NOTAM whose Q-circle cannot be read is kept."

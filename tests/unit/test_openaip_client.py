@@ -24,9 +24,10 @@ def page(name: str) -> dict:
 class Server:
     """A fake openAIP. Serves page 1 and page 2 from the fixtures and records every request."""
 
-    def __init__(self, pages=None, *, status=200, body=None, raises=None):
+    def __init__(self, pages=None, *, status=200, body=None, raises=None, error_response=None):
         self.pages = pages if pages is not None else {"1": page("page1"), "2": page("page2")}
         self.status = status
+        self.error_response = error_response  # what an error status answers with; default is an empty body
         self.body = body
         self.raises = raises
         self.seen: list[httpx.Request] = []
@@ -36,7 +37,7 @@ class Server:
         if self.raises:
             raise self.raises
         if self.status != 200:
-            return httpx.Response(self.status)
+            return self.error_response or httpx.Response(self.status)
         if self.body is not None:
             return httpx.Response(200, content=self.body)
         return httpx.Response(200, json=self.pages[request.url.params["page"]])
@@ -63,30 +64,57 @@ def test_the_request_goes_to_the_airspaces_endpoint_with_the_key_header():
     assert FAKE_KEY not in str(first.url)  # the key is a header, never in the URL
 
 
-def test_the_bbox_is_the_box_rule_either_side_of_the_lz():
+def test_the_request_asks_for_the_whole_country_and_never_sends_a_bbox_or_pos():
     server = Server()
     fetch(server)
-    min_lon, min_lat, max_lon, max_lat = (float(x) for x in server.seen[0].url.params["bbox"].split(","))
+    for request in server.seen:  # openAIP's firewall answers an HTML 403 to bbox and pos
+        assert set(request.url.params) == {"country", "limit", "page"}
+        assert (request.url.params["country"], request.url.params["limit"]) == ("GB", "1000")
+
+
+def names(result) -> set[str]:
+    return {a.name for a in result.areas}
+
+
+def test_only_the_airspaces_touching_the_box_are_kept():
+    result = fetch(Server())
+    assert names(result) == {"EGD496A", "NEWCASTLE CTA 3", "HUMBERSIDE CTR", "D323A WEEKDAY RANGE", "WIDGET MYSTERY ZONE", "BOWTIE RMZ"}
+    assert "EDINBURGH CTR" not in names(result) and "JUST OUTSIDE TMA" not in names(result)  # one far away, one just beyond the box
+
+
+def test_the_box_is_the_box_rule_either_side_of_the_lz():
+    min_lon, min_lat, max_lon, max_lat = openaip.box_bounds(*LZ, openaip.RULES.airspace_box_nm.value)
     assert min_lon < LZ[1] < max_lon and min_lat < LZ[0] < max_lat
-    half_width = 10
-    assert distance_nm(LZ[0], LZ[1], max_lat, LZ[1]) == pytest.approx(half_width, rel=0.005)
-    assert distance_nm(LZ[0], LZ[1], min_lat, LZ[1]) == pytest.approx(half_width, rel=0.005)
+    assert distance_nm(LZ[0], LZ[1], max_lat, LZ[1]) == pytest.approx(10, rel=0.005)
+    assert distance_nm(LZ[0], LZ[1], min_lat, LZ[1]) == pytest.approx(10, rel=0.005)
     # the box is at least the half-width wide to the east and west too
-    assert distance_nm(max_lat, LZ[1], max_lat, max_lon) >= half_width and distance_nm(max_lat, LZ[1], max_lat, min_lon) >= half_width
-    assert half_width == openaip.RULES.airspace_box_nm.value
+    assert distance_nm(max_lat, LZ[1], max_lat, max_lon) >= 10 and distance_nm(max_lat, LZ[1], max_lat, min_lon) >= 10
 
 
-def test_a_changed_box_rule_changes_the_bbox():
-    server = Server()
-    fetch(server, rules=with_rules(airspace_box_nm=5))
-    min_lon, min_lat, max_lon, max_lat = (float(x) for x in server.seen[0].url.params["bbox"].split(","))
-    assert distance_nm(LZ[0], LZ[1], max_lat, LZ[1]) == pytest.approx(5, rel=0.005)
+def test_a_changed_box_rule_changes_what_is_kept():
+    # Humberside CTR's southern edge is about 9 NM north of the LZ
+    assert "HUMBERSIDE CTR" in names(fetch(Server()))
+    assert "HUMBERSIDE CTR" not in names(fetch(Server(), rules=with_rules(airspace_box_nm=5)))
 
 
-def test_every_page_is_followed_and_a_repeated_item_is_kept_once():
+def test_the_box_cut_uses_the_polygon_and_not_only_its_bounding_box():
+    _, _, max_lon, max_lat = openaip.box_bounds(*LZ, 10)
+
+    def at(dlon: float, dlat: float) -> list[float]:
+        return [max_lon + dlon, max_lat + dlat]
+
+    # a triangle on the far side of the line from (-0.1, +0.2) to (+0.2, -0.1) off the box's north-east corner:
+    # its bounding box overlaps the box, its body does not
+    miss = [at(-0.1, 0.2), at(0.2, 0.2), at(0.2, -0.1), at(-0.1, 0.2)]
+    hit = [at(-0.05, -0.05), at(0.5, -0.05), at(0.5, 0.5), at(-0.05, -0.05)]
+    items = [{"_id": key, "name": name, "type": 4, "geometry": {"type": "Polygon", "coordinates": [ring]}} for key, name, ring in (("t1", "CORNER MISS", miss), ("t2", "CORNER HIT", hit))]
+    assert names(fetch(Server(pages={"1": {"items": items, "nextPage": None}}))) == {"CORNER HIT"}
+
+
+def test_every_page_is_followed_by_nextpage_and_a_repeated_item_is_kept_once():
     server = Server()
     result = fetch(server)
-    assert [r.url.params["page"] for r in server.seen] == ["1", "2"]
+    assert [r.url.params["page"] for r in server.seen] == ["1", "2"]  # page 1 says nextPage 2, page 2 says null
     assert [a.id[-1] for a in result.areas] == ["1", "2", "3", "4", "5", "6"]  # item 3 is on both pages
     assert result.status.state is SourceState.OK
     assert result.status.source is SourceName.AIRSPACE and result.status.fetched_at == NOW
@@ -119,6 +147,20 @@ def test_an_http_error_is_a_failed_status_with_the_code(status):
     assert result.status.fetched_at == NOW
 
 
+@pytest.mark.parametrize("status", [401, 403])
+def test_a_json_refusal_is_the_key_error_and_an_html_refusal_is_the_firewall(status):
+    refused = fetch(Server(status=status, error_response=httpx.Response(status, json={"error": "invalid api key"})))
+    assert refused.status.state is SourceState.FAILED and refused.status.reason == f"openAIP: HTTP {status}"
+    for html in (
+        httpx.Response(status, headers={"content-type": "text/html; charset=utf-8"}, content=b"<html><body>Access denied</body></html>"),
+        httpx.Response(status, content=b"  <!DOCTYPE html><title>Forbidden</title>"),  # no content type, HTML body
+    ):
+        blocked = fetch(Server(status=status, error_response=html))
+        assert blocked.status.state is SourceState.FAILED and blocked.areas == []
+        assert blocked.status.reason == f"openAIP blocked the request (HTML {status}, not a key error)"
+        assert "key" not in blocked.status.reason.replace("not a key error", "") and "\n" not in blocked.status.reason
+
+
 @pytest.mark.parametrize("error", [httpx.ReadTimeout("slow"), httpx.ConnectError("down")])
 def test_a_timeout_or_connection_error_is_failed_with_the_exception_class(error):
     result = fetch(Server(raises=error))
@@ -138,14 +180,41 @@ def test_a_body_that_is_not_an_airspace_page_is_failed(body):
     assert result.status.state is SourceState.FAILED and "not an airspace page" in result.status.reason
 
 
+@pytest.mark.parametrize("following", ["2", True, 0, 1, -3])
+def test_a_next_page_that_is_not_a_later_page_number_is_failed(following):
+    result = fetch(Server(pages={"1": {"items": [], "nextPage": following}}))
+    assert result.status.state is SourceState.FAILED and "nextPage" in result.status.reason
+
+
+def test_without_a_nextpage_field_total_pages_decides_so_a_short_read_is_not_taken_for_the_country():
+    server = Server(pages={"1": {"items": [], "totalPages": 2}, "2": {"items": [], "totalPages": 2}})
+    assert fetch(server).status.state is SourceState.OK
+    assert [r.url.params["page"] for r in server.seen] == ["1", "2"]
+
+
 def test_a_bad_total_pages_is_failed():
     result = fetch(Server(pages={"1": {"items": [], "totalPages": "many"}}))
     assert result.status.state is SourceState.FAILED and "totalPages" in result.status.reason
 
 
 def test_a_server_that_never_finishes_is_stopped():
-    result = fetch(Server(pages={str(n): {"items": [], "totalPages": 10_000} for n in range(1, 100)}))
+    result = fetch(Server(pages={str(n): {"items": [], "nextPage": n + 1} for n in range(1, 100)}))
     assert result.status.state is SourceState.FAILED and "more pages" in result.status.reason
+
+
+def test_an_item_with_no_usable_polygon_far_from_the_box_is_skipped_and_one_inside_it_fails():
+    far = {"_id": "f", "name": "FAR NO POLYGON", "type": 4, "geometry": {"type": "Point", "coordinates": [-4.0, 57.0]}}
+    assert fetch(Server(pages={"1": {"items": [far], "nextPage": None}})).status.state is SourceState.OK
+    near = {"_id": "n", "name": "NEAR NO POLYGON", "type": 4, "geometry": {"type": "Point", "coordinates": [LZ[1], LZ[0]]}}
+    result = fetch(Server(pages={"1": {"items": [far, near], "nextPage": None}}))
+    assert result.status.state is SourceState.FAILED and "NEAR NO POLYGON" in result.status.reason
+
+
+@pytest.mark.parametrize("coordinates", [[5], [[[0.0, "x"]]], [[]], "none", []])
+def test_an_item_whose_place_cannot_be_worked_out_is_read_and_fails_closed(coordinates):
+    odd = {"_id": "o", "name": "ODD PLACE", "type": 4, "geometry": {"type": "Polygon", "coordinates": coordinates}}
+    result = fetch(Server(pages={"1": {"items": [odd], "nextPage": None}}))
+    assert result.status.state is SourceState.FAILED and "ODD PLACE" in result.status.reason
 
 
 def test_an_item_with_no_usable_polygon_fails_the_fetch():

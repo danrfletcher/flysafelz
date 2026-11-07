@@ -1,0 +1,4 @@
+$ env -u OPENAIP_API_KEY make fixtures CASE=blue_mill_2026-10-31
+OPENAIP_API_KEY is not set (add it to .env)
+make: *** [fixtures] Error 1
+exit=2

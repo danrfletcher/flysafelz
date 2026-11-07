@@ -45,7 +45,7 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 | fl_ft_per_hpa | 27 | ft/hPa | = | ICAO standard atmosphere: about 27 ft per hPa near sea level | sourced | Converts a flight level to feet against the forecast pressure_msl. |
 | fl_reference_hpa | 1013.25 | hPa | = | ICAO standard atmosphere sea-level pressure | sourced | Flight levels are measured from this pressure. |
 | local_area | 2 | NM | = | FlySafeLZ Spec s2, Plan 2 primitives (Dan) | educated guess | Radius of the local flying area around the landing zone. Not user-adjustable. |
-| airspace_box_nm | 10 | NM | = | FlySafeLZ Spec s2, Plan 2 G7 (wider than the 2 NM local area so the map has context) | educated guess | Half-width of the box around the LZ that the openAIP query asks for. Every airspace touching the box is fetched. |
+| airspace_box_nm | 10 | NM | = | FlySafeLZ Spec s2, Plan 2 G7 (wider than the 2 NM local area so the map has context) | educated guess | Half-width of the box around the LZ that the airspaces are cut down to. openAIP is asked for all of country=GB (its firewall refuses a bbox) and every airspace touching the box is kept. |
 | band_low | 5000 | ft | = | FlySafeLZ Spec s2, Plan 2 primitives (Dan) | educated guess | Airspace floors below this give a ceiling condition; above it, a warning. |
 | band_high | 10000 | ft | = | FlySafeLZ Spec s2, Plan 2 primitives (Dan) | educated guess | Airspace floors above this are awareness only (map and collapsed list). |
 | verdict_horizon_day | 3 | day | = | FlySafeLZ Spec s2, Plan 2 Q9 (Dan); day 0 is today in Europe/London | educated guess | Last day that can carry a verdict, if every required weather variable is present. |
@@ -66,6 +66,7 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 | notam_restriction_subjects | RD, RR, RP, RT | subject | in | ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4 | best practice | Danger, restricted, prohibited and temporary reserved airspace. With a designator in item E the NOTAM is handled through the airspace polygon; without one it goes to the reader. |
 | notam_awareness_subjects | GW | subject | in | ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4 | best practice | GNSS or radio-frequency jamming: awareness only, no reader. |
 | notam_area_wide_nm | 50 | NM | >= | ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4 | educated guess | A Q-line radius at or above this is an area-wide NOTAM: awareness only (and FIR-wide AIS admin for the subjects in notam_wide_ignore_subjects). A radius of 999 means the whole FIR. |
+| capture_trim_nm | 25 | NM | > | FlySafeLZ Spec s2, Plan 2 G20 (fixture PIBs are trimmed to 25 NM) | educated guess | make fixtures keeps a NOTAM only when its Q-circle edge is within this distance of the LZ, so a fixture stays small but covers well past the 2 NM local area. A NOTAM whose Q-circle cannot be read is kept. |
 
 Confidence is `sourced` (a citable document), `best practice` (common practice, not one citation) or `educated guess` (our own call). Limits cannot be changed by the user.
 

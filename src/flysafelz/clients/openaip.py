@@ -3,16 +3,22 @@
     fetch_airspace(lat, lon, *, api_key, client)   GET /api/airspaces, every page -> AirspaceFetch
     parse_airspace(item)                           one openAIP item -> Airspace
 
-The box reaches the airspace_box_nm rule either side of the LZ (that rule is
-a half-width, so the box is a square twice that wide). The key goes in the `x-openaip-api-key` header. This module never reads the
+openAIP's firewall answers an HTML 403 to any airspaces request that carries `bbox` or `pos`,
+with or without a key, so the box cannot be asked for. The request is `country=GB` instead,
+PAGE_LIMIT items per page, following `nextPage` until it is empty. The box is then cut out
+here: an airspace is kept when its polygon touches the box that reaches the airspace_box_nm
+rule either side of the LZ (that rule is a half-width, so the box is a square twice that wide).
+The key goes in the `x-openaip-api-key` header. This module never reads the
 environment: the caller reads OPENAIP_API_KEY and passes it in. A missing key is
 a failed status with a one-line reason that names the variable, and no request
 is made. The key is never put in a reason.
 
 Nothing is raised to the caller. An HTTP error status (an auth refusal, a server error), a timeout, a body
-that is not JSON or not an openAIP page, or an item that cannot be read at all
+that is not JSON or not an openAIP page, or an item inside the box that cannot be read at all
 gives a status of `failed` with a one-line reason and no airspaces. An empty
-result is `ok` with zero airspaces.
+result is `ok` with zero airspaces. A 401/403 whose body is JSON is the key refused
+("openAIP: HTTP 403"). A 401/403 whose body is HTML is the firewall, not the key, and is worded
+as such ("openAIP blocked the request (HTML 403, not a key error)").
 
 Fail closed when reading an item (each is noted on the Airspace):
 - an unknown type code is "other" (awareness only);
@@ -44,8 +50,9 @@ KEY_HEADER = "x-openaip-api-key"
 KEY_VARIABLE = "OPENAIP_API_KEY"
 
 TIMEOUT_SECONDS = 30
-PAGE_LIMIT = 100  # items asked for per page
-MAX_PAGES = 40  # a stop for a server that never says it is done; far more pages than the box holds
+COUNTRY = "GB"  # the only airspace filter openAIP's firewall lets through; the box is cut out locally
+PAGE_LIMIT = "1000"  # items asked for per page, as the query-string text it is sent as (GB is about 1,200 airspaces: two pages)
+MAX_PAGES = 40  # a stop for a server that never says it is done; far more pages than the country holds
 
 ARC_MINUTES_PER_DEGREE = 60  # one nautical mile is one minute of latitude, by definition
 FEET_PER_METRE = 3.280839895
@@ -233,6 +240,15 @@ def _repair(shape: Shape, name: str) -> tuple[Shape, list[str]]:
 # --- one item -------------------------------------------------------------------
 
 
+def _name(item: dict[str, Any]) -> str:
+    return str(item.get("name") or "").strip() or "(unnamed airspace)"
+
+
+def item_id(item: dict[str, Any]) -> str:
+    """The id an item gets as an Airspace: openAIP's `_id`, else its name."""
+    return str(item.get("_id") or _name(item))
+
+
 def parse_airspace(item: dict[str, Any]) -> Airspace:
     """One entry of an openAIP page's `items` as an Airspace.
 
@@ -241,7 +257,7 @@ def parse_airspace(item: dict[str, Any]) -> Airspace:
     """
     if not isinstance(item, dict):
         raise OpenAipError("airspace item is not an object")
-    name = str(item.get("name") or "").strip() or "(unnamed airspace)"
+    name = _name(item)
     notes: list[str] = []
 
     type_code = item.get("type")
@@ -271,7 +287,7 @@ def parse_airspace(item: dict[str, Any]) -> Airspace:
     shape, repairs = _repair(shape, name)
     designators = find_designators(name)
     return Airspace(
-        id=str(item.get("_id") or name),
+        id=item_id(item),
         name=name,
         type=type_name,
         type_code=type_code if isinstance(type_code, int) else None,
@@ -305,23 +321,91 @@ def _failed(reason: str, now: datetime) -> AirspaceFetch:
     return AirspaceFetch(status=SourceStatus(source=SourceName.AIRSPACE, state=SourceState.FAILED, reason=reason, fetched_at=now))
 
 
+def _is_html(response: httpx.Response) -> bool:
+    return "html" in response.headers.get("content-type", "").lower() or response.text.lstrip().startswith("<")
+
+
 def _get_page(client: httpx.Client, params: dict[str, str | int], key: str) -> httpx.Response | str:
     """The response, or a one-line failure reason (status code or exception class)."""
     try:
         response = client.get(URL, params=params, headers={KEY_HEADER: key})
         response.raise_for_status()
     except httpx.HTTPStatusError as exc:
-        return f"openAIP: HTTP {exc.response.status_code}"
+        status = exc.response.status_code
+        if status in (401, 403) and _is_html(exc.response):  # the firewall's page, not openAIP's answer about the key
+            return f"openAIP blocked the request (HTML {status}, not a key error)"
+        return f"openAIP: HTTP {status}"
     except httpx.HTTPError as exc:
         return f"openAIP: {type(exc).__name__}"
     return response
 
 
+def _coordinates(node: object) -> list[tuple[float, float]] | None:
+    """Every [lon, lat] pair under a GeoJSON `coordinates` value, or None when it is not made of numbers."""
+    if not isinstance(node, list) or not node:
+        return None
+    if all(isinstance(v, int | float) and not isinstance(v, bool) for v in node):
+        return [(float(node[0]), float(node[1]))] if len(node) > 1 else None
+    found: list[tuple[float, float]] = []
+    for child in node:
+        part = _coordinates(child)
+        if part is None:
+            return None
+        found += part
+    return found
+
+
+def _raw_bounds(item: object) -> tuple[float, float, float, float] | None:
+    """(min lon, min lat, max lon, max lat) of an item's raw geometry, or None when that cannot be worked out."""
+    geometry = item.get("geometry") if isinstance(item, dict) else None
+    points = _coordinates(geometry.get("coordinates")) if isinstance(geometry, dict) else None
+    if not points:
+        return None
+    lons, lats = [p[0] for p in points], [p[1] for p in points]
+    return min(lons), min(lats), max(lons), max(lats)
+
+
+def _outside(bounds: tuple[float, float, float, float], area_box: tuple[float, float, float, float]) -> bool:
+    lon0, lat0, lon1, lat1 = bounds
+    box_lon0, box_lat0, box_lon1, box_lat1 = area_box
+    return lon0 > box_lon1 or lon1 < box_lon0 or lat0 > box_lat1 or lat1 < box_lat0
+
+
+def _touches(area: Airspace, area_box: tuple[float, float, float, float]) -> bool:
+    """True when any polygon of the airspace overlaps or touches the box (shapely: x is lon, y is lat)."""
+    window = box(*area_box)
+    for poly in area.shape:
+        rings = [[(lon, lat) for lat, lon in ring] for ring in poly]
+        if Polygon(rings[0], rings[1:]).intersects(window):
+            return True
+    return False
+
+
+def _next_page(payload: dict[str, Any], page: int) -> int | None | str:
+    """The next page number, None when this was the last, or a one-line reason when the page cannot say.
+
+    openAIP gives `nextPage` (empty on the last page). If a page has no `nextPage` at all, `totalPages` decides,
+    so a short read cannot pass for the whole country.
+    """
+    if "nextPage" in payload:
+        following = payload["nextPage"]
+        if following is None:
+            return None
+        if isinstance(following, bool) or not isinstance(following, int) or following <= page:
+            return "openAIP: nextPage is not a later page number"
+        return following
+    total = payload.get("totalPages", 1)
+    if isinstance(total, bool) or not isinstance(total, int):
+        return "openAIP: totalPages is not a number"
+    return page + 1 if page < total else None
+
+
 def _fetch_pages(client: httpx.Client, lat: float, lon: float, key: str, now: datetime, rules: Rules) -> AirspaceFetch:
-    bounds = box_bounds(lat, lon, float(rules.airspace_box_nm.value))  # type: ignore[arg-type]
-    base: dict[str, str | int] = {"bbox": ",".join(f"{b:.6f}" for b in bounds), "limit": PAGE_LIMIT}
+    area_box = box_bounds(lat, lon, float(rules.airspace_box_nm.value))  # type: ignore[arg-type]
+    base: dict[str, str | int] = {"country": COUNTRY, "limit": PAGE_LIMIT}
     areas: dict[str, Airspace] = {}
-    for page in range(1, MAX_PAGES + 1):
+    page = 1
+    for _ in range(MAX_PAGES):
         got = _get_page(client, {**base, "page": page}, key)
         if isinstance(got, str):
             return _failed(got, now)
@@ -333,17 +417,22 @@ def _fetch_pages(client: httpx.Client, lat: float, lon: float, key: str, now: da
         if not isinstance(items, list):
             return _failed("openAIP: response is not an airspace page", now)
         for item in items:
+            bounds = _raw_bounds(item)
+            if bounds is not None and _outside(bounds, area_box):
+                continue  # clearly elsewhere in the country: not read, so one odd item far away cannot fail the fetch
             try:
                 area = parse_airspace(item)
             except OpenAipError as exc:
                 return _failed(f"openAIP: {exc}", now)
-            areas.setdefault(area.id, area)
-        total = payload.get("totalPages", 1)
-        if isinstance(total, bool) or not isinstance(total, int):
-            return _failed("openAIP: totalPages is not a number", now)
-        if page >= total:
+            if _touches(area, area_box):
+                areas.setdefault(area.id, area)
+        following = _next_page(payload, page)
+        if isinstance(following, str):
+            return _failed(following, now)
+        if following is None:
             status = SourceStatus(source=SourceName.AIRSPACE, state=SourceState.OK, fetched_at=now)
             return AirspaceFetch(areas=list(areas.values()), status=status)
+        page = following
     return _failed("openAIP: more pages than expected", now)
 
 
@@ -356,7 +445,7 @@ def fetch_airspace(
     now: datetime | None = None,
     rules: Rules = RULES,
 ) -> AirspaceFetch:
-    """Every airspace touching the box around (lat, lon), following every page.
+    """Every airspace touching the box around (lat, lon): all of country=GB, page by page, cut down to the box here.
 
     `now` is the fetched-at time; leave it out and the clock is read. Pass a client
     to control the transport (tests use httpx.MockTransport). Without one, a client
