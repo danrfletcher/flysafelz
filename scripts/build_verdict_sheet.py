@@ -6,7 +6,12 @@ An example marked `metadata.blind: true` gets a blind entry; any other gets a dr
 NOTAM actions, to correct). `--blind` or `--draft` builds only that mode's examples.
 
 `--examples` and `--out` may be anywhere. The repository root (where fixtures/ is) is found from this
-file's own location, never from the working directory. Writes a new sheet only; an existing `--out` is refused.
+file's own location, never from the working directory.
+
+A rerun on an existing `--out` only appends the entries of new examples (text appended; nothing already in the file
+changes) and reports any entry whose example has changed as stale, leaving it alone. `--check` validates the sheet and
+prints the counts per example; it exits 1 when it finds an error. `flysafelz.verdict_sheet.load_sheet(path)` reads a
+labelled sheet into data for scoring.
 """
 
 import sys

@@ -1,0 +1,11 @@
+# first run, then a second run, then a byte compare
+$ uv run python scripts/build_verdict_sheet.py --examples <tmp>/ex.yaml --out <tmp>/sheet.yaml
+wrote <tmp>/sheet.yaml: 1 new, 0 unchanged, 0 stale, 0 skipped, 0 failed
+exit 0
+
+$ uv run python scripts/build_verdict_sheet.py --examples <tmp>/ex.yaml --out <tmp>/sheet.yaml
+nothing written: 0 new, 1 unchanged, 0 stale, 0 skipped, 0 failed
+exit 0
+
+$ cmp <sheet after the first run> <sheet after the second run>
+identical (cmp exit 0)

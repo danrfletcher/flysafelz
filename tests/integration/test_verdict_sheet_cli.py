@@ -66,7 +66,7 @@ def test_gp2_the_script_writes_one_blind_entry_with_13_rows_and_20_null_notam_ac
     out = tmp_path / "verdict_sheet.yaml"
     result = run_script("--blind", "--examples", str(gp1), "--out", str(out), cwd=tmp_path)
     assert result.returncode == 0, result.stderr
-    assert result.stdout.strip() == f"wrote {out}: 1 built, 0 skipped, 0 failed" and result.stderr == ""
+    assert result.stdout.strip() == f"wrote {out}: 1 new, 0 unchanged, 0 stale, 0 skipped, 0 failed" and result.stderr == ""
     (entry,) = sheet(out)
     assert (entry["id"], entry["mode"], entry["actions_done"]) == ("blue_mill_2026-10-31", "blind", False)
     assert len(entry["rows"]) == 13
@@ -90,14 +90,14 @@ def test_f2_the_examples_file_keeps_its_bytes_and_mtime_after_a_build(gp1, tmp_p
     assert (gp1.read_bytes(), gp1.stat().st_mtime_ns) == before
 
 
-def test_an_existing_out_is_refused_with_one_line_and_its_bytes_are_unchanged(gp1, tmp_path):
+def test_an_existing_out_gets_the_new_entry_appended_and_its_own_bytes_are_unchanged(gp1, tmp_path):
     out = tmp_path / "verdict_sheet.yaml"
-    out.write_bytes(b"- id: Dan's labels\n  mode: blind\n")
-    before = (out.read_bytes(), out.stat().st_mtime_ns)
+    before = b"- id: Dan's labels\n  mode: blind\n  rows: []  # his own comment\n"
+    out.write_bytes(before)
     result = run_script("--blind", "--examples", str(gp1), "--out", str(out))
-    assert result.returncode == 1 and result.stdout == ""
-    assert result.stderr.count("\n") == 1 and str(out) in result.stderr and "already exists" in result.stderr
-    assert (out.read_bytes(), out.stat().st_mtime_ns) == before
+    assert result.stdout.strip() == f"wrote {out}: 1 new, 0 unchanged, 0 stale, 0 skipped, 0 failed"
+    assert out.read_bytes().startswith(before)
+    assert [e["id"] for e in sheet(out)] == ["Dan's labels", "blue_mill_2026-10-31"]
 
 
 def test_e4_two_examples_with_the_same_id_exit_1_naming_the_id_and_create_no_sheet(tmp_path):
@@ -133,9 +133,9 @@ def test_no_flag_builds_each_example_in_its_own_mode_and_the_flags_pick_one_mode
     assert result.returncode == 0, result.stderr
     assert [(e["id"], e["mode"]) for e in sheet(out)] == [("open", "draft")]
     blind_only = run_script("--blind", "--examples", str(unmarked), "--out", str(tmp_path / "b.yaml"))
-    assert blind_only.returncode == 0 and blind_only.stdout.strip() == "nothing written: 0 built, 1 skipped, 0 failed" and not (tmp_path / "b.yaml").exists()
+    assert blind_only.returncode == 0 and blind_only.stdout.strip() == "nothing written: 0 new, 0 unchanged, 0 stale, 1 skipped, 0 failed" and not (tmp_path / "b.yaml").exists()
     draft_only = run_script("--draft", "--examples", str(gp1), "--out", str(tmp_path / "d.yaml"))
-    assert draft_only.returncode == 0 and "0 built, 1 skipped" in draft_only.stdout and not (tmp_path / "d.yaml").exists()
+    assert draft_only.returncode == 0 and "0 new, 0 unchanged, 0 stale, 1 skipped" in draft_only.stdout and not (tmp_path / "d.yaml").exists()
     marked = run_script("--examples", str(gp1), "--out", str(tmp_path / "m.yaml"))
     assert marked.returncode == 0, marked.stderr
     assert [e["mode"] for e in sheet(tmp_path / "m.yaml")] == ["blind"]
@@ -154,13 +154,13 @@ def test_e5_an_explain_example_is_skipped_and_the_summary_counts_it(tmp_path, ca
     code = call(tmp_path, example("bm", cases.BLUE_MILL, now=NOW, window=(utc(31, 7), utc(31, 18))), explain, root=root)
     assert code == 0
     assert [e["id"] for e in sheet(tmp_path / "sheet.yaml")] == ["bm"]
-    assert capsys.readouterr().out.strip() == f"wrote {tmp_path / 'sheet.yaml'}: 1 built, 1 skipped, 0 failed"
+    assert capsys.readouterr().out.strip() == f"wrote {tmp_path / 'sheet.yaml'}: 1 new, 0 unchanged, 0 stale, 1 skipped, 0 failed"
 
 
 def test_e5_only_explain_examples_write_nothing_and_exit_0(tmp_path, capsys):
     assert call(tmp_path, {"id": "why", "reference": {"path": "explain"}}) == 0
     assert not (tmp_path / "sheet.yaml").exists()
-    assert capsys.readouterr().out.strip() == "nothing written: 0 built, 1 skipped, 0 failed"
+    assert capsys.readouterr().out.strip() == "nothing written: 0 new, 0 unchanged, 0 stale, 1 skipped, 0 failed"
 
 
 def test_e6_a_capture_failure_skips_that_example_with_one_line_and_the_rest_are_written(tmp_path, capsys, monkeypatch):
@@ -183,7 +183,7 @@ def test_e6_a_capture_failure_skips_that_example_with_one_line_and_the_rest_are_
     out, err = capsys.readouterr()
     assert code == 0
     assert [e["id"] for e in sheet(tmp_path / "sheet.yaml")] == ["bm"]
-    assert out.strip().endswith("1 built, 0 skipped, 1 failed")
+    assert out.strip().endswith("1 new, 0 unchanged, 0 stale, 0 skipped, 1 failed")
     assert err.count("\n") == 1 and err.startswith("example lost: openAIP: the key was rejected (HTTP 403)")
     assert FAKE_KEY not in out + err and (tmp_path / "sheet.yaml").read_text(encoding="utf-8").count(FAKE_KEY) == 0
     assert [a[0] for a in attempts] == ["never_captured"] and "lat: 53.802797" in attempts[0][2] and "days" not in attempts[0][2]
@@ -195,7 +195,7 @@ def test_e6_with_no_key_the_example_is_skipped_and_nothing_is_captured(tmp_path,
     day = datetime(2026, 11, 1, 7, 30, tzinfo=UTC)
     code = call(tmp_path, example("lost", "never_captured", now=day, window=None))
     out, err = capsys.readouterr()
-    assert code == 1 and out.strip() == "nothing written: 0 built, 0 skipped, 1 failed"
+    assert code == 1 and out.strip() == "nothing written: 0 new, 0 unchanged, 0 stale, 0 skipped, 1 failed"
     assert err == "example lost: OPENAIP_API_KEY is not set (add it to .env)\n"
     assert not (tmp_path / "sheet.yaml").exists() and not (tmp_path / "fixtures" / "never_captured").exists()
 
@@ -251,7 +251,7 @@ def test_e14_a_default_window_on_single_day_blue_mill_names_the_example_and_the_
     assert code == 1 and not (tmp_path / "sheet.yaml").exists()
     assert err.count("\n") == 1 and err.startswith("example bm_default:") and "London day 2026-11-01" in err
     assert "blue_mill_2026-10-31_2day" in err and "days: 2" in err
-    assert out.strip() == "nothing written: 0 built, 0 skipped, 1 failed"
+    assert out.strip() == "nothing written: 0 new, 0 unchanged, 0 stale, 0 skipped, 1 failed"
 
 
 def test_e14_e16_a_failing_example_gets_no_entry_and_the_good_one_is_still_written(tmp_path, capsys):
@@ -267,7 +267,7 @@ def test_e14_e16_a_failing_example_gets_no_entry_and_the_good_one_is_still_writt
     assert code == 0
     assert [e["id"] for e in sheet(tmp_path / "sheet.yaml")] == ["bm"]
     assert "example late: inputs.now is 2026-10-31T09:30:00Z but case blue_mill_2026-10-31 has 2026-10-31T07:30:00Z" in err
-    assert "example bm_default:" in err and out.strip().endswith("1 built, 0 skipped, 2 failed")
+    assert "example bm_default:" in err and out.strip().endswith("1 new, 0 unchanged, 0 stale, 0 skipped, 2 failed")
 
 
 # --- synthetic cases ---------------------------------------------------------------------------------------------
