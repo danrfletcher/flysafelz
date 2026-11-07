@@ -115,6 +115,12 @@ def test_g10_a_null_verdict_and_every_enum_value_are_accepted():
     assert report.errors == [] and report.labelled == 3
 
 
+def test_check_sup_is_a_valid_notam_action_and_loads_as_itself():
+    assert checked(edited(notam_actions={"A1/26": "CHECK_SUP"})).errors == []
+    assert checked(edited(notam_actions={"A1/26": "CHECK_SUP"})).unread_left == 0
+    assert "CHECK_SUP" in checked(edited(notam_actions={"A1/26": "X"})).errors[0]
+
+
 @pytest.mark.parametrize("labels", [{"verdict": "NO_GO", "approaching_limits": None}, {"verdict": None, "approaching_limits": True}])
 def test_g10_a_row_with_only_one_of_the_two_labels_is_incomplete_counted_and_not_an_error(labels):
     report = checked(with_rows(row("07:00", "08:00", **labels), row("08:00", "09:00")))

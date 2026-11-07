@@ -40,6 +40,7 @@ def test_the_severity_order_is_the_spec_s():
     assert SEVERITY == (
         NotamAction.NO_FLY,
         NotamAction.UNREAD_OVER_LZ,
+        NotamAction.CHECK_SUP,
         NotamAction.CONTACT_FIRST,
         NotamAction.AVOID_SECTOR,
         NotamAction.AWARENESS,

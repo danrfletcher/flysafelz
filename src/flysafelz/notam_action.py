@@ -13,19 +13,36 @@ the unread path):
     1 IGNORE          not active in the segment, beyond the local area, does not apply to
                       a paramotor (drones only, aerodrome users only, or a quoted
                       PARAMOTOR_CLASS exemption)
-    2 NO_FLY          over the LZ, floor SFC, prohibitive (category, or a prohibitive reason),
-                      or cooperative with no phone or email contact
-    3 CONTACT_FIRST   over the LZ, floor SFC, cooperative, with a phone or email contact
+    2a NO_FLY         over the LZ, floor SFC, Q-code subject RR, RP or RT (restricted, prohibited,
+                      temporary restricted area); the reason names the Q-code
+    2b NO_FLY         over the LZ, floor SFC, subject RD with a prohibitive reason (live firing,
+                      entry prohibited, byelaws); the reason quotes prohibitive_quote
+    2c CONTACT_FIRST  over the LZ, floor SFC, subject RD, reason none, with a phone or email
+                      contact (the reason names the AIP SUP when the E text has one)
+    2d CHECK_SUP      over the LZ, floor SFC, subject RD, reason none, no phone or email contact:
+                      "read the SUP / AIP ENR 5.1 entry[ for <designator>] before flight[; details
+                      in AIP SUP n/yyyy]", each bracket only when the code found it in the E text
+    2  NO_FLY         over the LZ, floor SFC, any other subject: prohibitive (category, or a
+                      prohibitive reason), or cooperative with no phone or email contact (row 3
+                      comes first)
+    3  CONTACT_FIRST  over the LZ, floor SFC, any other subject: cooperative, with a phone or
+                      email contact
     4 AVOID_SECTOR    within the local area but not over the LZ; or over the LZ with a floor
                       up to the low band ("stay below <floor QNH - buffer> ft QNH")
     5 AWARENESS       floor up to the high band (shown in the answer)
     6 AWARENESS_MAP   floor above the high band (map and collapsed list only)
 
-An informational reading over the LZ from SFC is a warning, not a restriction (Q13): it
+A danger area (RD) over the LZ from SFC is decided by prohibitive_reason and the contact alone,
+never by the reader's category: the data can rule a flight out or attach a condition, never rule
+it in, so an RD is never IGNORE or AWARENESS and is NO_FLY only on a quoted stay-out reason
+(F2). Contact is a phone or an email with a value; a radio frequency is not a contact. A NOTAM
+whose Q-code is too short or in lower case has no subject and takes the other-subject rows.
+
+An informational reading over the LZ from SFC (any subject but RD) is a warning, not a restriction (Q13): it
 is AWARENESS, shown in the answer, and never NO_FLY. With no reading (Q8), a NOTAM over
 the LZ from SFC is UNREAD_OVER_LZ with its E text (phone numbers redacted to <PHONE_n>); any other unread NOTAM gets its
 code-only action (AVOID_SECTOR, AWARENESS, AWARENESS_MAP or IGNORE). An unread NOTAM is
-never NO_FLY or CONTACT_FIRST.
+never NO_FLY, CONTACT_FIRST or CHECK_SUP.
 
 Geometry: the reading's circle or polygon, else the NOTAM's Q-circle. "Over the LZ" is
 inside or exactly on the edge. "Within" is the distance to the edge being at most the
@@ -89,9 +106,12 @@ from flysafelz.geo import (
 from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import Schedule, parse_schedule
+from flysafelz.sup_refs import sup_detail
 
 UNLIMITED_FL = 999  # a Q-line upper limit of FL999 means no upper limit
 SFC_LIMIT = Limit(value=0, unit=LimitUnit.FT, datum=Datum.SFC)
+DANGER_AREA = "RD"  # Q-code subject: a danger area, which the data never rules in
+RESTRICTED_SUBJECTS = {"RR": "restricted area", "RP": "prohibited area", "RT": "temporary restricted area"}  # row 2a
 _LIMIT_TEXT = re.compile(
     r"(?P<sfc>SFC|GND)|(?P<unl>UNL)|FL\s?(?P<fl>\d+)|(?P<ft>\d+)\s?FT\s?(?P<datum>AGL|AMSL)",
     re.IGNORECASE,
@@ -362,9 +382,45 @@ def _result(parsed: ParsedNotam, action: NotamAction, reason: str, debug: list[s
     return ActionResult(notam_id=parsed.id, action=action, reason=line, bearing_deg=bearing, debug=list(debug))
 
 
+def _sup_tail(parsed: ParsedNotam) -> str:
+    """"; details in AIP SUP 108/2026" for the SUP references in the E text, else nothing."""
+    detail = sup_detail(parsed.sup_references)
+    return f"; {detail}" if detail else ""
+
+
+def check_sup_text(parsed: ParsedNotam) -> str:
+    """FR5: "read the SUP / AIP ENR 5.1 entry[ for <designator>] before flight[; details in AIP SUP n/yyyy]".
+
+    A bracketed part is there only when the code found it in the E text (every designator and every SUP, in order of appearance).
+    """
+    where = f" for {', '.join(parsed.designators)}" if parsed.designators else ""
+    return f"read the SUP / AIP ENR 5.1 entry{where} before flight{_sup_tail(parsed)}"
+
+
+def _danger_area(parsed: ParsedNotam, reading: NotamReading, here: str, debug: list[str], extras: list[str]) -> ActionResult:
+    """Rows 2b to 2d for a danger area (QRD) over the LZ from the surface. The reader's category is ignored (CR2)."""
+    if reading.prohibitive_reason is not ProhibitiveReason.NONE:
+        quote = " ".join(redact_phones(reading.prohibitive_quote or "")[0].split())
+        said = f': "{quote}"' if quote else ""
+        return _result(parsed, NotamAction.NO_FLY, f"{here}: prohibitive ({reading.prohibitive_reason.value}){said}", debug, extras)
+    if _has_contact(reading):
+        contact = f"{reading.contact.kind.value} {(reading.contact.value or '').strip()}"
+        return _result(parsed, NotamAction.CONTACT_FIRST, f"{here}: contact {contact} first and fly only if they agree{_sup_tail(parsed)}", debug, extras)
+    # The FR5 text comes first and the fail-closed notes (schedule not parsed, no usable geometry, a ceiling disagreement, a
+    # conditional exemption's quote) follow it, as on the other two rows. Only "activates <designator>" is left out of the reason:
+    # the FR5 text already names the designator the code found in the E text. It stays in the debug list.
+    shown = [note for note in extras if not note.startswith("activates ")]
+    hidden = [note for note in extras if note.startswith("activates ")]
+    return _result(parsed, NotamAction.CHECK_SUP, check_sup_text(parsed), [*debug, *hidden], shown)
+
+
 def _over_lz_from_sfc(parsed: ParsedNotam, reading: NotamReading, label: str, conditional: bool, debug: list[str], extras: list[str], schedule_text: str) -> ActionResult:
-    """Rows 2, 3 and the informational warning, for a read NOTAM over the LZ from the surface."""
+    """Rows 2a-2d, 2, 3 and the informational warning, for a read NOTAM over the LZ from the surface."""
     here = f"{label} over the LZ from the surface"
+    if parsed.subject in RESTRICTED_SUBJECTS:
+        return _result(parsed, NotamAction.NO_FLY, f"{here}: Q-code {parsed.q_code} ({RESTRICTED_SUBJECTS[parsed.subject]})", debug, extras)
+    if parsed.subject == DANGER_AREA:
+        return _danger_area(parsed, reading, here, debug, extras)
     why = _prohibition(reading)
     if why is not None:
         return _result(parsed, NotamAction.NO_FLY, f"{here}: {why}", debug, extras)

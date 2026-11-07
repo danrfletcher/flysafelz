@@ -16,7 +16,7 @@ pressure on both sides, so the two actions differ only by the readings.
                 far on the safe side
     agreement   neither
 
-Severity, strictest first: NO_FLY, UNREAD_OVER_LZ, CONTACT_FIRST, AVOID_SECTOR, AWARENESS, AWARENESS_MAP, IGNORE. An unread
+Severity, strictest first: NO_FLY, UNREAD_OVER_LZ, CHECK_SUP, CONTACT_FIRST, AVOID_SECTOR, AWARENESS, AWARENESS_MAP, IGNORE. An unread
 NOTAM is thus stricter than a label of CONTACT_FIRST (over-caution, not harm), and milder than NO_FLY (harm, "reader failed").
 An unread result is judged on its actions only: it has no designators or heights to compare, and the airspace path adds the
 danger-area condition for it anyway.
@@ -49,6 +49,7 @@ from flysafelz.reader.contract import ReaderResult
 SEVERITY: tuple[NotamAction, ...] = (
     NotamAction.NO_FLY,
     NotamAction.UNREAD_OVER_LZ,
+    NotamAction.CHECK_SUP,
     NotamAction.CONTACT_FIRST,
     NotamAction.AVOID_SECTOR,
     NotamAction.AWARENESS,

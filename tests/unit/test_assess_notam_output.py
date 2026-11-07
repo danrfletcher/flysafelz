@@ -1,6 +1,7 @@
 """G15 and G17: the NOTAMs a segment lists against the debug list, and the order of the conditions."""
 
 from factories import (
+    LZ,
     airspace_fetch,
     amsl,
     circle_at,
@@ -9,11 +10,14 @@ from factories import (
     pib_result,
     reading,
     run_assess,
+    segment,
     utc,
 )
 from airspace_helpers import volume
 
-from flysafelz.contracts import Category, NotamAction
+from flysafelz.assess import CONDITION_ORDER, _notam_findings, display
+from flysafelz.contracts import Category, ContactKind, NotamAction, NotamActionResult, Verdict
+from flysafelz.notam_action import notam_action
 
 
 def only_segment(assessment):
@@ -111,3 +115,95 @@ def test_a_condition_text_is_never_repeated():
     pib, readings = read_all(("J1/26", circle_at(0), {}))
     segment = only_segment(run_assess(window=(utc(9), utc(10)), pib=pib, readings=readings, airspace=airspace_fetch(volume("atz"), volume("atz", name="TEST ATZ"))))
     assert len(segment.conditions) == len(set(segment.conditions))
+
+
+# --- ticket 3b PR-3: CHECK_SUP in the segment ---------------------------------------------------------------------------------
+
+DANGER_E = "TEMPORARY DANGER AREA EGD496A ACTIVATED. UAS BVLOS OPS. SEE AIP SUP 108/2026."
+GP4_CONDITION = "read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026"
+
+
+def danger(notam_id="J4/26", item_e=DANGER_E, **options):
+    """A constructed QRD NOTAM over the LZ from SFC, active, with its reading: no phone, no email, no placeholder, no real number."""
+    circle = circle_at(0)
+    parsed = notam(notam_id, circle=circle, subject="RD", item_f="SFC", item_e=item_e)
+    read = reading(notam_id=notam_id, geometry=circle, contact=ContactKind.NONE, value=None, **options)
+    return parsed, read
+
+
+def segment_of(*pairs, **kw):
+    notams = [p for p, _r in pairs]
+    readings = {r.id: r for _p, r in pairs}
+    return only_segment(run_assess(window=(utc(9), utc(10)), pib=pib_result(*notams), readings=readings, **kw))
+
+
+def test_cr3_the_check_sup_slot_sits_directly_before_contact():
+    assert CONDITION_ORDER.index("check_sup") + 1 == CONDITION_ORDER.index("contact")
+    assert CONDITION_ORDER == ("check_sup", "contact", "permission", "ceiling", "sector", "warning")
+
+
+def test_gp4_a_constructed_danger_area_with_no_contact_is_pilot_discretion_with_conditions_naming_the_designator_and_the_sup():
+    parsed, read = danger()
+    assert notam_action(parsed, read, LZ, segment()).action is NotamAction.CHECK_SUP
+    seg = segment_of((parsed, read))
+    assert [a.action for a in seg.notam_actions] == [NotamAction.CHECK_SUP]
+    assert seg.verdict is Verdict.PILOT_DISCRETION and seg.blockers == []
+    assert seg.conditions == [GP4_CONDITION]
+    assert display(seg) == "PILOT DISCRETION \u2013 WITH CONDITIONS"
+    print(f"GP4 verdict: {display(seg)}\nGP4 condition: {seg.conditions[0]}")
+
+
+def test_gp4_without_the_sup_reference_the_condition_has_no_details_tail_and_no_empty_brackets():
+    parsed, read = danger(item_e="TEMPORARY DANGER AREA EGD496A ACTIVATED. UAS BVLOS OPS.")
+    seg = segment_of((parsed, read))
+    assert seg.conditions == ["read the SUP / AIP ENR 5.1 entry for EGD496A before flight"]
+    assert "details in" not in seg.conditions[0] and "[" not in seg.conditions[0] and "()" not in seg.conditions[0]
+    assert display(seg) == "PILOT DISCRETION \u2013 WITH CONDITIONS"
+
+
+def test_a_segment_whose_only_finding_is_check_sup_is_never_plain_pilot_discretion_and_is_flyable():
+    assessment = run_assess(window=(utc(9), utc(10)), pib=pib_result(danger()[0]), readings={"J4/26": danger()[1]})
+    seg = only_segment(assessment)
+    assert display(seg) != "PILOT DISCRETION" and seg.conditions
+    assert [(w.start, w.end) for w in assessment.flyable_windows] == [(utc(9), utc(10))]
+    assert assessment.overall_verdict is Verdict.PILOT_DISCRETION
+
+
+def test_the_check_sup_condition_is_listed_before_the_contact_condition_whatever_the_notam_order():
+    contact_circle = circle_at(0)
+    contact = (notam("J1/26", circle=contact_circle), reading(notam_id="J1/26", geometry=contact_circle, activity="alpha contact", value="07700 900123"))
+    for pairs in ((contact, danger()), (danger(), contact)):
+        seg = segment_of(*pairs)
+        assert len(seg.conditions) == 2
+        assert seg.conditions[0] == GP4_CONDITION and "alpha contact" in seg.conditions[1]
+
+
+def test_a_check_sup_notam_beside_a_no_fly_notam_is_no_go_and_the_check_sup_condition_is_still_listed():
+    circle = circle_at(0)
+    stay_out = (notam("J1/26", circle=circle, subject="RR"), reading(notam_id="J1/26", geometry=circle))
+    seg = segment_of(stay_out, danger())
+    assert seg.verdict is Verdict.NO_GO and display(seg) == "NO-GO"
+    assert [b.source for b in seg.blockers] == ["notam"] and "J1/26" in seg.blockers[0].text
+    assert seg.conditions == [GP4_CONDITION]
+
+
+def test_a_check_sup_notam_that_the_airspace_path_owns_adds_no_condition_here():
+    result = NotamActionResult(notam_id="J4/26", action=NotamAction.CHECK_SUP, reason=GP4_CONDITION)
+    assert _notam_findings([result], {"J4/26"}) == ([], [], [])
+    assert _notam_findings([result], set()) == ([], [("check_sup", GP4_CONDITION)], [])
+    contact = NotamActionResult(notam_id="J5/26", action=NotamAction.CONTACT_FIRST, reason="call them")
+    assert _notam_findings([contact], {"J5/26"}) == ([], [], [])  # as CONTACT_FIRST does today
+
+
+def test_an_unread_danger_area_is_unverified_and_never_check_sup():
+    parsed, _read = danger()
+    seg = only_segment(run_assess(window=(utc(9), utc(10)), pib=pib_result(parsed)))
+    assert seg.verdict is Verdict.UNVERIFIED
+    assert [a.action for a in seg.notam_actions] == [NotamAction.UNREAD_OVER_LZ]
+    assert not any("read the SUP" in c for c in seg.conditions)
+
+
+def test_check_sup_maps_to_pilot_discretion_and_nothing_else():
+    seg = segment_of(danger())
+    assert seg.verdict is Verdict.PILOT_DISCRETION
+    assert [v.name for v in Verdict] == ["NO_GO", "UNVERIFIED", "PILOT_DISCRETION"]

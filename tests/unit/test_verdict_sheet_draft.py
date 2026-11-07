@@ -195,15 +195,33 @@ def test_fill_rows_refuses_rows_that_are_not_this_assessments_segments():
 
 
 def test_g4_severity_order_is_the_plans():
-    assert SEVERITY == (A.NO_FLY, A.UNREAD_OVER_LZ, A.CONTACT_FIRST, A.AVOID_SECTOR, A.AWARENESS, A.AWARENESS_MAP, A.IGNORE)
+    assert SEVERITY == (A.NO_FLY, A.UNREAD_OVER_LZ, A.CHECK_SUP, A.CONTACT_FIRST, A.AVOID_SECTOR, A.AWARENESS, A.AWARENESS_MAP, A.IGNORE)
     assert set(SEVERITY) == set(NotamAction)
 
 
 @pytest.mark.parametrize(("first", "second"), list(itertools.product(NotamAction, repeat=2)))
-def test_g4_worst_action_of_every_pair_of_the_seven_actions(first, second):
+def test_g4_worst_action_of_every_pair_of_the_eight_actions(first, second):
     expected = first if SEVERITY.index(first) <= SEVERITY.index(second) else second
     assert worst_action(first, second) is expected
     assert worst_action(second, first) is expected
+
+
+def test_g4_check_sup_is_below_unread_over_lz_and_above_contact_first():
+    assert worst_action(A.CHECK_SUP, A.UNREAD_OVER_LZ) is A.UNREAD_OVER_LZ
+    assert worst_action(A.CHECK_SUP, A.NO_FLY) is A.NO_FLY
+    assert worst_action(A.CHECK_SUP, A.CONTACT_FIRST) is A.CHECK_SUP
+    assert worst_action(A.CONTACT_FIRST, A.CHECK_SUP) is A.CHECK_SUP
+    assert SEVERITY.index(A.CHECK_SUP) == SEVERITY.index(A.UNREAD_OVER_LZ) + 1 == SEVERITY.index(A.CONTACT_FIRST) - 1
+
+
+def test_g4_a_segment_s_worst_action_picks_check_sup_over_contact_first_and_lists_it_in_severity_order():
+    a = assessment(
+        seg(start=HOUR, actions=(result("B2/26", A.CONTACT_FIRST), result("C3/26", A.CHECK_SUP), result("D4/26", A.AVOID_SECTOR))),
+        seg(start=datetime(2026, 10, 31, 10, tzinfo=UTC), end=datetime(2026, 10, 31, 11, tzinfo=UTC), actions=(result("B2/26", A.CHECK_SUP), result("A1/26", A.UNREAD_OVER_LZ))),
+    )
+    listed = draft_actions(a)
+    assert listed == {"A1/26": "UNREAD_OVER_LZ", "B2/26": "CHECK_SUP", "C3/26": "CHECK_SUP", "D4/26": "AVOID_SECTOR"}
+    assert list(listed) == ["A1/26", "B2/26", "C3/26", "D4/26"]
 
 
 def test_g4_each_notam_is_listed_once_with_its_worst_action_in_severity_order_then_id():

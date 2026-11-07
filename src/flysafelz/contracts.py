@@ -276,20 +276,31 @@ class NotamReading(BaseModel):
 class NotamAction(StrEnum):
     """What a NOTAM means for the pilot in one segment. notam_action() (PR-6) owns the logic.
 
-    First match wins:
-      IGNORE            not active in the slot, beyond the local area, exempts paramotors, or irrelevant
-      NO_FLY            over the LZ from the surface and prohibitive (or cooperative with no phone or email)
-      CONTACT_FIRST     over the LZ from the surface, cooperative, with a phone or email contact
-      AVOID_SECTOR      within the local area but not over the LZ, or over it with a floor of 0-5,000 ft
-      AWARENESS         floor 5,000-10,000 ft: shown in the answer
-      AWARENESS_MAP     floor above 10,000 ft: shown on the map and the collapsed list only
-      UNREAD_OVER_LZ    no reading, and the NOTAM lies over the LZ from the surface (Q8):
-                        the segment is UNVERIFIED and the E text is printed
+    First match wins (row 1 first; rows 2a-2d and 3 only over the LZ from the surface). The Q-code
+    subject (ParsedNotam.subject) keys rows 2a-2d; a danger area (RD) is never ruled in by the data:
+      IGNORE            1   not active in the slot, beyond the local area, exempts paramotors, or irrelevant
+      NO_FLY            2a  subject RR, RP or RT (restricted, prohibited or temporary restricted area)
+                        2b  subject RD with a prohibitive reason (live firing, entry prohibited, byelaws),
+                            quoted from the E text
+                        2   any other subject: prohibitive (category or reason), or cooperative with no
+                            phone or email contact
+      CONTACT_FIRST     2c  subject RD, no prohibitive reason, with a phone or email contact
+                        3   any other subject: cooperative (or a conditional exemption), with a phone or
+                            email contact
+      CHECK_SUP         2d  subject RD, no prohibitive reason, no phone or email contact: read the SUP /
+                            AIP ENR 5.1 entry before flight (shows as PILOT DISCRETION - WITH CONDITIONS)
+      AVOID_SECTOR      4   within the local area but not over the LZ, or over it with a floor of 0-5,000 ft
+      AWARENESS         5   floor 5,000-10,000 ft: shown in the answer
+      AWARENESS_MAP     6   floor above 10,000 ft: shown on the map and the collapsed list only
+      UNREAD_OVER_LZ        no reading, and the NOTAM lies over the LZ from the surface (Q8):
+                            the segment is UNVERIFIED and the E text is printed
+    For a danger area the reader's category is ignored: only prohibitive_reason and the contact decide.
     """
 
     IGNORE = "IGNORE"
     NO_FLY = "NO_FLY"
     CONTACT_FIRST = "CONTACT_FIRST"
+    CHECK_SUP = "CHECK_SUP"
     AVOID_SECTOR = "AVOID_SECTOR"
     AWARENESS = "AWARENESS"
     AWARENESS_MAP = "AWARENESS_MAP"
