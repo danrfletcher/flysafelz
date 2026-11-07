@@ -22,7 +22,10 @@ BLUE_MILL_GP3 = ["assess", "--case", BLUE_MILL, "--start", "2026-10-31T07:00Z", 
 BARE_GO = re.compile(r"(?<![-\w])GO(?![-\w])")
 ROW = re.compile(r"^(\d\d):\d\d\u2013\d\d:\d\d(?:  (.*))?$")  # a top-level table row: no indent
 
-DANGER_AREA = "Danger area EGD496A active 08:00\u201318:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree; details in AIP SUP 108/2026"
+# The contact the CLI shows is the captured fixture's own (the real one: CONTACT_FIRST asks the pilot to call it), so it is read from the
+# committed reading, not typed into this file (F5: no real number in a test source).
+FIXTURE_CONTACT = cases.load(BLUE_MILL)[4]["J3857/26"].contact.value
+DANGER_AREA = f"Danger area EGD496A active 08:00\u201318:00 (UAS BVLOS ops): phone {FIXTURE_CONTACT} and fly only if they agree; details in AIP SUP 108/2026"
 STAY_BELOW = "stay below 1,300 ft QNH"
 
 

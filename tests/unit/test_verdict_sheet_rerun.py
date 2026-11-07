@@ -110,7 +110,7 @@ def test_g6_an_append_that_would_not_parse_leaves_the_file_alone(root, capsys):
     """A sheet written as a flow list cannot take block entries after it; the check before writing refuses and nothing changes."""
     (root / "sheet.yaml").write_text("[]\n", encoding="utf-8")
     before = (sheet_bytes(root), (root / "sheet.yaml").stat().st_mtime_ns)
-    code, out, err = run(root, ex("a"), capsys=capsys)
+    code, _out, err = run(root, ex("a"), capsys=capsys)
     assert code == 1 and "nothing written" in err and err.count("\n") == 1
     assert (sheet_bytes(root), (root / "sheet.yaml").stat().st_mtime_ns) == before
 
@@ -173,7 +173,7 @@ def test_e3_the_pilots_lat_lon_now_case_and_drop_each_make_an_entry_stale_too(ro
     run(root, ex("a"), capsys=capsys)
     before = sheet_bytes(root)
     for changed in (ex("a", lat=53.9), ex("a", lon=-0.1), ex("a", drop=["pib"]), example("a", "c", now=utc(7, 45), window=WINDOW)):
-        code, out, _err = run(root, changed, capsys=capsys)
+        _code, out, _err = run(root, changed, capsys=capsys)
         assert "example a: stale (inputs)" in out, changed
         assert sheet_bytes(root) == before
 
@@ -314,7 +314,7 @@ def test_e7_a_sheet_whose_indentation_was_broken_by_hand_names_its_line(root, ca
 
 def test_f2_the_examples_file_keeps_its_hash_and_mtime_through_a_build_a_rerun_and_a_check(root, capsys):
     path = examples_file(root / "examples.yaml", ex("a"), ex("b", blind=False))
-    stamp = lambda: (hashlib.sha256(path.read_bytes()).hexdigest(), path.stat().st_mtime_ns)  # noqa: E731
+    stamp = lambda: (hashlib.sha256(path.read_bytes()).hexdigest(), path.stat().st_mtime_ns)
     before = stamp()
     argv = ["--examples", str(path), "--out", str(root / "sheet.yaml")]
     for extra in ([], [], ["--check"]):
@@ -339,7 +339,7 @@ def test_an_existing_entrys_case_folder_gone_is_never_captured_again(root, capsy
     before = sheet_bytes(root)
     monkeypatch.setattr(capture, "capture", lambda *a, **k: pytest.fail("a case was captured for an existing entry"))
     moved = example("a", "new_case_name", now=NOW, window=WINDOW)
-    code, out, err = run(root, moved, capsys=capsys)
+    code, out, _err = run(root, moved, capsys=capsys)
     assert code == 0 and "example a: stale (inputs)" in out and sheet_bytes(root) == before
 
 

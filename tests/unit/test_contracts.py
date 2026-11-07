@@ -1,7 +1,6 @@
 """Contracts round-trip, reject bad input, and display_verdict builds the six strings (F4)."""
 
 from datetime import UTC, datetime
-
 from pathlib import Path
 
 import pytest

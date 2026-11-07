@@ -49,8 +49,9 @@ def test_edge_name_table(reasons, name):
 # --- segment_rows through the real assess() ----------------------------------------------------------
 
 
-def rows_for(*notams, window=(utc(8), utc(12)), now=None):
+def rows_for(*notams, window=None, now=None):
     """The sheet rows of a Blue Mill assessment with these NOTAMs, as (start, end, edge) in UTC minutes of the window's day."""
+    window = window or (utc(8), utc(12))
     kwargs = {} if now is None else {"now": now}
     pib = pib_result(*notams)
     assessment = run_assess(window=window, pib=pib, **kwargs)

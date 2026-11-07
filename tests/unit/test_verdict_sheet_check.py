@@ -214,7 +214,7 @@ def test_gp5_check_prints_one_line_per_example_with_the_columns_and_exits_0(buil
 
 
 def test_gp5_the_counts_follow_the_labels_dan_types_and_actions_done(built, capsys):
-    root, examples, sheet = built
+    _root, _examples, sheet = built
     text = sheet.read_text(encoding="utf-8")
     text = text.replace("verdict: null\n    approaching_limits: null", "verdict: NO_GO\n    approaching_limits: true", 1).replace("actions_done: false", "actions_done: true")
     text = text.replace("X1/26: null", "X1/26: UNREAD_OVER_LZ")
@@ -258,7 +258,7 @@ def test_check_cannot_be_combined_with_the_build_mode_flags(built):
 
 
 def test_an_orphan_is_reported_not_an_error_and_a_stale_entry_is_reported_not_an_error(built, capsys):
-    root, examples, sheet = built
+    root, _examples, sheet = built
     other = examples_file(root / "other.yaml", example("somebody_else", "c", now=NOW, window=(utc(8), utc(11))))
     code = main(["--check", "--examples", str(other), "--out", str(sheet)], root=root, environ={})
     out, _err = capsys.readouterr()
