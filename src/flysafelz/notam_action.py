@@ -2,6 +2,7 @@
 
     notam_action(parsed, reading | None, lz, segment) -> ActionResult
     active_intervals(parsed, reading, lz, start, end) -> list of (start, end) UTC spans
+    merged_limits(parsed, reading, lz, segment) -> (floor, ceiling) in ft QNH, as the table below uses them
 
 No network, no model, no state. Every reading is written by hand or by ticket 3's
 reader. Every number is a rules.yaml rule (local_area, band_low, band_high,
@@ -204,6 +205,22 @@ def _limits(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, 
     return floor, ceiling
 
 
+def _pressure(segment: Segment | ActionSegment, rules: Rules) -> float:
+    """The segment's forecast pressure, else the reference pressure."""
+    pressure = segment.pressure_msl if isinstance(segment, ActionSegment) else None
+    return _number(rules.fl_reference_hpa) if pressure is None else pressure
+
+
+def merged_limits(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, segment: Segment | ActionSegment, *, rules: Rules | None = None) -> tuple[float, float]:
+    """The floor and ceiling notam_action() works with (the E10 merge), in feet QNH. A ceiling of no upper limit is infinity.
+
+    A wrapper over the same merge, so the reader eval compares heights as numbers (R3.12) without a second copy of the rule.
+    """
+    rules = RULES if rules is None else rules
+    floor, ceiling = _limits(parsed, reading, lz, _pressure(segment, rules), rules, [])
+    return floor.qnh, ceiling.qnh
+
+
 # --- geometry -----------------------------------------------------------------
 
 
@@ -373,9 +390,7 @@ def notam_action(
     rules = RULES if rules is None else rules
     debug: list[str] = []
     extras: list[str] = []
-    pressure = segment.pressure_msl if isinstance(segment, ActionSegment) else None
-    if pressure is None:
-        pressure = _number(rules.fl_reference_hpa)
+    pressure = _pressure(segment, rules)
 
     # Row 1: does it apply to a paramotor, is it active, is it near?
     exemptions = _checked(parsed, reading, debug) if reading else []
