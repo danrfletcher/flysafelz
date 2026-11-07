@@ -17,6 +17,8 @@ from flysafelz.rules import DEFAULT_PATH, RULES
 ROOT = Path(__file__).resolve().parents[2]
 SRC = ROOT / "src" / "flysafelz"
 PY_FILES = sorted(SRC.rglob("*.py"))
+SCRIPT_FILES = sorted((ROOT / "scripts").glob("*.py"))
+FORBIDDEN_IMPORTS = ("langgraph", "langchain", "langsmith", "openai", "anthropic")
 
 
 def _parse(path: Path) -> ast.Module:
@@ -54,16 +56,96 @@ def test_pyproject_has_no_agent_or_llm_dependency():
         assert not name.startswith(("langgraph", "langchain", "openai", "anthropic")), name
 
 
+def _imported_modules(path: Path) -> list[str]:
+    modules = []
+    for node in ast.walk(_parse(path)):
+        if isinstance(node, ast.Import):
+            modules += [a.name for a in node.names]
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            modules.append(node.module)
+    return modules
+
+
 def test_source_imports_no_agent_framework():
-    for path in PY_FILES:
-        for node in ast.walk(_parse(path)):
-            modules = []
-            if isinstance(node, ast.Import):
-                modules = [a.name for a in node.names]
-            elif isinstance(node, ast.ImportFrom) and node.module:
-                modules = [node.module]
-            for module in modules:
-                assert not module.startswith(("langgraph", "langchain", "openai", "anthropic")), (path, module)
+    for path in PY_FILES + SCRIPT_FILES:
+        for module in _imported_modules(path):
+            assert not module.startswith(FORBIDDEN_IMPORTS), (path, module)
+
+
+# F1 (PR-3.F1): the verdict sheet has no model, no reader, and writes no label on a blind row.
+VERDICT_SHEET_FILES = [SRC / "verdict_sheet.py", ROOT / "scripts" / "build_verdict_sheet.py"]
+
+
+def test_the_verdict_sheet_imports_no_model_client_and_no_reader():
+    assert all(p.exists() for p in VERDICT_SHEET_FILES)
+    for path in VERDICT_SHEET_FILES:
+        for module in _imported_modules(path):
+            assert not module.startswith(FORBIDDEN_IMPORTS), (path, module)
+            assert "reader" not in module.lower(), (path, module)
+
+
+def test_the_verdict_sheet_writes_no_label_value():
+    labels = {m.value for m in contracts.Verdict} | {m.name for m in contracts.Verdict} | {m.value for m in contracts.NotamAction}
+    for path in VERDICT_SHEET_FILES:
+        tree = _parse(path)
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                assert node.value not in labels, f"{path}:{node.lineno}: {node.value!r}"
+            if isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+                assert node.value.id not in {"Verdict", "NotamAction"}, f"{path}:{node.lineno}: {node.value.id}.{node.attr}"
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Dict):
+                for key, value in zip(node.keys, node.values, strict=True):
+                    if isinstance(key, ast.Constant) and key.value in {"verdict", "approaching_limits"}:
+                        assert isinstance(value, ast.Constant) and value.value is None, f"{path}:{node.lineno}: {key.value} is not None"
+
+
+CUT_POINT_NAMES = {"active_intervals", "daylight_edges"}
+
+
+def _cut_point_uses(tree: ast.AST) -> list[tuple[int, str]]:
+    """Calls to, and imports of, the cut-point primitives that the sheet must leave to assess."""
+    found = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            func = node.func
+            name = func.id if isinstance(func, ast.Name) else func.attr if isinstance(func, ast.Attribute) else None
+            if name in CUT_POINT_NAMES:
+                found.append((node.lineno, f"call {name}"))
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            for alias in node.names:
+                if alias.name.rsplit(".", 1)[-1] in CUT_POINT_NAMES:
+                    found.append((node.lineno, f"import {alias.name}"))
+    return found
+
+
+def test_the_verdict_sheet_defines_no_cut_point_logic_of_its_own():
+    for path in VERDICT_SHEET_FILES:
+        assert _cut_point_uses(_parse(path)) == [], path
+
+
+def test_the_cut_point_scan_catches_planted_uses():
+    planted = ast.parse(
+        "from flysafelz.assess import active_intervals\n"
+        "import flysafelz.daylight as d\n"
+        "from flysafelz.daylight import daylight_edges as edges\n"
+        "a = active_intervals(x)\n"
+        "b = d.daylight_edges(y)\n"
+    )
+    uses = [kind for _, kind in _cut_point_uses(planted)]
+    assert sorted(uses) == [
+        "call active_intervals",
+        "call daylight_edges",
+        "import active_intervals",
+        "import daylight_edges",
+    ]
+
+
+def test_the_label_scan_catches_a_planted_label():
+    planted = ast.parse('row = {"verdict": "NO_GO"}\nother = Verdict.NO_GO\n')
+    constants = [n.value for n in ast.walk(planted) if isinstance(n, ast.Constant)]
+    assert "NO_GO" in constants
+    assert any(isinstance(n, ast.Attribute) and isinstance(n.value, ast.Name) and n.value.id == "Verdict" for n in ast.walk(planted))
 
 
 # F3: no threshold literals in Python.
