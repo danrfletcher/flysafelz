@@ -1,0 +1,52 @@
+# Reader eval selection: the 40 real NOTAMs the labelling sheet is built from.
+# Selected by Vector (selection only; no model or worker writes a label).
+# Source: github.com/Jonty/uk-notam-archive, data/PIB.xml at each commit below
+#   fc03e3b9cbf0cb730b96918dfe04341aa5b9817e  PIB issued 2026-07-04
+#   e688158a8b52101b09f810b59d6ed0c6717b61f3  PIB issued 2026-08-22
+#   27e0709e518b8ee56fe79ff5975abd4c8da7bfd4  PIB issued 2026-09-19
+#   bdab14658f0270dc41460eebcd03332abfb230ec  PIB issued 2026-10-31 (the Blue Mill case)
+# Ranks 1-24 cover each of the 24 types once. Ranks 25-40 give a second example of the
+# types of ranks 1-16, in the same order. Stopping at rank 24 still covers every type.
+# `type` is one of the 24 tags below; any other value is a selection error.
+
+items:
+  - {rank: 1, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "J1458/26", type: rat_all_aircraft_paramotor_trap}
+  - {rank: 2, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "J1927/26", type: rat_uas_only}
+  - {rank: 3, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "J1874/26", type: tda_trigger_by_place}
+  - {rank: 4, sha: bdab14658f0270dc41460eebcd03332abfb230ec, id: "J3857/26", type: tda_with_designator}
+  - {rank: 5, sha: bdab14658f0270dc41460eebcd03332abfb230ec, id: "H7171/26", type: drone_ops_with_phone}
+  - {rank: 6, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "H2999/26", type: model_flying}
+  - {rank: 7, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "H1910/26", type: parachuting}
+  - {rank: 8, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "H2986/26", type: tethered_balloon}
+  - {rank: 9, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "H3442/26", type: glider_winch_launching}
+  - {rank: 10, sha: 27e0709e518b8ee56fe79ff5975abd4c8da7bfd4, id: "H5759/26", type: air_display_fly_in}
+  - {rank: 11, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "I5452/26", type: aerodrome_drone}
+  - {rank: 12, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "I2608/26", type: aerodrome_fireworks_laser}
+  - {rank: 13, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "L3361/26", type: aerodrome_users_only}
+  - {rank: 14, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "C3808/26", type: crane_obstacle}
+  - {rank: 15, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "B1042/26", type: tmz}
+  - {rank: 16, sha: bdab14658f0270dc41460eebcd03332abfb230ec, id: "Q74/26", type: military_exercise_series_q}
+  - {rank: 17, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "U5777/26", type: multi_height_agl_amsl}
+  - {rank: 18, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "A2410/26", type: polygon_area}
+  - {rank: 19, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "L3350/26", type: radius_in_metres}
+  - {rank: 20, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "D2637/26", type: no_coordinates_in_e}
+  - {rank: 21, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "J2831/26", type: radio_only_contact}
+  - {rank: 22, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "C3856/26", type: email_contact}
+  - {rank: 23, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "J1974/26", type: emergency_services_exemption}
+  - {rank: 24, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "H3640/26", type: survey_inspection}
+  - {rank: 25, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "J2323/26", type: rat_all_aircraft_paramotor_trap}
+  - {rank: 26, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "J1985/26", type: rat_uas_only}
+  - {rank: 27, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "J2809/26", type: tda_trigger_by_place}
+  - {rank: 28, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "J1859/26", type: tda_with_designator}
+  - {rank: 29, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "H4903/26", type: drone_ops_with_phone}
+  - {rank: 30, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "L4880/26", type: model_flying}
+  - {rank: 31, sha: 27e0709e518b8ee56fe79ff5975abd4c8da7bfd4, id: "H6076/26", type: parachuting}
+  - {rank: 32, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "A2907/26", type: tethered_balloon}
+  - {rank: 33, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "H5296/26", type: glider_winch_launching}
+  - {rank: 34, sha: 27e0709e518b8ee56fe79ff5975abd4c8da7bfd4, id: "H6002/26", type: air_display_fly_in}
+  - {rank: 35, sha: bdab14658f0270dc41460eebcd03332abfb230ec, id: "I6971/26", type: aerodrome_drone}
+  - {rank: 36, sha: bdab14658f0270dc41460eebcd03332abfb230ec, id: "I7484/26", type: aerodrome_fireworks_laser}
+  - {rank: 37, sha: 27e0709e518b8ee56fe79ff5975abd4c8da7bfd4, id: "U7211/26", type: aerodrome_users_only}
+  - {rank: 38, sha: e688158a8b52101b09f810b59d6ed0c6717b61f3, id: "L4935/26", type: crane_obstacle}
+  - {rank: 39, sha: fc03e3b9cbf0cb730b96918dfe04341aa5b9817e, id: "U5358/26", type: tmz}
+  - {rank: 40, sha: bdab14658f0270dc41460eebcd03332abfb230ec, id: "Q73/26", type: military_exercise_series_q}
