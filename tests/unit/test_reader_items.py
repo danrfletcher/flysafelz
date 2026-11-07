@@ -286,10 +286,10 @@ def test_the_script_refuses_to_write_a_sheet_with_a_number_left_in_it(tmp_path, 
 # --- F4: no labels ------------------------------------------------------------------------------
 
 
-def test_no_labels_file_exists_and_the_script_never_names_one():
-    assert not (READER / "labels.yaml").exists()
+def test_the_script_never_names_a_labels_file():
+    # No check that labels.yaml is absent from the tree: Dan adds evals/reader/labels.yaml at Review, and
+    # make test must keep passing then. The guard is that this script never reads or writes one.
     assert "labels.yaml" not in SCRIPT.read_text(encoding="utf-8")
-    assert not list(READER.glob("labels*"))
 
 
 def test_the_script_writes_only_the_out_file(tmp_path):

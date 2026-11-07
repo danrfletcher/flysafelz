@@ -29,6 +29,8 @@ build-backend = "uv_build"
 [tool.pytest.ini_options]
 addopts = "--disable-socket"
 testpaths = ["tests"]
+# The reader eval's scoring package, evals/reader_eval, sits at the repository root, outside src/.
+pythonpath = ["."]
 
 [tool.ruff]
 # The code keeps a comment or a sentence on one line, so 200 columns, not the default 88.

@@ -1,0 +1,21 @@
+# Operational knobs of the reader eval's scoring (G13, G14). None is a safety threshold: those live in
+# src/flysafelz/rules.yaml. Each is loaded by name in settings.py, and no number equal to one of them may be written in
+# this package's code (tests/unit/test_reader_eval_fence.py).
+
+# Distance in NM from the area's edge to the spots just inside it and just outside it (G13, R3.4).
+ring_inner_nm: 0.1
+
+# Distance in NM from the area's edge to the spots near the edge of the local area. It is below the 2 NM local_area rule
+# by a margin, so float noise on the prefilter's `> 2` comparison cannot flip a side (R3.4).
+ring_outer_nm: 1.9
+
+# Ground height in ft for every spot, on both sides of a comparison (R3.11). A test-only assumption: a real assessment uses
+# the LZ's own elevation. It makes a height read with the wrong datum give a different action.
+site_elevation_ft: 500
+
+# A top more than this many ft below the label's, or a bottom more than this many ft above it, is a harmful downgrade; the
+# opposite direction is over-caution; exactly this many ft is neither (R3.12).
+height_tolerance_ft: 100
+
+# Two heights count as the same in the per-field accuracy (G14) when they are at most this many ft apart after the FL x 100 conversion.
+field_height_tolerance_ft: 100
