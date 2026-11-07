@@ -80,13 +80,13 @@ READINGS = {
 
 # (activation kind, area arguments, active with no activation?)
 KINDS = {
-    "byNotam": (dict(by_notam=True), False),
-    "hours, inside": (dict(hours="DAILY 0800-1800"), True),
-    "hours, outside": (dict(hours="DAILY 1000-1100"), False),
-    "H24": (dict(hours="H24"), True),
-    "unparseable": (dict(hours="WHENEVER THE RANGE IS HOT"), True),
-    "unreadable": (dict(hours_readable=False), True),
-    "empty": (dict(hours=None), True),
+    "byNotam": ({"by_notam": True}, False),
+    "hours, inside": ({"hours": "DAILY 0800-1800"}, True),
+    "hours, outside": ({"hours": "DAILY 1000-1100"}, False),
+    "H24": ({"hours": "H24"}, True),
+    "unparseable": ({"hours": "WHENEVER THE RANGE IS HOT"}, True),
+    "unreadable": ({"hours_readable": False}, True),
+    "empty": ({"hours": None}, True),
 }
 
 

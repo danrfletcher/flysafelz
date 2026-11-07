@@ -10,8 +10,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-from pydantic import BaseModel, ValidationError
-
 from fence_scan import (
     READER_REVIEWED_LITERALS,
     REVIEWED_FLOATS,
@@ -23,6 +21,7 @@ from fence_scan import (
     unreviewed_floats,
     unreviewed_literals,
 )
+from pydantic import BaseModel, ValidationError
 
 from flysafelz import cli, contracts
 from flysafelz.rules import DEFAULT_PATH, RULES
@@ -413,7 +412,7 @@ def test_the_key_scan_catches_a_planted_reader_key_and_ignores_an_empty_one(tmp_
 
 
 def test_env_is_gitignored_and_example_is_empty():
-    ignored = subprocess.run(["git", "check-ignore", ".env"], cwd=ROOT, capture_output=True, text=True)
+    ignored = subprocess.run(["git", "check-ignore", ".env"], cwd=ROOT, capture_output=True, text=True, check=False)
     assert ignored.returncode == 0
     expected = ["OPENAIP_API_" + "KEY=", "READER_PROVIDER=", "READER_BASE_URL=", "READER_API_" + "KEY=", "READER_MODEL="]  # split so this file never matches the F6 scan
     assert (ROOT / ".env.example").read_text(encoding="utf-8").splitlines() == expected
