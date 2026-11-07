@@ -1,0 +1,29 @@
+# Operational knobs of the agent and its guidance search. None is a safety threshold (those live in rules.yaml),
+# and no key here may share a name with a rules.yaml id. Each is loaded by name in settings.py.
+
+# Chunks the guidance search returns for one query (G13).
+top_k: 4
+
+# The band, in tokens, the guidance chunker aims each section's chunks at (G17).
+chunk_tokens_min: 300
+chunk_tokens_max: 800
+
+# Extra model calls the guard may make after a failed first answer (G15, FR10).
+guard_retries: 1
+
+# Retries the chat model's client makes on a timeout or a bad reply, set on ChatOpenAI (FR17).
+model_max_retries: 1
+
+# Minutes a fetched source is reused within a thread before it is fetched again (FR12).
+source_reuse_minutes: 15
+
+# The fastembed model for guidance search, downloaded by `make setup` (F5), and the folder it is stored in.
+# The folder is relative to the repository root and git-ignored; fastembed's own default is a temp folder that gets wiped.
+embedding_model: BAAI/bge-small-en-v1.5
+embedding_cache_dir: .cache/fastembed
+
+# Part of the corpus key: bump it when the chunker changes, so the committed embeddings are rebuilt (G18).
+chunker_version: 1
+
+# The LangSmith project runs go to when LANGSMITH_PROJECT is not set (G20).
+langsmith_project: flysafelz
