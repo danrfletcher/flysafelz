@@ -5,11 +5,17 @@ hand. No fixture file, no network, no .env.
 """
 
 import math
-from datetime import UTC, datetime
+from collections.abc import Mapping
+from datetime import UTC, datetime, timedelta
 
 from pib_helpers import parsed as pib_parsed
+from weather_helpers import calm
 
+from flysafelz.assess import assess, default_window
+from flysafelz.clients.open_meteo import Forecast
+from flysafelz.clients.openaip import Airspace, AirspaceFetch
 from flysafelz.contracts import (
+    Assessment,
     AppliesTo,
     Category,
     Circle,
@@ -24,9 +30,13 @@ from flysafelz.contracts import (
     ParsedNotam,
     Polygon,
     ProhibitiveReason,
+    SourceName,
+    SourceState,
+    SourceStatus,
 )
 from flysafelz.geo import distance_nm
 from flysafelz.notam_action import ActionSegment, LandingZone
+from flysafelz.pib import PibResult
 from flysafelz.rules import RULES, Rules
 
 BLUE_MILL = LandingZone(lat=53.802797, lon=-0.086644, elevation_ft=30.0)
@@ -137,3 +147,100 @@ def reading(
 
 def exemption(quote: str, covers: ExemptionCovers = ExemptionCovers.PARAMOTOR_CLASS) -> Exemption:
     return Exemption(quote=quote, covers=covers)
+
+
+# --- assess(): sources and a calm default run ---------------------------------------------
+
+
+NOW = utc(7, 30)  # the conftest clock: 2026-10-31T07:30Z, a Saturday; London is on GMT (the clocks went back on 25 Oct)
+ISSUED = utc(7, 0)  # a PIB issued half an hour before NOW
+ONE_HOUR = timedelta(hours=1)
+
+
+def status(source: SourceName, state: SourceState = SourceState.OK, reason: str = "", issued_at: datetime | None = None) -> SourceStatus:
+    """A hand-built SourceStatus. Failed and stale ones get a reason, as the clients give them."""
+    if state is not SourceState.OK and not reason:
+        reason = f"{source.value} {state.value} in this test"
+    return SourceStatus(source=source, state=state, reason=reason, fetched_at=NOW, issued_at=issued_at)
+
+
+def weather_forecast(
+    first: datetime,
+    last: datetime,
+    *,
+    changes: Mapping[datetime, Mapping[str, float | None]] | None = None,
+    after: Mapping[datetime, Mapping[str, float | None]] | None = None,
+    elevation_m: float | None = 9.0,
+    state: SourceState = SourceState.OK,
+) -> Forecast:
+    """A calm forecast with a sample at every whole hour from first to last, both included.
+
+    changes maps a timestamp to values that replace the calm ones (None removes one).
+    after maps a timestamp to values applied to that timestamp and every later one.
+    A failed state gives a Forecast with no samples, as the client does.
+    """
+    if state is not SourceState.OK:
+        return Forecast(status=status(SourceName.WEATHER, state))
+    samples = {}
+    t = first
+    while t <= last:
+        values = {}
+        for since, over in (after or {}).items():
+            if t >= since:
+                values.update(over)
+        values.update((changes or {}).get(t, {}))
+        samples[t] = calm(**values)
+        t += ONE_HOUR
+    return Forecast(status=status(SourceName.WEATHER), elevation_m=elevation_m, samples=samples)
+
+
+def forecast_failed(state: SourceState = SourceState.FAILED) -> Forecast:
+    """What the weather client returns when it could not get a forecast."""
+    return Forecast(status=status(SourceName.WEATHER, state))
+
+
+def airspace_fetch(*areas: Airspace, state: SourceState = SourceState.OK) -> AirspaceFetch:
+    return AirspaceFetch(areas=[] if state is not SourceState.OK else list(areas), status=status(SourceName.AIRSPACE, state))
+
+
+def pib_result(*notams: ParsedNotam, state: SourceState = SourceState.OK, issued: datetime = ISSUED) -> PibResult:
+    """A PIB result. Failed has no NOTAMs. Issued sets the PIB's Issued time, which the stale rule reads."""
+    return PibResult(status=status(SourceName.NOTAMS, state, issued_at=issued), notams=[] if state is SourceState.FAILED else list(notams))
+
+
+def run_assess(
+    *,
+    window: tuple[datetime, datetime] | None = (utc(9), utc(12)),
+    now: datetime = NOW,
+    forecast: Forecast | None = None,
+    airspace: AirspaceFetch | None = None,
+    pib: PibResult | None = None,
+    readings: Mapping[str, NotamReading] | None = None,
+    lat: float = LZ.lat,
+    lon: float = LZ.lon,
+    live: bool = False,
+) -> Assessment:
+    """assess() at Blue Mill on a calm day. By default: 09:00-12:00Z, calm weather, no airspace, no NOTAMs, all sources ok.
+
+    window=None asks for the default window; the calm forecast then covers it.
+    """
+    if forecast is None:
+        first, last = window or default_window(now)
+        forecast = weather_forecast(first - ONE_HOUR, last + ONE_HOUR)
+    return assess(
+        lat,
+        lon,
+        now=now,
+        forecast=forecast,
+        airspace=airspace or airspace_fetch(),
+        pib=pib or pib_result(),
+        readings=readings,
+        window=window,
+        live=live,
+    )
+
+
+def wind(mph: float) -> dict[str, float]:
+    """Calm weather with the 10 m wind at mph and a gust 2 mph above it (spread 2), and 80 m / 120 m wind kept near it."""
+    return {"wind_10m": mph, "gust_10m": mph + 2, "wind_80m": mph + 1, "wind_120m": mph + 2}
+
