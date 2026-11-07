@@ -114,9 +114,10 @@ def test_the_timeout_comes_from_settings_yaml_and_is_sent_with_every_call():
 
 def test_settings_load_from_any_file_and_refuse_a_missing_or_unknown_key(tmp_path):
     path = tmp_path / "settings.yaml"
-    path.write_text("timeout_s: 12.5\n", encoding="utf-8")
+    rest = "concurrency: 3\nruns: 3\n"  # settings.yaml also holds the pool size and the eval's run count (PR-5); each is required
+    path.write_text("timeout_s: 12.5\n" + rest, encoding="utf-8")
     assert load_settings(path).timeout_s == 12.5
-    for text in ("{}\n", "timeout_s: 12\nretries: 3\n", "timeout_s: 0\n", "timeout_s: soon\n"):
+    for text in ("{}\n", "timeout_s: 12\nretries: 3\n" + rest, "timeout_s: 0\n" + rest, "timeout_s: soon\n" + rest, "timeout_s: 12\n"):
         path.write_text(text, encoding="utf-8")
         with pytest.raises(ValidationError):
             load_settings(path)

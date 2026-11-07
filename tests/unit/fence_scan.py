@@ -28,6 +28,42 @@ def banned_words(path: Path, reader: Path) -> list[str]:
     return [match.group(0) for match in pattern.finditer(text)]
 
 
+# F10/F2: no LLM env variable, READER_* name or /models path anywhere in src/, except the reader package (ticket 3 F2). OPENAIP_API_KEY is the
+# openAIP key, not an LLM variable.
+LLM_ENV_PATTERN = re.compile(r"OPENAI(?!P_API_KEY)|ANTHROPIC|LLM_|MODEL_|READER_|/models")
+
+
+def llm_env_words(path: Path, reader: Path) -> list[str]:
+    """The LLM env variables, READER_ names and /models paths in a source file. `reader` is the one directory where they are allowed."""
+    if reader in path.parents:
+        return []
+    return [match.group(0) for match in LLM_ENV_PATTERN.finditer(path.read_text(encoding="utf-8"))]
+
+
+# F2: environment and `.env` reads. The reader's config.py is the only place that reads READER_* (and the only reader file that may
+# touch the environment). The openAIP key is read by the capture path before this ticket; those files are reviewed here, each
+# with its reason, and a new file that reads the environment fails until it is added.
+ENV_READ = re.compile(r"environ|getenv|\.env\b|dotenv")
+OPENAIP_KEY_READERS = {
+    "capture.py": "reads OPENAIP_API_KEY from the environment or .env (find_key)",
+    "sources.py": "passes find_key the environment for the openAIP key",
+    "verdict_sheet.py": "passes the environment on to capture for the openAIP key",
+    "clients/openaip.py": "its docstring says the caller reads OPENAIP_API_KEY; the module reads none",
+    "clients/pib_source.py": "its docstring says there is no .env; the module reads none",
+}
+READER_CONFIG = "reader/config.py"
+
+
+def env_read_files(src: Path, files: list[Path]) -> list[str]:
+    """The files (as paths under `src`) whose text matches an environment or `.env` read, less the reviewed openAIP key readers and reader/config.py."""
+    found = []
+    for path in files:
+        relative = path.relative_to(src).as_posix()
+        if relative != READER_CONFIG and relative not in OPENAIP_KEY_READERS and ENV_READ.search(path.read_text(encoding="utf-8")):
+            found.append(relative)
+    return found
+
+
 # The numeric literals the reader's modules may hold besides 0 and 1, per module, each with its reason (F6). None is a
 # threshold. This is the scan that catches a planted `slack = 1.5`: 1.5 is not a rules.yaml value, so the equals-a-rules-value
 # scan cannot see it (and reader_area_slack_nm = 1.0 is exempt as structural 1). A new literal fails until it is added here.
@@ -38,6 +74,9 @@ READER_REVIEWED_LITERALS = {
     },
     "reader/cache.py": {},  # the cache (G9) and its read: structural 0 and 1 only
     "reader/cached_read.py": {},
+    "reader/config.py": {},  # F6: the reader's package holds structural 0 and 1 only; the knobs are in settings.yaml
+    "reader/reader_set.py": {},
+    "reader/settings.py": {},
     "build_reader_items.py": {
         40: "how many NOTAMs the sheet holds (structure): ITEM_COUNT, the selection's fixed size",
         8: "characters of a commit sha shown in an error message (display)",
