@@ -19,6 +19,15 @@ make test    # uv run pytest, with sockets disabled
 
 Copy `.env.example` to `.env` for the openAIP key when fixtures are captured later. `.env` is gitignored.
 
+## Assessing a landing zone
+
+```
+uv run python -m flysafelz.cli assess --case blue_mill_2026-10-31   # offline, from fixtures/<case>/
+uv run python -m flysafelz.cli assess --lat 53.802797 --lon -0.086644 # live; needs OPENAIP_API_KEY in the environment or .env
+```
+
+One row per UTC hour (a segment edge inside an hour prints as sub-rows), then source statuses, flyable windows and the overall line. `--start` and `--end` (ISO 8601 with a timezone, end exclusive) narrow the window; `--debug` also lists the NOTAMs that were dropped or ignored, with the reason. A live run has no NOTAM readings, so a NOTAM over the LZ that needs one reads UNVERIFIED. There is no flag that changes a limit. The committed outputs for both cases are in `tests/golden/`; `uv run pytest --update-golden` rewrites them.
+
 ## Rules
 
 Every threshold lives in `src/flysafelz/rules.yaml` with its source and confidence. Python code holds no limits of its own. This table is the output of `uv run python -m flysafelz.cli rules`, and a test keeps the two identical.

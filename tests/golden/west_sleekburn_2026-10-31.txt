@@ -1,0 +1,101 @@
+FlySafeLZ assess – case west_sleekburn_2026-10-31
+LZ 55.158, -1.570 · now 2026-10-31T07:30Z
+PIB: archive commit bdab14658f0270dc41460eebcd03332abfb230ec, issued 2026-10-31T07:00:37Z
+Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
+
+2026-10-31 (UTC)
+07:00–08:00
+  07:00–07:09  NO-GO
+      blocked (weather): visibility 1420 m, limit 1500
+      condition: stay below 1,300 ft QNH
+      condition: avoid the sector to the SSW (NEWCASTLE CTR)
+      caution: gust spread 5.4 mph, limit 4
+      caution: gradient 10.6 mph, limit 9
+      caution: low cloud 93 %, limit 90
+      caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
+  07:09–08:00  NO-GO
+      blocked (weather): visibility 1420 m, limit 1500
+      condition: stay below 1,300 ft QNH
+      condition: avoid the sector to the SSW (NEWCASTLE CTR)
+      caution: gust spread 5.4 mph, limit 4
+      caution: gradient 10.6 mph, limit 9
+      caution: low cloud 93 %, limit 90
+08:00–09:00  NO-GO
+    blocked (weather): visibility 1420 m, limit 1500
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+    caution: gust spread 5.4 mph, limit 4
+    caution: low cloud 93 %, limit 90
+09:00–10:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+    caution: gust spread 5.2 mph, limit 4
+    caution: visibility 3960 m, limit 5000
+10:00–11:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+    caution: gust spread 5.2 mph, limit 4
+11:00–12:00  NO-GO
+    blocked (weather): gust spread 6.3 mph, limit 6
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+12:00–13:00  NO-GO
+    blocked (weather): gust spread 6.3 mph, limit 6
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+13:00–14:00  NO-GO
+    blocked (weather): gust spread 6.3 mph, limit 6
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+14:00–15:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+    caution: gust spread 5.8 mph, limit 4
+15:00–16:00  NO-GO
+    blocked (weather): gust spread 6.2 mph, limit 6
+    condition: stay below 1,300 ft QNH
+    condition: avoid the sector to the SSW (NEWCASTLE CTR)
+    caution: wind at 120 m 16.7 mph, limit 16
+    caution: gradient 9.3 mph, limit 9
+16:00–17:00
+  16:00–16:30  NO-GO
+      blocked (weather): gust spread 6.2 mph, limit 6
+      condition: stay below 1,300 ft QNH
+      condition: avoid the sector to the SSW (NEWCASTLE CTR)
+      caution: wind at 80 m 16.5 mph, limit 16
+      caution: wind at 120 m 16.9 mph, limit 16
+      caution: gradient 9.3 mph, limit 9
+  16:30–17:00  NO-GO
+      blocked (weather): gust spread 6.2 mph, limit 6
+      condition: stay below 1,300 ft QNH
+      condition: avoid the sector to the SSW (NEWCASTLE CTR)
+      caution: wind at 80 m 16.5 mph, limit 16
+      caution: wind at 120 m 16.9 mph, limit 16
+      caution: gradient 9.3 mph, limit 9
+      caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
+17:00–18:00
+  17:00–17:09  NO-GO
+      blocked (weather): gust spread 6.7 mph, limit 6
+      condition: stay below 1,300 ft QNH
+      condition: avoid the sector to the SSW (NEWCASTLE CTR)
+      caution: wind at 80 m 18 mph, limit 16
+      caution: wind at 120 m 18.7 mph, limit 16
+      caution: gradient 10.4 mph, limit 9
+      caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
+  17:09–18:00  NO-GO
+      blocked (weather): gust spread 6.7 mph, limit 6
+      blocked (daylight): night: outside civil twilight
+      condition: stay below 1,300 ft QNH
+      condition: avoid the sector to the SSW (NEWCASTLE CTR)
+      caution: wind at 80 m 18 mph, limit 16
+      caution: wind at 120 m 18.7 mph, limit 16
+      caution: gradient 10.4 mph, limit 9
+
+Sources
+  weather: ok
+  airspace: ok
+  NOTAMs: ok (PIB issued 2026-10-31T07:00:37Z)
+Flyable windows (UTC)
+  2026-10-31T09:00Z to 2026-10-31T11:00Z
+  2026-10-31T14:00Z to 2026-10-31T15:00Z
+Overall: NO-GO
