@@ -130,6 +130,7 @@ class Rules(BaseModel):
     notam_restriction_subjects: Rule
     notam_awareness_subjects: Rule
     notam_area_wide_nm: Rule
+    capture_trim_nm: Rule
 
     def all(self) -> list[Rule]:
         """Every rule, in file order."""

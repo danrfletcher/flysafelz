@@ -47,6 +47,7 @@ EXPECTED = [
     ("notam_restriction_subjects", ["RD", "RR", "RP", "RT"], "subject", "in"),
     ("notam_awareness_subjects", ["GW"], "subject", "in"),
     ("notam_area_wide_nm", 50, "NM", ">="),
+    ("capture_trim_nm", 25, "NM", ">"),
 ]
 
 

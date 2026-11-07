@@ -1,0 +1,4 @@
+$ make fixtures CASE=nope_2026   # a placeholder key is set in the environment
+unknown case 'nope_2026': no folder fixtures/nope_2026. usage: make fixtures CASE=<case>  (a folder under fixtures/)
+make: *** [fixtures] Error 64
+exit=2

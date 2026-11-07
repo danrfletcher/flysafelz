@@ -1,0 +1,238 @@
+{
+ "limit": 1000,
+ "totalCount": 10,
+ "totalPages": 2,
+ "page": 2,
+ "items": [
+  {
+   "_id": "aaa000000000000000000003",
+   "name": "HUMBERSIDE CTR",
+   "type": 4,
+   "icaoClass": 3,
+   "lowerLimit": {
+    "value": 0,
+    "unit": 1,
+    "referenceDatum": 0
+   },
+   "upperLimit": {
+    "value": 3500,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -0.1712034452900389,
+       53.952797000000004
+      ],
+      [
+       -0.002084554709961106,
+       53.952797000000004
+      ],
+      [
+       -0.002084554709961106,
+       54.052797
+      ],
+      [
+       -0.1712034452900389,
+       54.052797
+      ],
+      [
+       -0.1712034452900389,
+       53.952797000000004
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "aaa000000000000000000004",
+   "name": "D323A WEEKDAY RANGE",
+   "type": 2,
+   "icaoClass": 8,
+   "hoursOfOperation": {
+    "operatingHours": [
+     {
+      "dayOfWeek": 1,
+      "startTime": "08:00",
+      "endTime": "17:00",
+      "sunrise": false,
+      "sunset": false,
+      "byNotam": false
+     },
+     {
+      "dayOfWeek": 2,
+      "startTime": "08:00",
+      "endTime": "17:00",
+      "sunrise": false,
+      "sunset": false,
+      "byNotam": false
+     },
+     {
+      "dayOfWeek": 3,
+      "startTime": "08:00",
+      "endTime": "17:00",
+      "sunrise": false,
+      "sunset": false,
+      "byNotam": false
+     },
+     {
+      "dayOfWeek": 4,
+      "startTime": "08:00",
+      "endTime": "17:00",
+      "sunrise": false,
+      "sunset": false,
+      "byNotam": false
+     },
+     {
+      "dayOfWeek": 5,
+      "startTime": "08:00",
+      "endTime": "17:00",
+      "sunrise": false,
+      "sunset": false,
+      "byNotam": false
+     }
+    ]
+   },
+   "lowerLimit": {
+    "value": 0,
+    "unit": 1,
+    "referenceDatum": 0
+   },
+   "upperLimit": {
+    "value": 2000,
+    "unit": 1,
+    "referenceDatum": 1
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -0.014830481763346288,
+       53.78613033333333
+      ],
+      [
+       0.0415424817633463,
+       53.78613033333333
+      ],
+      [
+       0.0415424817633463,
+       53.819463666666664
+      ],
+      [
+       -0.014830481763346288,
+       53.819463666666664
+      ],
+      [
+       -0.014830481763346288,
+       53.78613033333333
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "aaa000000000000000000005",
+   "name": "WIDGET MYSTERY ZONE",
+   "type": 99,
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       0.08516951823665372,
+       53.78613033333333
+      ],
+      [
+       0.1415424817633463,
+       53.78613033333333
+      ],
+      [
+       0.1415424817633463,
+       53.819463666666664
+      ],
+      [
+       0.08516951823665372,
+       53.819463666666664
+      ],
+      [
+       0.08516951823665372,
+       53.78613033333333
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "aaa000000000000000000006",
+   "name": "BOWTIE RMZ",
+   "type": 6,
+   "icaoClass": 6,
+   "hoursOfOperation": {
+    "operatingHours": [
+     {
+      "dayOfWeek": 0,
+      "startTime": "08:00",
+      "endTime": "18:00",
+      "sunrise": true,
+      "sunset": true,
+      "byNotam": false
+     }
+    ]
+   },
+   "lowerLimit": {
+    "value": 0,
+    "unit": 1,
+    "referenceDatum": 0
+   },
+   "upperLimit": {
+    "value": 60,
+    "unit": 6,
+    "referenceDatum": 2
+   },
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       -0.136644,
+       53.752797
+      ],
+      [
+       -0.036643999999999996,
+       53.852796999999995
+      ],
+      [
+       -0.036643999999999996,
+       53.752797
+      ],
+      [
+       -0.136644,
+       53.852796999999995
+      ],
+      [
+       -0.136644,
+       53.752797
+      ]
+     ]
+    ]
+   }
+  },
+  {
+   "_id": "bbb000000000000000000009",
+   "name": "FAR NO POLYGON",
+   "type": 4,
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -4.0,
+     57.0
+    ]
+   }
+  }
+ ],
+ "nextPage": null
+}

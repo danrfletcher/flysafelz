@@ -1,6 +1,6 @@
 {
- "limit": 3,
- "totalCount": 6,
+ "limit": 1000,
+ "totalCount": 10,
  "totalPages": 2,
  "page": 2,
  "items": [
@@ -220,6 +220,19 @@
      ]
     ]
    }
+  },
+  {
+   "_id": "bbb000000000000000000009",
+   "name": "FAR NO POLYGON",
+   "type": 4,
+   "geometry": {
+    "type": "Point",
+    "coordinates": [
+     -4.0,
+     57.0
+    ]
+   }
   }
- ]
+ ],
+ "nextPage": null
 }
