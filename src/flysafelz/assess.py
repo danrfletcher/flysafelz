@@ -50,6 +50,12 @@ PILOT_DISCRETION segments with exact edges. Anything else, or a gap, ends a run.
 
 The debug list holds every NOTAM that was dropped or ignored and never shown in any segment,
 with its reason.
+
+Time zone. assess() takes an optional keyword-only `tz` (an IANA zone name; None is UTC, byte for byte as before). It
+changes only the times written into text: the assumption line, the reversed-window error, the stale-PIB reason, the
+danger-area activation span in a condition, and the times in the debug reasons. Every structured field (segment and
+window times, hours, source times) stays UTC, and so do the day tiers, which count Europe/London days. Verdicts,
+conditions and their order are the same for any tz. Quoted NOTAM text is never reformatted.
 """
 
 from collections.abc import Mapping
@@ -59,7 +65,6 @@ from typing import Literal, get_args
 from flysafelz.airspace import Activation, Outcome, TimeSpan, assess_airspace, find_item_e_contact
 from flysafelz.clients.open_meteo import Forecast
 from flysafelz.clients.openaip import AirspaceFetch, metres_to_feet
-from flysafelz.clients.pib_source import utc_text
 from flysafelz.contracts import (
     Assessment,
     Blocker,
@@ -98,6 +103,7 @@ from flysafelz.notam_action import ActionSegment, LandingZone, active_intervals,
 from flysafelz.pib import PibResult, SortAction, prefilter, sort_notam
 from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule
+from flysafelz.timetext import check_tz, stamp
 from flysafelz.weather import HourTier, WeatherRow, build_rows, check_row, weather_tier
 
 # Condition groups, in the order a pilot reads them (G17).
@@ -178,16 +184,17 @@ def assessed_span(start: datetime, end: datetime, now: datetime, live: bool) -> 
 # --- sources (E1, E2) -----------------------------------------------------------------
 
 
-def _checked_notam_status(status: SourceStatus, now: datetime, *, stale_rule: bool = True) -> SourceStatus:
+def _checked_notam_status(status: SourceStatus, now: datetime, *, stale_rule: bool = True, tz: str | None = None) -> SourceStatus:
     """The NOTAM status, marked stale here too when its PIB was issued too long before now (E2).
 
     stale_rule False (case mode) leaves an ok status ok: the case's captured PIB is treated as current at its now.
+    The issued time in the reason is written in `tz`; status.issued_at stays UTC.
     """
     if not stale_rule:
         return status
     limit = _number(RULES.pib_stale_hours)
     if status.state is SourceState.OK and status.issued_at is not None and now - status.issued_at > timedelta(hours=limit):
-        reason = f"PIB issued {utc_text(status.issued_at)}, more than {limit:g} h before now"
+        reason = f"PIB issued {stamp(status.issued_at, tz)}, more than {limit:g} h before now"
         return status.model_copy(update={"state": SourceState.STALE, "reason": reason})
     return status
 
@@ -230,9 +237,10 @@ def _airspace_findings(
     pressure: float | None,
     activations: list[Activation],
     notes: list[str],
+    tz: str | None,
 ) -> tuple[list[Blocker], list[Condition], list[str]]:
-    """Blockers, conditions and UNVERIFIED reasons from airspace and danger areas (G8 to G10)."""
-    result = assess_airspace(areas.areas, (lat, lon), span, site_elevation_ft=elevation_ft, pressure_msl=pressure, activations=activations)
+    """Blockers, conditions and UNVERIFIED reasons from airspace and danger areas (G8 to G10). Times in the text are in `tz`."""
+    result = assess_airspace(areas.areas, (lat, lon), span, site_elevation_ft=elevation_ft, pressure_msl=pressure, activations=activations, tz=tz)
     notes += result.notes
     blockers: list[Blocker] = []
     conditions: list[Condition] = []
@@ -282,11 +290,12 @@ def _notam_results(
     readings: Mapping[str, NotamReading],
     pressure: float | None,
     ignored: dict[str, str],
+    tz: str | None,
 ) -> list[NotamActionResult]:
-    """The non-IGNORE NOTAM actions for one segment (G15). Every IGNORE goes into `ignored` with its reason."""
+    """The non-IGNORE NOTAM actions for one segment (G15). Every IGNORE goes into `ignored` with its reason (times in `tz`)."""
     results = []
     for notam in notams:
-        sorted_ = sort_notam(notam, (span.start, span.end), (lz.lat, lz.lon))
+        sorted_ = sort_notam(notam, (span.start, span.end), (lz.lat, lz.lon), tz=tz)
         if sorted_.action is SortAction.IGNORE:
             ignored.setdefault(notam.id, sorted_.reason)
         elif sorted_.action is SortAction.AWARENESS:
@@ -368,17 +377,19 @@ def notams_in_hour(
     readings: Mapping[str, NotamReading],
     lz: LandingZone,
     ignored: dict[str, str] | None = None,
+    *,
+    tz: str | None = None,
 ) -> list[ParsedNotam]:
     """The NOTAMs that matter somewhere in this hour: the ones sort_notam() does not IGNORE, in input order (Q10).
 
     This is the set assess cuts the hour on. `notams` are the prefiltered ones. Each IGNORE reason goes
     into `ignored` (when given) with setdefault, so the first reason a NOTAM gets across hours is kept.
     `readings` is not read: sort_notam() works from the NOTAM text alone. It is in the signature so
-    callers pass the same arguments they pass to cut_points_with_reasons().
+    callers pass the same arguments they pass to cut_points_with_reasons(). The times in an IGNORE reason are in `tz`.
     """
     kept = []
     for notam in notams:
-        sorted_ = sort_notam(notam, (hour, hour + ONE_HOUR), (lz.lat, lz.lon))
+        sorted_ = sort_notam(notam, (hour, hour + ONE_HOUR), (lz.lat, lz.lon), tz=tz)
         if sorted_.action is SortAction.IGNORE:
             if ignored is not None:
                 ignored.setdefault(notam.id, sorted_.reason)
@@ -425,13 +436,14 @@ def _segment(
     readings: Mapping[str, NotamReading],
     ignored: dict[str, str],
     notes: list[str],
+    tz: str | None,
 ) -> Segment:
     """One segment: all the checks, every reason kept, then the verdict by the precedence rule."""
     pressure = row.values.pressure_msl if row else None
     weather_blockers, weather_cautions = _weather_findings(row)
     daylight_blockers, daylight_cautions = _daylight_findings(lat, lon, span.start)
-    air_blockers, air_conditions, air_unverified = _airspace_findings(airspace, lat, lon, span, lz.elevation_ft, pressure, activations, notes)
-    actions = _notam_results(notams, span, lz, readings, pressure, ignored)
+    air_blockers, air_conditions, air_unverified = _airspace_findings(airspace, lat, lon, span, lz.elevation_ft, pressure, activations, notes, tz)
+    actions = _notam_results(notams, span, lz, readings, pressure, ignored, tz)
     owned = {a.notam_id for a in activations}
     notam_blockers, notam_conditions, notam_unverified = _notam_findings(actions, owned)
 
@@ -517,6 +529,7 @@ def assess(
     window: tuple[datetime, datetime] | None = None,
     live: bool = False,
     stale_rule: bool | None = None,
+    tz: str | None = None,
 ) -> Assessment:
     """Assess every UTC hour of the window [start, end) for the LZ at lat, lon.
 
@@ -528,10 +541,13 @@ def assess(
     stale_rule says whether the PIB-age rule is applied again here to an ok PIB status (it is applied
     when the PIB is loaded too, pib.load_pib). None follows live: live mode applies it, case mode does
     not (the case's captured PIB is treated as current at its now). A status that is already stale stays stale.
-    Raises ValueError outside UK coverage, for a naive time, for an empty or reversed window, and
+    tz is an IANA zone name for the times written into text (assumptions, reasons, conditions); None writes UTC, as
+    before. It changes no structured field, tier, verdict or condition order (see the module doc).
+    Raises ValueError outside UK coverage, for a naive time, for an unknown tz, for an empty or reversed window, and
     when a NOTAM is in both readings and reader_status or has a status other than the two above.
     """
     check_uk_bounds(lat, lon)
+    check_tz(tz)
     now = _aware(now, "now")
     readings = readings or {}
     reader_status = reader_status or {}
@@ -545,16 +561,16 @@ def assess(
     if window is None:
         start, end = default_window(now)
         assumptions.append(
-            f"No window given: assessing from {utc_text(start)} (now rounded down to the hour) to {utc_text(end)} (the end of tomorrow, Europe/London)."
+            f"No window given: assessing from {stamp(start, tz)} (now rounded down to the hour) to {stamp(end, tz)} (the end of tomorrow, Europe/London)."
         )
     else:
         start, end = _aware(window[0], "window start"), _aware(window[1], "window end")
     if start >= end:
-        raise ValueError(f"the window must start before it ends, got {utc_text(start)} to {utc_text(end)}")
+        raise ValueError(f"the window must start before it ends, got {stamp(start, tz)} to {stamp(end, tz)}")
 
     hour_starts = _hour_starts(start, end, now, live)
 
-    statuses = [forecast.status, airspace.status, _checked_notam_status(pib.status, now, stale_rule=live if stale_rule is None else stale_rule)]
+    statuses = [forecast.status, airspace.status, _checked_notam_status(pib.status, now, stale_rule=live if stale_rule is None else stale_rule, tz=tz)]
     problems = _unavailable(statuses)
     weather_ok = forecast.status.state is SourceState.OK
     rows = build_rows(forecast, hour_starts[0], hour_starts[-1] + ONE_HOUR) if weather_ok and hour_starts else []
@@ -571,7 +587,7 @@ def assess(
         assumptions.append(f"NOTAM reader unavailable for {', '.join(unavailable)}: treated as unread")
 
     window_span = assessed_span(start, end, now, live)
-    near_notams, dropped = prefilter(pib.notams, (lat, lon), window_span)
+    near_notams, dropped = prefilter(pib.notams, (lat, lon), window_span, tz=tz)
     activations = _activations(near_notams, readings, lz, *window_span)
 
     ignored: dict[str, str] = {}
@@ -585,13 +601,13 @@ def assess(
             continue
 
         # The NOTAMs that matter somewhere in this hour, and the minutes where one starts or ends.
-        in_hour = notams_in_hour(hour, near_notams, readings, lz, ignored)
+        in_hour = notams_in_hour(hour, near_notams, readings, lz, ignored, tz=tz)
         cuts = cut_points_with_reasons(hour, lat, lon, in_hour, readings, lz)
         edges = [hour, *(t for t, _reasons in cuts), hour + ONE_HOUR]
 
         hour_problems = problems + ([tier.reason] if tier.unverified else [])
         segments = [
-            _segment(TimeSpan(start=a, end=b), row, hour_problems, lat, lon, lz, airspace, activations, in_hour, readings, ignored, notes)
+            _segment(TimeSpan(start=a, end=b), row, hour_problems, lat, lon, lz, airspace, activations, in_hour, readings, ignored, notes, tz)
             for a, b in zip(edges, edges[1:])
         ]
         hours.append(HourAssessment(hour=hour, tier=Tier.VERDICT, segments=segments, weather=row.values if row else WeatherValues()))
