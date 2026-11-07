@@ -1,0 +1,354 @@
+# Every threshold and setting the verdict depends on. Python never holds a
+# limit of its own: it reads these. Each entry needs value, unit, comparison,
+# source, confidence and note.
+#
+# comparison: ">=", ">", "<", "<=" for a limit (a value breaches it when
+#   "value <comparison> limit" holds), "in" for a list, "=" for a plain setting.
+# confidence: "sourced" (a citable document), "best practice" (common
+#   practice that is not a single citation), "educated guess" (our own call).
+#
+# Most limits come from the FlySafeLZ Spec section 2 (Plan 2, settled with Dan,
+# Q3 and G22). None of the wind, cloud, rain or thermal numbers is quoted from
+# a regulation, so they are marked as best practice or educated guess.
+
+wind_10m_caution:
+  value: 12
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits"
+  confidence: best practice
+  note: "Mean wind at 10 m. Caution band below the 10 m NO_GO limit."
+
+wind_10m_no_go:
+  value: 16
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits"
+  confidence: best practice
+  note: "Mean wind at 10 m. 16.0 mph is NO_GO."
+
+gust_spread_caution:
+  value: 4
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Gust minus mean wind at 10 m, worst of the row's timestamps."
+
+gust_spread_no_go:
+  value: 6
+  unit: mph
+  comparison: ">"
+  source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Gust minus mean wind at 10 m. Exactly 6.0 mph is not NO_GO; the comparison is strict."
+
+wind_aloft_caution:
+  value: 16
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3): same number as the 10 m NO_GO limit"
+  confidence: educated guess
+  note: "Wind at 80 m or 120 m. Caution only; the hard limits are at 10 m."
+
+gradient_caution:
+  value: 9
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Absolute difference between 120 m and 10 m wind."
+
+gradient_no_go:
+  value: 16
+  unit: mph
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3)"
+  confidence: educated guess
+  note: "Absolute difference between 120 m and 10 m wind."
+
+precipitation_no_go:
+  value: 0.1
+  unit: mm/h
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22"
+  confidence: educated guess
+  note: "Any measurable rain in the preceding hour. Applies to the hour's closing timestamp."
+
+rain_chance_caution:
+  value: 50
+  unit: "%"
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22"
+  confidence: educated guess
+  note: "Precipitation probability. Optional variable: skipped and noted when missing."
+
+visibility_caution:
+  value: 5000
+  unit: m
+  comparison: "<"
+  source: "Standard 5 km VFR visibility figure (UK SERA.5001 is the reference to check); Plan 2 G22"
+  confidence: best practice
+  note: "Not checked against the regulation text."
+
+visibility_no_go:
+  value: 1500
+  unit: m
+  comparison: "<"
+  source: "Plan 2 G22; compare the Class G flight-visibility minimum for slow aircraft in UK SERA.5001"
+  confidence: best practice
+  note: "Not checked against the regulation text; confirm before relying on it as sourced."
+
+low_cloud_caution:
+  value: 90
+  unit: "%"
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G22"
+  confidence: educated guess
+  note: "Low cloud cover (Open-Meteo cloud_cover_low)."
+
+thermic_shortwave_caution:
+  value: 600
+  unit: W/m²
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G3/G22 (Dan, Q2)"
+  confidence: educated guess
+  note: "Thermic caution needs this AND the thermic CAPE limit together."
+
+thermic_cape_caution:
+  value: 300
+  unit: J/kg
+  comparison: ">="
+  source: "FlySafeLZ Spec s2, Plan 2 G3/G22 (Dan, Q2)"
+  confidence: educated guess
+  note: "Thermic caution needs this AND the shortwave limit together."
+
+cape_no_go:
+  value: 1000
+  unit: J/kg
+  comparison: ">="
+  source: "Common convention that CAPE of about 1,000 J/kg or more is meaningful convective instability; Plan 2 G22 (Dan, Q2)"
+  confidence: best practice
+  note: "Convective instability and thunderstorm risk."
+
+ceiling_left_no_go:
+  value: 300
+  unit: ft
+  comparison: "<"
+  source: "FlySafeLZ Spec s2, Plan 2 E15/G22"
+  confidence: educated guess
+  note: "Airspace ceiling (floor QNH minus the buffer) minus site elevation. Under this, no room to fly."
+
+ceiling_buffer:
+  value: 200
+  unit: ft
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives"
+  confidence: educated guess
+  note: "Margin kept below an airspace floor when stating 'stay below X ft QNH'."
+
+fl_ft_per_hpa:
+  value: 27
+  unit: ft/hPa
+  comparison: "="
+  source: "ICAO standard atmosphere: about 27 ft per hPa near sea level"
+  confidence: sourced
+  note: "Converts a flight level to feet against the forecast pressure_msl."
+
+fl_reference_hpa:
+  value: 1013.25
+  unit: hPa
+  comparison: "="
+  source: "ICAO standard atmosphere sea-level pressure"
+  confidence: sourced
+  note: "Flight levels are measured from this pressure."
+
+local_area:
+  value: 2
+  unit: NM
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives (Dan)"
+  confidence: educated guess
+  note: "Radius of the local flying area around the landing zone. Not user-adjustable."
+
+airspace_box_nm:
+  value: 10
+  unit: NM
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 G7 (wider than the 2 NM local area so the map has context)"
+  confidence: educated guess
+  note: "Half-width of the box around the LZ that the airspaces are cut down to. openAIP is asked for all of country=GB (its firewall refuses a bbox) and every airspace touching the box is kept."
+
+band_low:
+  value: 5000
+  unit: ft
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives (Dan)"
+  confidence: educated guess
+  note: "Airspace floors below this give a ceiling condition; above it, a warning."
+
+band_high:
+  value: 10000
+  unit: ft
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 primitives (Dan)"
+  confidence: educated guess
+  note: "Airspace floors above this are awareness only (map and collapsed list)."
+
+verdict_horizon_day:
+  value: 3
+  unit: day
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 Q9 (Dan); day 0 is today in Europe/London"
+  confidence: educated guess
+  note: "Last day that can carry a verdict, if every required weather variable is present."
+
+outlook_horizon_day:
+  value: 7
+  unit: day
+  comparison: "="
+  source: "Vector check of Open-Meteo ukmo_seamless on 2026-11-06: 10 m wind, gust, CAPE and visibility run to day 7"
+  confidence: sourced
+  note: "Beyond this day nothing is fetched and the hour is TOO_FAR."
+
+pib_stale_hours:
+  value: 3
+  unit: h
+  comparison: "="
+  source: "FlySafeLZ Spec s2, Plan 2 E2"
+  confidence: educated guess
+  note: "A PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED."
+
+uk_bounds_lat_min:
+  value: 49.8
+  unit: deg
+  comparison: "<"
+  source: "Plan 2 E16 (south of the Isles of Scilly)"
+  confidence: educated guess
+  note: "A latitude below this is outside UK coverage. Exactly this latitude is inside."
+
+uk_bounds_lat_max:
+  value: 61.0
+  unit: deg
+  comparison: ">"
+  source: "Plan 2 E16 (north of Shetland)"
+  confidence: educated guess
+  note: "A latitude above this is outside UK coverage. Exactly this latitude is inside."
+
+uk_bounds_lon_min:
+  value: -8.7
+  unit: deg
+  comparison: "<"
+  source: "Plan 2 E16 (west of Northern Ireland)"
+  confidence: educated guess
+  note: "A longitude (east positive) below this is outside UK coverage. Exactly this longitude is inside."
+
+uk_bounds_lon_max:
+  value: 2.0
+  unit: deg
+  comparison: ">"
+  source: "Plan 2 E16 (east of East Anglia)"
+  confidence: educated guess
+  note: "A longitude (east positive) above this is outside UK coverage. Exactly this longitude is inside."
+
+civil_twilight_depression:
+  value: 6
+  unit: deg
+  comparison: "="
+  source: "Standard definition of civil twilight: sun centre 6 degrees below the horizon; Plan 2 G6"
+  confidence: sourced
+  note: "Angle below the horizon for civil dawn and civil dusk. Outside civil twilight is night."
+
+# --- NOTAM prefilter (G13) and code-only sort (G23) ----------------------------
+# The sort lists below are matched against coded PIB fields only: the Q-line
+# subject (letters 2-3 of the five-letter code), traffic, purpose and radius.
+
+notam_max_lower_fl:
+  value: 195
+  unit: FL
+  comparison: ">"
+  source: "FlySafeLZ Spec s2, Plan 2 G13; Class G in the UK runs up to FL195"
+  confidence: educated guess
+  note: "A NOTAM whose Q-line lower limit is above this is dropped by the prefilter."
+
+notam_ignore_subject_letters:
+  value: [L, F, M, N, I, C, S, O]
+  unit: subject first letter
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Q-line subjects whose first letter cannot affect a paramotor (lighting, aerodrome facilities, movement area, nav aids, comms, ATS services, other). A, R and W are never in this list."
+
+notam_keep_subjects:
+  value: [FA, OB, OL]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Subjects kept although their first letter is in the ignore list: aerodrome warnings (drones, fireworks, lasers, live ordnance) and obstacles (cranes, rigs)."
+
+notam_wide_ignore_subjects:
+  value: [AF]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: educated guess
+  note: "FIR information subjects. At or above the area-wide radius they are FIR-wide AIS admin (e.g. MIL AIP checklists) and are ignored; below it (transponder mandatory zones) they are kept."
+
+notam_ignore_traffic:
+  value: [I]
+  unit: Q-line traffic
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Traffic exactly I (IFR only) cannot affect a paramotor. IV and V are kept."
+
+notam_ignore_purpose:
+  value: [K]
+  unit: Q-line purpose
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: sourced
+  note: "Purpose K marks a checklist or status NOTAM."
+
+notam_ignore_security_subjects:
+  value: [RO]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "In series V only: security advice to air operators. Series V with any other subject (e.g. volcanic ash) is kept."
+
+notam_restriction_subjects:
+  value: [RD, RR, RP, RT]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "Danger, restricted, prohibited and temporary reserved airspace. With a designator in item E the NOTAM is handled through the airspace polygon; without one it goes to the reader."
+
+notam_awareness_subjects:
+  value: [GW]
+  unit: subject
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "GNSS or radio-frequency jamming: awareness only, no reader."
+
+notam_area_wide_nm:
+  value: 50
+  unit: NM
+  comparison: ">="
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: educated guess
+  note: "A Q-line radius at or above this is an area-wide NOTAM: awareness only (and FIR-wide AIS admin for the subjects in notam_wide_ignore_subjects). A radius of 999 means the whole FIR."
+
+# --- fixture capture (G20) ------------------------------------------------------
+
+capture_trim_nm:
+  value: 25
+  unit: NM
+  comparison: ">"
+  source: "FlySafeLZ Spec s2, Plan 2 G20 (fixture PIBs are trimmed to 25 NM)"
+  confidence: educated guess
+  note: "make fixtures keeps a NOTAM only when its Q-circle edge is within this distance of the LZ, so a fixture stays small but covers well past the 2 NM local area. A NOTAM whose Q-circle cannot be read is kept."
