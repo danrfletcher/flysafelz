@@ -1,9 +1,14 @@
-"""Fence checks for the reader eval's scoring package (ticket 3 F2, F4, F6). Each scan is shown to catch a planted violation in a tmp_path copy.
+"""Fence checks for the reader eval package (ticket 3 F2, F4, F6, F7). Each scan is shown to catch a planted violation in a tmp_path copy.
 
 Nothing is planted in the real tree. The scans read evals/reader_eval/*.py as text and as an AST; they import nothing from it.
+
+run.py is the one file that reads a model and writes anything: it may import the reader's model-calling modules (never an LLM
+client package itself) and write only the report folder, in the two functions named in REPORT_WRITERS. Every other file
+imports none of those modules and writes nothing.
 """
 
 import ast
+import re
 import shutil
 from pathlib import Path
 
@@ -18,6 +23,12 @@ ROOT = Path(__file__).resolve().parents[2]
 EVAL = ROOT / "evals" / "reader_eval"
 EVAL_FILES = sorted(EVAL.glob("*.py"))
 SETTINGS_YAML = EVAL / "settings.yaml"
+READER_SETTINGS_YAML = ROOT / "src" / "flysafelz" / "reader" / "settings.yaml"
+RUNNER = EVAL / "run.py"
+# The only functions of run.py that write: they make the run folder and put the two reports in it.
+REPORT_WRITERS = {"make_run_folder", "write_report"}
+# Identifiers the spec rules out of this ticket (F7): a few-shot prompt, a judge or a guard around the scoring, and putting a phone number back.
+BANNED_IDENTIFIERS = re.compile(r"few_?shot|judge|guard|rehydrat|unredact", re.IGNORECASE)
 # The reader modules that call a model or read its configuration. reader.contract (the shapes of a reading) is not one of them.
 MODEL_CALLING_READER_MODULES = {"flysafelz.reader.read", "flysafelz.reader.config", "flysafelz.reader.cached_read", "flysafelz.reader.prompt", "flysafelz.reader.cache", "flysafelz.reader.reader_set"}
 WRITE_MODES = set("wax+")
@@ -49,15 +60,22 @@ def settings_values() -> set[float]:
     return {value for value in data.values() if isinstance(value, (int, float))}
 
 
-def llm_imports(path: Path) -> list[str]:
-    """The LLM client packages and the model-calling reader modules a file imports."""
-    return [name for name in imports_of(path) if name.split(".")[0] in LLM_PACKAGES or name in MODEL_CALLING_READER_MODULES]
+def llm_imports(path: Path, *, reads_model: bool = False) -> list[str]:
+    """The LLM client packages and the model-calling reader modules a file imports. A file that `reads_model` (run.py) may import the modules, never a package."""
+    return [name for name in imports_of(path) if name.split(".")[0] in LLM_PACKAGES or (not reads_model and name in MODEL_CALLING_READER_MODULES)]
 
 
-def write_calls(path: Path) -> list[tuple[int, str]]:
-    """(line, what) for each call that could write: open() with a write mode, and any write, delete, move or dump method."""
+def write_calls(path: Path, *, outside: frozenset[str] | set[str] = frozenset()) -> list[tuple[int, str]]:
+    """(line, what) for each call that could write: open() with a write mode, and any write, delete, move or dump method.
+
+    Calls inside a function named in `outside` are not counted: that is where a file is allowed to write.
+    """
+    tree = tree_of(path)
+    allowed = {id(node) for fn in ast.walk(tree) if isinstance(fn, ast.FunctionDef) and fn.name in outside for node in ast.walk(fn)}
     found = []
-    for node in ast.walk(tree_of(path)):
+    for node in ast.walk(tree):
+        if id(node) in allowed:
+            continue
         if not isinstance(node, ast.Call):
             continue
         func = node.func
@@ -80,7 +98,7 @@ def plant(tmp_path: Path, source: str) -> Path:
 
 
 def test_the_package_is_where_the_scans_look():
-    assert {path.name for path in EVAL_FILES} >= {"__init__.py", "downgrade.py", "fields.py", "items.py", "labels.py", "settings.py", "spots.py"}
+    assert {path.name for path in EVAL_FILES} >= {"__init__.py", "blue_mill.py", "downgrade.py", "fields.py", "items.py", "labels.py", "report.py", "run.py", "settings.py", "spots.py"}
     assert (ROOT / "evals" / "__init__.py").exists() and SETTINGS_YAML.exists()
 
 
@@ -89,7 +107,20 @@ def test_the_package_is_where_the_scans_look():
 
 @pytest.mark.parametrize("path", EVAL_FILES, ids=lambda p: p.name)
 def test_f2_the_eval_imports_no_llm_client(path):
-    assert llm_imports(path) == []
+    assert llm_imports(path, reads_model=path == RUNNER) == []
+
+
+def test_f2_only_the_runner_imports_the_reader_modules_that_call_a_model():
+    """run.py builds the model and reads through flysafelz.reader; nothing else in the eval does."""
+    importers = {path.name for path in EVAL_FILES if set(imports_of(path)) & MODEL_CALLING_READER_MODULES}
+    assert importers == {"run.py"}
+    assert "flysafelz.reader.config" in imports_of(RUNNER)  # it builds the model through the reader's own config
+
+
+def test_f2_the_runner_takes_its_model_as_a_parameter():
+    """Tests hand in a fake: evaluate() and main() both have an `llm` parameter."""
+    functions = {node.name: [a.arg for a in node.args.args] for node in ast.walk(tree_of(RUNNER)) if isinstance(node, ast.FunctionDef)}
+    assert "llm" in functions["evaluate"] and "llm" in functions["main"]
 
 
 def test_f2_notam_action_stays_model_free():
@@ -112,6 +143,15 @@ def test_f2_a_planted_llm_import_is_caught(tmp_path, source):
     assert llm_imports(plant(tmp_path, source))
 
 
+@pytest.mark.parametrize("source", ["import openai\n", "from langchain_core.language_models.chat_models import BaseChatModel\n", "from langchain_openai import ChatOpenAI\n"])
+def test_f2_the_runner_may_not_import_a_client_package_either(tmp_path, source):
+    assert llm_imports(plant(tmp_path, source), reads_model=True)
+
+
+def test_f2_the_runner_may_import_the_reader_modules(tmp_path):
+    assert llm_imports(plant(tmp_path, "from flysafelz.reader.config import build_llm\n"), reads_model=True) == []
+
+
 def test_f2_the_reader_contract_import_is_allowed():
     assert any(name == "flysafelz.reader.contract" for path in EVAL_FILES for name in imports_of(path))  # the eval does use it
     assert llm_imports(ROOT / "evals" / "reader_eval" / "labels.py") == []
@@ -124,8 +164,29 @@ def test_f2_the_reader_contract_import_is_allowed():
 
 
 @pytest.mark.parametrize("path", EVAL_FILES, ids=lambda p: p.name)
-def test_f4_no_code_in_the_eval_writes_anything(path):
-    assert write_calls(path) == []
+def test_f4_no_code_in_the_eval_writes_anything_but_the_report_writers(path):
+    assert write_calls(path, outside=REPORT_WRITERS if path == RUNNER else set()) == []
+
+
+def test_f4_the_runner_does_write_the_report_in_its_two_functions():
+    """The exemption is real (the writers exist and do write) and narrow (they are the only writers)."""
+    assert len(write_calls(RUNNER)) >= 2
+    assert write_calls(RUNNER, outside=REPORT_WRITERS) == []
+    names = {node.name for node in ast.walk(tree_of(RUNNER)) if isinstance(node, ast.FunctionDef)}
+    assert REPORT_WRITERS <= names
+
+
+def test_f4_a_write_outside_the_report_writers_is_caught_in_the_runner(tmp_path):
+    source = f"from pathlib import Path\ndef write_report(folder):\n    (folder / 'report.md').write_text('')\ndef sneaky():\n    Path('{LABELS}').write_text('')\n"
+    found = write_calls(plant(tmp_path, source), outside=REPORT_WRITERS)
+    assert [what for _line, what in found] == ["write_text"]
+
+
+def test_f4_the_runner_never_names_the_labels_file_to_a_writer():
+    """labels.yaml reaches run.py only as paths.labels, handed to the loader and to `.is_file()`."""
+    text = RUNNER.read_text(encoding="utf-8")
+    uses = [line.strip() for line in text.splitlines() if "paths.labels" in line]
+    assert uses and all("load_labels(" in line or "reject_malformed(" in line or "is_file()" in line or "shown(" in line for line in uses)
 
 
 @pytest.mark.parametrize(
@@ -195,3 +256,79 @@ def test_f6_the_pressure_is_read_from_the_rules_not_written():
     planted = ROOT / "planted_pressure.py"  # not written: a tree is parsed from text to show the scan would catch the literal
     tree = ast.parse(f"pressure = {float(pressure)}\n")
     assert hard_coded_rule_values(planted, tree, {float(pressure)})
+
+
+# --- F6: runs and concurrency come from the reader's settings, by name ----------------------------------------------------------
+
+
+def reader_settings_values() -> set[float]:
+    data = yaml.safe_load(READER_SETTINGS_YAML.read_text(encoding="utf-8"))
+    return {value for value in data.values() if isinstance(value, (int, float))}
+
+
+def test_f6_the_runner_reads_runs_and_concurrency_by_name():
+    text = RUNNER.read_text(encoding="utf-8")
+    assert "READER_SETTINGS.runs" in text and "READER_SETTINGS.concurrency" in text
+    assert reader_settings_values() >= {3, 45}
+
+
+# The files of this slice: the older ones use a 3 for the sides of a triangle, which is not the number of runs.
+RUN_FILES = [EVAL / "run.py", EVAL / "report.py", EVAL / "blue_mill.py"]
+
+
+@pytest.mark.parametrize("path", RUN_FILES, ids=lambda p: p.name)
+def test_f6_no_number_in_the_run_files_equals_a_reader_setting(path):
+    assert hard_coded_rule_values(path, tree_of(path), reader_settings_values()) == []
+
+
+@pytest.mark.parametrize("source", ["pool = ThreadPoolExecutor(max_workers=3)\n", "runs = 3\n", "timeout = 45\n"])
+def test_f6_a_planted_reader_setting_is_caught(tmp_path, source):
+    path = plant(tmp_path, source)
+    assert hard_coded_rule_values(path, tree_of(path), reader_settings_values())
+
+
+# --- F7: nothing outside this ticket ---------------------------------------------------------------------------------------------
+
+
+def identifiers(path: Path) -> list[str]:
+    """Every name the file defines or uses: variables, attributes, functions, arguments, imports."""
+    found = []
+    for node in ast.walk(tree_of(path)):
+        if isinstance(node, ast.Name):
+            found.append(node.id)
+        elif isinstance(node, ast.Attribute):
+            found.append(node.attr)
+        elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+            found.append(node.name)
+        elif isinstance(node, ast.arg):
+            found.append(node.arg)
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            found += [alias.name for alias in node.names] + ([node.module] if isinstance(node, ast.ImportFrom) and node.module else [])
+    return [name for name in found if BANNED_IDENTIFIERS.search(name)]
+
+
+@pytest.mark.parametrize("path", EVAL_FILES, ids=lambda p: p.name)
+def test_f7_no_few_shot_judge_guard_or_phone_rehydration_in_the_eval(path):
+    assert identifiers(path) == []
+
+
+@pytest.mark.parametrize(
+    "source",
+    ["few_shot_examples = []\n", "def judge(report):\n    pass\n", "from flysafelz.redact import rehydrate\n", "class Guard:\n    pass\n", "x = obj.unredact(text)\n", "def f(fewshot):\n    pass\n"],
+)
+def test_f7_a_planted_identifier_is_caught(tmp_path, source):
+    assert identifiers(plant(tmp_path, source))
+
+
+def test_f7_the_prompt_is_not_touched_by_the_eval():
+    """The eval reads PROMPT_VERSION and nothing else of the prompt: it neither builds a prompt nor changes one."""
+    uses = [name for path in EVAL_FILES for name in imports_of(path) if name == "flysafelz.reader.prompt"]
+    assert uses == ["flysafelz.reader.prompt"]  # run.py, for PROMPT_VERSION
+    assert "from flysafelz.reader.prompt import PROMPT_VERSION\n" in RUNNER.read_text(encoding="utf-8")
+
+
+def test_f2_runs_are_gitignored():
+    import subprocess
+
+    done = subprocess.run(["git", "check-ignore", "-q", "evals/reader/runs/20261107T160000Z/report.md"], cwd=ROOT, check=False)
+    assert done.returncode == 0

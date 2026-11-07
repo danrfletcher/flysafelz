@@ -310,11 +310,13 @@ def test_a_planted_asyncio_in_the_reader_is_caught(source_copy, planted):
     assert not ASYNC.search((READER / "reader_set.py").read_text(encoding="utf-8"))
 
 
-def test_the_makefile_has_no_eval_target_and_only_test_runs_the_suite():
+def test_the_makefile_has_the_eval_target_and_only_test_runs_the_suite():
+    """PR-8 adds `eval-reader`, the one target that calls the model. `make test` does not run it and mentions no READER_* setting."""
     makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
-    assert re.findall(r"^([a-z-]+):", makefile, re.MULTILINE) == ["setup", "test", "fixtures"]
-    assert "eval-reader" not in makefile and "READER" not in makefile
-    assert "--cov=flysafelz.reader " in makefile and "--cov-fail-under=90" in makefile
+    assert re.findall(r"^([a-z-]+):", makefile, re.MULTILINE) == ["setup", "test", "fixtures", "eval-reader"]
+    test_recipe = re.search(r"^test:[^\n]*\n((?:\t[^\n]*\n?)+)", makefile, re.MULTILINE)
+    assert test_recipe and "eval-reader" not in test_recipe[1] and "READER" not in test_recipe[1] and "reader_eval.run" not in test_recipe[1]
+    assert "--cov=flysafelz.reader " in makefile and "--cov=evals.reader_eval " in makefile and "--cov-fail-under=90" in makefile
 
 
 # --- F6: no threshold literal in the reader --------------------------------------------------------------------------------------------------------

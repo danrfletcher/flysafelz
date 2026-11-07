@@ -33,6 +33,16 @@ def digit_runs(text: str) -> list[str]:
     return [run for run in DIGIT_RUN.findall(re.sub(r"\s+", "", text)) if not is_date_time_group(run)]
 
 
+def leaked(artifacts: str, numbers: set[str] | dict[str, set[str]]) -> set[str]:
+    """The leak-list numbers that appear in the artifacts: a substring search on the text with all whitespace removed.
+
+    `digit_runs` builds the list; it must not search the artifacts. Artifacts hold many other numbers, and a greedy
+    10-11 digit match joins digits before a leaked number onto it (`CTC 124.600 01632960003`), moving the run's edges.
+    """
+    squashed = re.sub(r"\s+", "", artifacts)
+    return {number for number in numbers if number in squashed}
+
+
 def leak_list(pibs: Path = PIBS) -> dict[str, set[str]]:
     """{digits: {NOTAM ids it was found in}} over every raw E text of the committed PIBs."""
     found: dict[str, set[str]] = {}
