@@ -19,10 +19,11 @@ from fence_scan import (
     banned_words,
     env_read_files,
     hard_coded_rule_values,
+    import_violations,
     llm_env_words,
     unreviewed_literals,
 )
-from test_fence import _agent_imports, _banned_dependencies, _declared_dependencies
+from test_fence import _dependency_differences, _dependency_name, _pyproject
 
 from flysafelz.rules import DEFAULT_PATH
 
@@ -73,14 +74,13 @@ def append(path: Path, text: str) -> None:
 # --- F2: dependencies --------------------------------------------------------------------------------------------------------------
 
 
-def test_pyproject_adds_exactly_langchain_openai_and_nothing_else_of_the_banned_kinds():
-    declared = _declared_dependencies()
-    names = {re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower().replace("_", "-") for d in declared}
-    assert {n for n in names if n.startswith(("langchain", "langgraph", "langsmith", "openai", "anthropic"))} == {"langchain-openai"}
-    assert _banned_dependencies(declared) == []
+def test_pyproject_still_declares_langchain_openai_for_the_reader():
+    """Ticket 4 adds the agent packages; test_fence.py's allowlist now holds the exact set. The reader's one dependency is still in it."""
+    assert "langchain-openai" in {_dependency_name(d) for d in _pyproject()["project"]["dependencies"]}
+    assert _dependency_differences(_pyproject()) == {}
 
 
-@pytest.mark.parametrize("planted", ["langgraph", "langgraph>=1", "openai>=1", "anthropic", "langchain-community", "langchain", "langchain-anthropic"])
+@pytest.mark.parametrize("planted", ["openai>=1", "anthropic", "langchain-community", "langchain-anthropic"])
 def test_a_planted_dependency_in_a_copy_of_the_pyproject_is_caught(tmp_path, planted):
     copy = tmp_path / "pyproject.toml"
     text = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
@@ -88,8 +88,8 @@ def test_a_planted_dependency_in_a_copy_of_the_pyproject_is_caught(tmp_path, pla
     copy.write_text(text.replace('"astral>=3.2",', f'"astral>=3.2",\n    "{planted}",', 1), encoding="utf-8")
     config = tomllib.loads(copy.read_text(encoding="utf-8"))
 
-    assert _banned_dependencies(config["project"]["dependencies"]) == [re.split(r"[<>=]", planted)[0]]
-    assert _banned_dependencies(_declared_dependencies()) == []  # the real file is clean, so the hit is the planted line
+    assert _dependency_differences(config) == {"project": {"unlisted": [_dependency_name(planted)], "missing": []}}
+    assert _dependency_differences(_pyproject()) == {}  # the real file is clean, so the hit is the planted line
 
 
 # --- F2: the three narrowed source scans, each against a planted violation outside reader/ ---------------------------------------------------
@@ -100,7 +100,7 @@ def scan_the_copy(copy: Path) -> dict[str, list[str]]:
     reader = copy / "reader"
     hits: dict[str, list[str]] = {}
     for path in sorted(copy.rglob("*.py")):
-        found = _agent_imports(path, reader) + llm_env_words(path, reader) + banned_words(path, reader)
+        found = import_violations(path, copy) + llm_env_words(path, reader) + banned_words(path, reader)
         if found:
             hits[path.relative_to(copy).as_posix()] = found
     return hits
@@ -158,7 +158,7 @@ def test_the_real_tree_uses_each_exemption_and_nothing_outside_reader_does():
     assert "READER_" in CONFIG_PY.read_text(encoding="utf-8")
     for path in PY_FILES:
         if READER not in path.parents:
-            assert _agent_imports(path) + llm_env_words(path, READER) + banned_words(path, READER) == [], path
+            assert import_violations(path, SRC) + llm_env_words(path, READER) + banned_words(path, READER) == [], path
 
 
 CLI_READER_IMPORTS = {
@@ -177,7 +177,7 @@ CLI_READER_IMPORTS = {
 
 def test_cli_py_passes_every_narrowed_scan_unchanged():
     cli = SRC / "cli.py"
-    assert banned_words(cli, READER) == [] and llm_env_words(cli, READER) == [] and _agent_imports(cli) == []
+    assert banned_words(cli, READER) == [] and llm_env_words(cli, READER) == [] and import_violations(cli, SRC) == []
     assert not re.search(r"environ|getenv", cli.read_text(encoding="utf-8"))
     # PR-6: the command line is the one file outside reader/ that imports the reader, and only these modules of it.
     assert {m for m in imports_of(cli) if m.startswith("flysafelz.reader")} <= CLI_READER_IMPORTS
