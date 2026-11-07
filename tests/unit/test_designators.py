@@ -11,11 +11,11 @@ J3857_E = (
     "THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE\n"
     "(SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR\n"
     "LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC\n"
-    "OPS(AT)FLYLOGIX.COM OR 07784 546062. SURVEYING CYGNUS.\n"
+    "OPS(AT)FLYLOGIX.COM OR 07700 900123. SURVEYING CYGNUS.\n"
     "AR-2026-7404/05."
 )
 J3864_E = J3857_E.replace("AR-2026-7404/05.", "AR-2026-7404/09.")
-H7171_E = "UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT \n700FT AGL. FOR INFO 07784 546062. AR-2026-10264/01."
+H7171_E = "UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT \n700FT AGL. FOR INFO 07700 900123. AR-2026-10264/01."
 
 
 @pytest.mark.parametrize("text", ["D323A", "EGD 323A", "EG D323A", "egd323a", "EGD323A", "d323a", "Egd 323a", "EG D 323A", " EGD323A ", "D 323A"])
@@ -31,9 +31,37 @@ def test_the_kind_digits_and_optional_suffix_are_kept(text, expected):
     assert normalise_designator(text) == expected
 
 
-@pytest.mark.parametrize("text", ["", "   ", "EGD", "EGD32", "EGD3234", "EGD323AB", "EGX323A", "ABC", "EGD323A EGD323B", "SUP 108", "EGD 323 A", "108/2026"])
+@pytest.mark.parametrize("text", ["", "   ", "EGD", "EGD32", "EGD3234", "EGD323ABC", "EGX323A", "ABC", "EGD323A EGD323B", "SUP 108", "EGD 323 A", "108/2026"])
 def test_a_string_that_is_not_exactly_one_designator_gives_none(text):
     assert normalise_designator(text) is None
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [("EGD323AB", "EGD323AB"), ("D323AB", "EGD323AB"), ("EG D323AB", "EGD323AB"), ("egd 323ab", "EGD323AB"), ("EGR106XY", "EGR106XY")],
+)
+def test_a_two_letter_suffix_is_kept(text, expected):
+    assert normalise_designator(text) == expected
+    assert find_designators(text) == [expected]
+
+
+@pytest.mark.parametrize(("text", "expected"), [("EGD 323A", "EGD323A"), ("EG D323A", "EGD323A"), ("D323A", "EGD323A"), ("EGD323AB", "EGD323AB")])
+def test_e5_every_written_form_is_found_in_text(text, expected):
+    assert find_designators(f"TDA {text} ACTIVE") == [expected]
+    assert find_designators(text) == [expected]
+
+
+def test_cr4_one_and_two_letter_suffixes_stay_distinct():
+    """openAIP matching compares normalise_designator on both sides: EGD323A and EGD323AB are different areas, D323A is still EGD323A."""
+    assert normalise_designator("EGD323A") != normalise_designator("EGD323AB")
+    assert normalise_designator("EGD323A") != normalise_designator("EGD323")
+    assert normalise_designator("D323A") == normalise_designator("EGD323A") == "EGD323A"
+    assert find_designators("EGD323A AND EGD323AB AND D323A AND EGD323") == ["EGD323A", "EGD323AB", "EGD323"]
+
+
+def test_a_three_letter_suffix_gives_no_designator_not_a_shorter_one():
+    assert find_designators("EGD323ABC") == []
+    assert find_designators("AREA EGD323ABC AND EGD323A") == ["EGD323A"]
 
 
 def test_matching_is_exact_egd496_is_not_egd496a():
@@ -64,7 +92,8 @@ def test_e_text_with_no_designator_gives_an_empty_list():
         "XD323A",
         "ABCD323A",
         "RP108/2026",
-        "EGD323AB",
+        "EGD323ABC",
+        "D323ABC",
         "WORD323",
         "ED12",
     ],
