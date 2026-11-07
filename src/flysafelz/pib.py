@@ -63,6 +63,10 @@ reaches the sort.
 Every number the rules need (2 NM, FL195, 50 NM, the 3 h stale limit, the subject
 lists) is read from rules.yaml. Distances come from geo.py and activity from
 schedule.py; nothing is measured or parsed twice.
+
+load_pib, prefilter and sort_notam take an optional keyword-only `tz` (an IANA zone name). It changes only how the
+times in their reasons are written (timetext.stamp); None is UTC, byte for byte as before. The request parameters
+sent to the archive, the datetimes on the results, and the NOTAM text as published all stay UTC.
 """
 
 import re
@@ -73,13 +77,14 @@ from enum import StrEnum
 import httpx
 from pydantic import BaseModel, ConfigDict, Field
 
-from flysafelz.clients.pib_source import Source, fetch_pib, utc_text
+from flysafelz.clients.pib_source import Source, fetch_pib
 from flysafelz.contracts import IgnoredNotam, NotamType, ParsedNotam, SourceName, SourceState, SourceStatus
 from flysafelz.designators import find_designators
 from flysafelz.geo import circle_edge_distance_nm
 from flysafelz.notam_area import Broken, Shape, area_from_item_e
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import parse_schedule
+from flysafelz.timetext import check_tz, stamp
 
 LatLon = tuple[float, float]  # the landing zone: (lat, lon) in degrees, east positive
 Window = tuple[datetime, datetime]  # [start, end): start is in, end is out
@@ -349,7 +354,13 @@ def _number(rule: Rule) -> float:
 
 
 def load_pib(
-    source: Source, now: datetime, *, client: httpx.Client | None = None, rules: Rules = RULES, stale_rule: bool = True
+    source: Source,
+    now: datetime,
+    *,
+    client: httpx.Client | None = None,
+    rules: Rules = RULES,
+    stale_rule: bool = True,
+    tz: str | None = None,
 ) -> PibResult:
     """Fetch the PIB and read it. The status is ok, stale (issued too long before now) or failed.
 
@@ -360,7 +371,11 @@ def load_pib(
     captured PIB is treated as current at the case's now, because the archive snapshots it only about twice
     a day. The status is then ok whatever the PIB's age, and its reason says so. A PIB that fails to read is
     still failed.
+
+    tz is an IANA zone name for the time in the stale reason ("PIB issued 2026-10-31 07:00 GMT ..."); None writes UTC.
+    The request to the archive stays UTC either way, and so do the status's issued_at and fetched_at.
     """
+    check_tz(tz)
     fetched = fetch_pib(source, now, client=client)
     if fetched.xml is None:
         return PibResult(status=fetched.status)
@@ -378,7 +393,7 @@ def load_pib(
     if not stale_rule:
         reason, state = CASE_MODE_NOTE, SourceState.OK
     elif now - issued > timedelta(hours=limit):
-        reason = f"PIB issued {utc_text(issued)}, more than {limit:g} h before now"
+        reason = f"PIB issued {stamp(issued, tz)}, more than {limit:g} h before now"
         state = SourceState.STALE
     else:
         reason, state = "", SourceState.OK
@@ -391,7 +406,7 @@ def load_pib(
 # --- prefilter (G13) ---------------------------------------------------------------
 
 
-def _drop_reason(notam: ParsedNotam, lz: LatLon, window: Window, rules: Rules) -> str | None:
+def _drop_reason(notam: ParsedNotam, lz: LatLon, window: Window, rules: Rules, tz: str | None) -> str | None:
     """Why the prefilter drops this NOTAM, or None to keep it."""
     start, end = window
     edge = circle_edge_distance_nm(lz[0], lz[1], notam.centre_lat, notam.centre_lon, notam.radius_nm)
@@ -400,25 +415,28 @@ def _drop_reason(notam: ParsedNotam, lz: LatLon, window: Window, rules: Rules) -
     if rules.notam_max_lower_fl.breached(notam.lower_fl):
         return f"Q-line lower limit FL{notam.lower_fl:03d} is above FL{_number(rules.notam_max_lower_fl):03g}"
     if notam.valid_from >= end:
-        return f"starts {utc_text(notam.valid_from)}, at or after the window end {utc_text(end)}"
+        return f"starts {stamp(notam.valid_from, tz)}, at or after the window end {stamp(end, tz)}"
     if notam.valid_to is not None and notam.valid_to <= start:
-        return f"ended {utc_text(notam.valid_to)}, at or before the window start {utc_text(start)}"
+        return f"ended {stamp(notam.valid_to, tz)}, at or before the window start {stamp(start, tz)}"
     return None
 
 
 def prefilter(
-    notams: list[ParsedNotam], lz: LatLon, window: Window, *, rules: Rules = RULES
+    notams: list[ParsedNotam], lz: LatLon, window: Window, *, rules: Rules = RULES, tz: str | None = None
 ) -> tuple[list[ParsedNotam], list[IgnoredNotam]]:
     """Keep a NOTAM only when all three hold; return (kept, dropped with reasons).
 
     1. The LZ is within the local area (rules.yaml) of the Q-circle's edge. Inside the circle counts as 0.
     2. The Q-line lower limit is not above the FL cap (rules.yaml).
     3. B-C overlaps the half-open window [start, end). A PERM C overlaps any window after B.
+
+    The times in a drop reason are written in `tz` (None: UTC). The NOTAM's own fields stay UTC.
     """
+    check_tz(tz)
     kept: list[ParsedNotam] = []
     dropped: list[IgnoredNotam] = []
     for notam in notams:
-        reason = _drop_reason(notam, lz, window, rules)
+        reason = _drop_reason(notam, lz, window, rules, tz)
         if reason is None:
             kept.append(notam)
         else:
@@ -429,13 +447,16 @@ def prefilter(
 # --- code-only sort (G23) ----------------------------------------------------------
 
 
-def _inactive_reason(notam: ParsedNotam, span: Window, lz: LatLon) -> tuple[str | None, str | None]:
-    """(why the NOTAM is not active in the span or None, a note when item D could not be read)."""
+def _inactive_reason(notam: ParsedNotam, span: Window, lz: LatLon, tz: str | None) -> tuple[str | None, str | None]:
+    """(why the NOTAM is not active in the span or None, a note when item D could not be read).
+
+    The B and C times in the reason are written in `tz`. The item D text quoted in it stays as published.
+    """
     start, end = span
     if notam.valid_from >= end:
-        return f"not active in the span: starts {utc_text(notam.valid_from)}", None
+        return f"not active in the span: starts {stamp(notam.valid_from, tz)}", None
     if notam.valid_to is not None and notam.valid_to <= start:
-        return f"not active in the span: ended {utc_text(notam.valid_to)}", None
+        return f"not active in the span: ended {stamp(notam.valid_to, tz)}", None
     if not notam.item_d:
         return None, None
     # Clip B-C to the span first: any interval left is an overlap, and a PERM C needs an end.
@@ -468,7 +489,7 @@ def _ignore_reason(notam: ParsedNotam, rules: Rules) -> str | None:
     return None
 
 
-def sort_notam(notam: ParsedNotam, span: Window, lz: LatLon, *, rules: Rules = RULES) -> SortResult:
+def sort_notam(notam: ParsedNotam, span: Window, lz: LatLon, *, rules: Rules = RULES, tz: str | None = None) -> SortResult:
     """Decide IGNORE, VIA_AIRSPACE, AWARENESS or TO_READER for one NOTAM in one span [start, end). First match wins.
 
     1. IGNORE: not active in the span (B/C, then D) · traffic I only · purpose K · cancelled ·
@@ -485,8 +506,11 @@ def sort_notam(notam: ParsedNotam, span: Window, lz: LatLon, *, rules: Rules = R
     FIR-wide admin and security advice, which no drawn area makes relevant.
 
     Run it after the prefilter. Series Q is not ignored.
+
+    The times in the "not active in the span" reason are written in `tz` (None: UTC). Item E and item D are never reformatted.
     """
-    inactive, note = _inactive_reason(notam, span, lz)
+    check_tz(tz)
+    inactive, note = _inactive_reason(notam, span, lz, tz)
     if inactive:
         return SortResult(action=SortAction.IGNORE, reason=inactive)
     ignore = _ignore_reason(notam, rules)
