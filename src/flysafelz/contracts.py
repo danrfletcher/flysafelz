@@ -257,6 +257,7 @@ class NotamReading(BaseModel):
     contact: Contact
     activates_designators: list[str] = Field(default_factory=list)  # e.g. ["EGD496A"]
     prohibitive_reason: ProhibitiveReason = ProhibitiveReason.NONE
+    prohibitive_quote: str | None = None  # the E-text words the reason rests on, word for word; None when the reason is none
 
 
 class NotamAction(StrEnum):

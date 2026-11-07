@@ -44,6 +44,7 @@ def reply_fields(**overrides: Any) -> dict[str, Any]:
         "contact": {"kind": "phone", "value": "<PHONE_1>"},
         "activates_designators": [],
         "prohibitive_reason": "none",
+        "prohibitive_quote": None,
     }
     fields.update(overrides)
     return fields

@@ -66,9 +66,31 @@ def test_a_row_holds_the_semantic_fields_and_created_at_and_nothing_coded(tmp_pa
     ((stored_key, stored_json, created_at),) = table(database)
 
     assert stored_key == key_text(key) and json.loads(stored_key) == ["H7171/26", key.input_sha256, FAKE_MODEL, key.prompt_sha256]
-    assert set(json.loads(stored_json)) == set(ReaderOutput.model_fields)  # category .. prohibitive_reason
+    assert set(json.loads(stored_json)) == set(ReaderOutput.model_fields)  # category .. prohibitive_quote
     assert not {"geometry", "schedule", "id"} & set(json.loads(stored_json))
     assert created_at == now.isoformat()
+
+
+def test_e6_a_reading_with_a_reason_round_trips_its_quote_through_the_row(tmp_path, now):
+    database, key = tmp_path / "readings.sqlite", cache_key(H7171, FAKE_MODEL)
+    quote = "UAS OPR WI 0.5NM"
+    original = read_h7171(prohibitive_reason="entry prohibited", prohibitive_quote=quote)
+    assert original.status is ReaderStatus.READ and original.reading is not None and original.reading.prohibitive_quote == quote
+    store(database, key, original, now)
+
+    ((_, stored_json, _),) = table(database)
+    assert json.loads(stored_json)["prohibitive_quote"] == quote and json.loads(stored_json)["prohibitive_reason"] == "entry prohibited"
+    loaded = lookup(database, H7171, key)
+    assert loaded is not None and loaded.reading == original.reading and loaded.reading.prohibitive_quote == quote
+
+
+def test_a_row_stored_with_the_reason_none_holds_a_null_quote_and_a_loaded_quote_is_dropped_for_none(tmp_path, now):
+    database, key = tmp_path / "readings.sqlite", cache_key(H7171, FAKE_MODEL)
+    store(database, key, read_h7171(prohibitive_reason="none", prohibitive_quote="UAS OPR WI 0.5NM"), now)
+    assert json.loads(table(database)[0][1])["prohibitive_quote"] is None  # merge_reading dropped it before the row was written
+    corrupt_the_row(database, json.dumps({**GOOD_ROW, "prohibitive_reason": "none", "prohibitive_quote": "UAS OPR WI 0.5NM"}))
+    loaded = lookup(database, H7171, key)  # a hand-edited row: merge_reading drops the quote on load too, so it is not a miss
+    assert loaded is not None and loaded.reading is not None and loaded.reading.prohibitive_quote is None
 
 
 def test_area_and_schedule_are_built_by_code_on_every_load(tmp_path, now):
@@ -213,6 +235,9 @@ BAD_ROWS = {
     "a geometry the model must not fill (F1)": json.dumps({**GOOD_ROW, "geometry": {"kind": "circle", "lat": 51.0, "lon": -1.0, "radius_nm": 9.0}}),
     "a schedule the model must not fill (F1)": json.dumps({**GOOD_ROW, "schedule": "0000-2359"}),
     "a field missing after a contract change": json.dumps({k: v for k, v in GOOD_ROW.items() if k != "prohibitive_reason"}),
+    "a v1 row with no prohibitive_quote (E6)": json.dumps({k: v for k, v in GOOD_ROW.items() if k != "prohibitive_quote"}),
+    "a reason with a quote that is not in the text": json.dumps({**GOOD_ROW, "prohibitive_reason": "live firing", "prohibitive_quote": "LIVE FIRING TAKES PLACE"}),
+    "a reason with no quote": json.dumps({**GOOD_ROW, "prohibitive_reason": "byelaws", "prohibitive_quote": None}),
     "a quote that is not in the text": json.dumps({**GOOD_ROW, "exemptions": [{"quote": "EXCEPT PARAGLIDERS", "covers": "PARAMOTOR_CLASS"}]}),
     "a placeholder the NOTAM does not have": json.dumps({**GOOD_ROW, "contact": {"kind": "phone", "value": "<PHONE_7>"}}),
     "a json null": "null",

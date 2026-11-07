@@ -109,7 +109,7 @@ def test_the_response_format_is_strict_json_schema_built_from_reader_output():
 
 def test_the_schema_has_no_field_for_a_coded_value():
     """F1: nothing in the model's form is id, Q-line, B/C, D, F/G or area."""
-    assert set(FIELDS) == {"category", "activity", "floor", "ceiling", "applies_to", "exemptions", "contact", "activates_designators", "prohibitive_reason"}
+    assert set(FIELDS) == {"category", "activity", "floor", "ceiling", "applies_to", "exemptions", "contact", "activates_designators", "prohibitive_reason", "prohibitive_quote"}
     text = json.dumps(response_format())
     for coded in ("geometry", "schedule", "valid_from", "valid_to", "q_code", "item_d", "item_f", "item_g", "centre", "radius_nm", '"id"'):
         assert coded not in text, coded
@@ -158,6 +158,7 @@ def test_the_semantic_fields_reach_the_reading_unchanged():
         contact={"kind": "email", "value": "ops@example.org"},
         activates_designators=["EGD496A", "D323"],
         prohibitive_reason="live firing",
+        prohibitive_quote="LIVE FIRING",
     )
     e_text = "LIVE FIRING. EXCEPT PARAGLIDERS. WITH ATC PERMISSION. EGD496A AND D323 ACTIVE."
     reading = read(parsed(item_e=e_text), reply)[0].reading
@@ -168,7 +169,7 @@ def test_the_semantic_fields_reach_the_reading_unchanged():
     assert [(e.quote, e.covers.value) for e in reading.exemptions] == [("EXCEPT PARAGLIDERS", "PARAMOTOR_CLASS"), ("WITH ATC PERMISSION", "CONDITIONAL")]
     assert (reading.contact.kind, reading.contact.value) == (ContactKind.EMAIL, "ops@example.org")
     assert reading.activates_designators == ["EGD496A", "D323"]  # as written: normalising is notam_action()'s job
-    assert reading.prohibitive_reason is ProhibitiveReason.LIVE_FIRING
+    assert reading.prohibitive_reason is ProhibitiveReason.LIVE_FIRING and reading.prohibitive_quote == "LIVE FIRING"
     assert NotamReading.model_validate_json(reading.model_dump_json()) == reading
 
 

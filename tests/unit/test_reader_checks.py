@@ -79,10 +79,12 @@ def test_check_reading_changes_nothing_and_gives_the_same_list_twice():
     assert check_reading(PARSED, bad, MAP) == first
 
 
-def test_the_sentences_come_in_the_order_b_c_d_e_f():
-    bad = reading(floor=amsl(900), ceiling=amsl(300), value="<PHONE_3>", exemptions=[exemption("EXCEPT FOR PARAGLIDING")], designators=["EGD496"]).model_copy(update={"applies_to": "PARAMOTORS"})
+def test_the_sentences_come_in_the_order_b_c_d_e_prohibitive_quote_f():
+    bad = reading(floor=amsl(900), ceiling=amsl(300), value="<PHONE_3>", exemptions=[exemption("EXCEPT FOR PARAGLIDING")], designators=["EGD496"]).model_copy(
+        update={"applies_to": "PARAMOTORS", "prohibitive_reason": ProhibitiveReason.LIVE_FIRING, "prohibitive_quote": "LIVE FIRING IN PROGRESS"}
+    )
     sentences = check_reading(PARSED, bad, MAP)
-    openings = ["your floor", "your contact value", "your activates_designators entry", "your exemption quote", "your applies_to"]
+    openings = ["your floor", "your contact value", "your activates_designators entry", "your exemption quote", "your prohibitive_quote", "your applies_to"]
     assert [s.startswith(o) for s, o in zip(sentences, openings, strict=True)] == [True] * len(openings)
 
 
@@ -366,6 +368,110 @@ def test_e_with_an_empty_e_text_any_quote_fails():
     assert len(check_reading(empty, reading(value=None, contact=ContactKind.NONE, exemptions=[exemption("X")]), {})) == 1
 
 
+# --- (e2) prohibitive quote ----------------------------------------------------------------------------------------
+
+REASONS = list(ProhibitiveReason)
+GIVING_A_REASON = [r for r in ProhibitiveReason if r is not ProhibitiveReason.NONE]
+QUOTES = {
+    "none": (None, False),
+    "empty": ("", False),
+    "whitespace": ("  \n\t\u00a0", False),
+    "in the text": ("PARAGLIDERS EXEMPT", True),
+    "in the text, other case and whitespace": ("  uas   opr\nnear\u00a0GARTON.  ", True),
+    "not in the text": ("ENTRY IS PROHIBITED", False),
+    "a real number": (f"CALL {REAL} FIRST", False),
+    "placeholder in the map": ("CALL <PHONE_1> FIRST", True),
+    "placeholder not in the map": ("CALL <PHONE_2> FIRST", False),
+}
+
+
+def quote_sentences(sentences):
+    return [s for s in sentences if s.startswith("your prohibitive_quote")]
+
+
+@pytest.mark.parametrize("reason", REASONS, ids=lambda r: r.value)
+@pytest.mark.parametrize("name", QUOTES)
+def test_g9_the_quote_check_over_every_reason_and_quote(reason, name):
+    quote, in_text = QUOTES[name]
+    sentences = check_reading(PARSED, broken(prohibitive_reason=reason, prohibitive_quote=quote), MAP)
+    failed = quote_sentences(sentences)
+    if reason is ProhibitiveReason.NONE or in_text:
+        assert failed == []
+    else:
+        assert len(failed) == 1
+        assert "prohibitive_quote" in failed[0] and "or answer prohibitive_reason none" in failed[0] and "word for word" in failed[0]
+    for sentence in sentences:
+        assert "900123" not in sentence and "07700" not in sentence  # no sentence ever shows the number
+
+
+def test_g9_a_clean_reading_with_a_reason_and_its_quote_passes_every_check():
+    assert check_reading(PARSED, broken(prohibitive_reason=ProhibitiveReason.ENTRY_PROHIBITED, prohibitive_quote="uas opr near garton"), MAP) == []
+
+
+def test_g9_an_empty_quote_says_so_and_names_the_reason():
+    (sentence,) = broken_sentences(prohibitive_reason=ProhibitiveReason.LIVE_FIRING, prohibitive_quote="   ")
+    assert sentence == "your prohibitive_quote is empty but your prohibitive_reason is 'live firing'; quote the words of the NOTAM text the reason rests on, word for word, or answer prohibitive_reason none"
+    assert broken_sentences(prohibitive_reason=ProhibitiveReason.BYELAWS, prohibitive_quote=None) == [sentence.replace("live firing", "byelaws")]
+
+
+def test_g9_a_quote_not_in_the_text_is_shown_back_trimmed_with_the_instruction():
+    (sentence,) = broken_sentences(prohibitive_reason=ProhibitiveReason.BYELAWS, prohibitive_quote="  BYELAWS APPLY  ")
+    assert sentence == "your prohibitive_quote 'BYELAWS APPLY' does not appear in the NOTAM text; quote the words the reason rests on, word for word, or answer prohibitive_reason none"
+
+
+def broken_sentences(**changes):
+    return quote_sentences(check_reading(PARSED, broken(**changes), MAP))
+
+
+def test_g9_a_real_number_in_the_quote_fails_check_c_and_does_not_match_and_is_never_shown():
+    sentences = check_reading(PARSED, broken(prohibitive_reason=ProhibitiveReason.LIVE_FIRING, prohibitive_quote=f"CALL {REAL} FIRST"), MAP)
+    assert [s.split(" ")[:3] for s in sentences] == [["your", "prohibitive", "quote"], ["your", "prohibitive_quote", "'CALL"]]
+    assert "has a phone number written out" in sentences[0]
+    assert "<PHONE_1>" in sentences[1]
+    assert all("900123" not in s and "07700" not in s for s in sentences)
+
+
+def test_g9_check_c_also_covers_a_quote_with_a_placeholder_that_is_not_in_the_map():
+    sentences = check_reading(PARSED, broken(prohibitive_reason=ProhibitiveReason.LIVE_FIRING, prohibitive_quote="CALL <PHONE_2> FIRST"), MAP)
+    assert sentences[0].startswith("your prohibitive quote mentions <PHONE_2>, which is not in the NOTAM text")
+    assert len(quote_sentences(sentences)) == 1
+
+
+def test_g9_a_quote_across_two_sentences_passes_when_it_is_contiguous_and_fails_with_words_from_two_places():
+    contiguous = "PARAGLIDERS EXEMPT. CALL <PHONE_1> FIRST"
+    assert broken_sentences(prohibitive_reason=ProhibitiveReason.ENTRY_PROHIBITED, prohibitive_quote=contiguous) == []
+    assert len(broken_sentences(prohibitive_reason=ProhibitiveReason.ENTRY_PROHIBITED, prohibitive_quote="UAS OPR NEAR GARTON. EGD 496A ACTIVE")) == 1
+    assert len(broken_sentences(prohibitive_reason=ProhibitiveReason.ENTRY_PROHIBITED, prohibitive_quote="GARTON EGD 496A")) == 1
+
+
+def test_g9_with_an_empty_e_text_any_reason_other_than_none_fails():
+    empty = notam(item_e="")
+    for quote in ("", "X", "   "):
+        for reason in GIVING_A_REASON:
+            changed = reading(value=None, contact=ContactKind.NONE).model_copy(update={"prohibitive_reason": reason, "prohibitive_quote": quote})
+            assert len(quote_sentences(check_reading(empty, changed, {}))) == 1, (reason, quote)
+    none = reading(value=None, contact=ContactKind.NONE).model_copy(update={"prohibitive_quote": None})
+    assert check_reading(empty, none, {}) == []
+
+
+def test_g9_unicode_and_quote_characters_pass_through_unchanged():
+    text = "ENTRY \u2013 \u201cPILOTS ARE TO AVOID\u201d \u2019S \u00c9 \u4e2d THE AREA."
+    quote = "\u201cpilots are to avoid\u201d \u2019s \u00e9 \u4e2d"  # lower case, \u00e9 casefolds from \u00c9
+    unicode_notam = notam(item_e=text)
+    changed = reading(value=None, contact=ContactKind.NONE).model_copy(update={"prohibitive_reason": ProhibitiveReason.ENTRY_PROHIBITED, "prohibitive_quote": quote})
+    before = copy.deepcopy(changed)
+    assert check_reading(unicode_notam, changed, {}) == []
+    assert changed == before and changed.prohibitive_quote == quote and unicode_notam.item_e == text
+    wrong_dash = changed.model_copy(update={"prohibitive_quote": "\u2014 \u201cpilots are to avoid\u201d"})  # an em dash is not the text's en dash
+    assert len(quote_sentences(check_reading(unicode_notam, wrong_dash, {}))) == 1
+
+
+def test_e2_no_check_forces_a_reason_when_the_text_says_pilots_are_to_avoid():
+    avoid = notam(item_e="PILOTS ARE TO AVOID THE AREA")
+    none = reading(value=None, contact=ContactKind.NONE).model_copy(update={"prohibitive_reason": ProhibitiveReason.NONE, "prohibitive_quote": None})
+    assert check_reading(avoid, none, {}) == []
+
+
 # --- (f) enums and types -------------------------------------------------------------------------------------------
 
 ALLOWED = {
@@ -411,6 +517,7 @@ def reply_error(**overrides) -> ValidationError:
         "contact": {"kind": "none", "value": None},
         "activates_designators": [],
         "prohibitive_reason": "none",
+        "prohibitive_quote": None,
     }
     fields.update(overrides)
     fields = {k: v for k, v in fields.items() if v != "<missing>"}
@@ -463,3 +570,13 @@ def test_f_a_real_number_in_a_rejected_value_is_shown_as_a_placeholder():
 def test_f_every_problem_gets_a_sentence_in_the_form_order():
     sentences = schema_failures(reply_error(category="x", ceiling="<missing>", prohibitive_reason="y"))
     assert [s.split(" ")[1] for s in sentences] == ["category", "answer", "prohibitive_reason"]
+
+
+@pytest.mark.parametrize("value", ["ordnance", "demolition", "explosives", "rockets"])
+def test_f3_a_new_reason_value_is_a_schema_failure_listing_the_four_allowed_values(value):
+    (sentence,) = schema_failures(reply_error(prohibitive_reason=value))
+    assert sentence == f"your prohibitive_reason is '{value}', which is not allowed; use 'byelaws', 'entry prohibited', 'live firing' or 'none'"
+
+
+def test_f3_a_reply_without_the_quote_key_is_a_missing_field_sentence():
+    assert schema_failures(reply_error(prohibitive_quote="<missing>")) == ["your answer has no prohibitive_quote; give every field (null where the NOTAM text states none)"]
