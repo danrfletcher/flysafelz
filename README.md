@@ -15,9 +15,12 @@ Python 3.12 with `uv` · LangGraph + LangChain v1 · LangSmith (traces, datasets
 ```
 make setup   # uv sync; needs no API key
 make test    # uv run pytest, with sockets disabled
+make eval-reader   # the reader eval: the only target that calls the model, so it needs the READER_* settings
 ```
 
 Copy `.env.example` to `.env` for the openAIP key when fixtures are captured later. `.env` is gitignored. The NOTAM reader's model endpoint is four more lines in the same file (or in the environment, which wins): `READER_PROVIDER`, `READER_BASE_URL`, `READER_API_KEY` and `READER_MODEL`, any OpenAI-compatible endpoint. All four are required and nothing falls back to a default; only `src/flysafelz/reader/config.py` reads them, and only when the reader is first used. `make test` never needs them.
+
+`make eval-reader` reads every fully labelled NOTAM in `evals/reader/labels.yaml` three times with the real model (no cache), scores the runs against the labels, checks the live Blue Mill case against its `readings.yaml`, and writes `evals/reader/runs/<time>/report.md` and `report.json` (gitignored), printing their paths. Harmful downgrades lead the report; they never change the exit code. With a `READER_*` setting missing it stops and names it.
 
 ## Assessing a landing zone
 

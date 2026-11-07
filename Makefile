@@ -1,4 +1,4 @@
-.PHONY: setup test fixtures
+.PHONY: setup test fixtures eval-reader
 
 # Needs no API key: only installs the project and its dependencies.
 setup:
@@ -17,3 +17,11 @@ test:
 # CASE reaches the program through the environment, so it is never parsed by the shell.
 fixtures:
 	@uv run python -m flysafelz.capture "$$CASE"
+
+# The reader eval, and the only target that calls the model: it needs the four READER_* settings (environment or .env) and
+# stops, naming the missing ones, when any is absent. It reads every fully labelled item in evals/reader/labels.yaml `runs`
+# times (src/flysafelz/reader/settings.yaml) with the real model and the cache bypassed, scores the runs, checks the live
+# Blue Mill case, and writes evals/reader/runs/<time>/report.md and report.json. `make test` never runs it. A harmful
+# downgrade does not fail it: it is a report, not a gate.
+eval-reader:
+	@uv run python -m evals.reader_eval.run
