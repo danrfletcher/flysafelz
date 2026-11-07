@@ -1,0 +1,3 @@
+6 [('06:21', [('NIGHT', 'TWILIGHT')]), ('06:59', [('TWILIGHT', 'DAY')])]
+16 [('16:28', [('DAY', 'TWILIGHT')])]
+17 [('17:06', [('TWILIGHT', 'NIGHT')])]

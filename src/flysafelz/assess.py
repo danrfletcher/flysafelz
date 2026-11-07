@@ -4,6 +4,8 @@
     fetch_horizon(now)       the UTC time (exclusive) up to which weather is worth fetching
     default_window(now)      the window used when none is given
     display(segment)         the verdict display string of a segment
+    notams_in_hour(...)      the NOTAMs an hour is cut on
+    cut_points_with_reasons(...)  the minutes an hour is cut at, each with why
 
 assess never calls a client. The caller fetches (up to fetch_horizon), hands the results
 in, and gets an Assessment back. Every threshold is a rules.yaml rule.
@@ -72,6 +74,7 @@ from flysafelz.daylight import (
     LONDON,
     ONE_DAY,
     ONE_HOUR,
+    ONE_MINUTE,
     Phase,
     daylight_edges,
     daylight_phase,
@@ -297,14 +300,64 @@ def _activations(
     return activations
 
 
-def _cut_points(hour: datetime, lat: float, lon: float, notams: list[ParsedNotam], readings: Mapping[str, NotamReading], lz: LandingZone) -> list[datetime]:
-    """Every minute strictly inside the hour where a segment ends: daylight edges and NOTAM starts and ends (Q10)."""
+# Why a segment ends at a cut: a daylight phase change (before, after), or a NOTAM edge (id, "starts" | "ends").
+DaylightReason = tuple[Phase, Phase]
+NotamReason = tuple[str, str]
+CutReason = DaylightReason | NotamReason
+
+STARTS = "starts"
+ENDS = "ends"
+_NOTAM_EDGE_ORDER = (STARTS, ENDS)
+
+
+def notams_in_hour(
+    hour: datetime,
+    notams: list[ParsedNotam],
+    readings: Mapping[str, NotamReading],
+    lz: LandingZone,
+    ignored: dict[str, str] | None = None,
+) -> list[ParsedNotam]:
+    """The NOTAMs that matter somewhere in this hour: the ones sort_notam() does not IGNORE, in input order (Q10).
+
+    This is the set assess cuts the hour on. `notams` are the prefiltered ones. Each IGNORE reason goes
+    into `ignored` (when given) with setdefault, so the first reason a NOTAM gets across hours is kept.
+    `readings` is not read: sort_notam() works from the NOTAM text alone. It is in the signature so
+    callers pass the same arguments they pass to cut_points_with_reasons().
+    """
+    kept = []
+    for notam in notams:
+        sorted_ = sort_notam(notam, (hour, hour + ONE_HOUR), (lz.lat, lz.lon))
+        if sorted_.action is SortAction.IGNORE:
+            if ignored is not None:
+                ignored.setdefault(notam.id, sorted_.reason)
+        else:
+            kept.append(notam)
+    return kept
+
+
+def cut_points_with_reasons(
+    hour: datetime, lat: float, lon: float, notams: list[ParsedNotam], readings: Mapping[str, NotamReading], lz: LandingZone
+) -> list[tuple[datetime, list[CutReason]]]:
+    """Every minute strictly inside the hour where a segment ends, with why, in time order (Q10).
+
+    The cuts are daylight edges and NOTAM starts and ends. `notams` are the ones that apply in the hour
+    (see notams_in_hour). A daylight reason is (phase before, phase after); a NOTAM reason is
+    (id, "starts" | "ends"). When several fall on one minute they share one cut: daylight first,
+    then NOTAMs by id (a start before an end). An edge on HH:00 or a NOTAM active across the hour cuts nothing.
+    """
     end = hour + ONE_HOUR
-    cuts = {t for t, _phase in daylight_edges(lat, lon, hour, end)}
+    reasons: dict[datetime, list[CutReason]] = {}
+    for t, phase_after in daylight_edges(lat, lon, hour, end):
+        reasons.setdefault(t, []).append((daylight_phase(lat, lon, t - ONE_MINUTE), phase_after))
+    notam_reasons: dict[datetime, set[NotamReason]] = {}
     for notam in notams:
         for span_start, span_end in active_intervals(notam, readings.get(notam.id), lz, hour, end):
-            cuts.update(t for t in (span_start, span_end) if hour < t < end)
-    return sorted(cuts)
+            for t, edge in ((span_start, STARTS), (span_end, ENDS)):
+                if hour < t < end:
+                    notam_reasons.setdefault(t, set()).add((notam.id, edge))
+    for t, found in notam_reasons.items():
+        reasons.setdefault(t, []).extend(sorted(found, key=lambda r: (r[0], _NOTAM_EDGE_ORDER.index(r[1]))))
+    return sorted(reasons.items())
 
 
 def _segment(
@@ -463,14 +516,9 @@ def assess(
             continue
 
         # The NOTAMs that matter somewhere in this hour, and the minutes where one starts or ends.
-        in_hour = []
-        for notam in near_notams:
-            sorted_ = sort_notam(notam, (hour, hour + ONE_HOUR), (lat, lon))
-            if sorted_.action is SortAction.IGNORE:
-                ignored.setdefault(notam.id, sorted_.reason)
-            else:
-                in_hour.append(notam)
-        edges = [hour, *_cut_points(hour, lat, lon, in_hour, readings, lz), hour + ONE_HOUR]
+        in_hour = notams_in_hour(hour, near_notams, readings, lz, ignored)
+        cuts = cut_points_with_reasons(hour, lat, lon, in_hour, readings, lz)
+        edges = [hour, *(t for t, _reasons in cuts), hour + ONE_HOUR]
 
         hour_problems = problems + ([tier.reason] if tier.unverified else [])
         segments = [

@@ -1,0 +1,10 @@
+ src/flysafelz/assess.py                            |  74 +++++++--
+ src/flysafelz/cases.py                             |  70 ++++++++
+ src/flysafelz/sources.py                           |  29 +++-
+ tests/cases.py                                     |  34 +---
+ tests/golden/assess_blue_mill_2026-10-31.json      |   1 +
+ tests/golden/assess_west_sleekburn_2026-10-31.json |   1 +
+ tests/integration/test_assess_refactor_parity.py   |  67 ++++++++
+ tests/integration/test_cases_loader.py             | 181 +++++++++++++++++++++
+ tests/unit/test_assess_helpers.py                  | 171 +++++++++++++++++++
+ 9 files changed, 580 insertions(+), 48 deletions(-)
