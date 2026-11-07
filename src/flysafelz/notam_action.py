@@ -44,15 +44,24 @@ the LZ from SFC is UNREAD_OVER_LZ with its E text (phone numbers redacted to <PH
 code-only action (AVOID_SECTOR, AWARENESS, AWARENESS_MAP or IGNORE). An unread NOTAM is
 never NO_FLY, CONTACT_FIRST or CHECK_SUP.
 
-Geometry: the reading's circle or polygon, else the NOTAM's Q-circle. "Over the LZ" is
-inside or exactly on the edge. "Within" is the distance to the edge being at most the
-local_area rule. A shape that cannot be used falls back to the Q-circle; with no usable
-shape the NOTAM is treated as over the LZ (fail closed) and the reason says so.
+Geometry (G16): the area item E draws, parsed by code (notam_area.area_from_item_e), else the
+NOTAM's Q-circle, else (fail closed) over the LZ. The reader never locates a NOTAM: the
+`geometry` field of a reading is not used here. A polygon or circle in item E is what the
+LZ is measured against, however large (there is no area-wide cap for it). Coordinate text
+that does not make a valid shape (Broken), a route (coordinates with times) and text with
+no coordinates all use the Q-circle, which always contains the real area, so it can
+over-warn but never under-warn; the debug list says why a Broken one was not used. "Over
+the LZ" is inside or exactly on the edge. "Within" is the distance to the edge being at
+most the local_area rule. With no usable Q-circle the NOTAM is treated as over the LZ and
+the reason says so. (A route or no area in an area-wide NOTAM never gets this far: the
+sort in pib.sort_notam answers AWARENESS first.)
 
 Limits (E10): the reading's, else F/G, else the Q-line's lower and upper FL. A reading's
 floor or ceiling of None means its E text states none, so that side goes on to F/G and then
 the Q-line. When the reading and F/G both give a side and differ, the lower floor and the
-higher ceiling win and the reason says so. The E text is never read for limits. Floors are converted to
+higher ceiling win and the reason says so. A flight level of FL999 or more is no upper limit
+wherever it is written (reading, item F/G or Q-line), so a reading of FL999 agrees with item G UNL.
+The E text is never read for limits. Floors are converted to
 feet QNH (AGL with the site elevation, FL with the segment's pressure_msl) and a floor at
 or below the site elevation is SFC. Bands are floor <= band_low, then <= band_high: a
 floor exactly on an edge belongs to the lower band, as in airspace.py (the band rules
@@ -103,12 +112,13 @@ from flysafelz.geo import (
     shape_from_points,
     shape_over,
 )
+from flysafelz.notam_area import Broken, Shape, area_from_item_e
 from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import Schedule, parse_schedule
 from flysafelz.sup_refs import sup_detail
 
-UNLIMITED_FL = 999  # a Q-line upper limit of FL999 means no upper limit
+UNLIMITED_FL = 999  # a flight level of FL999 or more (Q-line, reading, or item F/G) means no upper limit
 SFC_LIMIT = Limit(value=0, unit=LimitUnit.FT, datum=Datum.SFC)
 DANGER_AREA = "RD"  # Q-code subject: a danger area, which the data never rules in
 RESTRICTED_SUBJECTS = {"RR": "restricted area", "RP": "prohibited area", "RT": "temporary restricted area"}  # row 2a
@@ -164,6 +174,10 @@ def _show(limit: Limit) -> str:
 
 
 def _bound(limit: Limit, lz: LandingZone, pressure: float, rules: Rules) -> _Bound:
+    """A limit as a bound. Any flight level at or above UNLIMITED_FL (FL999) is no upper limit, wherever it is written:
+    the reading, item F/G or the Q-line, so that a reading of FL999 agrees with item G UNL."""
+    if limit.unit is LimitUnit.FL and limit.value >= UNLIMITED_FL:
+        return _unlimited()
     return _Bound(_show(limit), limit_qnh_ft(limit, lz.elevation_ft, pressure, rules))
 
 
@@ -275,19 +289,19 @@ def _polygon_where(lz: LandingZone, polygon: Polygon) -> _Where | None:
     return _Where(False, shape_edge_distance_nm(lz.lat, lz.lon, shape), shape_edge_bearing_deg(lz.lat, lz.lon, shape), "polygon edge")
 
 
-def _where(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, debug: list[str]) -> _Where:
-    """The reading's shape, else the Q-circle, else (fail closed) over the LZ."""
-    geometry = reading.geometry if reading else None
-    if isinstance(geometry, Circle):
-        found = _circle_where(lz, geometry, "circle edge")
-    elif isinstance(geometry, Polygon):
-        found = _polygon_where(lz, geometry)
-    else:
-        found = None
+def _where(parsed: ParsedNotam, lz: LandingZone, debug: list[str]) -> _Where:
+    """The shape item E draws, else the Q-circle, else (fail closed) over the LZ. The reading is never asked (G16)."""
+    area = area_from_item_e(parsed)
+    found = None
+    if isinstance(area, Shape):
+        drawn = area.area
+        found = _circle_where(lz, drawn, "circle edge") if isinstance(drawn, Circle) else _polygon_where(lz, drawn)
+        if found is None:
+            debug.append("item E shape not usable; the Q-circle is used")
+    elif isinstance(area, Broken):
+        debug.append(f"item E coordinates not usable ({area.reason}); the Q-circle is used")
     if found is not None:
         return found
-    if geometry is not None:
-        debug.append("reading geometry not usable; the Q-circle is used")
     q_circle = _circle_where(lz, Circle(lat=parsed.centre_lat, lon=parsed.centre_lon, radius_nm=parsed.radius_nm), "Q-circle edge")
     if q_circle is not None:
         return q_circle
@@ -459,7 +473,7 @@ def notam_action(
     if not schedule.parsed:
         extras.append("schedule not parsed")
         debug.append(schedule.note or "schedule not parsed")
-    where = _where(parsed, reading, lz, debug)
+    where = _where(parsed, lz, debug)
     local_area = _number(rules.local_area)
     if not where.over and where.distance_nm > local_area:
         return _result(parsed, NotamAction.IGNORE, f"{where.distance_nm:.2f} NM from the LZ, beyond the {local_area:g} NM local area", debug)

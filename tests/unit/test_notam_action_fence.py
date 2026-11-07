@@ -11,7 +11,7 @@ import tomllib
 from pathlib import Path
 
 import pytest
-from factories import LZ, SFC, amsl, circle_at, exemption, notam, reading, segment
+from factories import LZ, SFC, act_on, amsl, circle_at, exemption, notam, reading, segment
 
 from flysafelz import notam_action as module
 from flysafelz.assess import display
@@ -26,7 +26,6 @@ from flysafelz.contracts import (
     Verdict,
     display_verdict,
 )
-from flysafelz.notam_action import notam_action
 
 PATH = Path(module.__file__)
 FORBIDDEN_MODULES = ("openai", "anthropic", "langchain", "langgraph", "httpx")
@@ -96,7 +95,7 @@ def test_f6_a_check_sup_runs_with_sockets_blocked():
     config = tomllib.loads((Path(__file__).resolve().parents[2] / "pyproject.toml").read_text(encoding="utf-8"))
     assert "--disable-socket" in config["tool"]["pytest"]["ini_options"]["addopts"]  # test_socket_guard shows it bites
     parsed = notam(circle=circle_at(0), item_f="SFC", subject="RD", item_e="DANGER AREA EGD496A. SEE AIP SUP 108/2026.")
-    assert notam_action(parsed, reading(geometry=circle_at(0), contact=ContactKind.NONE, value=None), LZ, segment()).action is NotamAction.CHECK_SUP
+    assert act_on(parsed, reading(geometry=circle_at(0), contact=ContactKind.NONE, value=None), LZ, segment()).action is NotamAction.CHECK_SUP
 
 
 # --- F1: no new verdict, no new display string -----------------------------------------------------------------------------
@@ -145,7 +144,7 @@ def test_f2_no_danger_area_over_the_lz_from_sfc_comes_out_ignore_or_awareness_an
     kind, value = CONTACTS[contact]
     parsed = notam(circle=circle_at(0), item_f="SFC", item_e=E_TEXT, subject="RD")
     read = reading(geometry=circle_at(0), category=category, contact=kind, value=value, reason=reason, quote=None if reason is ProhibitiveReason.NONE else "ENTRY PROHIBITED", exemptions=EXEMPTIONS[exemptions])
-    action = notam_action(parsed, read, LZ, segment()).action
+    action = act_on(parsed, read, LZ, segment()).action
     assert action not in (NotamAction.IGNORE, NotamAction.AWARENESS, NotamAction.AWARENESS_MAP, NotamAction.AVOID_SECTOR, NotamAction.UNREAD_OVER_LZ)
     assert (action is NotamAction.NO_FLY) == (reason is not ProhibitiveReason.NONE)
     if reason is ProhibitiveReason.NONE:
@@ -156,7 +155,7 @@ def test_f2_no_danger_area_over_the_lz_from_sfc_comes_out_ignore_or_awareness_an
 @pytest.mark.parametrize("applies", [AppliesTo.UAS_ONLY, AppliesTo.AERODROME_USERS])
 def test_f2_the_row_1_exemptions_are_the_only_way_a_danger_area_over_the_lz_is_ignored(applies):
     parsed = notam(circle=circle_at(0), item_f="SFC", item_e=E_TEXT, subject="RD")
-    assert notam_action(parsed, reading(geometry=circle_at(0), applies_to=applies), LZ, segment()).action is NotamAction.IGNORE
+    assert act_on(parsed, reading(geometry=circle_at(0), applies_to=applies), LZ, segment()).action is NotamAction.IGNORE
 
 
 # --- F7: rows 1, 4-6 and the informational rule are unchanged for every subject but a danger area ------------------------------
@@ -226,11 +225,11 @@ def unchanged_case(name: str, subject: str):
 @pytest.mark.parametrize("name", UNCHANGED)
 def test_f7_the_action_and_reason_of_every_other_row_are_byte_for_byte_what_they_were(name, subject):
     parsed, read = unchanged_case(name, subject)
-    result = notam_action(parsed, read, LZ, segment())
+    result = act_on(parsed, read, LZ, segment())
     assert (result.action, result.reason) == UNCHANGED[name]
 
 
 @pytest.mark.parametrize("name", [n for n in UNCHANGED if n not in ("prohibitive", "prohibitive reason", "cooperative, contact", "cooperative, no contact", "cooperative, radio only", "informational")])
 def test_f7_rows_1_and_4_to_6_are_the_same_for_a_danger_area(name):
-    plain, danger = (notam_action(*unchanged_case(name, subject), LZ, segment()) for subject in ("WU", "RD"))
+    plain, danger = (act_on(*unchanged_case(name, subject), LZ, segment()) for subject in ("WU", "RD"))
     assert (danger.action, danger.reason) == (plain.action, plain.reason)

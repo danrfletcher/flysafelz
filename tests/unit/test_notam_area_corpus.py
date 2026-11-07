@@ -10,7 +10,7 @@ from factories import notam
 
 from flysafelz.contracts import Circle, Polygon
 from flysafelz.geo import distance_nm
-from flysafelz.notam_area import build_area
+from flysafelz.notam_area import Broken, NoArea, Route, Shape, area_from_item_e, build_area
 from flysafelz.pib import read_notams
 from flysafelz.rules import RULES
 
@@ -93,3 +93,29 @@ def test_the_ethiopia_text_cut_off_at_every_length_never_raises(corpus):
         area, note = build_area(notam(item_e=text[:length], circle=Circle(lat=parsed.centre_lat, lon=parsed.centre_lon, radius_nm=parsed.radius_nm)))
         assert area is None or isinstance(area, Circle | Polygon)
         assert note
+
+
+def test_area_from_item_e_over_every_notam_never_raises_and_every_shape_is_inside_its_q_circle_slack(corpus):
+    counts = Counter()
+    for sha, notams in corpus.items():
+        for parsed in notams:
+            area = area_from_item_e(parsed)
+            assert isinstance(area, Shape | Route | Broken | NoArea), (sha[:8], parsed.id)
+            counts[type(area).__name__] += 1
+            if isinstance(area, Broken):
+                assert area.reason and "\n" not in area.reason, (sha[:8], parsed.id)
+            if isinstance(area, Shape):
+                assert build_area(parsed)[0] == area.area  # the same answer build_area gives
+    print(f"area_from_item_e over the corpus: {dict(sorted(counts.items()))}")
+    assert counts["Shape"] > 0 and counts["NoArea"] > counts["Shape"]
+
+
+def test_the_ethiopia_polygon_is_broken_not_a_shape_so_the_q_circle_decides(corpus):
+    found = [n for n in corpus[BLUE_MILL_SHA] if "STRAIGHT LINES" in n.item_e and "ETHIOPIA" in n.item_e]
+    assert found and all(isinstance(area_from_item_e(n), Broken) for n in found)
+
+
+def test_h7171_is_a_shape_a_circle_of_half_a_mile(corpus):
+    parsed = next(n for n in corpus[BLUE_MILL_SHA] if n.id == "H7171/26")
+    area = area_from_item_e(parsed)
+    assert isinstance(area, Shape) and area.kind == "circle" and area.area.radius_nm == 0.5

@@ -47,7 +47,7 @@ def parsed(notam_id: str = "H7171/26", **overrides: object) -> ParsedNotam:
         "item_a": "EGTT",
         "valid_from": utc(29, 8),
         "valid_to": utc(10, 18, month=11),
-        "item_e": "UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W.",
+        "item_e": "UAS OPR WI 0.5NM. SFC-700FT AGL.",  # no coordinates: item E draws no area (G16), so the Q-circle is where it is
         "section": "WAR",
         "sections": ["WAR"],
     }

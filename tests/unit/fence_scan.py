@@ -71,6 +71,7 @@ READER_REVIEWED_LITERALS = {
     "redact.py": {},  # the digit counts are written in its patterns, not as numbers
     "notam_area.py": {
         60: "minutes per degree and seconds per minute (unit): MINUTES_PER_DEGREE, SECONDS_PER_MINUTE",
+        20_000: "memory bound on the remembered areas (_REMEMBER_LIMIT), more than the archive's distinct NOTAMs; not a threshold",
     },
     "reader/cache.py": {},  # the cache (G9) and its read: structural 0 and 1 only
     "reader/cached_read.py": {},

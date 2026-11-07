@@ -234,3 +234,44 @@ def test_the_trimmed_pib_sorts_as_the_31_oct_notams_do():
     assert sorted_["J3864/26"].designators == ["EGD496A"]
     assert "AF" in sorted_["Q172/26"].reason
     assert "series V" in sorted_["V34/26"].reason
+
+
+# --- G16: an area drawn in item E replaces the area-wide cap (step 4 only) -----------------------------------------
+
+SQUARE = "551000N 0013000W - 551000N 0012000W - 550500N 0012000W - 550500N 0013000W"  # fiction, ~80 NM north of the default Q centre
+DRAWN = {
+    "polygon": f"EXERCISE WI AREA BOUNDED BY {SQUARE}. SFC-UNL.",
+    "circle": "EXERCISE WI 5NM RADIUS OF PSN 551000N 0013000W. SFC-UNL.",
+    "broken": "EXERCISE WI 5NM RADIUS OF PSN 551000N. SFC-UNL.",  # a latitude with no longitude
+}
+TRANSIT = "TRANSIT\n551000N 0013000W 0900\n551000N 0012000W 0910\n550500N 0012000W 0920"
+
+
+@pytest.mark.parametrize(("kind", "reason"), [("polygon", "draws a polygon"), ("circle", "draws a circle"), ("broken", "Q-circle is used")])
+def test_g16_an_area_wide_notam_that_draws_an_area_or_tried_to_goes_to_the_reader_not_awareness(kind, reason):
+    result = run(parsed(subject="WE", radius_nm=152.0, item_e=DRAWN[kind]))
+    assert result.action is READER
+    assert reason in result.reason and "area-wide" in result.reason
+
+
+@pytest.mark.parametrize("item_e", [TRANSIT, "EXERCISE SFC-UNL. FOR INFO CTC 07700 900123.", ""], ids=["route", "no coordinates", "empty"])
+def test_g16_a_route_or_no_area_keeps_the_area_wide_rule(item_e):
+    result = run(parsed(subject="WE", radius_nm=152.0, item_e=item_e))
+    assert result.action is AWARE
+    assert result.reason == "radius 152 NM is area-wide"
+
+
+def test_g16_a_drawn_area_changes_nothing_below_the_area_wide_radius():
+    for item_e in DRAWN.values():
+        assert run(parsed(subject="WE", radius_nm=49.0, item_e=item_e)).action is READER
+
+
+@pytest.mark.parametrize("kind", list(DRAWN))
+def test_g16_af_admin_and_series_v_stay_ignored_with_a_parseable_area(kind):
+    """Step 1 runs first: those are FIR-wide admin and security advice, which no drawn area makes relevant."""
+    assert run(parsed("L1/26", subject="AF", radius_nm=60.0, item_e=DRAWN[kind])).action is IGNORE
+    assert run(parsed("V34/26", subject="RO", radius_nm=999.0, item_e=DRAWN[kind])).action is IGNORE
+
+
+def test_g16_a_gnss_jamming_notam_is_still_awareness_whatever_it_draws():
+    assert run(parsed(subject="GW", radius_nm=152.0, item_e=DRAWN["polygon"])).action is AWARE

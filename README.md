@@ -89,3 +89,4 @@ Confidence is `sourced` (a citable document), `best practice` (common practice, 
 
 - Airspace comes from openAIP only. It is not cross-checked against the official UK AIP, so a difference between the two will not be caught.
 - A danger area whose openAIP record has no activation hours is treated as active (over-cautious on purpose).
+- A NOTAM whose E text is a route (coordinates each with a time, such as a transit list) is not located by its path: it is treated as an area-wide NOTAM when its Q-circle is 50 NM or more, and by its Q-circle otherwise (known limitation 20). A NOTAM that draws a polygon or circle in item E is located by that shape, however large its Q-circle; coordinate text that does not make a valid shape falls back to the Q-circle, which can over-warn but never under-warn.

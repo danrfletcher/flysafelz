@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 
 import pytest
 import yaml
-from factories import circle_at, notam, pib_result, reading, run_assess, square_at, utc
+from factories import circle_at, drawing, notam, pib_result, reading, run_assess, utc
 
 from flysafelz.contracts import (
     Assessment,
@@ -279,11 +279,11 @@ def test_g4_nothing_ignored_gives_an_empty_block():
     assert ignored_by_code([], {"A1/26"}, []) == [] and ignored_by_code([ig("A1/26")], set(), []) == []
 
 
-def test_g4_a_notam_ignored_from_a_readings_own_polygon_beyond_2_nm_is_in_the_block_through_the_real_assess():
-    near = notam("R1/26", circle=circle_at(1.0))  # its Q-circle is 1 NM away: it passes the prefilter
+def test_g4_a_notam_ignored_from_its_item_e_shape_beyond_2_nm_is_in_the_block_through_the_real_assess():
+    near = notam("R1/26", circle=circle_at(1.0, radius_nm=10.0), item_e=f"UAS OPR {drawing(circle_at(5.0))}")  # its Q-circle is 1 NM away: it passes the prefilter; the circle it draws is 5 NM away
     far = notam("F1/26", circle=circle_at(5.0))  # its Q-circle is 5 NM away: the prefilter drops it
     pib = pib_result(near, far)
-    result_ = run_assess(window=(utc(9), utc(12)), pib=pib, readings={"R1/26": reading(notam_id="R1/26", geometry=square_at(5.0))})
+    result_ = run_assess(window=(utc(9), utc(12)), pib=pib, readings={"R1/26": reading(notam_id="R1/26")})
     reasons = {i.notam_id: i.reason for i in result_.ignored_notams}
     assert "R1/26" in reasons and "F1/26" in reasons and "local area" in reasons["R1/26"]
     block = ignored_by_code(result_.ignored_notams, local_notam_ids(pib, 53.802797, -0.086644), pib.superseded)

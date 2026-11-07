@@ -32,6 +32,14 @@ def now() -> datetime:
 
 
 @pytest.fixture(autouse=True)
+def forget_remembered_areas() -> None:
+    """notam_area remembers each NOTAM's area (so a parser miss is logged once); a test starts without any, so it sees its own log."""
+    from flysafelz import notam_area
+
+    notam_area.forget_areas()
+
+
+@pytest.fixture(autouse=True)
 def isolated_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """No test sees a real key or reads .env: the key is removed and `import dotenv` fails.
 

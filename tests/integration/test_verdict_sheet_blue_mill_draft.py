@@ -12,7 +12,7 @@ from pathlib import Path
 import cases
 import pytest
 import yaml
-from factories import circle_at, notam, reading, square_at
+from factories import circle_at, drawing, notam, reading
 from verdict_sheet_helpers import example, examples_file, write_case
 
 from flysafelz.cases import load_case_inputs
@@ -279,10 +279,11 @@ def test_q3_a_case_with_no_readings_yaml_drafts_with_no_readings_and_tags_every_
     text, (entry,), _out = build(root, draft_examples(tmp_path))
     _case, _forecast, _airspace, pib, _readings = load_case_inputs(root / "fixtures" / cases.BLUE_MILL, readings_optional=True)
     assert _readings == {}
-    assert entry["notam_actions"] == {"H7171/26": "UNREAD_OVER_LZ", "J3857/26": "UNREAD_OVER_LZ"}
-    assert text.count(UNREAD_NOTE) == 2
+    # H7171's E text draws a circle 0.15 NM from the LZ: code locates it (G16), so it needs no reading to be a sector to avoid
+    assert entry["notam_actions"] == {"H7171/26": "AVOID_SECTOR", "J3857/26": "UNREAD_OVER_LZ"}
+    assert text.count(UNREAD_NOTE) == 1
     unverified = [r for r in entry["rows"] if r["verdict"] == "UNVERIFIED"]
-    assert unverified and all(r["unread"] == ["H7171/26", "J3857/26"] for r in unverified)
+    assert unverified and all(r["unread"] == ["J3857/26"] for r in unverified)
     assert all("unread" not in r for r in entry["rows"] if r["verdict"] != "UNVERIFIED")
     assert local_notam_ids(pib, LAT, LON)
 
@@ -324,12 +325,12 @@ def test_g5_outlook_and_too_far_rows_in_a_draft_stay_tier_only(tmp_path):
 # --- G4: which NOTAMs the block lists, through the real code ---------------------------------------------------------------------------
 
 
-def test_g4_a_far_notam_is_in_neither_the_actions_nor_the_block_and_a_reading_geometry_ignore_is_in_the_block(tmp_path):
-    near = notam("R1/26", circle=circle_at(1.0))
+def test_g4_a_far_notam_is_in_neither_the_actions_nor_the_block_and_an_item_e_shape_ignore_is_in_the_block(tmp_path):
+    near = notam("R1/26", circle=circle_at(1.0, radius_nm=10.0), item_e=f"UAS OPR {drawing(circle_at(5.0))}")  # the Q-circle is 1 NM away, the E circle 5 NM
     far = notam("F1/26", circle=circle_at(5.0))
     shown = notam("S1/26", circle=circle_at(0.0))
     write_case(tmp_path, "g4", now=NOW, window=(utc(31, 8), utc(31, 11)), notams=(near, far, shown))
-    readings = [reading(notam_id="R1/26", geometry=square_at(5.0)), reading(notam_id="S1/26")]
+    readings = [reading(notam_id="R1/26"), reading(notam_id="S1/26")]
     (tmp_path / "fixtures" / "g4" / "readings.yaml").write_text(yaml.safe_dump([r.model_dump(mode="json") for r in readings]), encoding="utf-8")
     raw = example("g4", "g4", now=NOW, window=(utc(31, 8), utc(31, 11)), blind=False)
     text, (entry,), _out = build(tmp_path, examples_file(tmp_path / "g4.yaml", raw))

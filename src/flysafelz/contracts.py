@@ -261,7 +261,7 @@ class NotamReading(BaseModel):
     id: str
     category: Category
     activity: str
-    geometry: Annotated[Circle | Polygon, Field(discriminator="kind")] | None = None  # None: use the Q-circle
+    geometry: Annotated[Circle | Polygon, Field(discriminator="kind")] | None = None  # no longer used to locate a NOTAM (G16): notam_action() reads item E itself
     floor: Limit | None  # as the E text states it; None: E states none
     ceiling: Limit | None  # as the E text states it; None: E states none
     schedule: str  # D-item text, normalised
