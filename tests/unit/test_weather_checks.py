@@ -1,8 +1,9 @@
 """G2 / G3 checks: at and around every caution and NO_GO limit, built from the loaded rules.
 
 Each case probes a rule just below, exactly at, and just above its limit. The expected
-rule ids are written out by hand per probe, because the comparison differs: 16.0 mph is
-NO_GO under ">= 16", and a gust spread of 6.0 is only a caution under "> 6".
+rule ids are written out by hand per probe, because the comparison differs: NO_GO needs a value
+strictly past its limit, so 16.0 mph is a caution under "> 16", as is a gust spread of 6.0 under "> 6".
+The kind of each finding (caution or blocker) at the limit is tested in test_weather_boundaries.py.
 """
 
 import pytest
@@ -22,7 +23,7 @@ def step(rule) -> float:
 # (id, rule, how to set the probed value on a calm row, ids found [below, at, above])
 CASES = [
     ("wind_10m_caution", R.wind_10m_caution, lambda x: {"wind_10m": x}, [[], ["wind_10m_caution"], ["wind_10m_caution"]]),
-    ("wind_10m_no_go", R.wind_10m_no_go, lambda x: {"wind_10m": x}, [["wind_10m_caution"], ["wind_10m_no_go"], ["wind_10m_no_go"]]),
+    ("wind_10m_no_go", R.wind_10m_no_go, lambda x: {"wind_10m": x}, [["wind_10m_caution"], ["wind_10m_caution"], ["wind_10m_no_go"]]),  # exactly at ">" is a caution
     ("gust_spread_caution", R.gust_spread_caution, lambda x: {"gust_spread": x}, [[], ["gust_spread_caution"], ["gust_spread_caution"]]),
     (
         "gust_spread_no_go",
@@ -33,8 +34,8 @@ CASES = [
     ("wind_aloft_80m", R.wind_aloft_caution, lambda x: {"wind_80m": x}, [[], ["wind_aloft_caution"], ["wind_aloft_caution"]]),
     ("wind_aloft_120m", R.wind_aloft_caution, lambda x: {"wind_120m": x}, [[], ["wind_aloft_caution"], ["wind_aloft_caution"]]),
     ("gradient_caution", R.gradient_caution, lambda x: {"gradient": x}, [[], ["gradient_caution"], ["gradient_caution"]]),
-    ("gradient_no_go", R.gradient_no_go, lambda x: {"gradient": x}, [["gradient_caution"], ["gradient_no_go"], ["gradient_no_go"]]),
-    ("precipitation_no_go", R.precipitation_no_go, lambda x: {"precipitation": x}, [[], ["precipitation_no_go"], ["precipitation_no_go"]]),
+    ("gradient_no_go", R.gradient_no_go, lambda x: {"gradient": x}, [["gradient_caution"], ["gradient_caution"], ["gradient_no_go"]]),
+    ("precipitation_no_go", R.precipitation_no_go, lambda x: {"precipitation": x}, [[], ["precipitation_no_go"], ["precipitation_no_go"]]),  # at: on-the-limit caution; above: blocker
     (
         "rain_chance_caution",
         R.rain_chance_caution,
@@ -45,7 +46,7 @@ CASES = [
         "visibility_caution",
         R.visibility_caution,
         lambda x: {"visibility": x},
-        [["visibility_caution"], [], []],  # "<": at the limit is fine
+        [["visibility_caution"], ["visibility_caution"], []],  # "<=": at the limit is a caution
     ),
     (
         "visibility_no_go",
@@ -84,7 +85,7 @@ def test_a_row_with_every_value_just_inside_its_limit_is_also_clean():
         gradient=R.gradient_caution.value - 0.1,
         precipitation=R.precipitation_no_go.value - 0.01,
         precipitation_probability=R.rain_chance_caution.value - 1,
-        visibility=R.visibility_caution.value,
+        visibility=R.visibility_caution.value + 1,
         cloud_cover_low=R.low_cloud_caution.value - 1,
         cape=R.thermic_cape_caution.value - 1,
         shortwave_radiation=R.thermic_shortwave_caution.value,
@@ -107,12 +108,14 @@ CAPE = R.thermic_cape_caution.value
         (SW + 100, CAPE - 1, []),  # shortwave alone is not enough
         (0, R.cape_no_go.value - 1, []),
         (SW + 100, R.cape_no_go.value - 1, ["thermic_cape_caution"]),  # just under CAPE NO_GO
-        (SW + 100, R.cape_no_go.value, ["cape_no_go"]),  # CAPE NO_GO wins over the thermic caution
-        (0, R.cape_no_go.value, ["cape_no_go"]),  # ... whatever the shortwave
+        (SW + 100, R.cape_no_go.value, ["cape_no_go", "thermic_cape_caution"]),  # exactly on the limit: two cautions
+        (0, R.cape_no_go.value, ["cape_no_go"]),  # ... and the on-the-limit caution needs no shortwave
+        (SW + 100, R.cape_no_go.value + 1, ["cape_no_go"]),  # past the limit: the blocker wins over the thermic caution
+        (0, R.cape_no_go.value + 1, ["cape_no_go"]),  # ... whatever the shortwave
         (SW - 1, R.cape_no_go.value + 500, ["cape_no_go"]),
     ],
 )
-def test_thermic_caution_needs_both_and_cape_no_go_needs_neither(shortwave, cape, expected):
+def test_thermic_caution_needs_both_and_cape_past_no_go_needs_neither(shortwave, cape, expected):
     found = check_row(calm_row(shortwave_radiation=shortwave, cape=cape))
     assert [f.rule_id for f in found] == expected
 
@@ -197,7 +200,8 @@ def test_a_changed_rules_file_changes_the_result(tmp_path, monkeypatch):
     assert [f.rule_id for f in check_row(row)] == ["wind_10m_no_go"]
     monkeypatch.setattr(weather, "RULES", rules_with(tmp_path, "wind_10m_no_go", 20))
     assert [f.rule_id for f in check_row(row)] == ["wind_10m_caution"]
-    assert check_row(calm_row(wind_10m=20))[0].text == "wind at 10 m 20 mph, limit 20"
+    [blocker] = check_row(calm_row(wind_10m=21))
+    assert (blocker.kind, blocker.text) == ("blocker", "wind at 10 m 21 mph, limit 20")
 
 
 def test_a_changed_thermic_limit_changes_the_result(tmp_path, monkeypatch):

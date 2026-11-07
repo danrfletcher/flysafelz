@@ -76,8 +76,8 @@ class Rule(BaseModel):
     def breached(self, x: float | str) -> bool:
         """Apply this rule's own comparison to x: `x <comparison> value`.
 
-        A value exactly at the limit follows the operator, so 16.0 breaches
-        ">= 16" and 6.0 does not breach "> 6". For "in" it is list membership.
+        A value exactly at the limit follows the operator, so 12.0 breaches
+        ">= 12" and 6.0 does not breach "> 6". For "in" it is list membership.
         """
         if isinstance(self.value, list):
             return x in self.value

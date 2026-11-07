@@ -1,0 +1,2 @@
+$ git diff --stat tests/golden   (after: uv run pytest --update-golden; the JSON parity snapshots also match unchanged)
+(no output: no golden file changed, so no golden verdict moved)
