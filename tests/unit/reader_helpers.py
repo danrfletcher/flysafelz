@@ -27,7 +27,7 @@ class RecordingChat(GenericFakeChatModel):
     model_name: str = FAKE_MODEL
     calls: list[dict[str, Any]] = Field(default_factory=list)
 
-    def _generate(self, messages, stop=None, run_manager=None, **kwargs):  # noqa: ANN001, ANN201
+    def _generate(self, messages, stop=None, run_manager=None, **kwargs):
         self.calls.append({"messages": list(messages), "kwargs": dict(kwargs)})
         return super()._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
 
@@ -66,6 +66,27 @@ def blue_mill_notams() -> dict[str, ParsedNotam]:
     return {notam.id: notam for notam in notams}
 
 
-def sent_text(llm: RecordingChat) -> str:
+def sent_text(llm: "RecordingChat | Steps") -> str:
     """Everything the fake was sent, over all its calls: every message and every keyword argument."""
     return "\n".join(f"{m.type}: {m.content}" for call in llm.calls for m in call["messages"]) + "\n" + json.dumps([call["kwargs"] for call in llm.calls], default=str)
+
+
+class Steps:
+    """A model double that, call by call, raises an exception or answers; for tests of the error paths.
+
+    A step is an exception (raised from `invoke`), an AIMessage, a dict (sent as JSON text) or a string (sent as it is).
+    Like RecordingChat it records every call's messages and keyword arguments, so `sent_text` reads it too.
+    """
+
+    model_name = FAKE_MODEL
+
+    def __init__(self, *steps: BaseException | dict[str, Any] | str | AIMessage):
+        self.steps = list(steps)
+        self.calls: list[dict[str, Any]] = []
+
+    def invoke(self, messages: list[Any], **kwargs: Any) -> AIMessage:
+        self.calls.append({"messages": list(messages), "kwargs": dict(kwargs)})
+        step = self.steps.pop(0)
+        if isinstance(step, BaseException):
+            raise step
+        return step if isinstance(step, AIMessage) else message(step)
