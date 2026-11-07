@@ -1,0 +1,32 @@
+PR-8.F1 archive run (G16), over the warm cache .cache/pib_archive (123 PIB files read; no request made).
+Distinct NOTAM ids: 14,609 (the brief quotes Titan's 14,347; this is the count the cached files give, earliest copy of each id).
+No item E text is printed here: only counts, ids and the code's own reasons.
+
+Item E as code reads it (area_from_item_e):
+  Shape, circle            3,921
+  Shape, polygon             870
+  Route                       17
+  Broken (Q-circle used)   1,469   (list by id with reason: screenshots/3b-PR-8.F1-broken.txt)
+  NoArea                   8,332
+
+Broken, by reason:
+  1,279  1 point and no radius (a lone obstacle or place: the Q-circle is the place)
+    106  corridor, buffer or arc
+     23  repeats a point inside the shape (several areas in one text)
+     12  2 points and no radius
+     11  a latitude or longitude has no partner
+     11  more than one radius
+     10  the outline crosses itself
+      9  the word RADIUS is there but no radius could be read
+      2  a radius with more than one point
+      6  parser miss: shape reaches more than the 1 NM slack outside the Q-circle
+         (V30/26, V32/26, C4553/26, A2884/26, C4720/26, C6602/26)
+
+Changed action, code only (no reader), at each committed case LZ. Each NOTAM is taken in the first hour of its own
+validity, so the change shown is the one the location rule makes, not the one the calendar makes. Before = HEAD
+(slice 7/8) src; after = this branch.
+                              changed  AWARENESS->IGNORE  AWARENESS->UNREAD_OVER_LZ  AVOID_SECTOR->IGNORE  UNREAD_OVER_LZ->AVOID_SECTOR  AWARENESS->AVOID_SECTOR
+  blue_mill_2026-10-31             76                 58                         6                    10                             1                         1
+  west_sleekburn_2026-10-31        66                 60                         5                     0                             1                         0
+  druridge_bay_2026-07-22          66                 57                         8                     0                             1                         0
+  bamburgh_2026-10-06              66                 57                         8                     1                             0                         0

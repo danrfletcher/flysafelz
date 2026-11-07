@@ -17,7 +17,10 @@ from factories import (
     STANDARD_HPA,
     agl,
     amsl,
+    as_written,
     circle_at,
+    drawing,
+    drawn,
     exemption,
     fl,
     notam,
@@ -75,7 +78,7 @@ EXEMPTIONS = {
 
 
 def act(parsed, read=None, seg=None, **kw) -> ActionResult:
-    return notam_action(parsed, read, LZ, seg or segment(), **kw)
+    return notam_action(drawn(parsed, read), read, LZ, seg or segment(), **kw)
 
 
 def build(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions="no-exemption", subject="WU", reason=ProhibitiveReason.NONE):
@@ -276,6 +279,24 @@ def test_reading_and_fg_that_agree_say_nothing_about_a_conflict():
     assert "disagree" not in result.reason
 
 
+@pytest.mark.parametrize("level", [999, 1000])
+def test_a_reading_ceiling_of_fl999_or_more_is_no_upper_limit_and_agrees_with_item_g_unl(level):
+    parsed = notam(circle=circle_at(0), item_f="SFC", item_g="UNL")
+    result = act(parsed, reading(geometry=circle_at(0), ceiling=fl(level)))
+    assert "disagree" not in result.reason
+    assert module.merged_limits(parsed, reading(ceiling=fl(level)), LZ, segment())[1] == math.inf
+
+
+def test_fl998_is_a_real_ceiling_and_still_disagrees_with_unl():
+    result = act(notam(circle=circle_at(0), item_f="SFC", item_g="UNL"), reading(geometry=circle_at(0), ceiling=fl(998)))
+    assert "disagree on the ceiling (FL998 against no upper limit)" in result.reason
+
+
+def test_item_g_fl999_is_no_upper_limit_too():
+    parsed = notam(circle=circle_at(0), item_f="SFC", item_g="FL999")
+    assert module.merged_limits(parsed, None, LZ, segment())[1] == math.inf
+
+
 def test_without_a_reading_fg_is_used_before_the_q_line():
     parsed = notam(circle=circle_at(0), item_f="2000FT AMSL", item_g="3000FT AMSL", lower_fl=5, upper_fl=20)
     result = act(parsed)
@@ -419,7 +440,7 @@ def edge_distance(circle) -> float:
 
 
 def test_a_distance_exactly_at_the_local_area_is_within_and_just_beyond_is_not():
-    circle = circle_at(1.5, bearing=45)
+    circle = as_written(circle_at(1.5, bearing=45))  # the circle as code reads it back from item E
     parsed = notam(circle=circle)
     read = reading(geometry=circle)
     distance = edge_distance(circle)
@@ -493,12 +514,20 @@ def test_reading_geometry_none_falls_back_to_the_q_circle():
     assert "(Q-circle edge)" in act(far, reading(geometry=None)).reason
 
 
-def test_a_polygon_that_cannot_be_used_falls_back_to_the_q_circle_and_logs_it():
-    broken = Polygon(points=[(53.8, -0.08), (53.81, -0.08)])
-    result = act(notam(circle=circle_at(1.0)), reading(geometry=broken))
+def test_coordinates_in_item_e_that_make_no_shape_fall_back_to_the_q_circle_and_log_why():
+    two_points = "AREA BOUNDED BY 534800N 0000448W - 534836N 0000448W."  # two corners are not an area
+    result = act(notam(circle=circle_at(1.0), item_e=two_points))
     assert result.action is A.AVOID_SECTOR
     assert "(Q-circle edge)" in result.reason
-    assert "reading geometry not usable; the Q-circle is used" in result.debug
+    assert "item E coordinates not usable (2 points and no radius); the Q-circle is used" in result.debug
+
+
+def test_the_readings_own_geometry_never_locates_a_notam():
+    near, far = circle_at(0), circle_at(5.0)
+    parsed = notam(circle=far, item_e="UAS OPR WI 0.5NM.")  # item E draws nothing: the Q-circle, 5 NM away, is where it is
+    assert notam_action(parsed, reading(geometry=near, category=Category.PROHIBITIVE), LZ, segment()).action is A.IGNORE
+    parsed = notam(circle=near)
+    assert notam_action(parsed, reading(geometry=far, category=Category.PROHIBITIVE), LZ, segment()).action is A.NO_FLY
 
 
 def test_with_no_usable_geometry_the_notam_is_treated_as_over_the_lz_and_the_reason_says_so():
@@ -689,7 +718,8 @@ J1458_EXCEPTION = "DOES NOT APPLY TO ANY ACFT FLYING IN ACCORDANCE WITH EXCEPTIO
 
 def j1458(edge, *, conditional=False, contact=ContactKind.NONE, value=None):
     circle = circle_at(edge, radius_nm=2.2)
-    parsed = notam("J1458/26", circle=circle, subject="RT", item_e=J1458_E, item_f="SFC", item_g="2000FT AMSL")
+    drawing_in_e = "WI 2.2NM RADIUS OF PSN 520528N 0000757E"  # moved to the test's LZ: item E is what locates a NOTAM
+    parsed = notam("J1458/26", circle=circle, subject="RT", item_e=J1458_E.replace(drawing_in_e, drawing(circle).rstrip(".")), item_f="SFC", item_g="2000FT AMSL")
     read = reading(
         notam_id="J1458/26",
         activity="Duxford RA(T)",

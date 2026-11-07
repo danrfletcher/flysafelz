@@ -87,6 +87,13 @@ def test_e20_west_sleekburn_reproduces_the_golden_file(capsys, update_golden):
     check_golden(WEST_SLEEKBURN, run_cli(capsys, ["assess", "--case", WEST_SLEEKBURN]), update_golden)
 
 
+@pytest.mark.parametrize("name", [cases.DRURIDGE_BAY, cases.BAMBURGH])
+def test_g16_the_labelled_large_notam_cases_reproduce_their_golden_files(capsys, update_golden, name):
+    """The goldens hold [phone] where the CLI prints a contact, so no real number is in the repo's tests (F8, spec)."""
+    out = run_cli(capsys, ["assess", "--case", name])
+    check_golden(name, re.sub(r"<PHONE_\d+>", "[phone]", redact_phones(out)[0]), update_golden)
+
+
 def test_g15_the_constructed_old_pib_case_reproduces_its_golden_file(capsys, update_golden):
     check_golden("stale_pib_constructed", run_cli(capsys, ["assess", "--case", "stale_pib_constructed"]), update_golden)
 

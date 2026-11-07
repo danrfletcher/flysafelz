@@ -1,0 +1,4 @@
+git diff --stat tests/golden (before the commit):
+ tests/golden/assess_blue_mill_2026-10-31.json | 2 +-   (one line: H7171/26 bearing 168.64055 -> 168.64054 deg; no action, verdict or window moved)
+New goldens: tests/golden/druridge_bay_2026-07-22.txt, tests/golden/bamburgh_2026-10-06.txt (numbers shown as [phone])
+Unchanged: tests/golden/blue_mill_2026-10-31.txt, tests/golden/west_sleekburn_2026-10-31.txt, tests/golden/stale_pib_constructed.txt

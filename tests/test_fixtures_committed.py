@@ -7,6 +7,7 @@ airspace.json was captured by Vector with the openAIP key (make fixtures). Both 
 missing one is a failure here, not a skip.
 """
 
+import hashlib
 import json
 import re
 from datetime import UTC, datetime
@@ -28,6 +29,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 BLUE_MILL = "blue_mill_2026-10-31"
 WEST_SLEEKBURN = "west_sleekburn_2026-10-31"
 CASES = [BLUE_MILL, WEST_SLEEKBURN]
+LABELLED = ["druridge_bay_2026-07-22", "bamburgh_2026-10-06"]  # Dan's labelled captures, copied byte for byte (PR-8.F1)
 CONSTRUCTED = "stale_pib_constructed"  # made up, not captured: PR-7.F1's old-PIB case
 
 SHA = "bdab14658f0270dc41460eebcd03332abfb230ec"
@@ -116,8 +118,8 @@ def test_no_fixture_holds_the_key_variable_or_a_request_header(name):
         assert KEY_VARIABLE not in text, path.name
 
 
-def test_fixtures_dir_holds_only_the_two_cases_and_the_constructed_one_and_nothing_with_a_key():
-    assert sorted(p.name for p in FIXTURES.iterdir()) == sorted([*CASES, CONSTRUCTED])
+def test_fixtures_dir_holds_only_the_known_cases_and_nothing_with_a_key():
+    assert sorted(p.name for p in FIXTURES.iterdir()) == sorted([*CASES, *LABELLED, CONSTRUCTED])
     for path in FIXTURES.rglob("*"):
         assert path.is_dir() or path.name in FILES, path
         if path.is_file():
@@ -235,3 +237,46 @@ def test_the_newcastle_cta_lies_over_the_west_sleekburn_lz_with_a_floor_of_1500_
     assert (cta.upper.value, cta.upper.unit.value) == (105, "FL")
     # the CTR is beside the LZ, not over it
     assert "NEWCASTLE CTR" not in over
+
+
+# --- the labelled captures (PR-8.F1) -----------------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("name", LABELLED)
+def test_a_labelled_capture_holds_exactly_the_five_files_and_loads_offline(name):
+    assert sorted(p.name for p in case_dir(name).iterdir()) == sorted(FILES)
+    case, _raw = load_case(case_dir(name) / "case.yaml", today=TODAY)
+    assert case.capture is not None and case.capture.sha
+
+
+def test_the_untouched_labelled_files_match_the_labelled_checksums_when_the_mirror_is_there():
+    """The four files copied unchanged match Dan's checksum list. The mirror is outside the repo: skipped where it is absent."""
+    root = Path.home() / ".local" / "share" / "vector" / "inputs" / "flysafelz"
+    sums = root / "labelled-fixtures.sha256"
+    if not sums.is_file():
+        pytest.skip("the labelled-fixtures checksum list is not on this machine")
+    wanted = {}
+    for line in sums.read_text(encoding="utf-8").splitlines():
+        digest, _, path = line.partition("  ")
+        if any(path.startswith(f"./{name}/") for name in LABELLED):
+            wanted[path.removeprefix("./")] = digest
+    assert len(wanted) == 2 * len(FILES)
+    changed = []
+    for path, digest in wanted.items():
+        if hashlib.sha256((FIXTURES / path).read_bytes()).hexdigest() != digest:
+            changed.append(path)
+    assert changed == ["druridge_bay_2026-07-22/readings.yaml"]  # by design the labelled `[]` line was replaced by the H2483/26 entry; nothing else differs
+
+
+def test_the_druridge_readings_file_is_the_labelled_one_with_its_empty_list_replaced_by_the_h2483_entry():
+    """The labelled file ends in `[]` (an empty YAML list); an entry cannot follow it, so that one line is replaced.
+    Everything above it is the labelled text unchanged."""
+    labelled = Path.home() / ".local" / "share" / "vector" / "inputs" / "flysafelz" / "labelled-fixtures" / "druridge_bay_2026-07-22" / "readings.yaml"
+    if not labelled.is_file():
+        pytest.skip("the labelled-fixtures mirror is not on this machine")
+    before = labelled.read_text(encoding="utf-8").splitlines()
+    after = (FIXTURES / "druridge_bay_2026-07-22" / "readings.yaml").read_text(encoding="utf-8").splitlines()
+    assert before[-1] == "[]"
+    assert after[: len(before) - 1] == before[:-1]  # the labelled lines above the `[]` are untouched
+    assert "[]" not in after  # replaced, not followed
+    assert len(after) > len(before)

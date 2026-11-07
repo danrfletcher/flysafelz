@@ -101,11 +101,20 @@ def test_h7171_read_is_avoid_sector_0_15_nm_to_the_sse_up_to_700_ft_agl(h7171, h
     assert "up to 700 ft AGL" in result.reason
 
 
-def test_h7171_unread_is_unverified_because_the_q_circle_covers_the_lz_from_the_surface(h7171):
+def test_h7171_unread_is_a_sector_because_its_e_text_draws_a_circle_that_misses_the_lz(h7171):
+    """Code reads the E text's circle (G16), so no reading is needed to know it is 0.15 NM from the LZ."""
     result = notam_action(h7171, None, LZ, SEGMENT)
+    assert result.action is A.AVOID_SECTOR
+    assert result.bearing_deg == pytest.approx(168.6, abs=0.5)
+    assert "(circle edge)" in result.reason
+
+
+def test_h7171_unread_is_unverified_when_its_e_text_draws_nothing_because_the_q_circle_covers_the_lz_from_the_surface(h7171):
+    no_area = h7171.model_copy(update={"item_e": H7171_E.replace("WI 0.5NM RADIUS OF 534732N 0000459W", "WI 0.5NM")})
+    result = notam_action(no_area, None, LZ, SEGMENT)
     assert result.action is A.UNREAD_OVER_LZ
-    assert redact_phones(H7171_E)[0] in result.reason  # redacted: no real number in the reason (R3.5)
-    assert redact_phones(H7171_E)[1]["<PHONE_1>"] not in result.reason
+    assert redact_phones(no_area.item_e)[0] in result.reason  # redacted: no real number in the reason (R3.5)
+    assert redact_phones(no_area.item_e)[1]["<PHONE_1>"] not in result.reason
 
 
 def test_h7171_with_the_real_g_item_the_merge_rule_gives_the_higher_ceiling(h7171_reading):

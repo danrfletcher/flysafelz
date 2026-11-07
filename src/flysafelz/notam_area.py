@@ -18,12 +18,26 @@ What is built, by what the E text holds:
 
 A built area that reaches more than `reader_area_slack_nm` outside the Q-circle is a parser miss, not a bigger
 NOTAM: it is replaced by the Q-circle and logged once. Exactly that far out is kept (the rule's own comparison).
+"Once" is once per NOTAM (id, E text, Q-circle): `build_area` remembers its answer, and the reader, the sort and each
+segment of the action table all ask it.
 
 Coordinates are DDMMN DDDMME or DDMMSSN DDDMMSSE, the seconds with decimals if the NOTAM has them.
+
+Where a NOTAM is (G16): `area_from_item_e(notam)` sorts the E text into one of four answers, on top of `build_area`.
+
+    Shape    a valid polygon or circle (`build_area`'s answer): what the action table measures the LZ against, however large
+    Route    two or more coordinates each with a time on its line (a transit list): a path, not an area (limitation 20)
+    Broken   coordinate-looking text that did not make a valid shape, with a one-line reason: the Q-circle, never the cap
+    NoArea   no coordinate-looking text at all
+
+Coordinate-looking text is a coordinate pair, or any run of 6 or 7 digits written straight before N, S, E or W. Frequencies
+(128.925), AR and SUP references, FL195 and telephone numbers have no such letter after the digits and are not coordinates.
 """
 
 import logging
 import re
+from dataclasses import dataclass
+from itertools import pairwise
 
 from flysafelz.contracts import Circle, ParsedNotam, Polygon
 from flysafelz.geo import HALF_TURN, METRES_PER_KM, METRES_PER_NM, MIN_POLYGON_POINTS, distance_nm
@@ -35,6 +49,8 @@ Area = Circle | Polygon | None
 
 MINUTES_PER_DEGREE = 60
 SECONDS_PER_MINUTE = 60
+_REMEMBER_LIMIT = 20_000  # more than the 14,609 distinct NOTAMs of the archive; past it the list starts again
+_REMEMBERED: dict[tuple[str, str, float, float, float, str], tuple[Area, str]] = {}
 
 _COORDINATE = re.compile(
     r"(?<![\d.])(\d{2})(\d{2})(\d{2}(?:\.\d+)?)?([NS])\s*(\d{3})(\d{2})(\d{2}(?:\.\d+)?)?([EW])(?![A-Z0-9])"
@@ -44,6 +60,8 @@ _UNIT = r"(NM|KM|METRES|METERS|M)\b"
 _RADIUS_BEFORE = re.compile(rf"{_NUMBER}\s*{_UNIT}\s+RADIUS\b")  # 2.2NM RADIUS OF, 185M RADIUS PSN
 _RADIUS_AFTER = re.compile(rf"\bRADIUS\s+(?:OF\s+)?{_NUMBER}\s*{_UNIT}")  # CIRCLE RADIUS 2000M CENTRED ON
 _WITHIN_OF = re.compile(rf"\b(?:WI|WITHIN)\s+{_NUMBER}\s*{_UNIT}\s+OF\s+(?:PSN\s+)?(?=\d{{4}})")  # WI 0.5NM OF PSN 5347..
+_LOOKS_LIKE_A_COORDINATE = re.compile(r"(?<![\d.])\d{6,7}(?:\.\d+)?[NSEW](?![A-Z0-9])")
+_TIME = re.compile(r"(?<![\d.])(?:[01]\d|2[0-3])[0-5]\d(?:Z)?(?![\d.A-Z])")  # HHMM or HHMMZ
 _RADIUS_WORD = re.compile(r"\bRADIUS\b")
 _MESSY = re.compile(r"\b(?:EITHER SIDE|BOTH SIDES|CORRIDOR|ARCS?|BUFFER(?:ED)?|CENTRE ?LINE|CENTER ?LINE|ALONG|TRACK)\b")
 _CUT_OFF = re.compile(r"[-\u2013\sNSEW\d.]*")  # what may follow the last whole coordinate of a list that was cut off mid-way
@@ -126,8 +144,25 @@ def _outside_by(notam: ParsedNotam, area: Area) -> float | None:
 def build_area(notam: ParsedNotam) -> tuple[Area, str]:
     """(the area the E text names or None for the Q-circle, a one-line note on where it came from).
 
-    Never raises on text, however odd or cut off.
+    Never raises on text, however odd or cut off. The answer is worked out once per NOTAM (id, E text, Q-circle and the slack
+    rule) and remembered, so the reader, the sort and every segment of the action table share one answer and a parser miss
+    is logged once, not once per segment. `forget_areas()` forgets them (tests).
     """
+    key = (notam.id, notam.item_e, notam.centre_lat, notam.centre_lon, notam.radius_nm, repr(RULES.reader_area_slack_nm.value))
+    if key not in _REMEMBERED:
+        if len(_REMEMBERED) >= _REMEMBER_LIMIT:
+            _REMEMBERED.clear()
+        _REMEMBERED[key] = _build_area(notam)
+    area, note = _REMEMBERED[key]
+    return (area.model_copy(deep=True) if area is not None else None), note  # a copy: callers never share a mutable model
+
+
+def forget_areas() -> None:
+    """Forget every remembered area (and so log a parser miss again)."""
+    _REMEMBERED.clear()
+
+
+def _build_area(notam: ParsedNotam) -> tuple[Area, str]:
     text = notam.item_e.upper()
     points = _points(text)
     if points is None:
@@ -163,3 +198,94 @@ def build_area(notam: ParsedNotam) -> tuple[Area, str]:
         )
         return None, f"Q-circle: the area built from the E text reaches {outside:.2f} NM outside the Q-circle, more than the {slack:g} NM slack (parser miss)"
     return area, note
+
+
+@dataclass(frozen=True)
+class Shape:
+    """A valid area from the E text: a circle or a polygon."""
+
+    area: Circle | Polygon
+
+    @property
+    def kind(self) -> str:
+        return "circle" if isinstance(self.area, Circle) else "polygon"
+
+
+@dataclass(frozen=True)
+class Route:
+    """Coordinates each with a time: where an aircraft goes, not an area it fills."""
+
+    waypoints: int
+
+
+@dataclass(frozen=True)
+class Broken:
+    """Coordinate-looking text that did not make a valid shape."""
+
+    reason: str
+
+
+@dataclass(frozen=True)
+class NoArea:
+    """No coordinate-looking text."""
+
+
+ItemEArea = Shape | Route | Broken | NoArea
+
+
+def _is_route(text: str, pairs: list[re.Match[str]]) -> bool:
+    """Two or more coordinates, each alone on its line with a time (HHMM or HHMMZ, the coordinates themselves left out).
+
+    One coordinate per line is what tells a transit list from a polygon written on one line with a schedule after it
+    ("... 550500N 0013000W. SFC-UNL. 0800-1200 DAILY"): there the line holds every corner, so it is an area, not a route.
+    A place name between the coordinate and its time is fine.
+    """
+    if len(pairs) <= 1:  # one coordinate is a place; a route has a leg
+        return False
+    for match in pairs:
+        start = text.rfind("\n", 0, match.start()) + 1
+        end = text.find("\n", match.end())
+        line = text[start : len(text) if end < 0 else end]
+        if len(_COORDINATE.findall(line)) != 1 or not _TIME.search(_COORDINATE.sub(" ", line)):
+            return False
+    return True
+
+
+def _crossing(a: Point, b: Point, c: Point, d: Point) -> bool:
+    """True when segment a-b and segment c-d cross at a point inside both (touching and overlapping do not count)."""
+
+    def side(p: Point, q: Point, r: Point) -> float:
+        return (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])
+
+    return side(a, b, c) * side(a, b, d) < 0 and side(c, d, a) * side(c, d, b) < 0
+
+
+def _crosses_itself(corners: list[Point]) -> bool:
+    """True when two edges of the closed outline that do not share a corner cross each other (a bow tie)."""
+    edges = list(pairwise([*corners, corners[0]]))
+    for i, (a, b) in enumerate(edges):
+        for j in range(i + 1, len(edges)):
+            if j == i + 1 or (i == 0 and j == len(edges) - 1):  # neighbours meet at their shared corner
+                continue
+            if _crossing(a, b, *edges[j]):
+                return True
+    return False
+
+
+def area_from_item_e(notam: ParsedNotam) -> ItemEArea:
+    """The area item E draws, sorted into Shape, Route, Broken or NoArea. Never raises, whatever the text."""
+    text = notam.item_e.upper()
+    pairs = list(_COORDINATE.finditer(text))
+    unpaired = [m for m in _LOOKS_LIKE_A_COORDINATE.finditer(text) if not any(p.start() <= m.start() and m.end() <= p.end() for p in pairs)]
+    if not pairs and not unpaired:
+        return NoArea()
+    if unpaired:
+        return Broken("a latitude or longitude has no partner")
+    if _is_route(text, pairs):
+        return Route(waypoints=len(pairs))
+    area, note = build_area(notam)
+    if area is None:
+        return Broken(note.removeprefix("Q-circle: "))
+    if isinstance(area, Polygon) and _crosses_itself(area.points):
+        return Broken("the outline crosses itself")
+    return Shape(area)

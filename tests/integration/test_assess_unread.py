@@ -41,10 +41,12 @@ def test_no_segment_is_ever_no_fly_without_a_reading():
 
 
 def test_unread_notams_are_listed_as_unread_over_lz_and_nothing_is_flyable_while_they_are_active():
+    """J3857 draws no area, so its Q-circle (over the LZ) makes it unread. H7171's E text draws a circle 0.15 NM from the LZ: code
+    locates it (G16), so with no reading it is a plain sector to avoid, not UNREAD_OVER_LZ."""
     assessment = cases.run(CASE, readings=False)
     for segment in segments(assessment):
         if segment.start >= utc(8):
-            assert {a.action for a in segment.notam_actions} == {NotamAction.UNREAD_OVER_LZ}
+            assert {a.notam_id: a.action for a in segment.notam_actions} == {"H7171/26": NotamAction.AVOID_SECTOR, "J3857/26": NotamAction.UNREAD_OVER_LZ}
     assert all(w.end <= utc(8) for w in assessment.flyable_windows)
 
 

@@ -35,7 +35,8 @@ from flysafelz.contracts import (
     SourceStatus,
 )
 from flysafelz.geo import distance_nm
-from flysafelz.notam_action import ActionSegment, LandingZone
+from flysafelz.notam_action import ActionSegment, LandingZone, notam_action
+from flysafelz.notam_area import NoArea, Shape, area_from_item_e
 from flysafelz.pib import PibResult
 from flysafelz.rules import RULES, Rules
 
@@ -107,10 +108,71 @@ def square_at(edge_nm: float, bearing: float = 180.0, half_nm: float = 0.5) -> P
 
 
 def notam(notam_id: str = "H7171/26", *, circle: Circle | None = None, **overrides: object) -> ParsedNotam:
-    """PR-4's parsed NOTAM, active all day 31 Oct. circle sets its Q-circle (centre and radius)."""
+    """PR-4's parsed NOTAM, active all day 31 Oct. circle sets its Q-circle (centre and radius).
+
+    Its E text draws no area, so where it is comes from the Q-circle until a test writes a shape into item E (see `drawn`).
+    """
     if circle is not None:
         overrides.update(centre_lat=circle.lat, centre_lon=circle.lon, radius_nm=circle.radius_nm)
     return pib_parsed(notam_id, **overrides)
+
+
+MICRO = 1_000_000  # seconds are written to six decimals, so a drawn shape comes back within a few millimetres
+
+
+def dms(value: float, hemispheres: str, degree_digits: int) -> str:
+    """One coordinate half as a NOTAM writes it: DDMMSS.ffffffN or DDDMMSS.ffffffW (hemispheres is \"NS\" or \"EW\")."""
+    micro_seconds = round(abs(value) * 3600 * MICRO)
+    degrees, rest = divmod(micro_seconds, 3600 * MICRO)
+    minutes, seconds = divmod(rest, 60 * MICRO)
+    return f"{degrees:0{degree_digits}d}{minutes:02d}{seconds / MICRO:09.6f}{hemispheres[0] if value >= 0 else hemispheres[1]}"
+
+
+def coordinate(lat: float, lon: float) -> str:
+    return f"{dms(lat, 'NS', 2)} {dms(lon, 'EW', 3)}"
+
+
+def drawing(shape: Circle | Polygon) -> str:
+    """The words an E text uses to draw this shape: a hyphen-joined list closed on its first corner, or WI <r>NM RADIUS OF <coordinate>."""
+    if isinstance(shape, Circle):
+        return f"WI {shape.radius_nm}NM RADIUS OF {coordinate(shape.lat, shape.lon)}."
+    corners = [*shape.points, shape.points[0]]
+    return "WI AREA BOUNDED BY " + " - ".join(coordinate(*corner) for corner in corners) + "."
+
+
+def _reach_nm(parsed: ParsedNotam, shape: Circle | Polygon) -> float:
+    """How far from the NOTAM's Q-circle centre the shape reaches, in NM."""
+    if isinstance(shape, Circle):
+        return distance_nm(parsed.centre_lat, parsed.centre_lon, shape.lat, shape.lon) + shape.radius_nm
+    return max(distance_nm(parsed.centre_lat, parsed.centre_lon, lat, lon) for lat, lon in shape.points)
+
+
+def drawn(parsed: ParsedNotam, read: NotamReading | None) -> ParsedNotam:
+    """The NOTAM with the shape a hand-written reading used to carry written into its E text, where code now reads it (G16).
+
+    A reading's `geometry` no longer locates a NOTAM; item E does. A reading with no geometry (or an empty polygon, which
+    cannot be written) leaves the NOTAM as it was. A NOTAM whose E text already holds coordinates is left as it is: item E
+    already draws it (a second drawing would be Broken). A real Q-circle always contains the area, and code treats a shape
+    that reaches more than the slack outside it as a parser miss, so the Q-circle is widened (centre kept) to contain what is drawn.
+    """
+    shape = read.geometry if read else None
+    if shape is None or (isinstance(shape, Polygon) and not shape.points) or not isinstance(area_from_item_e(parsed), NoArea):
+        return parsed
+    radius = max(parsed.radius_nm, _reach_nm(parsed, shape))
+    return parsed.model_copy(update={"item_e": f"{parsed.item_e} {drawing(shape)}", "radius_nm": radius})
+
+
+def as_written(shape: Circle) -> Circle:
+    """The circle as code reads it back from the E text (coordinates to six decimals of a second), for an exact-edge test."""
+    parsed = area_from_item_e(notam(circle=shape, item_e=drawing(shape)))
+    assert isinstance(parsed, Shape)
+    assert isinstance(parsed.area, Circle)
+    return parsed.area
+
+
+def act_on(parsed: ParsedNotam, read: NotamReading | None, lz: LandingZone, seg: ActionSegment, **kw):
+    """notam_action with the reading's shape written into item E first (see `drawn`)."""
+    return notam_action(drawn(parsed, read), read, lz, seg, **kw)
 
 
 def reading(
