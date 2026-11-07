@@ -75,8 +75,8 @@ def test_source_imports_no_agent_framework():
 # F1 (PR-3.F1): the verdict sheet has no model, no reader, and writes no label on a blind row.
 # VERDICT_SHEET_FILES is the blind path (the builder and its script); the draft module is the only code that writes
 # a verdict or an action, and the builder reaches it only for an example that is not blind (PR-4.F1).
-VERDICT_SHEET_FILES = [SRC / "verdict_sheet.py", ROOT / "scripts" / "build_verdict_sheet.py"]
-DRAFT_FILES = [SRC / "verdict_sheet_draft.py"]
+VERDICT_SHEET_FILES = [SRC / "verdict_sheet.py", SRC / "verdict_sheet_fingerprint.py", ROOT / "scripts" / "build_verdict_sheet.py"]
+DRAFT_FILES = [SRC / "verdict_sheet_draft.py", SRC / "verdict_sheet_check.py"]  # the check module names the enums to validate and load labels (PR-5.F1); it writes none
 
 
 def test_the_verdict_sheet_imports_no_model_client_and_no_reader():

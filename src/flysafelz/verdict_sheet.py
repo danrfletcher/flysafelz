@@ -12,6 +12,9 @@ example's, never the order of the examples. `--blind` / `--draft` build only the
     build_entry(example, dir)        whichever the example's `metadata.blind` asks for
     edge_name(reasons)               why a row starts where it does, from assess's own cut reasons
     check_weather_coverage(...)      the case must hold weather for every hour up to the verdict horizon (G7)
+    stale_reasons(example, entry, ..) what changed since an entry was written ([] = nothing) (G6)
+    append_entries(out, ...)         add new entries to the end of the sheet as text
+    load_sheet(path)                 the labelled sheet as Spec section 4 data (verdict_sheet_check)
     main(argv, root=...)             the command; scripts/build_verdict_sheet.py is a thin wrapper
 
 The examples file is a YAML list (or a mapping with an `examples:` list). An example is
@@ -23,7 +26,7 @@ The examples file is a YAML list (or a mapping with an `examples:` list). An exa
 
 The sheet is a YAML list with one entry per `assess` example:
     id, mode (blind | draft), window ("default" or {start, end}), actions_done (false),
-    notam_actions, rows
+    fingerprint, notam_actions, rows
 A blind entry's notam_actions is {NOTAM id: null} for every NOTAM within the local area. A draft entry's is code's
 worst action per NOTAM, and a comment block of the NOTAMs code ignored for a reason other than distance.
 
@@ -37,12 +40,17 @@ An edge on HH:00 is not a cut inside the hour, so it is found with a one-hour pr
 minute before HH:00: an edge at HH:00 is then strictly inside it (G14). A NOTAM that runs across
 HH:00 is not an edge there; one that starts or ends exactly on HH:00 is.
 
-The script writes a new sheet only: an existing `--out` is refused and never read or changed, and the
-examples file is only read (F2). A case folder that does not exist yet is captured through
-capture.capture(); one that exists is never recaptured or overwritten.
+A rerun only appends (PR-5.F1, G6). The sheet is created on the first run; after that the entries of examples that
+have none yet are added to the end as text, and the bytes already in the file are never changed, so Dan's labels,
+comments and spacing survive. Every entry carries a `fingerprint` (verdict_sheet_fingerprint) of what it was built
+from; an example whose entry no longer matches is reported `stale` and its entry is left exactly as it is. The script
+never deletes an entry. `--check` validates the whole sheet and prints the counts per example (verdict_sheet_check).
+The examples file is only read (F2). A case folder that does not exist yet is captured through capture.capture();
+one that exists is never recaptured or overwritten.
 """
 
 import argparse
+import copy
 import os
 import re
 import sys
@@ -86,10 +94,23 @@ from flysafelz.notam_action import LandingZone
 from flysafelz.pib import PibResult, prefilter
 from flysafelz.rules import RULES
 from flysafelz.sources import FIXTURES_DIR, SourceError
+from flysafelz.verdict_sheet_check import SheetEntry, SheetError, check_entries, parse_sheet, read_sheet, report_line
+from flysafelz.verdict_sheet_check import load_sheet as load_sheet  # re-exported: 5a imports it from here
 from flysafelz.verdict_sheet_draft import DraftEntry, draft_actions, fill_rows, ignored_by_code, render_entry
+from flysafelz.verdict_sheet_fingerprint import (
+    MODE_BLIND,
+    MODE_DRAFT,
+    PART_INPUTS,
+    PART_ROWS,
+    changed_parts,
+    file_parts,
+    fingerprint,
+    inputs_part,
+    rows_part,
+    sealed,
+    unseal,
+)
 
-MODE_BLIND = "blind"
-MODE_DRAFT = "draft"
 WINDOW_DEFAULT = "default"
 EDGE_WINDOW_START = "window start"
 EDGE_HOUR = "hour"
@@ -108,10 +129,6 @@ DAYLIGHT_NAMES = {
 _AWARE = TypeAdapter(AwareDatetime)
 _CASE_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")
 _DAY_SUFFIX = re.compile(r"_\d+day$")
-
-
-class SheetError(Exception):
-    """Something about an example, the examples file or the output stops the build. The message is the one line printed."""
 
 
 # --- the examples file ---------------------------------------------------------------------
@@ -498,29 +515,202 @@ def _remove_new_folder(case_dir: Path) -> None:
         pass
 
 
+# --- the rerun: what is new, what is stale (G6) ---------------------------------------------------------
+
+
+UNREADABLE = "fingerprint unreadable"
+
+
+def with_fingerprint(entry: dict[str, Any], parts: Mapping[str, str]) -> dict[str, Any]:
+    """The entry with its `fingerprint` key added after `actions_done`. A DraftEntry stays one (it keeps its comments)."""
+    items: dict[str, Any] = {}
+    for key, value in entry.items():
+        items[key] = value
+        if key == "actions_done":
+            items["fingerprint"] = sealed(parts)
+    stamped = copy.copy(entry)
+    stamped.clear()
+    stamped.update(items)
+    return stamped
+
+
+def stale_reasons(example: Example, stored: Mapping[str, Any], root: Path, build: Callable[[Example, Path], dict[str, Any]] = build_entry) -> list[str]:
+    """What changed since the sheet entry `stored` was written for this example: [] when nothing did, else the parts.
+
+    The parts, in order: `inputs`, `rows`, then a fixture file by name (draft entries only). When the inputs changed
+    the rows are not listed as well: moved rows are what a changed window does. A fingerprint that is
+    missing, mangled, edited by hand (its seal no longer matches) or not for the entry's mode is `fingerprint unreadable`; an example whose mode (blind or draft)
+    is no longer the entry's is `inputs`. The case is rebuilt to compare the row edges, from the case folder as it is
+    (never captured). When the case cannot be built, the parts that can still be compared are returned; if none of
+    them changed, SheetError says why the entry cannot be checked. Nothing is written.
+    """
+    mode = stored.get("mode")
+    old = unseal(stored.get("fingerprint"), mode)
+    if old is None:
+        return [UNREADABLE]
+    now_mode = MODE_BLIND if example.blind else MODE_DRAFT
+    if mode != now_mode:
+        return [f"{PART_INPUTS}: mode was {mode}, now {now_mode}"]
+    current = {PART_INPUTS: inputs_part(example)}
+    case_dir = root / FIXTURES_DIR / example.case
+    problem: SheetError | None = None
+    if case_dir.is_dir():
+        try:
+            current[PART_ROWS] = rows_part(build(example, case_dir)["rows"])
+        except SheetError as exc:
+            problem = exc
+        if now_mode == MODE_DRAFT:
+            current.update(file_parts(case_dir))
+    else:
+        problem = SheetError(f"example {example.id}: no case folder {FIXTURES_DIR}/{example.case}/ to compare its entry with")
+    changed = changed_parts(old, current)
+    if PART_INPUTS in changed:
+        changed = [name for name in changed if name != PART_ROWS]
+    if changed or problem is None:
+        return changed
+    raise problem
+
+
+def _entries_text(entries: Sequence[dict[str, Any]]) -> str:
+    return "".join(render_entry(e) if isinstance(e, DraftEntry) else yaml.safe_dump([e], sort_keys=False, default_flow_style=False, allow_unicode=True) for e in entries)
+
+
+def append_entries(out: Path, old_text: str | None, old_entries: Sequence[SheetEntry], entries: Sequence[dict[str, Any]]) -> None:
+    """Add the entries to the end of the sheet as text. Raises SheetError, with the file untouched, when they cannot be added.
+
+    The text of `entries` is appended after the file's own bytes (a newline first when the file does not end in
+    one); nothing already there is read back or re-dumped, so Dan's comments, key order and spacing survive.
+    Before anything is written the whole result is parsed again: it must be valid YAML, hold the old entries
+    byte for byte and the new ones after them. The file is read once more afterwards. `old_text` is None for a sheet
+    that does not exist yet; it is then created.
+    """
+    addition = _entries_text(entries)
+    if old_text and not old_text.endswith("\n"):
+        addition = "\n" + addition
+    combined = (old_text or "") + addition
+    try:
+        parsed = parse_sheet(combined, out)
+    except SheetError as exc:
+        raise SheetError(f"{exc}; nothing written (the new entries do not fit after the text already there)") from None
+    kept = len(old_entries)
+    same_old = [a.span for a in parsed[:kept]] == [b.span for b in old_entries] or (
+        kept > 0 and [a.span for a in parsed[: kept - 1]] == [b.span for b in old_entries[: kept - 1]] and parsed[kept - 1].span.startswith(old_entries[-1].span)
+    )
+    if len(parsed) != kept + len(entries) or not same_old:
+        raise SheetError(f"{out}: the new entries would not leave the existing ones as they are; nothing written")
+    try:
+        with out.open("ab" if old_text is not None else "xb") as handle:
+            handle.write(addition.encode("utf-8"))
+        written = out.read_bytes()
+    except OSError as exc:
+        raise SheetError(f"{out}: cannot be written ({type(exc).__name__})") from None
+    if written != combined.encode("utf-8"):
+        raise SheetError(f"{out}: changed while it was being written; check it before the next run")
+
+
 # --- the command ------------------------------------------------------------------------------------
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = OneLineParser(prog="build_verdict_sheet", description="Write a verdict sheet from an examples file: blind entries for blind examples, draft entries for the rest.")
+    parser = OneLineParser(
+        prog="build_verdict_sheet",
+        description="Add new examples to a verdict sheet (blind entries for blind examples, draft entries for the rest), or --check the sheet.",
+    )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--blind", action="store_true", help="build only the blind examples (metadata.blind: true); the others are skipped")
     mode.add_argument("--draft", action="store_true", help="build only the draft examples (no metadata.blind); the blind ones are skipped")
+    parser.add_argument("--check", action="store_true", help="validate the whole sheet and print the counts per example; writes nothing, exit 1 on any error")
     parser.add_argument("--examples", required=True, type=Path, help="Dan's examples.yaml (only read)")
-    parser.add_argument("--out", required=True, type=Path, help="the sheet to write; it must not exist yet")
+    parser.add_argument("--out", required=True, type=Path, help="the sheet: created on the first run, then only appended to")
     return parser
 
 
-def _write_new(out: Path, entries: list[dict[str, Any]]) -> None:
-    """Write the sheet to a file that must not exist yet (exclusive create). Raises SheetError."""
-    text = "".join(render_entry(e) if isinstance(e, DraftEntry) else yaml.safe_dump([e], sort_keys=False, default_flow_style=False, allow_unicode=True) for e in entries)
+def _default_windows(examples: Sequence[Example]) -> dict[str, tuple[datetime, datetime]]:
+    """The window of each example that names none: assess's default from the example's own `now`."""
+    return {e.id: default_window(e.now) for e in examples if e.path == "assess" and e.window is None and e.now is not None}
+
+
+def _read_sheet_if_there(out: Path) -> tuple[str | None, list[SheetEntry]]:
+    return read_sheet(out) if out.exists() else (None, [])
+
+
+def _rerun(args: argparse.Namespace, root: Path, environ: Mapping[str, str] | None, today: datetime | None, build: Callable[[Example, Path], dict[str, Any]]) -> int:
     try:
-        with out.open("x", encoding="utf-8") as handle:
-            handle.write(text)
-    except FileExistsError:
-        raise SheetError(f"{out}: already exists; not overwritten (a rerun that appends lands in PR-5)") from None
-    except OSError as exc:
-        raise SheetError(f"{out}: cannot be written ({type(exc).__name__})") from None
+        old_text, existing = _read_sheet_if_there(args.out)
+        examples = read_examples(args.examples)
+    except SheetError as exc:
+        print(exc, file=sys.stderr)
+        return 1
+    targets = [e for e in examples if e.path == "assess" and not (args.blind and not e.blind) and not (args.draft and e.blind)]
+    label_errors = [message for report in check_entries(existing, _default_windows(examples)) for message in report.errors]
+    for message in label_errors:
+        print(message, file=sys.stderr)
+
+    on_sheet = {entry.id: entry for entry in existing if entry.id}
+    entries: list[dict[str, Any]] = []
+    unchanged, stale, failed = 0, 0, 0
+    for example in targets:
+        try:
+            if example.id in on_sheet:
+                reasons = stale_reasons(example, on_sheet[example.id].data, root, build)
+                unchanged += not reasons
+                stale += bool(reasons)
+                if reasons:
+                    print(f"example {example.id}: stale ({', '.join(reasons)}); its entry is left as it is")
+                continue
+            case_dir = ensure_case(example, root, environ=environ, today=today)
+            entry = build(example, case_dir)
+            entries.append(with_fingerprint(entry, fingerprint(example, entry["rows"], case_dir, entry["mode"])))
+        except SheetError as exc:
+            failed += 1
+            print(exc, file=sys.stderr)
+    summary = f"{len(entries)} new, {unchanged} unchanged, {stale} stale, {len(examples) - len(targets)} skipped, {failed} failed"
+    if not entries:
+        print(f"nothing written: {summary}")
+        return 1 if failed or label_errors else 0
+    try:
+        append_entries(args.out, old_text, existing, entries)
+    except SheetError as exc:
+        print(exc, file=sys.stderr)
+        return 1
+    print(f"wrote {args.out}: {summary}")
+    return 1 if label_errors else 0
+
+
+def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path], dict[str, Any]]) -> int:
+    """`--check`: one line per entry (GP5) and an error line for each problem. Exit 0 when the sheet validates, 1 otherwise.
+
+    A stale entry or an orphan (an id no longer in the examples file) is reported but is not an error.
+    """
+    try:
+        _text, entries = read_sheet(args.out)
+        examples = read_examples(args.examples)
+    except SheetError as exc:
+        print(exc, file=sys.stderr)
+        return 1
+    by_id = {e.id: e for e in examples}
+    reports = check_entries(entries, _default_windows(examples))
+    errors = stale = orphans = 0
+    for entry, report in zip(entries, reports, strict=True):
+        example = by_id.get(entry.id) if entry.id else None
+        orphan = entry.id is not None and (example is None or example.path != "assess")
+        status = "no"
+        if example is not None and example.path == "assess" and isinstance(entry.data, dict):
+            try:
+                reasons = stale_reasons(example, entry.data, root, build)
+            except SheetError as exc:
+                report.errors.append(str(exc))
+            else:
+                status = f"({', '.join(reasons)})" if reasons else "no"
+        if entry.id is not None:
+            print(report_line(report, status, orphan=orphan))
+        for message in report.errors:
+            print(f"error: {message}")
+        errors += len(report.errors)
+        stale += status != "no"
+        orphans += orphan
+    print(f"{len(entries)} entries checked: {errors} errors, {stale} stale, {orphans} orphans")
+    return 1 if errors else 0
 
 
 def main(
@@ -531,42 +721,24 @@ def main(
     today: datetime | None = None,
     build: Callable[[Example, Path], dict[str, Any]] = build_entry,
 ) -> int:
-    """Run the command. Exit 0: at least one entry written (or nothing to build), 1: an error and no entry, 2: bad usage.
+    """Run the command. Exit 0: the sheet is as it should be (entries added, or nothing to add), 1: an error, 2: bad usage.
 
-    Each example is built in its own mode (blind or draft, by its `metadata.blind`); `--blind` or `--draft` builds only
-    that mode's examples and counts the rest as skipped. A failure inside one example (capture, a case that does not
-    fit the example) skips that example with one line and the rest are still written; the summary line counts them. A fault in the examples file or the output path
-    stops everything with nothing written.
+    Without --check: the sheet is created on the first run; later runs only append the entries of examples that
+    have none yet (G6). Every new entry gets a `fingerprint`. An example that already has an entry is never rebuilt
+    into it: if its inputs, row edges or (draft) fixture files have changed since, it is reported `stale` and the
+    entry is left byte for byte. Each example is built in its own mode (blind or draft, by `metadata.blind`);
+    `--blind` or `--draft` handles only that mode's examples and counts the rest as skipped. A failure inside one
+    example (capture, a case that does not fit the example) skips that example with one line and the rest go on; the
+    summary counts them. Label errors in entries already on the sheet are printed and make the exit code 1, but the
+    new entries are still appended. A sheet that is not valid YAML stops the run with its line number, with nothing
+    written and the file untouched. The examples file is never written (F2).
+
+    With --check: nothing is written; see _check.
     """
     parser = _parser()
     args = parser.parse_args(argv)
-    if args.out.exists():
-        print(f"{args.out}: already exists; not overwritten (a rerun that appends lands in PR-5)", file=sys.stderr)
-        return 1
-    try:
-        examples = read_examples(args.examples)
-    except SheetError as exc:
-        print(exc, file=sys.stderr)
-        return 1
-    targets = [e for e in examples if e.path == "assess" and not (args.blind and not e.blind) and not (args.draft and e.blind)]
-
-    entries: list[dict[str, Any]] = []
-    failed = 0
-    for example in targets:
-        try:
-            entries.append(build(example, ensure_case(example, root, environ=environ, today=today)))
-        except SheetError as exc:
-            failed += 1
-            print(exc, file=sys.stderr)
-    skipped = len(examples) - len(targets)
-    summary = f"{len(entries)} built, {skipped} skipped, {failed} failed"
-    if not entries:
-        print(f"nothing written: {summary}")
-        return 1 if failed else 0
-    try:
-        _write_new(args.out, entries)
-    except SheetError as exc:
-        print(exc, file=sys.stderr)
-        return 1
-    print(f"wrote {args.out}: {summary}")
-    return 0
+    if args.check and (args.blind or args.draft):
+        parser.error("--check validates the whole sheet; it cannot be combined with --blind or --draft")
+    if args.check:
+        return _check(args, root, build)
+    return _rerun(args, root, environ, today, build)

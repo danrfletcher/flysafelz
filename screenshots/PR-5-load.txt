@@ -1,0 +1,29 @@
+# rows 1-3 labelled, row 4 has a verdict but no approaching_limits (incomplete), the rest empty; actions_done: false
+$ uv run python -c "import json; from flysafelz.verdict_sheet import load_sheet; r = load_sheet('<tmp>/sheet.yaml')['blue_mill_2026-10-31']; print(json.dumps({k: r[k] for k in r}, indent=1))"
+{
+ "verdict_by_segment": [
+  {
+   "start": "2026-10-31T07:00:00Z",
+   "end": "2026-10-31T08:00:00Z",
+   "verdict": "NO_GO",
+   "approaching_limits": false
+  },
+  {
+   "start": "2026-10-31T08:00:00Z",
+   "end": "2026-10-31T09:00:00Z",
+   "verdict": "UNVERIFIED",
+   "approaching_limits": true
+  },
+  {
+   "start": "2026-10-31T09:00:00Z",
+   "end": "2026-10-31T10:00:00Z",
+   "verdict": "PILOT_DISCRETION",
+   "approaching_limits": false
+  }
+ ],
+ "tier": []
+}
+
+# actions_done: true, J3857/26 CONTACT_FIRST, H7171/26 AVOID_SECTOR; the other 18 stay null
+$ uv run python -c "from flysafelz.verdict_sheet import load_sheet; r = load_sheet('<tmp>/sheet.yaml')['blue_mill_2026-10-31']; a = r['notam_actions']; print(len(r['verdict_by_segment']), 'labelled rows;', len(a), 'actions;', {k: v for k, v in a.items() if v != 'IGNORE'}, '; unlisted ->', a['Z999/26'])"
+3 labelled rows; 20 actions; {'H7171/26': 'AVOID_SECTOR', 'J3857/26': 'CONTACT_FIRST'} ; unlisted -> IGNORE

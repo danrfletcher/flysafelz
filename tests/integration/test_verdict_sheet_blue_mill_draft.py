@@ -24,7 +24,7 @@ from flysafelz.verdict_sheet_draft import IGNORED_HEADER, UNREAD_NOTE
 GP1 = Path(__file__).resolve().parents[1] / "data" / "verdict_sheet" / "examples_blue_mill.yaml"
 NOW = datetime(2026, 10, 31, 7, 30, tzinfo=UTC)
 LAT, LON = 53.802797, -0.086644
-ENTRY_KEYS = {"id", "mode", "window", "actions_done", "notam_actions", "rows"}
+ENTRY_KEYS = {"id", "mode", "window", "actions_done", "fingerprint", "notam_actions", "rows"}  # the written entry; fingerprint is added by the rerun layer (PR-5.F1)
 
 
 def utc(day, hour, minute=0, month=10):
@@ -162,7 +162,7 @@ def test_f7_the_written_sheet_and_stdout_hold_no_recheck_text(draft):
 
 def test_the_command_prints_the_one_summary_line_only(draft, tmp_path):
     _text, _entry, out = draft
-    assert out.strip() == f"wrote {tmp_path / 'sheet.yaml'}: 1 built, 0 skipped, 0 failed"
+    assert out.strip() == f"wrote {tmp_path / 'sheet.yaml'}: 1 new, 0 unchanged, 0 stale, 0 skipped, 0 failed"
 
 
 def test_the_written_draft_equals_the_built_entry(tmp_path):
@@ -170,7 +170,8 @@ def test_the_written_draft_equals_the_built_entry(tmp_path):
     (ex,) = read_examples(draft_examples(tmp_path))
     built = build_draft_entry(ex, root / "fixtures" / cases.BLUE_MILL)
     text, (parsed,), _out = build(root, draft_examples(tmp_path, "again.yaml"))
-    assert parsed == dict(built) and list(parsed) == list(built)
+    without_fingerprint = {k: v for k, v in parsed.items() if k != "fingerprint"}  # the rerun layer's key, after actions_done
+    assert without_fingerprint == dict(built) and list(without_fingerprint) == list(built)
 
 
 # --- blind entries stay as they were (critique 3) -------------------------------------------------------------------
@@ -233,10 +234,10 @@ def test_flags_build_only_their_own_mode_and_count_the_rest_as_skipped(tmp_path,
     twin = {**raw, "id": "blue_mill_draft", "metadata": {}}
     examples = examples_file(tmp_path / "mixed.yaml", raw, twin)
     _text, sheet, out = build(root, examples, "--draft", capsys=capsys)
-    assert [e["mode"] for e in sheet] == ["draft"] and out.strip().endswith("1 built, 1 skipped, 0 failed")
+    assert [e["mode"] for e in sheet] == ["draft"] and out.strip().endswith("1 new, 0 unchanged, 0 stale, 1 skipped, 0 failed")
     (tmp_path / "sheet.yaml").unlink()
     _text, sheet, out = build(root, examples, "--blind", capsys=capsys)
-    assert [e["mode"] for e in sheet] == ["blind"] and out.strip().endswith("1 built, 1 skipped, 0 failed")
+    assert [e["mode"] for e in sheet] == ["blind"] and out.strip().endswith("1 new, 0 unchanged, 0 stale, 1 skipped, 0 failed")
 
 
 # --- E8: a reading is missing ------------------------------------------------------------------------------------------
