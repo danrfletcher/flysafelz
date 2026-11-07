@@ -15,9 +15,12 @@ Python 3.12 with `uv` · LangGraph + LangChain v1 · LangSmith (traces, datasets
 ```
 make setup   # uv sync; needs no API key
 make test    # uv run pytest, with sockets disabled
+make eval-reader   # the reader eval: the only target that calls the model, so it needs the READER_* settings
 ```
 
-Copy `.env.example` to `.env` for the openAIP key when fixtures are captured later. `.env` is gitignored.
+Copy `.env.example` to `.env` for the openAIP key when fixtures are captured later. `.env` is gitignored. The NOTAM reader's model endpoint is four more lines in the same file (or in the environment, which wins): `READER_PROVIDER`, `READER_BASE_URL`, `READER_API_KEY` and `READER_MODEL`, any OpenAI-compatible endpoint. All four are required and nothing falls back to a default; only `src/flysafelz/reader/config.py` reads them, and only when the reader is first used. `make test` never needs them.
+
+`make eval-reader` reads every fully labelled NOTAM in `evals/reader/labels.yaml` three times with the real model (no cache), scores the runs against the labels, checks the live Blue Mill case against its `readings.yaml`, and writes `evals/reader/runs/<time>/report.md` and `report.json` (gitignored), printing their paths. Harmful downgrades lead the report; they never change the exit code. With a `READER_*` setting missing it stops and names it.
 
 ## Assessing a landing zone
 
@@ -76,6 +79,7 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 | notam_awareness_subjects | GW | subject | in | ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4 | best practice | GNSS or radio-frequency jamming: awareness only, no reader. |
 | notam_area_wide_nm | 50 | NM | >= | ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4 | educated guess | A Q-line radius at or above this is an area-wide NOTAM: awareness only (and FIR-wide AIS admin for the subjects in notam_wide_ignore_subjects). A radius of 999 means the whole FIR. |
 | capture_trim_nm | 25 | NM | > | FlySafeLZ Spec s2, Plan 2 G20 (fixture PIBs are trimmed to 25 NM) | educated guess | make fixtures keeps a NOTAM only when its Q-circle edge is within this distance of the LZ, so a fixture stays small but covers well past the 2 NM local area. A NOTAM whose Q-circle cannot be read is kept. |
+| reader_area_slack_nm | 1 | NM | > | Ticket 3 Q4 (Dan); 4 archived PIBs (4 Jul, 22 Aug, 19 Sep, 31 Oct 2026): the area in the E text is never more than 1 NM outside the Q-circle | educated guess | A NOTAM area built from the E text that reaches further than this outside the Q-circle is treated as a parser miss and replaced by the Q-circle. Exactly this far out is kept. |
 
 Confidence is `sourced` (a citable document), `best practice` (common practice, not one citation) or `educated guess` (our own call). Limits cannot be changed by the user.
 

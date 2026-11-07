@@ -8,3 +8,4 @@ dist/
 *.sqlite
 .DS_Store
 .coverage
+evals/reader/runs/

@@ -11,6 +11,18 @@ import pytest
 import yaml
 from pydantic import BaseModel, ValidationError
 
+from fence_scan import (
+    READER_REVIEWED_LITERALS,
+    REVIEWED_FLOATS,
+    REVIEWED_NAMED_CONSTANTS,
+    banned_words,
+    hard_coded_rule_values,
+    llm_env_words,
+    number,
+    unreviewed_floats,
+    unreviewed_literals,
+)
+
 from flysafelz import cli, contracts
 from flysafelz.rules import DEFAULT_PATH, RULES
 
@@ -44,16 +56,39 @@ def test_source_files_are_found():
     assert SRC / "contracts.py" in PY_FILES and SRC / "rules.py" in PY_FILES
 
 
-# F2: no agent, tool, LangGraph, LangChain, RAG or UI code.
-def test_pyproject_has_no_agent_or_llm_dependency():
+# F2: no agent, tool, LangGraph, LangChain, RAG or UI code. Narrowed for the reader (ticket 3 F2): the pyproject may declare
+# langchain-openai (and its langchain-core), and only src/flysafelz/reader/ may import them. Everything else is still banned.
+READER = SRC / "reader"
+ALLOWED_LLM_DEPENDENCIES = {"langchain-openai", "langchain-core"}
+ALLOWED_LLM_IMPORTS = ("langchain_openai", "langchain_core")
+BANNED_DEPENDENCY_PREFIXES = ("langgraph", "langchain", "openai", "anthropic")
+
+
+def _banned_dependencies(declared: list[str]) -> list[str]:
+    """The declared dependencies that are an agent or LLM client and not one of the two the reader may use."""
+    names = [re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower().replace("_", "-") for d in declared]
+    return [name for name in names if name.startswith(BANNED_DEPENDENCY_PREFIXES) and name not in ALLOWED_LLM_DEPENDENCIES]
+
+
+def _declared_dependencies() -> list[str]:
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     declared = list(config["project"]["dependencies"])
     for group in config.get("dependency-groups", {}).values():
         declared += [d for d in group if isinstance(d, str)]
-    names = [re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower() for d in declared]
-    assert names, "no dependencies read"
-    for name in names:
-        assert not name.startswith(("langgraph", "langchain", "openai", "anthropic")), name
+    return declared
+
+
+def test_pyproject_has_no_agent_or_llm_dependency():
+    declared = _declared_dependencies()
+    assert declared, "no dependencies read"
+    assert _banned_dependencies(declared) == []
+
+
+def test_the_dependency_scan_allows_exactly_the_two_reader_packages_and_still_catches_the_rest():
+    assert _banned_dependencies(["langchain-openai>=1.7.4", "langchain-core", "langchain_core>=1"]) == []
+    planted = ["langgraph", "langchain", "langchain-community>=0.3", "langchain-anthropic", "openai>=1", "anthropic", "openai-agents", "langchain-openai-extra"]
+    assert _banned_dependencies(planted) == [d.split(">=")[0] for d in planted]
+    assert "langchain-openai" in {re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower() for d in _declared_dependencies()}  # the reader's one new dependency is declared
 
 
 def _imported_modules(path: Path) -> list[str]:
@@ -66,10 +101,46 @@ def _imported_modules(path: Path) -> list[str]:
     return modules
 
 
+def _is_allowed_import(module: str, path: Path, reader: Path) -> bool:
+    """langchain_openai and langchain_core (and their submodules) are allowed in the reader package only."""
+    in_reader = reader in path.parents
+    return in_reader and module.split(".")[0] in ALLOWED_LLM_IMPORTS
+
+
+def _agent_imports(path: Path, reader: Path = READER) -> list[str]:
+    """The modules the file imports that are an agent or LLM client, less what the reader package may import."""
+    return [m for m in _imported_modules(path) if m.startswith(FORBIDDEN_IMPORTS) and not _is_allowed_import(m, path, reader)]
+
+
 def test_source_imports_no_agent_framework():
     for path in PY_FILES + SCRIPT_FILES:
-        for module in _imported_modules(path):
-            assert not module.startswith(FORBIDDEN_IMPORTS), (path, module)
+        assert _agent_imports(path) == [], path
+
+
+def test_only_the_reader_package_imports_an_llm_client():
+    """The reader really uses the exemption (so it is not dead), and nothing outside it does."""
+    reader_files = sorted(READER.rglob("*.py"))
+    assert reader_files
+    assert {m.split(".")[0] for path in reader_files for m in _imported_modules(path)} >= {"langchain_core"}
+    for path in PY_FILES + SCRIPT_FILES:
+        if READER not in path.parents:
+            assert not [m for m in _imported_modules(path) if m.split(".")[0] in ALLOWED_LLM_IMPORTS], path
+
+
+def test_the_import_scan_still_catches_a_planted_llm_import_outside_the_reader(tmp_path):
+    """Planted violations: langchain_core appended to a temp copy of cli.py, and the same line in the reader's place."""
+    cli_copy = tmp_path / "cli.py"
+    cli_copy.write_text((SRC / "cli.py").read_text(encoding="utf-8") + "\nimport langchain_core\n", encoding="utf-8")
+    assert _agent_imports(cli_copy, reader=tmp_path / "reader") == ["langchain_core"]
+    assert _agent_imports(SRC / "cli.py") == []  # the real file is clean, so the hit above is the planted line
+    for module in ("langchain_openai", "langchain_core.messages", "langgraph", "openai", "anthropic", "langchain_community", "langsmith"):
+        outside = tmp_path / "other.py"
+        outside.write_text(f"import {module}\n", encoding="utf-8")
+        assert _agent_imports(outside, reader=tmp_path / "reader") == [module], module
+    (tmp_path / "reader").mkdir()
+    inside = tmp_path / "reader" / "read.py"
+    inside.write_text("import langchain_core.messages\nfrom langchain_openai import ChatOpenAI\nimport langgraph\nimport openai\nimport langchain_community\n", encoding="utf-8")
+    assert _agent_imports(inside, reader=tmp_path / "reader") == ["langgraph", "openai", "langchain_community"]  # the two allowed packages pass; the rest do not
 
 
 # F1 (PR-3.F1): the verdict sheet has no model, no reader, and writes no label on a blind row.
@@ -163,13 +234,95 @@ def test_no_numeric_literal_in_a_comparison_other_than_0_or_1():
 
 
 def test_no_numeric_literal_equals_a_rules_yaml_value():
+    """Structural 0 and 1 are exempt (reader_area_slack_nm is 1.0) and so are the reviewed named constants in geo.py (F6)."""
     values = _rule_values()
     assert values, "no rule values read"
     for path in PY_FILES:
-        for node in ast.walk(_parse(path)):
-            value = _number(node)
-            if value is not None and abs(value) in values:
-                pytest.fail(f"{path}:{node.lineno} hard-codes {value}, which is a rules.yaml value")
+        for lineno, value in hard_coded_rule_values(path, _parse(path), values):
+            pytest.fail(f"{path}:{lineno} hard-codes {value}, which is a rules.yaml value")
+
+
+def test_the_reader_area_slack_is_a_rule_and_the_area_module_holds_no_literal_for_it():
+    assert 1.0 in _rule_values()
+    text = (SRC / "notam_area.py").read_text(encoding="utf-8")
+    assert "RULES.reader_area_slack_nm" in text
+    floats = [n.value for n in ast.walk(ast.parse(text)) if isinstance(n, ast.Constant) and isinstance(n.value, float)]
+    assert floats == [], "notam_area.py holds a float literal"
+
+
+def _planted_hits(source: str, filename: str) -> list[float]:
+    return [value for _, value in hard_coded_rule_values(Path(filename), ast.parse(source), _rule_values())]
+
+
+def test_the_narrowed_scan_still_flags_a_planted_limit_outside_geo_py():
+    """F6 planted check: 1000 is cape_no_go. The geo.py exemption is for METRES_PER_KM = 1000 in geo.py only."""
+    assert _planted_hits("limit = 1000\n", "notam_area.py") == [1000]
+    assert _planted_hits("METRES_PER_KM = 1000\n", "notam_area.py") == [1000]  # same name, wrong file
+    assert _planted_hits("limit = 1000\n", "geo.py") == [1000]  # right file, not a reviewed name
+    assert _planted_hits("METRES_PER_KM = 1000\n", "geo.py") == []
+    assert _planted_hits("MIN_POLYGON_POINTS = 3\nMETRES_PER_KM = 1000\n", "geo.py") == []
+    assert _planted_hits("MIN_POLYGON_POINTS = 4\n", "geo.py") == [4]  # a reviewed name holding another rules value
+    assert _planted_hits("retries = 3\n", "pib.py") == [3]
+    assert {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3} == REVIEWED_NAMED_CONSTANTS
+
+
+def test_the_narrowed_scan_exempts_structural_zero_and_one_only():
+    """Slack is 1.0, so 1 would flag everywhere without the exemption; 1.5 is not a rule value, and 2 still is (local_area)."""
+    assert _planted_hits("e = 1 - WGS84_E2\nzero = 0\nx = 1.0\n", "geo.py") == []
+    assert _planted_hits("slack = 2.0\nlimit = -2\n", "notam_area.py") == [2.0, 2]
+    assert 1.5 not in _rule_values()  # so the equals scan above cannot see a planted slack of 1.5; the reviewed-literal scan below does
+
+
+def test_a_planted_slack_of_1_5_is_flagged_in_every_reader_module():
+    """F6 planted check: the reviewed-literal scan flags `slack = 1.5` in notam_area.py, redact.py and the script (not only geo.py)."""
+    planted = ast.parse("slack = 1.5\n")
+    for name in READER_REVIEWED_LITERALS:
+        assert [v for _, v in unreviewed_literals(Path(name), planted)] == [1.5], name
+    assert [v for _, v in unreviewed_literals(Path("notam_area.py"), ast.parse("slack = 40\nunit = 60\n"))] == [40]  # 40 is reviewed for the script only
+
+
+def _relative(path: Path) -> str:
+    return path.relative_to(SRC).as_posix()
+
+
+def test_a_planted_slack_of_1_5_is_flagged_in_every_module_under_src():
+    """F6 planted check, whole tree: the float scan flags `slack = 1.5` in each real module, not only the reader's."""
+    planted = ast.parse("slack = 1.5\n")
+    assert PY_FILES
+    for path in PY_FILES:
+        assert [v for _, v in unreviewed_floats(_relative(path), planted)] == [1.5], path
+    # Appended to the real source of a module that holds no float of its own, it is the only hit.
+    pib = SRC / "pib.py"
+    appended = ast.parse(pib.read_text(encoding="utf-8") + "\nslack = 1.5\n")
+    assert [v for _, v in unreviewed_floats("pib.py", appended)] == [1.5]
+    # Appended to a module with reviewed floats, the reviewed ones stay quiet and 1.5 is still caught.
+    geo = ast.parse((SRC / "geo.py").read_text(encoding="utf-8") + "\nslack = 1.5\n")
+    assert [v for _, v in unreviewed_floats("geo.py", geo)] == [1.5]
+    # A reviewed value is reviewed for its own module only.
+    assert [v for _, v in unreviewed_floats("pib.py", ast.parse("x = 3.280839895\n"))] == [3.280839895]
+
+
+@pytest.mark.parametrize("path", PY_FILES, ids=_relative)
+def test_every_float_literal_under_src_is_zero_one_or_reviewed(path):
+    assert unreviewed_floats(_relative(path), _parse(path)) == []
+
+
+def test_every_reviewed_float_is_still_used():
+    """A reviewed entry that no longer matches a literal is stale; drop it."""
+    for relative, reviewed in REVIEWED_FLOATS.items():
+        path = SRC / relative
+        assert path.is_file(), relative
+        used = {abs(v) for v in (number(n) for n in ast.walk(_parse(path))) if isinstance(v, float)}
+        assert set(reviewed) <= used, f"{relative}: stale reviewed floats {set(reviewed) - used}"
+        assert all(reviewed.values()), f"{relative}: a reviewed float has no reason"
+
+
+@pytest.mark.parametrize("name", sorted(READER_REVIEWED_LITERALS))
+def test_every_numeric_literal_in_a_reader_module_is_zero_one_or_reviewed(name):
+    path = ROOT / "scripts" / name if name.startswith("build_") else SRC / name
+    assert path.is_file(), path
+    assert unreviewed_literals(path, _parse(path)) == []
+    assert hard_coded_rule_values(path, _parse(path), _rule_values()) == []  # the script is not under src/, so the equals scan has not seen it
 
 
 def test_f3_scan_catches_a_planted_literal():
@@ -222,26 +375,47 @@ def _tracked_files() -> list[str]:
     return out.splitlines()
 
 
-def test_no_key_value_in_tracked_files():
-    tracked = _tracked_files()
-    assert ".env.example" in tracked
-    assert ".env" not in tracked
-    key_with_value = re.compile(r"OPENAIP_API_KEY[ \t]*=[ \t]*[^\s#]")
-    for name in tracked:
-        path = ROOT / name
+API_KEY_WITH_VALUE = re.compile(r"\b([A-Z0-9_]*API_KEY)[ \t]*=[ \t]*[^\s#]")  # OPENAIP_API_KEY, READER_API_KEY, any *_API_KEY
+
+
+def _files_with_a_key_value(root: Path, names: list[str]) -> list[str]:
+    """'<file>: <NAME>' for every file that holds a *_API_KEY set to something."""
+    found = []
+    for name in names:
+        path = root / name
         if not path.is_file():
             continue
         try:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
-        assert not key_with_value.search(text), f"{name} has an OPENAIP_API_KEY value"
+        match = API_KEY_WITH_VALUE.search(text)
+        if match:
+            found.append(f"{name}: {match.group(1)}")
+    return found
+
+
+def test_no_key_value_in_tracked_files():
+    tracked = _tracked_files()
+    assert ".env.example" in tracked
+    assert ".env" not in tracked
+    assert _files_with_a_key_value(ROOT, tracked) == []
+
+
+def test_the_key_scan_catches_a_planted_reader_key_and_ignores_an_empty_one(tmp_path):
+    # Split so this file never matches its own scan.
+    (tmp_path / "planted.env").write_text("READER_API_" + "KEY=sk-not-a-real-key\n", encoding="utf-8")
+    (tmp_path / "other.env").write_text("OPENAIP_API_" + "KEY=abc123\n", encoding="utf-8")
+    (tmp_path / "empty.env").write_text("READER_API_" + "KEY=\nREADER_API_" + "KEY= # unset\n", encoding="utf-8")
+    names = ["planted.env", "other.env", "empty.env", "missing.env"]
+    assert _files_with_a_key_value(tmp_path, names) == ["planted.env: READER_API_KEY", "other.env: OPENAIP_API_KEY"]
 
 
 def test_env_is_gitignored_and_example_is_empty():
     ignored = subprocess.run(["git", "check-ignore", ".env"], cwd=ROOT, capture_output=True, text=True)
     assert ignored.returncode == 0
-    assert (ROOT / ".env.example").read_text(encoding="utf-8").strip() == "OPENAIP_API_" + "KEY="  # split so this file never matches the F6 scan
+    expected = ["OPENAIP_API_" + "KEY=", "READER_PROVIDER=", "READER_BASE_URL=", "READER_API_" + "KEY=", "READER_MODEL="]  # split so this file never matches the F6 scan
+    assert (ROOT / ".env.example").read_text(encoding="utf-8").splitlines() == expected
 
 
 # F7: plain modules and functions.
@@ -253,9 +427,9 @@ def test_contract_classes_subclass_only_basemodel_or_enum():
 
 
 def test_no_registry_di_or_caching_in_source():
-    pattern = re.compile(r"lru_cache|functools\.cache|\bcache\b|registry|Registry|\binject\b|Provider\b")
+    """Narrowed for the reader (ticket 3 F2): only src/flysafelz/reader/ may use the word `cache`. test_reader_cache_fence.py shows a planted one elsewhere is still caught."""
     for path in PY_FILES:
-        assert not pattern.search(path.read_text(encoding="utf-8")), path
+        assert banned_words(path, READER) == [], path
 
 
 # F8: limits and the local area cannot be adjusted by the user.
@@ -281,12 +455,11 @@ def test_rules_module_and_cli_read_no_environment():
         assert not re.search(r"environ|getenv", text), name
 
 
-# F10: no LLM env vars, no /models dependency.
+# F10: no LLM env vars, no /models dependency. Narrowed for the reader (ticket 3 F2): only src/flysafelz/reader/ may name READER_*.
+# test_reader_fence.py shows a planted READER_ or /models string outside it is still caught.
 def test_no_llm_env_vars_or_models_endpoint_in_source():
-    pattern = re.compile(r"OPENAI(?!P_API_KEY)|ANTHROPIC|LLM_|MODEL_|/models")
     for path in PY_FILES:
-        match = pattern.search(path.read_text(encoding="utf-8"))
-        assert match is None, f"{path}: {match.group(0) if match else ''}"
+        assert llm_env_words(path, READER) == [], path
 
 
 # F4 / F7 / F1 (PR-4.F1): `# why` and the ignored block are comments only; no answer text; the draft is model-free.

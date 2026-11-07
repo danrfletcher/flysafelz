@@ -237,7 +237,11 @@ class Exemption(BaseModel):
 
 
 class NotamReading(BaseModel):
-    """The semantic fields a reader fills (ticket 3), or a fixture writes by hand."""
+    """The semantic fields a reader fills (ticket 3), or a fixture writes by hand.
+
+    floor and ceiling are the heights the E text states. None means the E text states none: notam_action() then
+    uses F/G, then the Q-line.
+    """
 
     model_config = STRICT
 
@@ -245,8 +249,8 @@ class NotamReading(BaseModel):
     category: Category
     activity: str
     geometry: Annotated[Circle | Polygon, Field(discriminator="kind")] | None = None  # None: use the Q-circle
-    floor: Limit
-    ceiling: Limit
+    floor: Limit | None  # as the E text states it; None: E states none
+    ceiling: Limit | None  # as the E text states it; None: E states none
     schedule: str  # D-item text, normalised
     applies_to: AppliesTo = AppliesTo.ALL_AIRCRAFT
     exemptions: list[Exemption] = Field(default_factory=list)

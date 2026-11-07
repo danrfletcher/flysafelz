@@ -2,7 +2,10 @@
 
 from datetime import UTC, datetime
 
+from pathlib import Path
+
 import pytest
+import yaml
 from pydantic import ValidationError
 
 from flysafelz.contracts import (
@@ -27,6 +30,7 @@ from flysafelz.contracts import (
     display_verdict,
 )
 
+ROOT = Path(__file__).resolve().parents[2]
 T0 = datetime(2026, 10, 31, 8, 0, tzinfo=UTC)
 T1 = datetime(2026, 10, 31, 9, 0, tzinfo=UTC)
 
@@ -92,6 +96,31 @@ def test_notam_reading_round_trips():
     assert reading.contact.value == "07784 546062"
     again = NotamReading.model_validate_json(reading.model_dump_json())
     assert again == reading
+
+
+def test_notam_reading_accepts_null_limits_and_still_requires_them_to_be_stated():
+    data = {**h7171_reading(), "floor": None, "ceiling": None}
+    reading = NotamReading.model_validate(data)
+    assert reading.floor is None and reading.ceiling is None
+    assert NotamReading.model_validate_json(reading.model_dump_json()) == reading
+    for side in ("floor", "ceiling"):
+        missing = {k: v for k, v in h7171_reading().items() if k != side}
+        with pytest.raises(ValidationError):
+            NotamReading.model_validate(missing)  # None must be said, not left out
+    with pytest.raises(ValidationError):
+        NotamReading.model_validate({**h7171_reading(), "floor": {"value": 0, "unit": "ft"}})
+
+
+@pytest.mark.parametrize("case", ["blue_mill_2026-10-31", "west_sleekburn_2026-10-31"])
+def test_every_committed_readings_yaml_still_loads_with_its_limits_unchanged(case):
+    path = ROOT / "fixtures" / case / "readings.yaml"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    readings = [NotamReading.model_validate(item) for item in data]
+    assert len(readings) == len(data)
+    for item, reading in zip(data, readings, strict=True):
+        assert reading.floor is not None and reading.ceiling is not None
+        assert reading.floor.model_dump(mode="json") == item["floor"] and reading.ceiling.model_dump(mode="json") == item["ceiling"]
+    assert len(readings) == (2 if case.startswith("blue") else 0)
 
 
 def test_assessment_round_trips():

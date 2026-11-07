@@ -1,0 +1,1877 @@
+# NOTAM reader labelling sheet: 40 real NOTAMs from the 4 archived PIBs, in priority order.
+# Built by scripts/build_reader_items.py from evals/reader/selection.yaml and evals/reader/pibs/. This repo copy is never
+# edited by hand and never holds labels: you fill the `label:` blocks in the vault copy, and Vector adds your labels to the
+# repo afterwards, keyed by id and e_hash (a label whose e_hash no longer matches is stale).
+# Ranks 1-24 cover each of the 24 types once; ranks 25-40 give a second example of the types of ranks 1-16, in the same
+# order. Stopping at rank 24 still covers every type.
+#
+# E is the NOTAM text as published, with each phone number replaced by <PHONE_n> (numbered per NOTAM) and the spaces at
+# the ends of lines removed.
+# The coded fields are what code parsed. `area` is what code built from E: a circle, a polygon, or the Q-circle when E
+# gives no usable shape. You label what the NOTAM says, never a geometry: there is no geometry key.
+#
+# Datum rule: when E gives a height twice (for example 400FT AGL and 534FT AMSL), label the AMSL value.
+#
+# Fill each `label:` block: category, activity, floor, ceiling, applies_to, exemptions, contact, activates_designators,
+# prohibitive_reason.
+
+items:
+  - rank: 1
+    id: "J1458/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "rat_all_aircraft_paramotor_trap"
+    e: |-
+      RESTRICTED AREA (TEMPORARY) ACTIVATED (DUXFORD).
+      WI 2.2NM RADIUS OF PSN 520528N 0000757E.
+      APPLIES TO ALL ACFT INCLUDING ANY SMALL BALLOON, ANY KITE, ANY
+      UAS AND ANY PARACHUTE INCLUDING A PARASCENDING PARACHUTE OR
+      PARAMOTOR. DOES NOT APPLY TO ANY ACFT FLYING IN ACCORDANCE WITH
+      EXCEPTIONS STATED IN THE AIC. AIC M057/2026 WITH CHART, REFERS.
+      FURTHER DETAILS WWW.NATS.AERO/AIS.
+      RESTRICTION OF FLYING REGULATIONS MADE UNDER ARTICLE 239 OF THE
+      AIR NAV ORDER 2016. AR-2026-2110/01.
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QRTCA"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 45
+        lat: 52.083333333333336
+        lon: 0.13333333333333333
+        radius_nm: 3.0
+      a: "EGSU"
+      b: "2026-07-03T10:00Z"
+      c: "2026-07-05T17:00Z"
+      d: "1000-1700"
+      f: "SFC"
+      g: "4500FT AMSL"
+    area:
+      source: "E text: 2.2 NM radius round one point"
+      kind: "circle"
+      lat: 52.09111111111111
+      lon: 0.1325
+      radius_nm: 2.2
+    e_hash: "1cf44507a93cb600db19e98c703a980a85dc1d3ed1edb5afc04d99380928ef55"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 2
+    id: "J1927/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "rat_uas_only"
+    e: |-
+      RESTRICTED AREA (TEMPORARY) ACTIVATED TO UAS ONLY FOR SOUTHERN 100
+      ROAD RACES. AREA BOUNDED BY A CIRCLE RADIUS 2000M CENTRED ON PSN
+      540515N 0043949W (CASTLETOWN, ISLE OF MAN). RESTRICTION OF FLYING
+      REGULATIONS HAVE BEEN MADE UNDER SECTION 11H OF THE AIRPORTS AND
+      CIVIL AVIATION ACT 1987.NO SMALL UNMANNED AIRCRAFT IS TO BE FLOWN WI
+      THE RA(T) EXCEPT WITH THE PERMISSION OF ISLE OF MAN CIVIL AVIATION
+      ADMINISTRATION. AIC M024/2026 REFERS. FOR INFO CTC ISLE OF MAN CAA
+      EMAIL CAA(AT)GOV.IM OR PHONE <PHONE_1> OR RONALDSWAY ATC PHONE
+      <PHONE_2>
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QRTCA"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 20
+        lat: 54.083333333333336
+        lon: -4.666666666666667
+        radius_nm: 2.0
+      a: "EGNS"
+      b: "2026-07-06T16:30Z"
+      c: "2026-07-09T15:45Z"
+      d: "06 1630-2040, 07 1630-2040, 08 0815-1050 1630-2040, 09 0800-1545"
+      f: "SFC"
+      g: "2000FT AMSL"
+    area:
+      source: "E text: 1.08 NM radius round one point"
+      kind: "circle"
+      lat: 54.087500000000006
+      lon: -4.663611111111112
+      radius_nm: 1.079913606911447
+    e_hash: "d0f3da9c98589a5f44e9b6124f134ce2815738cbd83f2d9514f8aee33147c4c7"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 3
+    id: "J1874/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "tda_trigger_by_place"
+    e: |-
+      TRIGGER NOTAM - AIP SUP 066/2026 WEF 25 JUN 2026 UNTIL 30 NOV
+      2026. TEMPORARY DANGER AREA (SNAIZEHOLME, YORKSHIRE DALES) BVLOS UAS
+      OPERATIONS TRIAL, 25 JUNE - 30 NOVEMBER 2026
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QRDTT"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 70
+        lat: 54.266666666666666
+        lon: -2.2666666666666666
+        radius_nm: 1.0
+      a: "EGTT"
+      b: "2026-06-25T00:00Z"
+      c: "2026-07-08T23:59Z"
+      d:
+      f: "SFC"
+      g: "7000FT AMSL"
+    area:
+      source: "Q-circle: no coordinates in the E text"
+      kind: "q_circle"
+      lat: 54.266666666666666
+      lon: -2.2666666666666666
+      radius_nm: 1.0
+    e_hash: "6e6d8db873f8b280d89c4b04ed0c138372b956c7eb0d4777a61eac284ff874d4"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 4
+    id: "J3857/26"
+    sha: "bdab14658f0270dc41460eebcd03332abfb230ec"
+    type: "tda_with_designator"
+    e: |-
+      TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026
+      REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI
+      THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE
+      (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR
+      LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC
+      OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS.
+      AR-2026-7404/05.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QRDCA"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 13
+        lat: 53.93333333333333
+        lon: 0.016666666666666666
+        radius_nm: 10.0
+      a: "EGTT"
+      b: "2026-10-31T08:00Z"
+      c: "2026-10-31T18:00Z"
+      d:
+      f: "SFC"
+      g: "1300FT AMSL"
+    area:
+      source: "Q-circle: no coordinates in the E text"
+      kind: "q_circle"
+      lat: 53.93333333333333
+      lon: 0.016666666666666666
+      radius_nm: 10.0
+    e_hash: "33073a5c37f3241f9837a65743b8c4620eb2daee896490ec189ef1d54adb5f90"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 5
+    id: "H7171/26"
+    sha: "bdab14658f0270dc41460eebcd03332abfb230ec"
+    type: "drone_ops_with_phone"
+    e: |-
+      UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT
+      700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWULW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 8
+        lat: 53.8
+        lon: -0.08333333333333333
+        radius_nm: 1.0
+      a: "EGTT"
+      b: "2026-10-29T08:00Z"
+      c: "2026-11-10T18:00Z"
+      d: "0800-1800"
+      f: "SFC"
+      g: "800FT AMSL"
+    area:
+      source: "E text: 0.5 NM radius round one point"
+      kind: "circle"
+      lat: 53.79222222222222
+      lon: -0.08305555555555555
+      radius_nm: 0.5
+    e_hash: "096d4d19adf4143986e294ad94f200a688d3d3fe7ffbd89dff3c5069bd97f028"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 6
+    id: "H2999/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "model_flying"
+    e: |-
+      FLYING OF LARGE MODEL ACFT WI 0.3NM RADIUS OF 504838N 0005525W
+      (THORNEY ISLAND).  FOR INFO <PHONE_1> / <PHONE_2>.
+      AR-2026-4778/01.
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QWULW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 13
+        lat: 50.81666666666667
+        lon: -0.9166666666666666
+        radius_nm: 1.0
+      a: "EGTT"
+      b: "2026-06-13T09:00Z"
+      c: "2026-08-30T17:00Z"
+      d: "SAT-SUN 0900-1700"
+      f: "SFC"
+      g: "1300FT AMSL"
+    area:
+      source: "E text: 0.3 NM radius round one point"
+      kind: "circle"
+      lat: 50.81055555555555
+      lon: -0.923611111111111
+      radius_nm: 0.3
+    e_hash: "cb8122d747b8855d9e7072914937f79ef126c50aeb32076ad387bf938b4b3d77"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 7
+    id: "H1910/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "parachuting"
+    e: |-
+      PJE WI 2NM RADIUS OF 513342N 0015055W (SWINDON). DROP HGT SUBJ
+      ATC CLR. FOR INFO <PHONE_1> / <PHONE_2>. AR-2026-3221/01.
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QWPLW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 56
+        lat: 51.56666666666667
+        lon: -1.85
+        radius_nm: 3.0
+      a: "EGTT"
+      b: "2026-07-04T14:45Z"
+      c: "2026-07-04T15:15Z"
+      d:
+      f: "SFC"
+      g: "5600FT AMSL"
+    area:
+      source: "E text: 2 NM radius round one point"
+      kind: "circle"
+      lat: 51.56166666666666
+      lon: -1.8486111111111112
+      radius_nm: 2.0
+    e_hash: "0ed128534e1bbd71e71c4b4f7d5505d286c42d53bc009d6a174a5e24cd5f6899"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 8
+    id: "H2986/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "tethered_balloon"
+    e: |-
+      HOT AIR BALLOON EVENT/FESTIVAL AT 504317N 0022528W (STINSFORD).
+      UP TO 5 TETHERED HOT AIR BALLOONS ARE PARTICIPATING INCLUDING
+      NIGHT GLOWS. PILOTS ARE REQUESTED TO EXER CTN IN THE VCY. FOR
+      INFO <PHONE_1> / <PHONE_2>. AR-2026-4369/01.
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QWCLW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 6
+        lat: 50.71666666666667
+        lon: -2.4166666666666665
+        radius_nm: 1.0
+      a: "EGTT"
+      b: "2026-07-04T17:00Z"
+      c: "2026-07-04T21:30Z"
+      d: "1700-1800 2050-2130"
+      f: "SFC"
+      g: "600FT AMSL"
+    area:
+      source: "Q-circle: 1 point and no radius"
+      kind: "q_circle"
+      lat: 50.71666666666667
+      lon: -2.4166666666666665
+      radius_nm: 1.0
+    e_hash: "7c2db05de8b894ae0d4797ceb13a8b2dc683bf91b53330da842ae0ddadaf2667"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 9
+    id: "H3442/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "glider_winch_launching"
+    e: |-
+      GLIDER ACTIVITY WITH WINCH LAUNCH WI 2NM RADIUS 512628N 0021645W
+      (COLERNE AIRFIELD). MAX HGT 3000FT AGL. FOR INFO <PHONE_1>.
+      AR-2026-2120/04.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWGLW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 37
+        lat: 51.43333333333333
+        lon: -2.283333333333333
+        radius_nm: 3.0
+      a: "EGUO"
+      b: "2026-06-29T03:55Z"
+      c: "2026-09-24T18:03Z"
+      d: "SAT SUN SR-SS, 31 AUG SR-SS"
+      f: "SFC"
+      g: "3700FT AMSL"
+    area:
+      source: "E text: 2 NM radius round one point"
+      kind: "circle"
+      lat: 51.441111111111105
+      lon: -2.279166666666667
+      radius_nm: 2.0
+    e_hash: "418977e1fc56c454bd39f55f26fe3a99ece2170b7a48232faeffb8be306d5a08"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 10
+    id: "H5759/26"
+    sha: "27e0709e518b8ee56fe79ff5975abd4c8da7bfd4"
+    type: "air_display_fly_in"
+    e: |-
+      AREA OF INTENSE AERIAL ACTIVITY DUE TO FLY-IN WI 5NM RADIUS OF
+      522656N 0010748E (TIBENHAM). PPR REQUIRED. SEE WEBSITE
+      WWW.FLYPFA.CO.UK. CTC CH 118.930. FOR INFO <PHONE_1> /
+      <PHONE_2>. AR-2026-8280/01.
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QXXLW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 18
+        lat: 52.45
+        lon: 1.1333333333333333
+        radius_nm: 6.0
+      a: "EGTT"
+      b: "2026-09-19T05:00Z"
+      c: "2026-09-19T21:00Z"
+      d:
+      f: "SFC"
+      g: "1800FT AMSL"
+    area:
+      source: "E text: 5 NM radius round one point"
+      kind: "circle"
+      lat: 52.44888888888889
+      lon: 1.1300000000000001
+      radius_nm: 5.0
+    e_hash: "72038e8901d892d56fb1155b250d4c6c9dd11143472d3538ef9667cef10ece1d"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 11
+    id: "I5452/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "aerodrome_drone"
+    e: |-
+      UAS OPR WI 0.05NM RADIUS OF 545854N 0013722W (ROYAL VICTORIA
+      INFIRMARY, NEWCASTLE UPON TYNE). MAX HGT 394FT AGL 700FT AMSL. FOR
+      INFO <PHONE_1> / <PHONE_2>. AR-2026-7262/01.
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QFAXX"
+        fir: "EGPX"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "A"
+        lower_fl: 0
+        upper_fl: 999
+        lat: 55.03333333333333
+        lon: -1.6833333333333333
+        radius_nm: 5.0
+      a: "EGNT"
+      b: "2026-08-22T08:00Z"
+      c: "2026-08-22T11:00Z"
+      d:
+      f:
+      g:
+    area:
+      source: "E text: 0.05 NM radius round one point"
+      kind: "circle"
+      lat: 54.98166666666667
+      lon: -1.6227777777777779
+      radius_nm: 0.05
+    e_hash: "76a5c4ddeb022f827b32b1e313fb323bd2008a3cf9ddd4c97f3e034a6de19829"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 12
+    id: "I2608/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "aerodrome_fireworks_laser"
+    e: |-
+      LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION
+      PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO
+      <PHONE_1>. AR-2026-2098/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QFAXX"
+        fir: "EGPX"
+        traffic: "IV"
+        purpose: "NBO"
+        scope: "A"
+        lower_fl: 0
+        upper_fl: 999
+        lat: 55.03333333333333
+        lon: -1.6833333333333333
+        radius_nm: 5.0
+      a: "EGNT"
+      b: "2026-07-10T22:00Z"
+      c: "2026-07-11T22:00Z"
+      d: "10 2200-0400, 11 2000-2200"
+      f:
+      g:
+    area:
+      source: "E text: 1 NM radius round one point"
+      kind: "circle"
+      lat: 54.984722222222224
+      lon: -1.6155555555555556
+      radius_nm: 1.0
+    e_hash: "e465dbda2d7e3fbfaf6ac5ad366e33cb79260461630b7479cf71d43391a9054a"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 13
+    id: "L3361/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "aerodrome_users_only"
+    e: |-
+      PPR MANDATORY. NO OTHER VISITORS ACCEPTED. SPECIAL JOINING
+      PROCEDURES IN PLACE. SEE SLEAPKOSH.CO.UK.
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QFALT"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "NBO"
+        scope: "A"
+        lower_fl: 0
+        upper_fl: 999
+        lat: 52.833333333333336
+        lon: -2.7666666666666666
+        radius_nm: 5.0
+      a: "EGCV"
+      b: "2026-07-10T08:00Z"
+      c: "2026-07-12T16:00Z"
+      d:
+      f:
+      g:
+    area:
+      source: "Q-circle: no coordinates in the E text"
+      kind: "q_circle"
+      lat: 52.833333333333336
+      lon: -2.7666666666666666
+      radius_nm: 5.0
+    e_hash: "cc7c9e149e0a93816eb1b81baf12d469988a50c5c72eb3baad7ff890b0d95db5"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 14
+    id: "C3808/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "crane_obstacle"
+    e: |-
+      LIT CRANE OPR 522848N 0014259W (81 DEG MAG 3624 FM BIRMINGHAM ARP)
+      MAX HGT 147FT AGL / 479FT AMSL
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QOBCE"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "AE"
+        lower_fl: 0
+        upper_fl: 5
+        lat: 52.483333333333334
+        lon: -1.7166666666666668
+        radius_nm: 1.0
+      a: "EGBB"
+      b: "2026-06-09T00:00Z"
+      c: "2026-09-05T23:59Z"
+      d:
+      f:
+      g:
+    area:
+      source: "Q-circle: 1 point and no radius"
+      kind: "q_circle"
+      lat: 52.483333333333334
+      lon: -1.7166666666666668
+      radius_nm: 1.0
+    e_hash: "611fa13bfd825eb1ebef649ac0f3576ad4c3dd3639887a0418c5163ca1eb8f8d"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 15
+    id: "B1042/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "tmz"
+    e: |-
+      EMERG TRANSPONDER MANDATORY ZONE INSTALLED WI AREA BOUNDED BY:
+      551137N 0040215W - 550606N 0040838W - 550312N 0040022W -
+      550858N 0035443W - 551137N 0040215W, BTN SFC/FL195 DUE TO LOWTHER
+      PRIMARY RADAR MAINT. ALL ACFT OPR WI THIS AREA IN CONTROLLED
+      AIRSPACE ARE REQ TO OPR A SVCBL TRANSPONDER.
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QAFXX"
+        fir: "EGPX"
+        traffic: "IV"
+        purpose: "NBO"
+        scope: "E"
+        lower_fl: 0
+        upper_fl: 195
+        lat: 55.11666666666667
+        lon: -4.033333333333333
+        radius_nm: 5.0
+      a: "EGPX"
+      b: "2026-07-13T00:00Z"
+      c: "2026-10-12T23:59Z"
+      d:
+      f:
+      g:
+    area:
+      source: "E text: polygon of 4 points"
+      kind: "polygon"
+      points:
+        - [55.19361111111111, -4.0375]
+        - [55.10166666666667, -4.143888888888889]
+        - [55.05333333333333, -4.006111111111111]
+        - [55.14944444444444, -3.9119444444444444]
+    e_hash: "f100d393bed2f2dd1ff0ccd51a0b039417eb57abb70e174412f8433bbd834e52"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 16
+    id: "Q74/26"
+    sha: "bdab14658f0270dc41460eebcd03332abfb230ec"
+    type: "military_exercise_series_q"
+    e: |-
+      EXER TALON STORM. MULTIPLE HEL WILL CONDUCT HIGH ENERGY
+      MANOEUVRES WI 5NM RADIUS OF 525741N 0003325W (ANCASTER). ACFT MAY BE
+      UNABLE TO COMPLY WITH RAC. FOR INFO <PHONE_1>. AR-2026-9711/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWELW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 10
+        lat: 52.96666666666667
+        lon: -0.55
+        radius_nm: 6.0
+      a: "EGYE"
+      b: "2026-11-03T15:15Z"
+      c: "2026-11-03T15:30Z"
+      d:
+      f: "SFC"
+      g: "1000FT AMSL"
+    area:
+      source: "E text: 5 NM radius round one point"
+      kind: "circle"
+      lat: 52.96138888888889
+      lon: -0.5569444444444445
+      radius_nm: 5.0
+    e_hash: "5e0166df1112c216c751d6ee37e81893537412431887ac0a09394eb938664205"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 17
+    id: "U5777/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "multi_height_agl_amsl"
+    e: |-
+      UAS OPR 0.8 NM RADIUS OF PSN 531500N 0043230W (RAF VALLEY)
+      394FT AGL / 424FT AMSL FOR MORE INFO CTC <PHONE_1>
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWULW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 5
+        lat: 53.25
+        lon: -4.55
+        radius_nm: 2.0
+      a: "EGOV"
+      b: "2026-07-04T13:00Z"
+      c: "2026-07-04T16:00Z"
+      d:
+      f: "SFC"
+      g: "424FT AMSL"
+    area:
+      source: "E text: 0.8 NM radius round one point"
+      kind: "circle"
+      lat: 53.25
+      lon: -4.541666666666667
+      radius_nm: 0.8
+    e_hash: "e4346ceb78f48c69604e73e252644f9d7156f2ba483050feb188a13772dd95d7"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 18
+    id: "A2410/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "polygon_area"
+    e: |-
+      UAS OPR WI AREA BOUNDED BY:
+      523733N 0011411E - 523732N 0011453E - 523652N 0011443E -
+      523711N 0011406E - 523716N 0011403E - 523733N 0011411E (EARLHAM).
+      MAX HGT 400FT AGL. FOR INFO <PHONE_1>. AR-2026-5532/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWULW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 6
+        lat: 52.61666666666667
+        lon: 1.25
+        radius_nm: 1.0
+      a: "EGSH"
+      b: "2026-07-09T10:00Z"
+      c: "2026-07-09T16:00Z"
+      d:
+      f: "SFC"
+      g: "600FT AMSL"
+    area:
+      source: "E text: polygon of 5 points"
+      kind: "polygon"
+      points:
+        - [52.62583333333333, 1.236388888888889]
+        - [52.62555555555556, 1.2480555555555557]
+        - [52.614444444444445, 1.245277777777778]
+        - [52.61972222222222, 1.235]
+        - [52.62111111111111, 1.2341666666666666]
+    e_hash: "c3bc7bcece60e7612e8a0a943545cf7ee9ad10522a0d3c6c7fabdbee06240f2b"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 19
+    id: "L3350/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "radius_in_metres"
+    e: |-
+      CRANE OPR WI 185M RADIUS PSN 505223N 0004407W (47DEG MAG, 2259M FM
+      GOODWOOD ARP), MAX HGT 204FT AMSL, 98FT AGL
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QOBCE"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "AE"
+        lower_fl: 0
+        upper_fl: 3
+        lat: 50.86666666666667
+        lon: -0.7333333333333333
+        radius_nm: 1.0
+      a: "EGHR"
+      b: "2026-06-08T07:00Z"
+      c: "2028-06-30T16:00Z"
+      d: "0700-1600"
+      f:
+      g:
+    area:
+      source: "E text: 0.09989 NM radius round one point"
+      kind: "circle"
+      lat: 50.87305555555555
+      lon: -0.7352777777777777
+      radius_nm: 0.09989200863930886
+    e_hash: "6d5826a1014071ce2ac0985a486aaf2e4c3de45105742c90bfc43a496956c3dd"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 20
+    id: "D2637/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "no_coordinates_in_e"
+    e: "DANGER AREA EGD208 STANFORD ACTIVATED"
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QRDCA"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 75
+        lat: 52.5
+        lon: 0.7666666666666667
+        radius_nm: 5.0
+      a: "EGTT"
+      b: "2026-06-30T09:00Z"
+      c: "2026-07-17T16:00Z"
+      d: "MON-FRI 0900-1600"
+      f: "SFC"
+      g: "7500FT AMSL"
+    area:
+      source: "Q-circle: no coordinates in the E text"
+      kind: "q_circle"
+      lat: 52.5
+      lon: 0.7666666666666667
+      radius_nm: 5.0
+    e_hash: "4f7c2a23374f6a68d873ebb89e8638d66ff4f38342bdb72e416df011e849a512"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 21
+    id: "J2831/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "radio_only_contact"
+    e: |-
+      TEMPO DANGER AREA (TDA) EGD789A ACTIVATED. AIP SUP 080/2026
+      REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI
+      THE TDA. A SPECIAL USE AIRSPACE CROSSING SERVICE (SUACS) WILL BE
+      AVBL FM ABERDEEN RADAR FREQ 134.100, 135.175 OR 132.550MHZ. A
+      SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL
+      BE AVBL FM SCOTTISH INFO FREQ 134.850MHZ. FOR INFO AND BOOKING
+      CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING SCOTT.
+      AR-2026-4768/99.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QRDCA"
+        fir: "EGPX"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 13
+        lat: 57.38333333333333
+        lon: -1.7333333333333334
+        radius_nm: 6.0
+      a: "EGPX"
+      b: "2026-08-22T08:00Z"
+      c: "2026-08-22T20:00Z"
+      d:
+      f: "SFC"
+      g: "1300FT AMSL"
+    area:
+      source: "Q-circle: no coordinates in the E text"
+      kind: "q_circle"
+      lat: 57.38333333333333
+      lon: -1.7333333333333334
+      radius_nm: 6.0
+    e_hash: "d731644b065bc1f0f20e7d5e313504bc62651161c7b8c53a26b9479ea6498363"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 22
+    id: "C3856/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "email_contact"
+    e: |-
+      OBST LGT U/S AT PSN 512354N 0023739W (SOUTH OF BISHOPSWORTH).
+      OBST TYPE TOWER, HGT 200FT AGL/900FT AMSL. FOR INFO <PHONE_1>
+      OR LIGHTING(AT)THINKDELTA.COM. AR-2026-4942/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QOLAS"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "AE"
+        lower_fl: 0
+        upper_fl: 9
+        lat: 51.4
+        lon: -2.6333333333333333
+        radius_nm: 1.0
+      a: "EGGD"
+      b: "2026-06-10T10:11Z"
+      c: "2026-07-09T11:00Z"
+      d:
+      f:
+      g:
+    area:
+      source: "Q-circle: 1 point and no radius"
+      kind: "q_circle"
+      lat: 51.4
+      lon: -2.6333333333333333
+      radius_nm: 1.0
+    e_hash: "12ada05570d3b0a0af33b43fb359baac939455afe5a4dcfff2e67a76728e17f4"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 23
+    id: "J1974/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "emergency_services_exemption"
+    e: |-
+      TEMPO RESERVED AREA (TRA) EGTR196 ACTIVATED WI AREA BOUNDED BY:
+      513004N 0000712W - 513014N 0000510W - 513003N 0000508W -
+      512952N 0000714W - 513004N 0000712W (SOUTHWARK). BEYOND VISUAL LINE
+      OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TRA. EMERG SER AND MIL OPS
+      REQUIRING IMMEDIATE ACCESS TO THE TRA SHOULD CONTACT HEATHROW RADAR
+      ON 125.625MHZ. FOR OTHER CREWED ACFT OR VISUAL LINE OF SIGHT OPS
+      ACCESS, CONTACT THE OPERATOR 72 HOURS PRIOR TO OPS COMMENCING ON <PHONE_1> OR VIA EMAIL TO FLIGHTOPS.UK(AT)MATTERNET.COM. FURTHER
+      DETAILS VIA: WWW.NATS-UK.EAD-IT.COM/. AIC Y006/2026 REFERS.
+      AR-2024-3782/00.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QRMCA"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 5
+        lat: 51.5
+        lon: -0.1
+        radius_nm: 1.0
+      a: "EGLC"
+      b: "2026-07-06T08:00Z"
+      c: "2026-07-06T15:00Z"
+      d:
+      f: "SFC"
+      g: "450FT AMSL"
+    area:
+      source: "E text: polygon of 4 points"
+      kind: "polygon"
+      points:
+        - [51.50111111111111, -0.12]
+        - [51.50388888888889, -0.08611111111111111]
+        - [51.50083333333333, -0.08555555555555555]
+        - [51.49777777777778, -0.12055555555555555]
+    e_hash: "1b51623f6abc59d8352c07df76cbc9be71524114470a6ea3e162faf2b37b0da1"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 24
+    id: "H3640/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "survey_inspection"
+    e: |-
+      AERIAL SURVEY BY A PA-31 ACFT OPR WI 6NM RADIUS OF
+      550343N 0023541W (2.9NM WEST OF BUTTERBURN). ACFT WILL CONDUCT
+      DYNAMIC MANOEUVRES. FOR INFO <PHONE_1>. AR-2026-5557/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWYLW"
+        fir: "EGXX"
+        traffic: "IV"
+        purpose: "M"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 77
+        lat: 55.06666666666667
+        lon: -2.6
+        radius_nm: 7.0
+      a: "EGTT EGPX"
+      b: "2026-07-06T08:00Z"
+      c: "2026-07-14T16:45Z"
+      d: "06-07 10-14 0800-1645, 08-09 1100-2145"
+      f: "SFC"
+      g: "7700FT AMSL"
+    area:
+      source: "E text: 6 NM radius round one point"
+      kind: "circle"
+      lat: 55.06194444444444
+      lon: -2.5947222222222224
+      radius_nm: 6.0
+    e_hash: "0658e1a35bffa76efe1395600ad9ba39cf0dc3302e7ae25d2b1d6aa8ed913970"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 25
+    id: "J2323/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "rat_all_aircraft_paramotor_trap"
+    e: |-
+      RESTRICTED AREA (TEMPORARY) ACTIVE (CLACTON-ON-SEA, ESSEX).
+      WI 3NM RADIUS OF PSN 514646N 0010837E. APPLIES TO ALL ACFT INCLUDING
+      ANY SMALL BALLOON, ANY KITE, ANY UAS AND ANY PARACHUTE INCLUDING A
+      PARASCENDING PARACHUTE OR PARAMOTOR. DOES NOT APPLY TO ANY ACFT
+      FLYING IN ACCORDANCE WITH EXCEPTIONS STATED IN THE AIC.
+      AIC M 077/2026 WITH CHART, REFERS. A FURTHER J SERIES NOTAM WILL
+      BE ISSUED FOR 27 AUG APPLICABLE TO UAS ONLY.  FURTHER DETAILS
+      WWW.NATS.AERO/AIS. RESTRICTION OF FLYING REGULATIONS MADE UNDER
+      ARTICLE 239 OF THE AIR NAV ORDER 2016. AR-2026-2448/01.
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QRTCA"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 35
+        lat: 51.78333333333333
+        lon: 1.15
+        radius_nm: 4.0
+      a: "EGTT"
+      b: "2026-08-27T09:00Z"
+      c: "2026-08-28T16:00Z"
+      d: "0900-1600"
+      f: "SFC"
+      g: "3500FT AMSL"
+    area:
+      source: "E text: 3 NM radius round one point"
+      kind: "circle"
+      lat: 51.779444444444444
+      lon: 1.1436111111111111
+      radius_nm: 3.0
+    e_hash: "161cfdeda9281ccdb4c5ceb53a6fe19d825ad0cd4ac1de740bdef539dcc9a648"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 26
+    id: "J1985/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "rat_uas_only"
+    e: |-
+      RESTRICTED AREA (TEMPORARY) INSTALLED FOR UAS ONLY DUE WORLD
+      DOWNHILL SKATEBOARDING CHAMPIONSHIPS. AIRSPACE OVER AND WITHIN 10
+      METRES OF A18 MOUNTAIN ROAD, ISLE OF MAN BETWEEN ITS JUNCTIONS WITH
+      LHEANEY ROAD, RAMSEY (541901N 0042301W) AND A14 THOLT Y WILL ROAD
+      (541502N 0042747W). NO UAS IS TO BE FLOWN BELOW 100 FEET AGL WI THE
+      RA(T) EXCEPT WITH THE PERMISSION OF ISLE OF MAN CIVIL AVIATION
+      ADMINISTRATION. RESTRICTION OF FLYING REGULATIONS HAVE BEEN MADE
+      UNDER SECTION 11H OF THE AIRPORTS AND CIVIL AVIATION ACT 1987. FOR
+      INFO CTC ISLE OF MAN CAA EMAIL CAA(AT)GOV.IM OR PHONE <PHONE_1>.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QRTCS"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 15
+        lat: 54.28333333333333
+        lon: -4.416666666666667
+        radius_nm: 3.0
+      a: "EGTT"
+      b: "2026-07-03T17:30Z"
+      c: "2026-07-05T22:30Z"
+      d: "03 1730-2200, 04 0800-2200, 05 0800-2230"
+      f: "SFC"
+      g: "1500FT AMSL"
+    area:
+      source: "Q-circle: 2 points and no radius"
+      kind: "q_circle"
+      lat: 54.28333333333333
+      lon: -4.416666666666667
+      radius_nm: 3.0
+    e_hash: "1e7c53093ae8e4f8ba863183d2048702d049af40e0e5bc232423fa7990d0e1f3"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 27
+    id: "J2809/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "tda_trigger_by_place"
+    e: |-
+      TRIGGER NOTAM - AIP SUP 094/2026 WEF 20 AUG 2026 UNTIL 25 OCT 2026
+      TEMPORARY DANGER AREA (RAF CRANWELL), PROTECTOR DIVERSION
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QRDTT"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 105
+        lat: 53.03333333333333
+        lon: -0.5
+        radius_nm: 6.0
+      a: "EGTT"
+      b: "2026-08-20T00:00Z"
+      c: "2026-09-02T23:59Z"
+      d:
+      f: "SFC"
+      g: "FL105"
+    area:
+      source: "Q-circle: no coordinates in the E text"
+      kind: "q_circle"
+      lat: 53.03333333333333
+      lon: -0.5
+      radius_nm: 6.0
+    e_hash: "86b8fbd2874d23d2c830027ef44e7ae0dc8b30d07b4bf7f7284d83af6c9d6ae6"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 28
+    id: "J1859/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "tda_with_designator"
+    e: |-
+      TEMPO DANGER AREA (TDA) EGD289A INSTALLED WI 1.65NM RADIUS OF
+      523022N 0015244W (ASTON, BIRMINGHAM). BEYOND VISUAL LINE OF SIGHT
+      (BVLOS) UAS OPS CONTAINED WHOLLY WI THE TDA. MAX HGT 400FT AGL.
+      EMERG SERVICES ACFT MAY ENTER THE AIRSPACE IN ACCORDANCE WITH
+      LOCAL DECONFLICTION AGREEMENTS. OPEN AND SPECIFIC CAT VLOS UAS
+      OPS ARE PERMITTED WI THE TDA WITHOUT PRIOR APPROVAL OR
+      DECONFLICTION. OTHER NON-STANDARD FLIGHT, FLIGHT RESTRICTION ZONE
+      OR CONTROLLED AIRSPACE APPROVALS MUST BE OBTAINED. OPERATORS ARE
+      REMINDED OF THEIR RESPONSIBILITY UNDER CAP722 5.2.2.3 REGARDING
+      OPR IN CLOSE PROXIMITY TO AN EMERG RESPONSE EFFORT. FOR INFO
+      AROPS(AT)CAA.CO.UK. AR-2026-2313/03.
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QRDCS"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 9
+        lat: 52.5
+        lon: -1.8833333333333333
+        radius_nm: 3.0
+      a: "EGBB"
+      b: "2026-07-01T06:00Z"
+      c: "2026-07-31T22:00Z"
+      d: "0600-2200"
+      f: "SFC"
+      g: "900FT AMSL"
+    area:
+      source: "E text: 1.65 NM radius round one point"
+      kind: "circle"
+      lat: 52.50611111111111
+      lon: -1.8788888888888888
+      radius_nm: 1.65
+    e_hash: "b48995386a4b7a40a09626fa344b5e97d4c8a05cceb0a43b8c03e245311275fc"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 29
+    id: "H4903/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "drone_ops_with_phone"
+    e: |-
+      UAS OPR WI 0.6NM RADIUS OF 512802N 0011757W (CHIEVELEY).
+      MAX HGT 390FT AGL. FOR INFO <PHONE_1> / <PHONE_2>.
+      AR-2026-7157/01.
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QWULW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 10
+        lat: 51.46666666666667
+        lon: -1.3
+        radius_nm: 1.0
+      a: "EGTT"
+      b: "2026-08-07T05:00Z"
+      c: "2026-11-04T23:00Z"
+      d: "AUG 07 - OCT 24 0500-2200, OCT 25 - NOV 04 0600-2300"
+      f: "SFC"
+      g: "1000FT AMSL"
+    area:
+      source: "E text: 0.6 NM radius round one point"
+      kind: "circle"
+      lat: 51.467222222222226
+      lon: -1.2991666666666666
+      radius_nm: 0.6
+    e_hash: "3498770150f23aad6945b95ea4f9b8ca1d3ce40176d5bc4511200842eee0773f"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 30
+    id: "L4880/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "model_flying"
+    e: |-
+      FLYING OF LARGE MODEL ACFT WI 0.3NM RADIUS OF 513922N 0010616W
+      (CHALGROVE).  FOR INFO <PHONE_1>. AR-2026-7301/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWULW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 13
+        lat: 51.65
+        lon: -1.1
+        radius_nm: 1.0
+      a: "EGLJ"
+      b: "2026-08-25T05:05Z"
+      c: "2026-11-22T16:06Z"
+      d: "SR-SS"
+      f: "SFC"
+      g: "1300FT AMSL"
+    area:
+      source: "E text: 0.3 NM radius round one point"
+      kind: "circle"
+      lat: 51.65611111111111
+      lon: -1.1044444444444446
+      radius_nm: 0.3
+    e_hash: "8bb55678b1f4f2cf351dc49c5d51025c206ad567e133bc8ebb7fc0a8508e8415"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 31
+    id: "H6076/26"
+    sha: "27e0709e518b8ee56fe79ff5975abd4c8da7bfd4"
+    type: "parachuting"
+    e: |-
+      PJE WI 1.08NM RADIUS OF 525705N 0024036W (ALDERFORD). DROP HGT
+      SUBJ ATC CLR. FOR INFO MONITOR CH118.105 OR CTC <PHONE_1>.
+      AR-2026-8707/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWPLW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 65
+        lat: 52.95
+        lon: -2.6833333333333336
+        radius_nm: 2.0
+      a: "EGTT"
+      b: "2026-09-18T08:00Z"
+      c: "2026-09-19T18:29Z"
+      d: "0800-1829"
+      f: "SFC"
+      g: "6500FT AMSL"
+    area:
+      source: "E text: 1.08 NM radius round one point"
+      kind: "circle"
+      lat: 52.95138888888889
+      lon: -2.6766666666666663
+      radius_nm: 1.08
+    e_hash: "775cd4a4ab9a2ce9a076860164e636e0df64d39b4a3fb95feab8e76975cf1ff9"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 32
+    id: "A2907/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "tethered_balloon"
+    e: |-
+      HOT AIR BALLOON EVENT/FESTIVAL WI 1NM RADIUS OF 531738N 0022555W
+      (PICKMERE). UP TO 5 TETHERED HOT AIR BALLOONS ARE PARTICIPATING
+      INCLUDING NIGHT GLOWS. PILOTS ARE REQUESTED TO EXER CTN IN THE VCY.
+      FOR INFO <PHONE_1> / <PHONE_2>. AR-2026-5645/01.
+    phones_redacted: 2
+    coded:
+      q_line:
+        code: "QWCLW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 4
+        lat: 53.3
+        lon: -2.4333333333333336
+        radius_nm: 2.0
+      a: "EGCC"
+      b: "2026-08-22T16:30Z"
+      c: "2026-08-22T20:30Z"
+      d: "1630-1730, 1945-2030"
+      f: "SFC"
+      g: "400FT AMSL"
+    area:
+      source: "E text: 1 NM radius round one point"
+      kind: "circle"
+      lat: 53.29388888888889
+      lon: -2.4319444444444445
+      radius_nm: 1.0
+    e_hash: "c024431595b0a18f6971d9fd45d8fa90edb8f704c8b9f52faf90dc11c4fb1c73"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 33
+    id: "H5296/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "glider_winch_launching"
+    e: |-
+      MAJOR GLIDING COMPETITION. INTENSE ACT WI 5NM RADIUS 511112N
+      0010155W (LASHAM). UP TO 100 GLIDERS PLUS TUG ACFT OPR. SEE
+      SEPARATE DAILY NOTAM AND GLIDINGTASKS.CO.UK FOR GLIDER ROUTES
+      OUTSIDE THIS AREA. FOR INFO <PHONE_1>. OPS CTC 131.030MHZ.
+      AR-2026-7564/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWGLW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 63
+        lat: 51.18333333333333
+        lon: -1.0333333333333334
+        radius_nm: 6.0
+      a: "EGHL"
+      b: "2026-08-22T09:00Z"
+      c: "2026-08-30T18:00Z"
+      d: "0900-1800"
+      f: "SFC"
+      g: "6300FT AMSL"
+    area:
+      source: "E text: 5 NM radius round one point"
+      kind: "circle"
+      lat: 51.18666666666666
+      lon: -1.0319444444444443
+      radius_nm: 5.0
+    e_hash: "2e8f4c7a69a4819eaf0d31050e0f649c7dfc4cf00bc4f7de0041f18981456d2d"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 34
+    id: "H6002/26"
+    sha: "27e0709e518b8ee56fe79ff5975abd4c8da7bfd4"
+    type: "air_display_fly_in"
+    e: |-
+      AIR DISPLAYS WI 2NM RADIUS OF 514409N 0005253E (BRADWELL BAY).
+      FOR INFO <PHONE_1>. AR-2026-8403/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWALW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "W"
+        lower_fl: 0
+        upper_fl: 15
+        lat: 51.733333333333334
+        lon: 0.8833333333333333
+        radius_nm: 3.0
+      a: "EGTT"
+      b: "2026-09-19T11:00Z"
+      c: "2026-09-19T15:00Z"
+      d:
+      f: "SFC"
+      g: "1500FT AMSL"
+    area:
+      source: "E text: 2 NM radius round one point"
+      kind: "circle"
+      lat: 51.73583333333333
+      lon: 0.8813888888888889
+      radius_nm: 2.0
+    e_hash: "566ae3df9af3f9820d95b18318ba7cc4e4d7ea03fe670a93b066d0dc6b1b2003"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 35
+    id: "I6971/26"
+    sha: "bdab14658f0270dc41460eebcd03332abfb230ec"
+    type: "aerodrome_drone"
+    e: |-
+      UAS OPR WI 0.2NM RADIUS OF 545835N 0013731W (LEAZES PARK,
+      NEWCASTLE UPON TYNE). MAX HGT 500FT AGL 800FT AMSL. FOR INFO <PHONE_1>.
+      AR-2026-9681/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QFAXX"
+        fir: "EGPX"
+        traffic: "IV"
+        purpose: "NBO"
+        scope: "A"
+        lower_fl: 0
+        upper_fl: 999
+        lat: 55.03333333333333
+        lon: -1.6833333333333333
+        radius_nm: 5.0
+      a: "EGNT"
+      b: "2026-11-02T14:00Z"
+      c: "2026-11-02T23:30Z"
+      d:
+      f:
+      g:
+    area:
+      source: "E text: 0.2 NM radius round one point"
+      kind: "circle"
+      lat: 54.97638888888889
+      lon: -1.6252777777777778
+      radius_nm: 0.2
+    e_hash: "b066fa6dd107c4dfff0b1977e81bee351d9500d5702553a2a8e509713ec95190"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 36
+    id: "I7484/26"
+    sha: "bdab14658f0270dc41460eebcd03332abfb230ec"
+    type: "aerodrome_fireworks_laser"
+    e: |-
+      FIREWORKS AND LASER DISPLAY WI 0.1NM RADIUS OF 555659N 0032342W
+      (FOXHALL HOUSE, KIRKLISTON). FIREWORKS UP TO 800FT AMSL, LASERS UNL.
+      LASER ORIENTATION NORTH/NORTHEAST. FOR INFO <PHONE_1>.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QFAXX"
+        fir: "EGPX"
+        traffic: "IV"
+        purpose: "NBO"
+        scope: "A"
+        lower_fl: 0
+        upper_fl: 999
+        lat: 55.95
+        lon: -3.4
+        radius_nm: 1.0
+      a: "EGPH"
+      b: "2026-11-01T17:30Z"
+      c: "2026-11-01T20:30Z"
+      d:
+      f:
+      g:
+    area:
+      source: "E text: 0.1 NM radius round one point"
+      kind: "circle"
+      lat: 55.94972222222222
+      lon: -3.395
+      radius_nm: 0.1
+    e_hash: "d75d48a71c008231b4f3f981787ac61bcd6b9a2fd2fdc2eced03ceb2f55c2ae8"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 37
+    id: "U7211/26"
+    sha: "27e0709e518b8ee56fe79ff5975abd4c8da7bfd4"
+    type: "aerodrome_users_only"
+    e: "NO VISITORS, PRACTICE DIVERSIONS OR DIV COMMITMENTS"
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QFALT"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "NBO"
+        scope: "A"
+        lower_fl: 0
+        upper_fl: 999
+        lat: 53.03333333333333
+        lon: -0.5
+        radius_nm: 5.0
+      a: "EGYD"
+      b: "2026-09-05T08:00Z"
+      c: "2026-10-02T16:00Z"
+      d:
+      f:
+      g:
+    area:
+      source: "Q-circle: no coordinates in the E text"
+      kind: "q_circle"
+      lat: 53.03333333333333
+      lon: -0.5
+      radius_nm: 5.0
+    e_hash: "76655b452807c167cdcedd8e43f462767d607a64a8f8250376a3bb83912f0f41"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 38
+    id: "L4935/26"
+    sha: "e688158a8b52101b09f810b59d6ed0c6717b61f3"
+    type: "crane_obstacle"
+    e: |-
+      CRANE OPR WI 0.1NM RADIUS OF 540848.62N 0031353.44W (1.67NM
+      49.09 DEG MAG FM WALNEY ARP). MAX HGT 200FT AMSL 147FT AGL.
+    phones_redacted: 0
+    coded:
+      q_line:
+        code: "QOBCE"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "M"
+        scope: "AE"
+        lower_fl: 0
+        upper_fl: 2
+        lat: 54.15
+        lon: -3.2333333333333334
+        radius_nm: 1.0
+      a: "EGNL"
+      b: "2026-08-17T05:00Z"
+      c: "2026-08-28T17:00Z"
+      d:
+      f:
+      g:
+    area:
+      source: "E text: 0.1 NM radius round one point"
+      kind: "circle"
+      lat: 54.14683888888889
+      lon: -3.2315111111111112
+      radius_nm: 0.1
+    e_hash: "184386484e7b1c1e942d94f3f328041c0b7cae7df1f5add2213e14b3915f59a7"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 39
+    id: "U5358/26"
+    sha: "fc03e3b9cbf0cb730b96918dfe04341aa5b9817e"
+    type: "tmz"
+    e: |-
+      TEMPO TRANSPONDER MANDATORY ZONE (TMZ) INSTALLED WI AREA BOUNDED
+      BY: 514444.15N 0015846.96W - 514556.30N 0015201.86W -
+      514758.04N 0014103.83W THEN THE CLOCKWISE ARC OF A CIRCLE RADIUS 8NM
+      CENTRED 514101.00N 0014724.00W TO 513916.06N 0013451.84W -
+      513909.06N 0013958.09W THEN THE CLOCKWISE ARC OF A CIRCLE RADIUS 5NM
+      CENTRED 514101.00N 0014724.00W TO 513618.12N 0015003.71W -
+      513515.37N 0015617.72W THEN THE CLOCKWISE ARC OF A CIRCLE RADIUS 8NM
+      CENTRED 514101.00N 0014724.00W TO 514444.15N 0015846.96W (FAIRFORD
+      AD). TMZ ACTIVE H24 SFC TO FL100. FOR ACFT EQUIPPED WITH AND
+      OPERATING SECONDARY SURVEILLANCE RADAR EQUIPMENT, AS DEFINED IN
+      GEN 1.5 PARAGRAPH 5.3, ACCESS TO THE TMZ IS NOT SUBJ TO ATC
+      APPROVAL. ACCESS TO THE TMZ WITHOUT SERVICEABLE TRANSPONDER
+      EQUIPMENT, AS DEFINED IN GEN 1.5 PARAGRAPH 5.3, IS SUBJ TO SPECIFIC
+      APPROVAL OF THE CONTROLLING AUTHORITY. A BRIEFING SHEET BFS 068/2026
+      WITH CHART REFERS. FURTHER DETAILS WWW.NATS.AERO/AIS.
+      FOR INFO CTC BRIZE ZONE CHANNEL 119.005 OR TEL <PHONE_1>.
+      AR-2026-1761/05.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QAFXX"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "NBO"
+        scope: "AE"
+        lower_fl: 0
+        upper_fl: 100
+        lat: 51.7
+        lon: -1.7833333333333332
+        radius_nm: 12.0
+      a: "EGVA"
+      b: "2026-06-19T11:12Z"
+      c: "2026-09-17T12:00Z"
+      d:
+      f:
+      g:
+    area:
+      source: "Q-circle: the E text describes a corridor, buffer or arc"
+      kind: "q_circle"
+      lat: 51.7
+      lon: -1.7833333333333332
+      radius_nm: 12.0
+    e_hash: "42c97a458d8ef683c4bb68ba49cfc634c94bd56e747968cef307a8e3c60cde49"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:
+
+  - rank: 40
+    id: "Q73/26"
+    sha: "bdab14658f0270dc41460eebcd03332abfb230ec"
+    type: "military_exercise_series_q"
+    e: |-
+      EXER TALON STORM. MULTIPLE HELI WILL CONDUCT HIGH ENERGY
+      MANOEUVRES WI 5NM RADIUS OF 530126N 0005431W (SYERSTON). ACFT MAY
+      BE UNABLE TO COMPLY WITH RAC. FOR INFO <PHONE_1>. AR-2026-9709/01.
+    phones_redacted: 1
+    coded:
+      q_line:
+        code: "QWELW"
+        fir: "EGTT"
+        traffic: "IV"
+        purpose: "BO"
+        scope: "AW"
+        lower_fl: 0
+        upper_fl: 10
+        lat: 53.016666666666666
+        lon: -0.9166666666666666
+        radius_nm: 6.0
+      a: "EGXY"
+      b: "2026-11-03T14:55Z"
+      c: "2026-11-03T15:10Z"
+      d:
+      f: "SFC"
+      g: "1000FT AMSL"
+    area:
+      source: "E text: 5 NM radius round one point"
+      kind: "circle"
+      lat: 53.02388888888889
+      lon: -0.9086111111111111
+      radius_nm: 5.0
+    e_hash: "5edce1726cf6989fa19ba4f24805e1881c705539892f4d3affacebac07dc624a"
+    label:
+      category:
+      activity:
+      floor:
+      ceiling:
+      applies_to:
+      exemptions:
+      contact:
+      activates_designators:
+      prohibitive_reason:

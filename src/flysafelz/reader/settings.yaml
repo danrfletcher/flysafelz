@@ -1,0 +1,11 @@
+# Operational knobs of the NOTAM reader. None is a safety threshold (those live in rules.yaml).
+# Each is loaded by name in settings.py.
+
+# Seconds one model call may take before it counts as unavailable (G7). Sent with every call.
+timeout_s: 45
+
+# Model calls in flight at once, first reads and repairs counted together (G8). The bridge allows three.
+concurrency: 3
+
+# Times the reader eval reads each labelled item (G12). Not used by the on-demand read.
+runs: 3

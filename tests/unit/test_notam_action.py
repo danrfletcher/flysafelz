@@ -277,6 +277,56 @@ def test_an_e_text_that_contradicts_fg_is_never_read_for_limits():
     assert "100" not in result.reason
 
 
+# --- E10 with a reading that states no height (ticket 3: floor and ceiling may be None) ----------------------------------
+
+READING_FLOOR, FG_FLOOR, Q_FLOOR = "1,000 ft AMSL", "1,500 ft AMSL", "FL020"
+READING_CEILING, FG_CEILING, Q_CEILING = "5,000 ft AMSL", "4,000 ft AMSL", "FL040"
+
+
+@pytest.mark.parametrize("fg_ceiling", [True, False], ids=["G present", "G absent"])
+@pytest.mark.parametrize("fg_floor", [True, False], ids=["F present", "F absent"])
+@pytest.mark.parametrize("read_ceiling", [True, False], ids=["reading ceiling", "ceiling None"])
+@pytest.mark.parametrize("read_floor", [True, False], ids=["reading floor", "floor None"])
+def test_a_none_limit_goes_on_to_fg_and_then_the_q_line_and_a_disagree_note_needs_both(read_floor, read_ceiling, fg_floor, fg_ceiling):
+    parsed = notam(
+        circle=circle_at(1.0),
+        item_f="1500FT AMSL" if fg_floor else None,
+        item_g="4000FT AMSL" if fg_ceiling else None,
+        lower_fl=20,
+        upper_fl=40,
+    )
+    read = reading(geometry=circle_at(1.0), floor=amsl(1000), ceiling=amsl(5000)).model_copy(
+        update={"floor": amsl(1000) if read_floor else None, "ceiling": amsl(5000) if read_ceiling else None}
+    )
+    result = act(parsed, read)
+    assert result.action is A.AVOID_SECTOR
+    floor = READING_FLOOR if read_floor else FG_FLOOR if fg_floor else Q_FLOOR  # the reading's, else F, else the Q-line
+    ceiling = READING_CEILING if read_ceiling else FG_CEILING if fg_ceiling else Q_CEILING
+    assert f"from {floor}, up to {ceiling}: avoid that sector" in result.reason
+    assert ("disagree on the floor" in result.reason) == (read_floor and fg_floor)  # the reading's 1,000 is below F's 1,500: both given and different
+    assert ("disagree on the ceiling" in result.reason) == (read_ceiling and fg_ceiling)
+
+
+def test_a_none_floor_with_no_item_f_and_a_surface_q_line_is_the_surface():
+    parsed = notam(circle=circle_at(0), item_f=None, item_g=None, lower_fl=0, upper_fl=40)
+    read = reading(geometry=circle_at(0)).model_copy(update={"floor": None, "ceiling": None})
+    result = act(parsed, read)
+    assert result.action is A.CONTACT_FIRST and "over the LZ from the surface" in result.reason
+
+
+def test_a_none_floor_with_a_raised_q_line_floor_is_not_the_surface():
+    parsed = notam(circle=circle_at(0), item_f=None, item_g=None, lower_fl=20, upper_fl=40)
+    read = reading(geometry=circle_at(0)).model_copy(update={"floor": None, "ceiling": None})
+    result = act(parsed, read)
+    assert result.action is A.AVOID_SECTOR and "stay below 1,800 ft QNH" in result.reason
+
+
+def test_a_none_ceiling_with_a_q_line_upper_limit_of_fl999_and_no_item_g_has_no_upper_limit():
+    parsed = notam(circle=circle_at(1.0), item_f=None, item_g=None, lower_fl=0, upper_fl=999)
+    read = reading(geometry=circle_at(1.0)).model_copy(update={"floor": None, "ceiling": None})
+    assert ", no upper limit: avoid that sector" in act(parsed, read).reason
+
+
 # --- AGL and FL floors ---------------------------------------------------------------------
 
 
@@ -786,3 +836,32 @@ def test_the_result_is_a_pydantic_model_with_the_notam_id_action_and_one_line_re
     assert isinstance(result, ActionResult)
     assert result.notam_id == "H7171/26"
     assert ActionResult.model_validate_json(result.model_dump_json()) == result
+
+
+# --- ticket 3 PR-6 (R3.5): an exemption quote is looked for in the redacted E text ---------------------------------------------
+
+PHONE_E_TEXT = "UAS OPR WI 0.5NM. PARAMOTORS EXEMPT, PHONE 07700 900123 FIRST."
+
+
+def test_a_quote_holding_a_placeholder_is_found_in_the_redacted_e_text_and_kept():
+    parsed = notam(circle=circle_at(0), item_e=PHONE_E_TEXT, item_f="SFC")
+    quote = "PARAMOTORS EXEMPT, PHONE <PHONE_1> FIRST"
+    result = act(parsed, reading(geometry=circle_at(0), category=Category.PROHIBITIVE, exemptions=[exemption(quote)]))
+    assert result.action is A.IGNORE
+    assert f'exempts paramotors: "{quote}"' in result.reason
+    assert result.debug == []
+
+
+def test_a_quote_holding_the_real_number_no_longer_matches_and_is_dropped_and_logged():
+    parsed = notam(circle=circle_at(0), item_e=PHONE_E_TEXT, item_f="SFC")
+    quote = "PARAMOTORS EXEMPT, PHONE 07700 900123 FIRST"
+    result = act(parsed, reading(geometry=circle_at(0), category=Category.PROHIBITIVE, exemptions=[exemption(quote)]))
+    assert result.action is A.NO_FLY  # as if there were no exemption
+    assert f'exemption quote not found: "{quote}"' in result.debug
+    assert "07700" not in result.reason
+
+
+def test_a_quote_without_a_number_still_matches_a_text_that_has_one():
+    parsed = notam(circle=circle_at(0), item_e=PHONE_E_TEXT, item_f="SFC")
+    result = act(parsed, reading(geometry=circle_at(0), category=Category.PROHIBITIVE, exemptions=[exemption("PARAMOTORS EXEMPT")]))
+    assert result.action is A.IGNORE
