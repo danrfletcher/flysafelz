@@ -73,12 +73,15 @@ def test_source_imports_no_agent_framework():
 
 
 # F1 (PR-3.F1): the verdict sheet has no model, no reader, and writes no label on a blind row.
+# VERDICT_SHEET_FILES is the blind path (the builder and its script); the draft module is the only code that writes
+# a verdict or an action, and the builder reaches it only for an example that is not blind (PR-4.F1).
 VERDICT_SHEET_FILES = [SRC / "verdict_sheet.py", ROOT / "scripts" / "build_verdict_sheet.py"]
+DRAFT_FILES = [SRC / "verdict_sheet_draft.py"]
 
 
 def test_the_verdict_sheet_imports_no_model_client_and_no_reader():
-    assert all(p.exists() for p in VERDICT_SHEET_FILES)
-    for path in VERDICT_SHEET_FILES:
+    assert all(p.exists() for p in VERDICT_SHEET_FILES + DRAFT_FILES)
+    for path in VERDICT_SHEET_FILES + DRAFT_FILES:
         for module in _imported_modules(path):
             assert not module.startswith(FORBIDDEN_IMPORTS), (path, module)
             assert "reader" not in module.lower(), (path, module)
@@ -284,3 +287,43 @@ def test_no_llm_env_vars_or_models_endpoint_in_source():
     for path in PY_FILES:
         match = pattern.search(path.read_text(encoding="utf-8"))
         assert match is None, f"{path}: {match.group(0) if match else ''}"
+
+
+# F4 / F7 / F1 (PR-4.F1): `# why` and the ignored block are comments only; no answer text; the draft is model-free.
+def _string_keys(tree: ast.AST) -> list[tuple[int, str]]:
+    """Every string used as a mapping key: dict literal keys and subscripts (a call's keyword argument is not a sheet key)."""
+    keys: list[tuple[int, str]] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Dict):
+            keys += [(k.lineno, k.value) for k in node.keys if isinstance(k, ast.Constant) and isinstance(k.value, str)]
+        elif isinstance(node, ast.Subscript) and isinstance(node.slice, ast.Constant) and isinstance(node.slice.value, str):
+            keys.append((node.lineno, node.slice.value))
+    return keys
+
+
+def test_the_builder_writes_no_why_reason_or_ignored_key():
+    for path in VERDICT_SHEET_FILES + DRAFT_FILES:
+        for line, key in _string_keys(_parse(path)):
+            assert not any(word in key.lower() for word in ("why", "reason", "ignored")), f"{path}:{line}: key {key!r}"
+        for node in ast.walk(_parse(path)):  # a string that starts a `why:` line (the comment is written as '# why: ...')
+            if isinstance(node, ast.Constant) and isinstance(node.value, str):
+                assert not re.match(r"\s*why\s*:", node.value), f"{path}:{node.lineno}: writes a why: key"
+
+
+def test_the_builder_imports_no_answer_formatting_from_the_cli():
+    for path in VERDICT_SHEET_FILES + DRAFT_FILES:
+        for node in ast.walk(_parse(path)):
+            if isinstance(node, ast.ImportFrom) and node.module and node.module.endswith("cli"):
+                names = {a.name for a in node.names}
+                assert not names & {"overall_line", "footer_lines"}, f"{path}:{node.lineno}: {names}"
+            if isinstance(node, ast.Attribute) and node.attr in {"overall_line", "footer_lines"}:
+                raise AssertionError(f"{path}:{node.lineno}: {node.attr}")
+
+
+def test_only_the_draft_module_may_name_a_verdict_or_an_action():
+    names = {"Verdict", "NotamAction"}
+    for path in VERDICT_SHEET_FILES:
+        for node in ast.walk(_parse(path)):
+            if isinstance(node, ast.ImportFrom):
+                assert not names & {a.name for a in node.names}, f"{path}:{node.lineno}"
+    assert any(isinstance(n, ast.ImportFrom) and n.module == "flysafelz.verdict_sheet_draft" for n in ast.walk(_parse(SRC / "verdict_sheet.py")))

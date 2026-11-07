@@ -1,9 +1,15 @@
-"""The verdict labelling sheet, blind mode (4b, PR-3.F1). Model-free: nothing here reads a NOTAM or fills a label.
+"""The verdict labelling sheet (4b): blind entries (PR-3.F1) and draft entries (PR-4.F1). Model-free: nothing here reads a NOTAM.
 
-    python scripts/build_verdict_sheet.py --blind --examples examples.yaml --out verdict_sheet.yaml
+    python scripts/build_verdict_sheet.py --examples examples.yaml --out verdict_sheet.yaml
+
+An example with `metadata.blind: true` gets a blind entry (nothing filled in); any other `assess` example gets a
+draft entry (code's verdicts and NOTAM actions, for Dan to correct; see verdict_sheet_draft). The mode is the
+example's, never the order of the examples. `--blind` / `--draft` build only the examples of that mode.
 
     read_examples(path)              Dan's examples file -> list[Example] (validated; raises SheetError)
-    build_blind_entry(example, dir)  one sheet entry (a dict) for an `assess` example, from fixtures/<case>/
+    build_blind_entry(example, dir)  the blind sheet entry (a dict) for an `assess` example, from fixtures/<case>/
+    build_draft_entry(example, dir)  the draft sheet entry for one (a DraftEntry: a dict plus its comments)
+    build_entry(example, dir)        whichever the example's `metadata.blind` asks for
     edge_name(reasons)               why a row starts where it does, from assess's own cut reasons
     check_weather_coverage(...)      the case must hold weather for every hour up to the verdict horizon (G7)
     main(argv, root=...)             the command; scripts/build_verdict_sheet.py is a thin wrapper
@@ -16,11 +22,14 @@ The examples file is a YAML list (or a mapping with an `examples:` list). An exa
     metadata:  {blind: true}
 
 The sheet is a YAML list with one entry per `assess` example:
-    id, mode (blind), window ("default" or {start, end}), actions_done (false),
-    notam_actions ({NOTAM id: null} for every NOTAM within the local area), rows
+    id, mode (blind | draft), window ("default" or {start, end}), actions_done (false),
+    notam_actions, rows
+A blind entry's notam_actions is {NOTAM id: null} for every NOTAM within the local area. A draft entry's is code's
+worst action per NOTAM, and a comment block of the NOTAMs code ignored for a reason other than distance.
 
 A row is exactly one segment of assess()'s own answer (G1): start, end, edge, verdict: null,
-approaching_limits: null. An OUTLOOK or TOO_FAR hour is one row with `tier` and no label keys (G5).
+approaching_limits: null (a draft row has code's values). An OUTLOOK or TOO_FAR hour is one row with `tier` and no
+label keys (G5), in either mode.
 Rows are never re-cut here. The edge names come from assess.cut_points_with_reasons() and
 assess.notams_in_hour(), the same code assess() cuts with (G2); this module has no cut-point logic.
 
@@ -56,7 +65,7 @@ from flysafelz.assess import (
     default_window,
     notams_in_hour,
 )
-from flysafelz.capture import CaptureError, case_day
+from flysafelz.capture import Case, CaptureError, case_day
 from flysafelz.cases import load_case_inputs
 from flysafelz.cli import OneLineParser
 from flysafelz.clients.open_meteo import Forecast
@@ -77,14 +86,15 @@ from flysafelz.notam_action import LandingZone
 from flysafelz.pib import PibResult, prefilter
 from flysafelz.rules import RULES
 from flysafelz.sources import FIXTURES_DIR, SourceError
+from flysafelz.verdict_sheet_draft import DraftEntry, draft_actions, fill_rows, ignored_by_code, render_entry
 
 MODE_BLIND = "blind"
+MODE_DRAFT = "draft"
 WINDOW_DEFAULT = "default"
 EDGE_WINDOW_START = "window start"
 EDGE_HOUR = "hour"
 DROP_SOURCES = {"weather": SourceName.WEATHER, "airspace": SourceName.AIRSPACE, "pib": SourceName.NOTAMS}
 DROPPED_REASON = "dropped for this example"
-DRAFT_LATER = "draft mode lands in PR-4"
 JOIN = " + "
 
 # The four daylight edges, by (phase before, phase after) (G2).
@@ -347,15 +357,38 @@ def _shown(value: datetime | float) -> str:
     return utc_text(value) if isinstance(value, datetime) else str(value)
 
 
-def build_blind_entry(example: Example, case_dir: Path) -> dict[str, Any]:
-    """The blind sheet entry for one `assess` example, from the committed case in case_dir. Raises SheetError.
+@dataclass(frozen=True)
+class _Assessed:
+    """What one assess() call over an example's case gave, and what the rows and the draft need from around it."""
 
-    The rows are the segments assess() returns for the example (same call, same readings: the case's
-    readings.yaml), with verdicts and actions dropped. Nothing is re-segmented.
-    """
+    example: Example
+    case: Case
+    window: tuple[datetime, datetime]
+    pib: PibResult
+    assessment: Assessment
+    near: list[ParsedNotam]  # prefilter()'s kept NOTAMs: the set assess cuts on
+    readings: Mapping[str, NotamReading]
+    lz: LandingZone
+
+    def head(self, mode: str) -> dict[str, Any]:
+        """The keys every entry starts with (the sheet's order), up to and including actions_done."""
+        window = self.example.window
+        return {
+            "id": self.example.id,
+            "mode": mode,
+            "window": WINDOW_DEFAULT if window is None else {"start": utc_text(self.window[0]), "end": utc_text(self.window[1])},
+            "actions_done": False,
+        }
+
+    def rows(self) -> list[dict[str, Any]]:
+        return segment_rows(self.assessment, self.case.lat, self.case.lon, self.near, self.readings, self.lz)
+
+
+def _assess_example(example: Example, case_dir: Path, *, readings_optional: bool = False) -> _Assessed:
+    """The one assess() call for an example, over the committed case in case_dir. Raises SheetError."""
     assert example.now is not None  # an assess example always has its inputs (read_examples)
     try:
-        case, forecast, airspace, pib, readings = load_case_inputs(case_dir)
+        case, forecast, airspace, pib, readings = load_case_inputs(case_dir, readings_optional=readings_optional)
     except (CaptureError, SourceError) as exc:
         raise SheetError(f"example {example.id}: {exc}") from None
     for field, mine, theirs in (("inputs.now", example.now, case.now), ("inputs.lat", example.lat, case.lat), ("inputs.lon", example.lon, case.lon)):
@@ -374,14 +407,42 @@ def build_blind_entry(example: Example, case_dir: Path) -> dict[str, Any]:
     span = (assessment.hours[0].hour, assessment.hours[-1].hour + ONE_HOUR)
     near, _dropped_notams = prefilter(pib.notams, (case.lat, case.lon), span)
     lz = LandingZone(lat=case.lat, lon=case.lon, elevation_ft=metres_to_feet(forecast.elevation_m) if forecast.elevation_m is not None else 0.0)
+    return _Assessed(example, case, window, pib, assessment, near, readings, lz)
+
+
+def build_blind_entry(example: Example, case_dir: Path) -> dict[str, Any]:
+    """The blind sheet entry for one `assess` example, from the committed case in case_dir. Raises SheetError.
+
+    The rows are the segments assess() returns for the example (same call, same readings: the case's
+    readings.yaml), with verdicts and actions dropped. Nothing is re-segmented. Nothing derived from code's
+    verdicts or actions is written: Dan is the reader.
+    """
+    built = _assess_example(example, case_dir)
     return {
-        "id": example.id,
-        "mode": MODE_BLIND,
-        "window": WINDOW_DEFAULT if example.window is None else {"start": utc_text(window[0]), "end": utc_text(window[1])},
-        "actions_done": False,
-        "notam_actions": dict.fromkeys(local_notam_ids(pib, case.lat, case.lon)),
-        "rows": segment_rows(assessment, case.lat, case.lon, near, readings, lz),
+        **built.head(MODE_BLIND),
+        "notam_actions": dict.fromkeys(local_notam_ids(built.pib, built.case.lat, built.case.lon)),
+        "rows": built.rows(),
     }
+
+
+def build_draft_entry(example: Example, case_dir: Path) -> DraftEntry:
+    """The draft sheet entry for one `assess` example: code's verdicts and NOTAM actions from the same assess() call as the rows.
+
+    A case with no readings.yaml has no readings (every NOTAM over the LZ from the surface is then unread). Raises SheetError.
+    """
+    built = _assess_example(example, case_dir, readings_optional=True)
+    try:
+        rows = fill_rows(built.rows(), built.assessment)
+    except ValueError as exc:
+        raise SheetError(f"example {example.id}: {exc}") from None
+    entry = DraftEntry({**built.head(MODE_DRAFT), "notam_actions": draft_actions(built.assessment), "rows": rows})
+    entry.ignored = ignored_by_code(built.assessment.ignored_notams, local_notam_ids(built.pib, built.case.lat, built.case.lon), built.pib.superseded)
+    return entry
+
+
+def build_entry(example: Example, case_dir: Path) -> dict[str, Any]:
+    """A blind entry for an example marked `metadata.blind: true`, a draft entry for any other. Never one for the other."""
+    return build_blind_entry(example, case_dir) if example.blind else build_draft_entry(example, case_dir)
 
 
 # --- a case folder that does not exist yet (G7) ------------------------------------------------------
@@ -441,27 +502,18 @@ def _remove_new_folder(case_dir: Path) -> None:
 
 
 def _parser() -> argparse.ArgumentParser:
-    parser = OneLineParser(prog="build_verdict_sheet", description="Write a blind verdict sheet from an examples file.")
+    parser = OneLineParser(prog="build_verdict_sheet", description="Write a verdict sheet from an examples file: blind entries for blind examples, draft entries for the rest.")
     mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--blind", action="store_true", help="build every assess example blind (verdicts and actions empty)")
-    mode.add_argument("--draft", action="store_true", help="not yet built (PR-4)")
+    mode.add_argument("--blind", action="store_true", help="build only the blind examples (metadata.blind: true); the others are skipped")
+    mode.add_argument("--draft", action="store_true", help="build only the draft examples (no metadata.blind); the blind ones are skipped")
     parser.add_argument("--examples", required=True, type=Path, help="Dan's examples.yaml (only read)")
     parser.add_argument("--out", required=True, type=Path, help="the sheet to write; it must not exist yet")
     return parser
 
 
-def _usage_error(parser: argparse.ArgumentParser, message: str) -> int:
-    """One line on stderr and argparse's own usage-error exit code, as a bad argument gets in the assess command."""
-    try:
-        parser.error(message)
-    except SystemExit as stop:
-        return int(stop.code or 0)
-    return 0  # parser.error never returns; this keeps the type checker content
-
-
 def _write_new(out: Path, entries: list[dict[str, Any]]) -> None:
     """Write the sheet to a file that must not exist yet (exclusive create). Raises SheetError."""
-    text = yaml.safe_dump(entries, sort_keys=False, default_flow_style=False, allow_unicode=True)
+    text = "".join(render_entry(e) if isinstance(e, DraftEntry) else yaml.safe_dump([e], sort_keys=False, default_flow_style=False, allow_unicode=True) for e in entries)
     try:
         with out.open("x", encoding="utf-8") as handle:
             handle.write(text)
@@ -477,18 +529,17 @@ def main(
     root: Path = capture.ROOT,
     environ: Mapping[str, str] | None = None,
     today: datetime | None = None,
-    build: Callable[[Example, Path], dict[str, Any]] = build_blind_entry,
+    build: Callable[[Example, Path], dict[str, Any]] = build_entry,
 ) -> int:
     """Run the command. Exit 0: at least one entry written (or nothing to build), 1: an error and no entry, 2: bad usage.
 
-    A failure inside one example (capture, a case that does not fit the example) skips that example with one line
-    and the rest are still written; the summary line counts them. A fault in the examples file or the output path
+    Each example is built in its own mode (blind or draft, by its `metadata.blind`); `--blind` or `--draft` builds only
+    that mode's examples and counts the rest as skipped. A failure inside one example (capture, a case that does not
+    fit the example) skips that example with one line and the rest are still written; the summary line counts them. A fault in the examples file or the output path
     stops everything with nothing written.
     """
     parser = _parser()
     args = parser.parse_args(argv)
-    if args.draft:
-        return _usage_error(parser, DRAFT_LATER)
     if args.out.exists():
         print(f"{args.out}: already exists; not overwritten (a rerun that appends lands in PR-5)", file=sys.stderr)
         return 1
@@ -497,9 +548,7 @@ def main(
     except SheetError as exc:
         print(exc, file=sys.stderr)
         return 1
-    targets = [e for e in examples if e.path == "assess"]
-    if not args.blind and not all(e.blind for e in targets):
-        return _usage_error(parser, DRAFT_LATER)
+    targets = [e for e in examples if e.path == "assess" and not (args.blind and not e.blind) and not (args.draft and e.blind)]
 
     entries: list[dict[str, Any]] = []
     failed = 0

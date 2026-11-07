@@ -46,15 +46,19 @@ def _own_now(case_yaml: Path) -> datetime:
         return _NEVER
 
 
-def _load(folder: Path, root: Path) -> CaseInputs:
+def _load(folder: Path, root: Path, readings_optional: bool = False) -> CaseInputs:
     case, _raw = load_case(folder / "case.yaml", today=_own_now(folder / "case.yaml"))
-    forecast, airspace, pib, readings = replay_files(case, folder, root)
+    forecast, airspace, pib, readings = replay_files(case, folder, root, readings_optional=readings_optional)
     return case, forecast, airspace, pib, readings
 
 
-def load_case_inputs(case_dir: Path) -> CaseInputs:
-    """The case in this folder, ready for assess(): (case, forecast, airspace, pib, readings by NOTAM id)."""
-    return _load(case_dir, ROOT)
+def load_case_inputs(case_dir: Path, *, readings_optional: bool = False) -> CaseInputs:
+    """The case in this folder, ready for assess(): (case, forecast, airspace, pib, readings by NOTAM id).
+
+    readings_optional: a folder with no readings.yaml gives no readings instead of a SourceError (the verdict
+    sheet's draft mode, Q3). A readings.yaml that is there is still read and checked.
+    """
+    return _load(case_dir, ROOT, readings_optional)
 
 
 def load_case_inputs_by_name(name: str, *, root: Path | None = None) -> CaseInputs:
