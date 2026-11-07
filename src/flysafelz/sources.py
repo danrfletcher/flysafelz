@@ -87,8 +87,13 @@ def _readings(path: Path, root: Path) -> dict[str, NotamReading]:
         raise SourceError(f"{_shown(path, root)}: not a list of valid NOTAM readings") from None
 
 
-def replay_files(case: Case, folder: Path, root: Path) -> tuple[Forecast, AirspaceFetch, PibResult, dict[str, NotamReading]]:
+def replay_files(
+    case: Case, folder: Path, root: Path, *, readings_optional: bool = False
+) -> tuple[Forecast, AirspaceFetch, PibResult, dict[str, NotamReading]]:
     """Replay a case folder's weather.json, airspace.json, pib.xml and readings.yaml through the real client code.
+
+    readings_optional: a folder with no readings.yaml has no readings (an empty dict) instead of being an error.
+    A readings.yaml that exists is always read and checked.
 
     Used by load_case_sources and by cases.load_case_inputs, so the two never differ. `root` only
     shortens the paths in error messages. Raises SourceError, naming the file, for one that is
@@ -102,7 +107,10 @@ def replay_files(case: Case, folder: Path, root: Path) -> tuple[Forecast, Airspa
         case.lat, case.lon, api_key=REPLAY_KEY, client=_replay(_read(folder / "airspace.json", root)), now=case.now
     )
     notams = pib.load_pib("live", case.now, client=_replay(_read(folder / "pib.xml", root)))
-    return forecast, airspace, notams, _readings(folder / "readings.yaml", root)
+    readings_path = folder / "readings.yaml"
+    if readings_optional and not readings_path.exists():
+        return forecast, airspace, notams, {}
+    return forecast, airspace, notams, _readings(readings_path, root)
 
 
 def load_case_sources(name: str, *, root: Path | None = None) -> CaseSources:

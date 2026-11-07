@@ -20,7 +20,7 @@ from verdict_sheet_helpers import example, examples_file, write_case
 
 from flysafelz import capture
 from flysafelz.capture import CaptureError
-from flysafelz.verdict_sheet import DRAFT_LATER, main
+from flysafelz.verdict_sheet import main
 
 REPO = Path(__file__).resolve().parents[2]
 SCRIPT = REPO / "scripts" / "build_verdict_sheet.py"
@@ -126,15 +126,19 @@ def test_an_unknown_drop_value_exits_1_naming_the_example_and_writes_nothing(tmp
     assert result.returncode == 1 and "dropper" in result.stderr and "'radar'" in result.stderr and not out.exists()
 
 
-def test_draft_mode_and_a_non_blind_example_without_blind_exit_2_and_say_where_draft_lands(gp1, tmp_path):
+def test_no_flag_builds_each_example_in_its_own_mode_and_the_flags_pick_one_mode(gp1, tmp_path):
+    unmarked = examples_file(tmp_path / "unmarked.yaml", example("open", cases.BLUE_MILL, now=NOW, window=(utc(31, 7), utc(31, 18)), blind=False))
     out = tmp_path / "out.yaml"
-    draft = run_script("--draft", "--examples", str(gp1), "--out", str(out))
-    assert (draft.returncode, draft.stderr.strip()) == (2, f"build_verdict_sheet: error: {DRAFT_LATER}") and not out.exists()
-    unmarked = examples_file(tmp_path / "unmarked.yaml", example("open", cases.BLUE_MILL, now=NOW, window=None, blind=False))
-    no_flag = run_script("--examples", str(unmarked), "--out", str(out))
-    assert (no_flag.returncode, no_flag.stderr.strip()) == (2, f"build_verdict_sheet: error: {DRAFT_LATER}") and not out.exists()
-    marked = run_script("--examples", str(gp1), "--out", str(out))  # every assess example is blind: no flag needed
+    result = run_script("--examples", str(unmarked), "--out", str(out))
+    assert result.returncode == 0, result.stderr
+    assert [(e["id"], e["mode"]) for e in sheet(out)] == [("open", "draft")]
+    blind_only = run_script("--blind", "--examples", str(unmarked), "--out", str(tmp_path / "b.yaml"))
+    assert blind_only.returncode == 0 and blind_only.stdout.strip() == "nothing written: 0 built, 1 skipped, 0 failed" and not (tmp_path / "b.yaml").exists()
+    draft_only = run_script("--draft", "--examples", str(gp1), "--out", str(tmp_path / "d.yaml"))
+    assert draft_only.returncode == 0 and "0 built, 1 skipped" in draft_only.stdout and not (tmp_path / "d.yaml").exists()
+    marked = run_script("--examples", str(gp1), "--out", str(tmp_path / "m.yaml"))
     assert marked.returncode == 0, marked.stderr
+    assert [e["mode"] for e in sheet(tmp_path / "m.yaml")] == ["blind"]
 
 
 def test_blind_and_draft_together_are_a_usage_error(gp1, tmp_path):
