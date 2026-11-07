@@ -352,3 +352,13 @@ capture_trim_nm:
   source: "FlySafeLZ Spec s2, Plan 2 G20 (fixture PIBs are trimmed to 25 NM)"
   confidence: educated guess
   note: "make fixtures keeps a NOTAM only when its Q-circle edge is within this distance of the LZ, so a fixture stays small but covers well past the 2 NM local area. A NOTAM whose Q-circle cannot be read is kept."
+
+# --- NOTAM reader: code-built area (G3) -----------------------------------------
+
+reader_area_slack_nm:
+  value: 1.0
+  unit: NM
+  comparison: ">"
+  source: "Ticket 3 Q4 (Dan); 4 archived PIBs (4 Jul, 22 Aug, 19 Sep, 31 Oct 2026): the area in the E text is never more than 1 NM outside the Q-circle"
+  confidence: educated guess
+  note: "A NOTAM area built from the E text that reaches further than this outside the Q-circle is treated as a parser miss and replaced by the Q-circle. Exactly this far out is kept."

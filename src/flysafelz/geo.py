@@ -28,6 +28,8 @@ from itertools import pairwise
 from flysafelz.rules import RULES
 
 METRES_PER_NM = 1852
+METRES_PER_KM = 1000  # unit: the radius in an E text may be written in km
+MIN_POLYGON_POINTS = 3  # structure: fewest distinct points that make an area (an E text with fewer is not a polygon)
 FULL_CIRCLE = 360  # degrees
 HALF_TURN = 180  # degrees
 WGS84_A = 6378137.0  # equatorial radius, metres

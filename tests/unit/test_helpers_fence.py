@@ -12,6 +12,8 @@ from pathlib import Path
 import pytest
 import yaml
 
+from fence_scan import REVIEWED_NAMED_CONSTANTS, hard_coded_rule_values
+
 from flysafelz.rules import DEFAULT_PATH
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -24,6 +26,8 @@ NEW_TESTS = [Path(__file__).parent / f"{name}.py" for name in ("test_geo", "test
 # A new literal fails the test until it is added here and reviewed.
 REVIEWED_LITERALS = {
     1852: "metres per nautical mile (unit)",
+    1000: "metres per kilometre (unit): geo.METRES_PER_KM only, which the equals-a-rules-value scan skips by name",
+    3: "fewest distinct points that make a polygon (structure): geo.MIN_POLYGON_POINTS only, skipped by name in that scan",
     60: "minutes per hour (unit)",
     24: "hours per day (unit; also the 2400 end-of-day time)",
     360: "degrees in a circle (unit)",
@@ -68,14 +72,34 @@ def test_f3_every_numeric_literal_is_zero_one_or_a_reviewed_unit_constant(path):
 def test_f3_no_literal_equals_a_rules_yaml_value_and_none_is_a_uk_bound_or_the_twilight_angle(path):
     values = _rule_values()
     assert {49.8, 61.0, 8.7, 2.0, 6} <= values  # the new rules are in the file, so the scan covers them
-    for lineno, value in _literals(_tree(path)):
-        assert abs(value) not in values, f"{path.name}:{lineno} hard-codes {value}, which is a rules.yaml value"
+    for lineno, value in hard_coded_rule_values(path, _tree(path), values):  # structural 0 and 1, and geo.py's reviewed constants, are exempt
+        raise AssertionError(f"{path.name}:{lineno} hard-codes {value}, which is a rules.yaml value")
 
 
 @pytest.mark.parametrize("path", MODULES, ids=lambda p: p.name)
 def test_f3_the_threshold_numbers_do_not_appear_as_text_either(path):
     text = path.read_text(encoding="utf-8")
     assert not re.search(r"49\.8|61\.0|(?<!\d)8\.7(?!\d)|depression\s*=\s*6\b|\b6\s*°|\b6 degrees below", text)
+
+
+def test_f6_the_reviewed_named_constants_are_in_geo_py_and_in_the_reviewed_list():
+    geo = {}
+    for stmt in _tree(SRC / "geo.py").body:
+        if isinstance(stmt, ast.Assign) and isinstance(stmt.targets[0], ast.Name) and isinstance(stmt.value, ast.Constant):
+            geo[stmt.targets[0].id] = stmt.value.value
+    for name, value in REVIEWED_NAMED_CONSTANTS.items():
+        assert geo[name] == value, name
+        assert value in REVIEWED_LITERALS, name
+    assert REVIEWED_LITERALS[1000].startswith("metres per kilometre") and REVIEWED_LITERALS[3].startswith("fewest distinct points")
+
+
+def test_f6_the_helper_scan_still_flags_a_planted_limit_outside_geo_py():
+    values = _rule_values()
+    planted = _tree_of("limit = 1000\nretries = 3\nMETRES_PER_KM = 1000\n")
+    assert [v for _, v in hard_coded_rule_values(SRC / "daylight.py", planted, values)] == [1000, 3, 1000]
+    assert [v for _, v in hard_coded_rule_values(SRC / "geo.py", planted, values)] == [1000, 3]  # only the reviewed name is skipped
+    unreviewed = _tree_of("slack = 1.5\nunit = 1852\n")
+    assert [v for _, v in _literals(unreviewed) if v not in (0, 1) and v not in REVIEWED_LITERALS] == [1.5]  # the unreviewed-literal scan above flags it
 
 
 def test_f3_the_scan_catches_a_planted_literal():
