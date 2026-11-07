@@ -5,28 +5,20 @@ reading (none, unread, phone, email, radio-only, prohibitive) and in or out of t
 the Blue Mill shape: TDA EGD496A activated 0800-1800 by J3857/26 with a hand-written reading.
 """
 
+import re
 from datetime import UTC, datetime
-from typing import Any
 
 import pytest
-from airspace_helpers import E_TEXT, LZ, SEGMENT, activation, amsl, assess, only, reading, utc, volume
+from airspace_helpers import E_TEXT, LZ, SEGMENT, activation, amsl, assess, blue_mill_tda, only, reading, utc
 
+from flysafelz import airspace as airspace_module
 from flysafelz.airspace import Activation, Outcome, TimeSpan, danger_area_active
 from flysafelz.clients.openaip import parse_airspace
 from flysafelz.contracts import Category, Circle, Contact, ContactKind, ProhibitiveReason
 from flysafelz.geo import distance_nm, shape_over
+from flysafelz.verdict_sheet_draft import SEVERITY
 
-PHONE_CONDITION = "Danger area EGD496A active 08:00\u201318:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree"
-
-
-def blue_mill_tda(**kwargs):
-    """EGD496A as a polygon around Blue Mill whose south-west edge is about 95 m from the LZ."""
-    lat, lon = LZ
-    ring = [(lat - 0.00085, lon - 0.00145), (lat - 0.00085, lon + 0.08), (lat + 0.08, lon + 0.08), (lat + 0.08, lon - 0.00145)]
-    shape = [[[*ring, ring[0]]]]
-    args: dict[str, Any] = {"type_": "danger", "name": "EGD496A", "designator": "EGD496A", "by_notam": True, "shape": shape}
-    args.update(kwargs)
-    return volume(**args)
+PHONE_CONDITION = "Danger area EGD496A active 08:00\u201318:00 (UAS BVLOS ops): phone Flylogix 07700 900123 and fly only if they agree"
 
 
 def test_blue_mill_is_inside_the_tda_and_about_95_m_from_its_south_west_edge():
@@ -62,7 +54,7 @@ def test_an_email_contact_names_the_email():
 
 def test_a_blank_activity_leaves_out_the_brackets():
     finding = only(assess([blue_mill_tda()], activations=[activation(read=reading(activity="  "))]))
-    assert finding.condition == "Danger area EGD496A active 08:00\u201318:00: phone Flylogix 07784 546062 and fly only if they agree"
+    assert finding.condition == "Danger area EGD496A active 08:00\u201318:00: phone Flylogix 07700 900123 and fly only if they agree"
 
 
 def test_the_window_in_the_wording_is_the_activation_in_utc():
@@ -76,24 +68,25 @@ READINGS = {
     "unread": (None, Outcome.UNVERIFIED),
     "phone": (reading(), Outcome.CONTACT_FIRST),
     "email": (reading(contact=ContactKind.EMAIL, value="ops@example.com"), Outcome.CONTACT_FIRST),
-    "radio-only": (reading(contact=ContactKind.RADIO_ONLY, value="Anglia Radar 120.620"), Outcome.NO_FLY),
-    "no contact": (reading(contact=ContactKind.NONE, value=None), Outcome.NO_FLY),
-    "phone without a number": (reading(value="  "), Outcome.NO_FLY),
+    "radio-only": (reading(contact=ContactKind.RADIO_ONLY, value="Anglia Radar 120.620"), Outcome.CHECK_SUP),
+    "no contact": (reading(contact=ContactKind.NONE, value=None), Outcome.CHECK_SUP),
+    "phone without a number": (reading(value="  "), Outcome.CHECK_SUP),
     "byelaws + phone": (reading(reason=ProhibitiveReason.BYELAWS), Outcome.NO_FLY),
     "entry prohibited + phone": (reading(reason=ProhibitiveReason.ENTRY_PROHIBITED), Outcome.NO_FLY),
     "live firing + phone": (reading(reason=ProhibitiveReason.LIVE_FIRING), Outcome.NO_FLY),
-    "prohibitive category + phone": (reading(category=Category.PROHIBITIVE), Outcome.NO_FLY),
+    "prohibitive category, reason none + phone": (reading(category=Category.PROHIBITIVE), Outcome.CONTACT_FIRST),
+    "informational category, reason none + phone": (reading(category=Category.INFORMATIONAL), Outcome.CONTACT_FIRST),
 }
 
 # (activation kind, area arguments, active with no activation?)
 KINDS = {
-    "byNotam": (dict(by_notam=True), False),
-    "hours, inside": (dict(hours="DAILY 0800-1800"), True),
-    "hours, outside": (dict(hours="DAILY 1000-1100"), False),
-    "H24": (dict(hours="H24"), True),
-    "unparseable": (dict(hours="WHENEVER THE RANGE IS HOT"), True),
-    "unreadable": (dict(hours_readable=False), True),
-    "empty": (dict(hours=None), True),
+    "byNotam": ({"by_notam": True}, False),
+    "hours, inside": ({"hours": "DAILY 0800-1800"}, True),
+    "hours, outside": ({"hours": "DAILY 1000-1100"}, False),
+    "H24": ({"hours": "H24"}, True),
+    "unparseable": ({"hours": "WHENEVER THE RANGE IS HOT"}, True),
+    "unreadable": ({"hours_readable": False}, True),
+    "empty": ({"hours": None}, True),
 }
 
 
@@ -243,34 +236,141 @@ def test_f11_a_prohibitive_reason_with_a_contact_is_no_fly_never_contact_first(w
     assert why.value in finding.reason
 
 
-def test_f11_a_prohibitive_category_with_a_phone_is_no_fly():
+def test_f11_a_prohibitive_reason_gives_no_fly_with_the_quote_in_the_reason():
+    read = reading(reason=ProhibitiveReason.BYELAWS, quote="ENTRY PROHIBITED UNDER BYELAWS")
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=read)]))
+    assert finding.outcome is Outcome.NO_FLY and 'prohibited (byelaws): "ENTRY PROHIBITED UNDER BYELAWS"' in finding.reason
+    assert "J3857/26" in finding.reason
+
+
+def test_f11_a_quote_never_carries_a_number_into_the_reason():
+    read = reading(reason=ProhibitiveReason.ENTRY_PROHIBITED, quote="MUST NOT ENTER, ASK 07700 900123")
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=read)]))
+    assert "07700" not in finding.reason and "<PHONE_1>" in finding.reason
+
+
+def test_cr2_a_prohibitive_category_with_reason_none_and_a_phone_is_contact_first_not_no_fly():
+    """E8: the airspace path follows the NOTAM table, which keys on prohibitive_reason and never on the category."""
     read = reading(category=Category.PROHIBITIVE)
-    assert only(assess([blue_mill_tda()], activations=[activation(read=read)])).outcome is Outcome.NO_FLY
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=read, notam_id="J3857/26")]))
+    assert finding.outcome is Outcome.CONTACT_FIRST and finding.condition == PHONE_CONDITION
+    assert "J3857/26" in finding.reason
 
 
-def test_f11_radio_only_is_no_fly_and_says_a_radio_frequency_is_not_a_contact():
+def test_cr2_a_prohibitive_category_with_reason_none_and_no_contact_is_check_sup():
+    read = reading(category=Category.PROHIBITIVE, contact=ContactKind.NONE, value=None)
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=read)]))
+    assert finding.outcome is Outcome.CHECK_SUP and "J3857/26" in finding.reason
+
+
+def test_f11_radio_only_is_check_sup_and_says_a_radio_frequency_is_not_a_contact():
     read = reading(contact=ContactKind.RADIO_ONLY, value="Anglia Radar 120.620")
     finding = only(assess([blue_mill_tda()], activations=[activation(read=read)]))
-    assert finding.outcome is Outcome.NO_FLY and "radio frequency alone is not a contact" in finding.reason
+    assert finding.outcome is Outcome.CHECK_SUP and "radio frequency is not a contact" in finding.reason
+    assert finding.condition == "read the SUP / AIP ENR 5.1 entry for EGD496A before flight"
 
 
-def test_a_contact_object_that_is_phone_but_empty_is_no_fly():
+def test_a_contact_object_that_is_phone_but_empty_is_check_sup():
     read = reading().model_copy(update={"contact": Contact(kind=ContactKind.PHONE, value=None)})
-    assert only(assess([blue_mill_tda()], activations=[activation(read=read)])).outcome is Outcome.NO_FLY
+    assert only(assess([blue_mill_tda()], activations=[activation(read=read)])).outcome is Outcome.CHECK_SUP
 
 
-# --- several activations: NO_FLY, then UNVERIFIED, then CONTACT_FIRST ----------------------------
+# --- CHECK_SUP and the SUP suffix ------------------------------------------------------------------------
+
+
+SUP = "AIP SUP 108/2026"
+
+
+def test_check_sup_names_the_designator_and_the_sup():
+    read = reading(contact=ContactKind.NONE, value=None)
+    result = assess([blue_mill_tda()], activations=[activation(read=read, sup=[SUP])])
+    finding = only(result)
+    assert finding.outcome is Outcome.CHECK_SUP
+    assert finding.condition == "read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026"
+
+
+def test_check_sup_names_every_sup_in_order():
+    read = reading(contact=ContactKind.NONE, value=None)
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=read, sup=[SUP, "AIP SUP 7/2026"])]))
+    assert finding.condition is not None and finding.condition.endswith("; details in AIP SUP 108/2026, AIP SUP 7/2026")
+
+
+def test_contact_first_appends_the_sup_to_the_unchanged_call_wording():
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=reading(), sup=[SUP])]))
+    assert finding.outcome is Outcome.CONTACT_FIRST
+    assert finding.condition == PHONE_CONDITION + "; details in AIP SUP 108/2026"
+
+
+@pytest.mark.parametrize("read", [reading(), reading(contact=ContactKind.NONE, value=None)])
+def test_no_sup_reference_means_no_suffix_no_empty_brackets_and_no_trailing_separator(read):
+    condition = only(assess([blue_mill_tda()], activations=[activation(read=read)])).condition or ""
+    assert "details" not in condition and "[" not in condition and "()" not in condition and not condition.rstrip().endswith(";")
+
+
+def test_the_reasons_of_contact_first_and_check_sup_hold_no_number_and_no_item_e():
+    for read in (reading(), reading(contact=ContactKind.NONE, value=None)):
+        finding = only(assess([blue_mill_tda()], activations=[activation(read=read, e_text="REDACTED <PHONE_1>")]))
+        assert "<PHONE_1>" not in finding.reason and "07700" not in finding.reason
+
+
+# --- the code decides the contact; a disagreement is noted -------------------------------------------------
+
+
+def test_code_finds_no_contact_but_the_reading_has_a_phone_code_decides_and_a_note_says_so():
+    result = assess([blue_mill_tda()], activations=[activation(read=reading(), contact=ContactKind.NONE)])
+    assert only(result).outcome is Outcome.CHECK_SUP
+    assert any("J3857/26" in n and "code finds none in item E" in n and "CHECK_SUP" in n for n in result.notes)
+
+
+def test_code_finds_a_contact_but_the_reading_has_none_code_decides_and_points_at_the_notam():
+    read = reading(contact=ContactKind.RADIO_ONLY, value="120.620")
+    result = assess([blue_mill_tda()], activations=[activation(read=read, contact=ContactKind.PHONE)])
+    finding = only(result)
+    assert finding.outcome is Outcome.CONTACT_FIRST
+    assert finding.condition == "Danger area EGD496A active 08:00\u201318:00 (UAS BVLOS ops): phone given in NOTAM J3857/26 and fly only if they agree"
+    assert any("code finds a phone in item E" in n and "CONTACT_FIRST" in n for n in result.notes)
+
+
+def test_no_note_when_the_code_and_the_reading_agree():
+    assert assess([blue_mill_tda()], activations=[activation(read=reading())]).notes == []
+    assert assess([blue_mill_tda()], activations=[activation(read=reading(contact=ContactKind.NONE, value=None))]).notes == []
+
+
+def test_an_activation_cannot_claim_a_radio_frequency_as_its_contact():
+    with pytest.raises(ValueError, match="radio frequency"):
+        activation(contact=ContactKind.RADIO_ONLY)
+
+
+# --- several activations: NO_FLY, then UNVERIFIED, then CHECK_SUP, then CONTACT_FIRST ------------------------
 
 
 def test_the_worst_covering_activation_wins():
     good, unread = activation(read=reading()), activation(notam_id="J3999/26", read=None)
-    bad = activation(notam_id="J3998/26", read=reading(contact=ContactKind.RADIO_ONLY, value="120.620"))
+    no_contact = activation(notam_id="J3997/26", read=reading(contact=ContactKind.RADIO_ONLY, value="120.620"))
+    bad = activation(notam_id="J3998/26", read=reading(reason=ProhibitiveReason.LIVE_FIRING, quote="LIVE FIRING"))
     area = blue_mill_tda()
     assert only(assess([area], activations=[good])).outcome is Outcome.CONTACT_FIRST
+    assert only(assess([area], activations=[good, no_contact])).outcome is Outcome.CHECK_SUP
+    assert only(assess([area], activations=[no_contact, good])).outcome is Outcome.CHECK_SUP
+    assert only(assess([area], activations=[no_contact, unread])).outcome is Outcome.UNVERIFIED
+    assert only(assess([area], activations=[unread, no_contact])).outcome is Outcome.UNVERIFIED
     assert only(assess([area], activations=[good, unread])).outcome is Outcome.UNVERIFIED
     assert only(assess([area], activations=[unread, good])).outcome is Outcome.UNVERIFIED
     assert only(assess([area], activations=[good, unread, bad])).outcome is Outcome.NO_FLY
     assert only(assess([area], activations=[bad, good])).outcome is Outcome.NO_FLY
+    assert only(assess([area], activations=[no_contact, bad])).outcome is Outcome.NO_FLY
+
+
+def test_a_no_fly_reading_plus_a_contact_reading_gives_no_fly_and_names_the_prohibiting_notam():
+    bad = activation(notam_id="J3998/26", read=reading(reason=ProhibitiveReason.BYELAWS, quote="BYELAWS APPLY"))
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=reading()), bad]))
+    assert finding.outcome is Outcome.NO_FLY and "J3998/26" in finding.reason
+
+
+def test_check_sup_plus_contact_first_gives_check_sup_and_names_the_check_sup_notam():
+    no_contact = activation(notam_id="J3997/26", read=reading(contact=ContactKind.NONE, value=None))
+    finding = only(assess([blue_mill_tda()], activations=[activation(read=reading()), no_contact]))
+    assert finding.outcome is Outcome.CHECK_SUP and "J3997/26" in finding.reason
 
 
 def test_an_activation_outside_the_segment_is_not_counted_among_them():
@@ -280,8 +380,48 @@ def test_an_activation_outside_the_segment_is_not_counted_among_them():
 
 
 def test_there_is_one_finding_per_danger_area_however_many_activations():
-    result = assess([blue_mill_tda()], activations=[activation(read=reading()), activation(notam_id="J3858/26", read=reading())])
+    result = assess([blue_mill_tda()], activations=[activation(read=reading()), activation(notam_id="J3858/26", read=reading()), activation(notam_id="J3859/26", read=reading(contact=ContactKind.NONE, value=None))])
     assert len(result.findings) == 1
+
+
+# --- G13: no activation, or unread on an area that is active alone, stays NO_FLY ------------------------------
+
+
+@pytest.mark.parametrize("hours", ["H24", None, "WHENEVER THE RANGE IS HOT", "DAILY 0800-1800"])
+def test_g13_active_alone_with_no_activation_stays_no_fly(hours):
+    finding = only(assess([blue_mill_tda(by_notam=False, hours=hours)]))
+    assert finding.outcome is Outcome.NO_FLY and "no NOTAM gives a way in" in finding.reason
+
+
+def test_g13_an_unread_activation_of_an_area_active_alone_stays_no_fly_and_of_a_by_notam_area_stays_unverified():
+    unread = activation(read=None)
+    assert only(assess([blue_mill_tda(by_notam=False, hours="H24")], activations=[unread])).outcome is Outcome.NO_FLY
+    finding = only(assess([blue_mill_tda()], activations=[unread]))
+    assert finding.outcome is Outcome.UNVERIFIED and E_TEXT in finding.reason
+
+
+# --- the docstring says what the code does ------------------------------------------------------------------
+
+
+def test_the_module_docstring_table_matches_the_rules():
+    doc = airspace_module.__doc__ or ""
+    # the stale rule is gone
+    assert "has no phone or email (a radio frequency" not in doc
+    assert "not a prohibitive category" not in doc
+    # every outcome a danger area over the LZ can give is in the table, with the rule that gives it
+    for outcome in ("NO_FLY", "UNVERIFIED", "CHECK_SUP", "CONTACT_FIRST"):
+        assert outcome in doc
+    assert "NO_FLY beats UNVERIFIED beats CHECK_SUP beats CONTACT_FIRST" in doc
+    assert "category never decides" in " ".join(doc.split())
+    # the same order as the verdict sheet's severity list and as airspace.Outcome
+    order = [a for a in SEVERITY if a.value in ("NO_FLY", "UNREAD_OVER_LZ", "CHECK_SUP", "CONTACT_FIRST")]
+    assert [a.value for a in order] == ["NO_FLY", "UNREAD_OVER_LZ", "CHECK_SUP", "CONTACT_FIRST"]
+    for outcome in (Outcome.NO_FLY, Outcome.UNVERIFIED, Outcome.CHECK_SUP, Outcome.CONTACT_FIRST):
+        assert outcome.value in doc
+    # each row of the table names the behaviour the tests above pin
+    assert re.search(r"no phone or email in its original item E\s+CHECK_SUP", doc)
+    assert re.search(r"a phone or email in its original item E\s+CONTACT_FIRST", doc)
+    assert re.search(r"prohibitive reason \(quoted\)\s+NO_FLY", doc)
 
 
 # --- designators: any way of writing one matches --------------------------------------------------

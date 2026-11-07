@@ -26,6 +26,11 @@ def test_from_08_every_segment_has_j3857_contact_first_and_h7171_avoid_sector():
         actions = {a.notam_id: a.action for a in segment.notam_actions}
         assert actions["J3857/26"] is NotamAction.CONTACT_FIRST, segment.start
         assert actions["H7171/26"] is NotamAction.AVOID_SECTOR, segment.start
+        # the airspace path gives the call-Flylogix condition (J3857/26 owns EGD496A) and names the SUP, once
+        danger = [c for c in segment.conditions if "EGD496A" in c]
+        assert len(danger) == 1 and danger[0].startswith("Danger area EGD496A active 08:00") and danger[0].endswith("; details in AIP SUP 108/2026"), segment.start
+        assert not any("read the SUP" in c for c in segment.conditions), segment.start
+        assert display(segment).endswith("WITH CONDITIONS") or segment.verdict is Verdict.NO_GO, segment.start
 
 
 def test_before_08_neither_notam_is_active_and_neither_is_listed():
@@ -67,6 +72,8 @@ def test_the_danger_area_is_decided_once_by_airspace_and_not_repeated_by_the_not
     danger = [c for c in segment.conditions if "EGD496A" in c]
     assert len(danger) == 1
     assert "phone Flylogix" in danger[0]
+    assert danger[0].endswith("; details in AIP SUP 108/2026")
+    assert danger[0].count("details in") == 1
 
 
 def test_the_debug_list_carries_each_ignored_31_oct_notam_with_a_reason():

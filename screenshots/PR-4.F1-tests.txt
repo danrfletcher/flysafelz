@@ -1,0 +1,41 @@
+$ make test   (tail)
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+evals/reader_eval/__init__.py             0      0   100%
+evals/reader_eval/blue_mill.py           52      0   100%
+evals/reader_eval/downgrade.py          148      9    94%   112-118, 124, 177
+evals/reader_eval/fields.py              35      0   100%
+evals/reader_eval/items.py               37      0   100%
+evals/reader_eval/labels.py             151      3    98%   132, 155, 171
+evals/reader_eval/report.py             131      3    98%   108, 287-288
+evals/reader_eval/run.py                118      1    99%   221
+evals/reader_eval/settings.py            22      1    95%   46
+evals/reader_eval/spots.py              136      4    97%   123, 151, 174-175
+src/flysafelz/airspace.py               345      4    99%   244, 453, 463, 566
+src/flysafelz/assess.py                 267      1    99%   133
+src/flysafelz/cases.py                   31      0   100%
+src/flysafelz/clients/open_meteo.py      69      0   100%
+src/flysafelz/clients/openaip.py        263      6    98%   210-211, 460-463
+src/flysafelz/clients/pib_source.py      78      0   100%
+src/flysafelz/designators.py             12      0   100%
+src/flysafelz/notam_action.py           248      2    99%   184, 322
+src/flysafelz/notam_area.py              95      0   100%
+src/flysafelz/pib.py                    260      0   100%
+src/flysafelz/reader/__init__.py          0      0   100%
+src/flysafelz/reader/cache.py            86      0   100%
+src/flysafelz/reader/cached_read.py      54      0   100%
+src/flysafelz/reader/checks.py          128      0   100%
+src/flysafelz/reader/config.py           67      1    99%   126
+src/flysafelz/reader/contract.py         42      0   100%
+src/flysafelz/reader/prompt.py           62      0   100%
+src/flysafelz/reader/read.py            115      0   100%
+src/flysafelz/reader/reader_set.py       50      3    94%   99, 105-106
+src/flysafelz/reader/settings.py         14      0   100%
+src/flysafelz/redact.py                  38      0   100%
+src/flysafelz/sup_refs.py                10      0   100%
+src/flysafelz/weather.py                108      0   100%
+-------------------------------------------------------------------
+TOTAL                                  3272     38    99%
+Required test coverage of 90% reached. Total coverage: 98.84%
+======================= 7103 passed in 61.89s (0:01:01) ========================
+rc=0

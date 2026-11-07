@@ -13,29 +13,55 @@ the unread path):
     1 IGNORE          not active in the segment, beyond the local area, does not apply to
                       a paramotor (drones only, aerodrome users only, or a quoted
                       PARAMOTOR_CLASS exemption)
-    2 NO_FLY          over the LZ, floor SFC, prohibitive (category, or a prohibitive reason),
-                      or cooperative with no phone or email contact
-    3 CONTACT_FIRST   over the LZ, floor SFC, cooperative, with a phone or email contact
+    2a NO_FLY         over the LZ, floor SFC, Q-code subject RR, RP or RT (restricted, prohibited,
+                      temporary restricted area); the reason names the Q-code
+    2b NO_FLY         over the LZ, floor SFC, subject RD with a prohibitive reason (live firing,
+                      entry prohibited, byelaws); the reason quotes prohibitive_quote
+    2c CONTACT_FIRST  over the LZ, floor SFC, subject RD, reason none, with a phone or email
+                      contact (the reason names the AIP SUP when the E text has one)
+    2d CHECK_SUP      over the LZ, floor SFC, subject RD, reason none, no phone or email contact:
+                      "read the SUP / AIP ENR 5.1 entry[ for <designator>] before flight[; details
+                      in AIP SUP n/yyyy]", each bracket only when the code found it in the E text
+    2  NO_FLY         over the LZ, floor SFC, any other subject: prohibitive (category, or a
+                      prohibitive reason), or cooperative with no phone or email contact (row 3
+                      comes first)
+    3  CONTACT_FIRST  over the LZ, floor SFC, any other subject: cooperative, with a phone or
+                      email contact
     4 AVOID_SECTOR    within the local area but not over the LZ; or over the LZ with a floor
                       up to the low band ("stay below <floor QNH - buffer> ft QNH")
     5 AWARENESS       floor up to the high band (shown in the answer)
     6 AWARENESS_MAP   floor above the high band (map and collapsed list only)
 
-An informational reading over the LZ from SFC is a warning, not a restriction (Q13): it
+A danger area (RD) over the LZ from SFC is decided by prohibitive_reason and the contact alone,
+never by the reader's category: the data can rule a flight out or attach a condition, never rule
+it in, so an RD is never IGNORE or AWARENESS and is NO_FLY only on a quoted stay-out reason
+(F2). Contact is a phone or an email with a value; a radio frequency is not a contact. A NOTAM
+whose Q-code is too short or in lower case has no subject and takes the other-subject rows.
+
+An informational reading over the LZ from SFC (any subject but RD) is a warning, not a restriction (Q13): it
 is AWARENESS, shown in the answer, and never NO_FLY. With no reading (Q8), a NOTAM over
 the LZ from SFC is UNREAD_OVER_LZ with its E text (phone numbers redacted to <PHONE_n>); any other unread NOTAM gets its
 code-only action (AVOID_SECTOR, AWARENESS, AWARENESS_MAP or IGNORE). An unread NOTAM is
-never NO_FLY or CONTACT_FIRST.
+never NO_FLY, CONTACT_FIRST or CHECK_SUP.
 
-Geometry: the reading's circle or polygon, else the NOTAM's Q-circle. "Over the LZ" is
-inside or exactly on the edge. "Within" is the distance to the edge being at most the
-local_area rule. A shape that cannot be used falls back to the Q-circle; with no usable
-shape the NOTAM is treated as over the LZ (fail closed) and the reason says so.
+Geometry (G16): the area item E draws, parsed by code (notam_area.area_from_item_e), else the
+NOTAM's Q-circle, else (fail closed) over the LZ. The reader never locates a NOTAM: the
+`geometry` field of a reading is not used here. A polygon or circle in item E is what the
+LZ is measured against, however large (there is no area-wide cap for it). Coordinate text
+that does not make a valid shape (Broken), a route (coordinates with times) and text with
+no coordinates all use the Q-circle, which always contains the real area, so it can
+over-warn but never under-warn; the debug list says why a Broken one was not used. "Over
+the LZ" is inside or exactly on the edge. "Within" is the distance to the edge being at
+most the local_area rule. With no usable Q-circle the NOTAM is treated as over the LZ and
+the reason says so. (A route or no area in an area-wide NOTAM never gets this far: the
+sort in pib.sort_notam answers AWARENESS first.)
 
 Limits (E10): the reading's, else F/G, else the Q-line's lower and upper FL. A reading's
 floor or ceiling of None means its E text states none, so that side goes on to F/G and then
 the Q-line. When the reading and F/G both give a side and differ, the lower floor and the
-higher ceiling win and the reason says so. The E text is never read for limits. Floors are converted to
+higher ceiling win and the reason says so. A flight level of FL999 or more is no upper limit
+wherever it is written (reading, item F/G or Q-line), so a reading of FL999 agrees with item G UNL.
+The E text is never read for limits. Floors are converted to
 feet QNH (AGL with the site elevation, FL with the segment's pressure_msl) and a floor at
 or below the site elevation is SFC. Bands are floor <= band_low, then <= band_high: a
 floor exactly on an edge belongs to the lower band, as in airspace.py (the band rules
@@ -86,12 +112,16 @@ from flysafelz.geo import (
     shape_from_points,
     shape_over,
 )
+from flysafelz.notam_area import Broken, Shape, area_from_item_e
 from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import Schedule, parse_schedule
+from flysafelz.sup_refs import sup_detail
 
-UNLIMITED_FL = 999  # a Q-line upper limit of FL999 means no upper limit
+UNLIMITED_FL = 999  # a flight level of FL999 or more (Q-line, reading, or item F/G) means no upper limit
 SFC_LIMIT = Limit(value=0, unit=LimitUnit.FT, datum=Datum.SFC)
+DANGER_AREA = "RD"  # Q-code subject: a danger area, which the data never rules in
+RESTRICTED_SUBJECTS = {"RR": "restricted area", "RP": "prohibited area", "RT": "temporary restricted area"}  # row 2a
 _LIMIT_TEXT = re.compile(
     r"(?P<sfc>SFC|GND)|(?P<unl>UNL)|FL\s?(?P<fl>\d+)|(?P<ft>\d+)\s?FT\s?(?P<datum>AGL|AMSL)",
     re.IGNORECASE,
@@ -144,6 +174,10 @@ def _show(limit: Limit) -> str:
 
 
 def _bound(limit: Limit, lz: LandingZone, pressure: float, rules: Rules) -> _Bound:
+    """A limit as a bound. Any flight level at or above UNLIMITED_FL (FL999) is no upper limit, wherever it is written:
+    the reading, item F/G or the Q-line, so that a reading of FL999 agrees with item G UNL."""
+    if limit.unit is LimitUnit.FL and limit.value >= UNLIMITED_FL:
+        return _unlimited()
     return _Bound(_show(limit), limit_qnh_ft(limit, lz.elevation_ft, pressure, rules))
 
 
@@ -255,19 +289,19 @@ def _polygon_where(lz: LandingZone, polygon: Polygon) -> _Where | None:
     return _Where(False, shape_edge_distance_nm(lz.lat, lz.lon, shape), shape_edge_bearing_deg(lz.lat, lz.lon, shape), "polygon edge")
 
 
-def _where(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, debug: list[str]) -> _Where:
-    """The reading's shape, else the Q-circle, else (fail closed) over the LZ."""
-    geometry = reading.geometry if reading else None
-    if isinstance(geometry, Circle):
-        found = _circle_where(lz, geometry, "circle edge")
-    elif isinstance(geometry, Polygon):
-        found = _polygon_where(lz, geometry)
-    else:
-        found = None
+def _where(parsed: ParsedNotam, lz: LandingZone, debug: list[str]) -> _Where:
+    """The shape item E draws, else the Q-circle, else (fail closed) over the LZ. The reading is never asked (G16)."""
+    area = area_from_item_e(parsed)
+    found = None
+    if isinstance(area, Shape):
+        drawn = area.area
+        found = _circle_where(lz, drawn, "circle edge") if isinstance(drawn, Circle) else _polygon_where(lz, drawn)
+        if found is None:
+            debug.append("item E shape not usable; the Q-circle is used")
+    elif isinstance(area, Broken):
+        debug.append(f"item E coordinates not usable ({area.reason}); the Q-circle is used")
     if found is not None:
         return found
-    if geometry is not None:
-        debug.append("reading geometry not usable; the Q-circle is used")
     q_circle = _circle_where(lz, Circle(lat=parsed.centre_lat, lon=parsed.centre_lon, radius_nm=parsed.radius_nm), "Q-circle edge")
     if q_circle is not None:
         return q_circle
@@ -362,9 +396,45 @@ def _result(parsed: ParsedNotam, action: NotamAction, reason: str, debug: list[s
     return ActionResult(notam_id=parsed.id, action=action, reason=line, bearing_deg=bearing, debug=list(debug))
 
 
+def _sup_tail(parsed: ParsedNotam) -> str:
+    """"; details in AIP SUP 108/2026" for the SUP references in the E text, else nothing."""
+    detail = sup_detail(parsed.sup_references)
+    return f"; {detail}" if detail else ""
+
+
+def check_sup_text(parsed: ParsedNotam) -> str:
+    """FR5: "read the SUP / AIP ENR 5.1 entry[ for <designator>] before flight[; details in AIP SUP n/yyyy]".
+
+    A bracketed part is there only when the code found it in the E text (every designator and every SUP, in order of appearance).
+    """
+    where = f" for {', '.join(parsed.designators)}" if parsed.designators else ""
+    return f"read the SUP / AIP ENR 5.1 entry{where} before flight{_sup_tail(parsed)}"
+
+
+def _danger_area(parsed: ParsedNotam, reading: NotamReading, here: str, debug: list[str], extras: list[str]) -> ActionResult:
+    """Rows 2b to 2d for a danger area (QRD) over the LZ from the surface. The reader's category is ignored (CR2)."""
+    if reading.prohibitive_reason is not ProhibitiveReason.NONE:
+        quote = " ".join(redact_phones(reading.prohibitive_quote or "")[0].split())
+        said = f': "{quote}"' if quote else ""
+        return _result(parsed, NotamAction.NO_FLY, f"{here}: prohibitive ({reading.prohibitive_reason.value}){said}", debug, extras)
+    if _has_contact(reading):
+        contact = f"{reading.contact.kind.value} {(reading.contact.value or '').strip()}"
+        return _result(parsed, NotamAction.CONTACT_FIRST, f"{here}: contact {contact} first and fly only if they agree{_sup_tail(parsed)}", debug, extras)
+    # The FR5 text comes first and the fail-closed notes (schedule not parsed, no usable geometry, a ceiling disagreement, a
+    # conditional exemption's quote) follow it, as on the other two rows. Only "activates <designator>" is left out of the reason:
+    # the FR5 text already names the designator the code found in the E text. It stays in the debug list.
+    shown = [note for note in extras if not note.startswith("activates ")]
+    hidden = [note for note in extras if note.startswith("activates ")]
+    return _result(parsed, NotamAction.CHECK_SUP, check_sup_text(parsed), [*debug, *hidden], shown)
+
+
 def _over_lz_from_sfc(parsed: ParsedNotam, reading: NotamReading, label: str, conditional: bool, debug: list[str], extras: list[str], schedule_text: str) -> ActionResult:
-    """Rows 2, 3 and the informational warning, for a read NOTAM over the LZ from the surface."""
+    """Rows 2a-2d, 2, 3 and the informational warning, for a read NOTAM over the LZ from the surface."""
     here = f"{label} over the LZ from the surface"
+    if parsed.subject in RESTRICTED_SUBJECTS:
+        return _result(parsed, NotamAction.NO_FLY, f"{here}: Q-code {parsed.q_code} ({RESTRICTED_SUBJECTS[parsed.subject]})", debug, extras)
+    if parsed.subject == DANGER_AREA:
+        return _danger_area(parsed, reading, here, debug, extras)
     why = _prohibition(reading)
     if why is not None:
         return _result(parsed, NotamAction.NO_FLY, f"{here}: {why}", debug, extras)
@@ -403,7 +473,7 @@ def notam_action(
     if not schedule.parsed:
         extras.append("schedule not parsed")
         debug.append(schedule.note or "schedule not parsed")
-    where = _where(parsed, reading, lz, debug)
+    where = _where(parsed, lz, debug)
     local_area = _number(rules.local_area)
     if not where.over and where.distance_nm > local_area:
         return _result(parsed, NotamAction.IGNORE, f"{where.distance_nm:.2f} NM from the LZ, beyond the {local_area:g} NM local area", debug)

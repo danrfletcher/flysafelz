@@ -206,7 +206,8 @@ def _read_block(block: object) -> tuple[ReaderOutput | None, tuple[str, ...], tu
             problems.append(f"{key}: {str(exc).splitlines()[0]}")
     if missing:
         return None, tuple(missing), tuple(problems)
-    return ReaderOutput.model_validate(values), (), ()
+    # Dan's labels have no quote (nine keys, not scored): the reading carries None, which is what merge_reading gives the reason `none` anyway.
+    return ReaderOutput.model_validate({**values, "prohibitive_quote": None}), (), ()
 
 
 # --- the file -----------------------------------------------------------------------------------------------------------------

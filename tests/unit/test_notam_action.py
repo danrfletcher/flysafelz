@@ -17,7 +17,10 @@ from factories import (
     STANDARD_HPA,
     agl,
     amsl,
+    as_written,
     circle_at,
+    drawing,
+    drawn,
     exemption,
     fl,
     notam,
@@ -61,7 +64,7 @@ BANDS = {
 EDGE_NM = {"over": 0.0, "within": 1.0, "beyond": 3.0}
 ACTIVE_D = {"active": "0800-1800", "inactive": "1200-1800"}  # the segment is 09:00-10:00Z
 CONTACTS = {
-    "phone": (ContactKind.PHONE, "07784 546062"),
+    "phone": (ContactKind.PHONE, "07700 900123"),  # an Ofcom fiction-range number
     "email": (ContactKind.EMAIL, "ops@example.org"),
     "radio-only": (ContactKind.RADIO_ONLY, "123.450"),
     "none": (ContactKind.NONE, None),
@@ -75,14 +78,14 @@ EXEMPTIONS = {
 
 
 def act(parsed, read=None, seg=None, **kw) -> ActionResult:
-    return notam_action(parsed, read, LZ, seg or segment(), **kw)
+    return notam_action(drawn(parsed, read), read, LZ, seg or segment(), **kw)
 
 
-def build(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions="no-exemption"):
+def build(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions="no-exemption", subject="WU", reason=ProhibitiveReason.NONE):
     """A parsed NOTAM and (if read) its reading, with the same circle, floor and schedule on both."""
     limit, text = BANDS[band]
     circle = circle_at(EDGE_NM[edge])
-    parsed = notam(circle=circle, item_d=ACTIVE_D[d], item_f=text, item_e=E_TEXT)
+    parsed = notam(circle=circle, item_d=ACTIVE_D[d], item_f=text, item_e=E_TEXT, subject=subject)
     if not read:
         return parsed, None
     kind, value = CONTACTS[contact]
@@ -96,10 +99,12 @@ def build(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone"
         value=value,
         applies_to=applies,
         exemptions=EXEMPTIONS[exemptions],
+        reason=reason,
+        quote=None if reason is ProhibitiveReason.NONE else QUOTE,
     )
 
 
-def expected(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions="no-exemption") -> NotamAction:
+def expected(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions="no-exemption", subject="WU", reason=ProhibitiveReason.NONE) -> NotamAction:
     """The table, written out rule by rule (first match wins). The oracle for the matrix."""
     if read and (applies in (AppliesTo.UAS_ONLY, AppliesTo.AERODROME_USERS) or exemptions == "paramotor-quoted"):
         return A.IGNORE  # row 1: does not apply to a paramotor
@@ -109,7 +114,13 @@ def expected(*, edge, band, d, read, category=Category.COOPERATIVE, contact="pho
     if over and band == "sfc":
         if not read:
             return A.UNREAD_OVER_LZ  # Q8
-        if category is Category.PROHIBITIVE:
+        if subject in ("RR", "RP", "RT"):
+            return A.NO_FLY  # row 2a: whatever the category, reason or contact
+        if subject == "RD":  # the reader's category and a conditional exemption do not count
+            if reason is not ProhibitiveReason.NONE:
+                return A.NO_FLY  # row 2b, before any contact
+            return A.CONTACT_FIRST if contact in ("phone", "email") else A.CHECK_SUP  # rows 2c and 2d
+        if category is Category.PROHIBITIVE or reason is not ProhibitiveReason.NONE:
             return A.NO_FLY  # row 2
         if contact in ("phone", "email") and (category is Category.COOPERATIVE or exemptions == "conditional"):
             return A.CONTACT_FIRST  # row 3
@@ -124,6 +135,8 @@ def expected(*, edge, band, d, read, category=Category.COOPERATIVE, contact="pho
 def case(**kw):
     ident = "-".join(
         [
+            *([kw["subject"]] if kw.get("subject", "WU") != "WU" else []),
+            *([kw["reason"].name.lower()] if kw.get("reason", ProhibitiveReason.NONE) is not ProhibitiveReason.NONE else []),
             "read" if kw["read"] else "unread",
             kw["edge"],
             kw["band"],
@@ -146,8 +159,30 @@ def matrix():
             yield case(edge=edge, band=band, d=d, read=True, category=Category.PROHIBITIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions=exemptions)
 
 
+SUBJECTS = ("RR", "RP", "RT", "RD", "WU")  # the Q-code subjects that key rows 2a-2d, and a W subject for the unchanged rows
+QUOTE = "FLY ONLY WITH ATC PERMISSION"  # words of E_TEXT, quoted as the stay-out reason
+
+
+def subject_case(**kw):
+    return case(**{"applies": AppliesTo.ALL_AIRCRAFT, "exemptions": "no-exemption", "reason": ProhibitiveReason.NONE, **kw})
+
+
+def subject_matrix():
+    """Q-code subject x prohibitive reason x contact x category over the LZ from SFC, active: where rows 2a-2d and 2 live."""
+    for subject, reason, contact, category in itertools.product(SUBJECTS, ProhibitiveReason, CONTACTS, Category):
+        yield subject_case(edge="over", band="sfc", d="active", read=True, category=category, contact=contact, subject=subject, reason=reason)
+    for subject in SUBJECTS:  # the rest of the table with each subject: row 1, rows 4-6, unread and a conditional exemption
+        for edge, band, d in itertools.product(EDGE_NM, BANDS, ACTIVE_D):
+            yield subject_case(edge=edge, band=band, d=d, read=False, subject=subject)
+            for category, contact in itertools.product(Category, ("phone", "none")):
+                yield subject_case(edge=edge, band=band, d=d, read=True, category=category, contact=contact, subject=subject)
+        for applies, exemptions in itertools.product(AppliesTo, EXEMPTIONS):
+            for contact in CONTACTS:
+                yield subject_case(edge="over", band="sfc", d="active", read=True, category=Category.INFORMATIONAL, contact=contact, applies=applies, exemptions=exemptions, subject=subject)
+
+
 # Some cases are reached by two of the loops above; keyed by id they are run once.
-CASES = list({p.id: p for p in matrix()}.values())
+CASES = list({p.id: p for p in [*matrix(), *subject_matrix()]}.values())
 
 
 @pytest.mark.parametrize("kw", [p.values[0] for p in CASES], ids=[p.id for p in CASES])
@@ -242,6 +277,24 @@ def test_reading_and_fg_that_agree_say_nothing_about_a_conflict():
     # 700 ft AGL at 30 ft elevation is 730 ft QNH; the same height written as AMSL agrees.
     result = act(parsed, reading(geometry=circle_at(1.0), ceiling=amsl(730)))
     assert "disagree" not in result.reason
+
+
+@pytest.mark.parametrize("level", [999, 1000])
+def test_a_reading_ceiling_of_fl999_or_more_is_no_upper_limit_and_agrees_with_item_g_unl(level):
+    parsed = notam(circle=circle_at(0), item_f="SFC", item_g="UNL")
+    result = act(parsed, reading(geometry=circle_at(0), ceiling=fl(level)))
+    assert "disagree" not in result.reason
+    assert module.merged_limits(parsed, reading(ceiling=fl(level)), LZ, segment())[1] == math.inf
+
+
+def test_fl998_is_a_real_ceiling_and_still_disagrees_with_unl():
+    result = act(notam(circle=circle_at(0), item_f="SFC", item_g="UNL"), reading(geometry=circle_at(0), ceiling=fl(998)))
+    assert "disagree on the ceiling (FL998 against no upper limit)" in result.reason
+
+
+def test_item_g_fl999_is_no_upper_limit_too():
+    parsed = notam(circle=circle_at(0), item_f="SFC", item_g="FL999")
+    assert module.merged_limits(parsed, None, LZ, segment())[1] == math.inf
 
 
 def test_without_a_reading_fg_is_used_before_the_q_line():
@@ -387,7 +440,7 @@ def edge_distance(circle) -> float:
 
 
 def test_a_distance_exactly_at_the_local_area_is_within_and_just_beyond_is_not():
-    circle = circle_at(1.5, bearing=45)
+    circle = as_written(circle_at(1.5, bearing=45))  # the circle as code reads it back from item E
     parsed = notam(circle=circle)
     read = reading(geometry=circle)
     distance = edge_distance(circle)
@@ -461,12 +514,20 @@ def test_reading_geometry_none_falls_back_to_the_q_circle():
     assert "(Q-circle edge)" in act(far, reading(geometry=None)).reason
 
 
-def test_a_polygon_that_cannot_be_used_falls_back_to_the_q_circle_and_logs_it():
-    broken = Polygon(points=[(53.8, -0.08), (53.81, -0.08)])
-    result = act(notam(circle=circle_at(1.0)), reading(geometry=broken))
+def test_coordinates_in_item_e_that_make_no_shape_fall_back_to_the_q_circle_and_log_why():
+    two_points = "AREA BOUNDED BY 534800N 0000448W - 534836N 0000448W."  # two corners are not an area
+    result = act(notam(circle=circle_at(1.0), item_e=two_points))
     assert result.action is A.AVOID_SECTOR
     assert "(Q-circle edge)" in result.reason
-    assert "reading geometry not usable; the Q-circle is used" in result.debug
+    assert "item E coordinates not usable (2 points and no radius); the Q-circle is used" in result.debug
+
+
+def test_the_readings_own_geometry_never_locates_a_notam():
+    near, far = circle_at(0), circle_at(5.0)
+    parsed = notam(circle=far, item_e="UAS OPR WI 0.5NM.")  # item E draws nothing: the Q-circle, 5 NM away, is where it is
+    assert notam_action(parsed, reading(geometry=near, category=Category.PROHIBITIVE), LZ, segment()).action is A.IGNORE
+    parsed = notam(circle=near)
+    assert notam_action(parsed, reading(geometry=far, category=Category.PROHIBITIVE), LZ, segment()).action is A.NO_FLY
 
 
 def test_with_no_usable_geometry_the_notam_is_treated_as_over_the_lz_and_the_reason_says_so():
@@ -657,7 +718,8 @@ J1458_EXCEPTION = "DOES NOT APPLY TO ANY ACFT FLYING IN ACCORDANCE WITH EXCEPTIO
 
 def j1458(edge, *, conditional=False, contact=ContactKind.NONE, value=None):
     circle = circle_at(edge, radius_nm=2.2)
-    parsed = notam("J1458/26", circle=circle, subject="RT", item_e=J1458_E, item_f="SFC", item_g="2000FT AMSL")
+    drawing_in_e = "WI 2.2NM RADIUS OF PSN 520528N 0000757E"  # moved to the test's LZ: item E is what locates a NOTAM
+    parsed = notam("J1458/26", circle=circle, subject="RT", item_e=J1458_E.replace(drawing_in_e, drawing(circle).rstrip(".")), item_f="SFC", item_g="2000FT AMSL")
     read = reading(
         notam_id="J1458/26",
         activity="Duxford RA(T)",
@@ -865,3 +927,199 @@ def test_a_quote_without_a_number_still_matches_a_text_that_has_one():
     parsed = notam(circle=circle_at(0), item_e=PHONE_E_TEXT, item_f="SFC")
     result = act(parsed, reading(geometry=circle_at(0), category=Category.PROHIBITIVE, exemptions=[exemption("PARAMOTORS EXEMPT")]))
     assert result.action is A.IGNORE
+
+
+# --- ticket 3b PR-3: rows 2a-2d (the Q-code subject) and CHECK_SUP ----------------------------------------------------------------
+# Contacts here are Ofcom fiction-range numbers and example.org addresses only.
+
+PHONE = "07700 900123"
+SUP_E = "TEMPORARY DANGER AREA EGD496A ACTIVATED. UAS BVLOS OPS. SEE AIP SUP 108/2026."
+NO_SUP_E = "TEMPORARY DANGER AREA EGD496A ACTIVATED. UAS BVLOS OPS."
+NEITHER_E = "TEMPORARY DANGER AREA ACTIVATED. UAS BVLOS OPS."
+CHECK_SUP_FULL = "read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026"
+
+
+def over(subject="RD", item_e=SUP_E, **overrides):
+    """A NOTAM over the LZ from the surface, active all day, with the given Q-code subject and E text."""
+    return notam("J3857/26", circle=circle_at(0), item_f="SFC", item_e=item_e, subject=subject, **overrides)
+
+
+def read_over(contact=ContactKind.NONE, value=None, **overrides):
+    return reading(notam_id="J3857/26", geometry=circle_at(0), contact=contact, value=value, **overrides)
+
+
+def test_gp4_a_danger_area_with_no_contact_names_the_designator_and_the_sup():
+    result = act(over(), read_over())
+    assert result.action is A.CHECK_SUP
+    assert result.reason == CHECK_SUP_FULL
+
+
+@pytest.mark.parametrize(
+    ("item_e", "text"),
+    [
+        (SUP_E, CHECK_SUP_FULL),
+        (NO_SUP_E, "read the SUP / AIP ENR 5.1 entry for EGD496A before flight"),
+        (NEITHER_E, "read the SUP / AIP ENR 5.1 entry before flight"),
+        ("DANGER AREA ACTIVATED. SEE AIP SUP 108/2026.", "read the SUP / AIP ENR 5.1 entry before flight; details in AIP SUP 108/2026"),
+    ],
+    ids=["designator and SUP", "designator only", "neither", "SUP only"],
+)
+def test_the_check_sup_wording_has_each_bracket_only_when_the_code_found_it(item_e, text):
+    result = act(over(item_e=item_e), read_over())
+    assert (result.action, result.reason) == (A.CHECK_SUP, text)
+    assert "[" not in result.reason and "()" not in result.reason and not result.reason.endswith(("for", "; "))
+
+
+def test_the_check_sup_reason_leaves_out_only_the_redundant_activates_note_which_stays_in_the_debug_list():
+    result = act(over(), read_over(designators=["EGD496A"], floor=SFC))
+    assert result.reason == CHECK_SUP_FULL
+    assert "activates EGD496A" in result.debug
+
+
+def test_a_check_sup_reason_keeps_the_fail_closed_notes_after_the_fr5_text():
+    e_text = SUP_E + " FLY ONLY WITH ATC PERMISSION."
+    conditional = [exemption(CONDITION, ExemptionCovers.CONDITIONAL)]
+    result = act(over(item_e=e_text, item_d="BY ARRANGEMENT WITH THE ESTATE"), read_over(exemptions=conditional, designators=["EGD496A"]))
+    assert result.action is A.CHECK_SUP
+    assert result.reason == f'{CHECK_SUP_FULL}; schedule not parsed; condition: "{CONDITION}"'
+    assert "activates" not in result.reason
+
+
+def test_a_check_sup_reason_keeps_the_no_geometry_and_ceiling_disagreement_notes():
+    no_geometry = act(notam("J3857/26", radius_nm=0.0, item_f="SFC", item_e=SUP_E, subject="RD"), reading(notam_id="J3857/26", geometry=Polygon(points=[]), contact=ContactKind.NONE, value=None))
+    assert no_geometry.action is A.CHECK_SUP
+    assert no_geometry.reason == f"{CHECK_SUP_FULL}; no usable geometry, so treated as over the LZ"
+    disagree = act(over(item_g="4000FT AMSL"), read_over(ceiling=amsl(3000)))
+    assert disagree.action is A.CHECK_SUP
+    assert disagree.reason.startswith(f"{CHECK_SUP_FULL}; ")
+    assert "disagree on the ceiling" in disagree.reason
+
+
+def test_two_sup_references_are_both_named_in_order_of_appearance():
+    e_text = "DANGER AREA EGD496A. SEE AIP SUP 108/2026 AND SUP 35/26 FOR DETAILS."
+    assert act(over(item_e=e_text), read_over()).reason == "read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026, AIP SUP 35/26"
+    swapped = "DANGER AREA EGD496A. SEE SUP 35/26 AND AIP SUP 108/2026."
+    assert act(over(item_e=swapped), read_over()).reason.endswith("details in AIP SUP 35/26, AIP SUP 108/2026")
+    with_contact = act(over(item_e=e_text), read_over(ContactKind.PHONE, PHONE))
+    assert with_contact.action is A.CONTACT_FIRST
+    assert with_contact.reason.endswith("fly only if they agree; details in AIP SUP 108/2026, AIP SUP 35/26")
+
+
+def test_contact_first_on_a_danger_area_has_the_sup_tail_only_when_the_e_text_has_one():
+    with_sup = act(over(), read_over(ContactKind.PHONE, PHONE))
+    assert with_sup.action is A.CONTACT_FIRST
+    assert with_sup.reason == f"drone ops over the LZ from the surface: contact phone {PHONE} first and fly only if they agree; details in AIP SUP 108/2026"
+    without = act(over(item_e=NO_SUP_E), read_over(ContactKind.EMAIL, "ops@example.org"))
+    assert without.action is A.CONTACT_FIRST
+    assert without.reason == "drone ops over the LZ from the surface: contact email ops@example.org first and fly only if they agree"
+
+
+def test_contact_first_keeps_the_designator_note_after_the_sup_tail():
+    result = act(over(), read_over(ContactKind.PHONE, PHONE, designators=["EGD496A"]))
+    assert result.reason.endswith("fly only if they agree; details in AIP SUP 108/2026; activates EGD496A")
+
+
+def test_a_non_danger_area_never_gets_the_sup_tail_or_check_sup():
+    result = act(over(subject="WU"), read_over(ContactKind.PHONE, PHONE))
+    assert result.action is A.CONTACT_FIRST
+    assert result.reason == f"drone ops over the LZ from the surface: contact phone {PHONE} first and fly only if they agree"
+    assert act(over(subject="WU"), read_over()).action is A.NO_FLY  # row 3: cooperative with nobody to ask
+
+
+@pytest.mark.parametrize(("subject", "kind"), [("RR", "restricted area"), ("RP", "prohibited area"), ("RT", "temporary restricted area")])
+@pytest.mark.parametrize("category", list(Category))
+def test_2a_the_reason_names_the_q_code_whatever_the_category(subject, kind, category):
+    result = act(over(subject), read_over(ContactKind.PHONE, PHONE, category=category))
+    assert result.action is A.NO_FLY
+    assert result.reason == f"drone ops over the LZ from the surface: Q-code Q{subject}LW ({kind})"
+
+
+@pytest.mark.parametrize("reason", [r for r in ProhibitiveReason if r is not ProhibitiveReason.NONE])
+def test_2b_the_reason_carries_the_prohibitive_reason_and_its_quote_and_a_contact_does_not_undo_it(reason):
+    for contact in ((ContactKind.NONE, None), (ContactKind.PHONE, PHONE), (ContactKind.EMAIL, "ops@example.org")):
+        result = act(over(item_e="DANGER AREA EGD496A. ENTRY PROHIBITED. SEE AIP SUP 108/2026."), read_over(*contact, reason=reason, quote="ENTRY  prohibited"))
+        assert result.action is A.NO_FLY
+        assert result.reason == f'drone ops over the LZ from the surface: prohibitive ({reason.value}): "ENTRY prohibited"'
+
+
+def test_2b_without_a_quote_the_reason_has_no_empty_quotation_marks():
+    result = act(over(), read_over(reason=ProhibitiveReason.BYELAWS))
+    assert result.action is A.NO_FLY
+    assert result.reason == "drone ops over the LZ from the surface: prohibitive (byelaws)"
+
+
+def test_2b_a_number_in_the_quote_is_redacted_in_the_reason():
+    result = act(over(), read_over(reason=ProhibitiveReason.BYELAWS, quote=f"CALL {PHONE}"))
+    assert PHONE not in result.reason and "<PHONE_1>" in result.reason
+
+
+@pytest.mark.parametrize("category", list(Category))
+def test_cr2_the_category_of_a_danger_area_is_ignored_when_the_reason_is_none(category):
+    assert act(over(), read_over(ContactKind.PHONE, PHONE, category=category)).action is A.CONTACT_FIRST
+    assert act(over(), read_over(category=category)).action is A.CHECK_SUP
+
+
+@pytest.mark.parametrize(
+    "contact",
+    [
+        (ContactKind.RADIO_ONLY, "123.450"),
+        (ContactKind.RADIO_ONLY, None),
+        (ContactKind.PHONE, ""),
+        (ContactKind.PHONE, "   "),
+        (ContactKind.PHONE, None),
+        (ContactKind.EMAIL, " \t "),
+        (ContactKind.NONE, None),
+    ],
+    ids=["radio frequency", "radio nothing", "phone empty", "phone blank", "phone none", "email blank", "none"],
+)
+def test_e3_no_usable_contact_on_a_danger_area_is_check_sup_never_contact_first(contact):
+    result = act(over(), read_over(*contact))
+    assert result.action is A.CHECK_SUP
+    assert "contact" not in result.reason
+
+
+def test_a_danger_area_with_a_conditional_exemption_and_no_contact_is_check_sup():
+    conditional = [exemption(CONDITION, ExemptionCovers.CONDITIONAL)]
+    parsed = over(item_e=E_TEXT + " DANGER AREA EGD496A.")
+    assert act(parsed, read_over(exemptions=conditional)).action is A.CHECK_SUP
+    assert act(parsed, read_over(ContactKind.PHONE, PHONE, exemptions=conditional)).action is A.CONTACT_FIRST
+
+
+def test_an_unread_danger_area_over_the_lz_is_still_unread_over_lz():
+    result = act(over())
+    assert result.action is A.UNREAD_OVER_LZ
+    assert "read the SUP" not in result.reason
+
+
+@pytest.mark.parametrize("q_code", ["qrdca", "QR", "", "Q"])
+def test_a_lower_case_or_short_q_code_has_no_danger_area_subject_and_takes_the_category_rows(q_code):
+    parsed = over(subject="WU", q_code=q_code)
+    assert parsed.subject not in ("RD", "RR", "RP", "RT")
+    assert act(parsed, read_over(category=Category.PROHIBITIVE)).action is A.NO_FLY
+    assert act(parsed, read_over(ContactKind.PHONE, PHONE)).action is A.CONTACT_FIRST
+    assert act(parsed, read_over(category=Category.INFORMATIONAL)).action is A.AWARENESS
+    assert act(parsed, read_over(category=Category.COOPERATIVE)).action is A.NO_FLY
+
+
+@pytest.mark.parametrize("subject", ["RD", "WU"])
+def test_g6_a_danger_area_with_a_floor_above_the_surface_has_the_same_action_and_reason_as_any_other_subject(subject):
+    for floor_text, floor in (("2000FT AMSL", amsl(2000)), ("7000FT AMSL", amsl(7000)), ("12000FT AMSL", amsl(12000))):
+        results = [act(notam("J3857/26", circle=circle_at(0), item_f=floor_text, item_e=SUP_E, subject=s), reading(notam_id="J3857/26", geometry=circle_at(0), floor=floor)) for s in ("RD", "WU")]
+        assert results[0] == results[1]
+        assert results[0].action in (A.AVOID_SECTOR, A.AWARENESS, A.AWARENESS_MAP)
+    sector = [act(notam("J3857/26", circle=circle_at(1.0), item_f="SFC", item_e=SUP_E, subject=s), reading(notam_id="J3857/26", geometry=circle_at(1.0))) for s in ("RD", "WU")]
+    assert sector[0] == sector[1] and sector[0].action is A.AVOID_SECTOR
+
+
+def test_g6_row_1_still_ignores_a_danger_area_that_does_not_apply():
+    assert act(over(), read_over(applies_to=AppliesTo.UAS_ONLY)).action is A.IGNORE
+    assert act(over(), read_over(applies_to=AppliesTo.AERODROME_USERS)).action is A.IGNORE
+    assert act(over(item_e=E_TEXT), read_over(exemptions=[exemption(QUOTED)])).action is A.IGNORE
+    assert act(over(item_d="1200-1800"), read_over(schedule="1200-1800")).action is A.IGNORE
+    assert act(notam("J3857/26", circle=circle_at(3.0), item_f="SFC", subject="RD"), reading(geometry=circle_at(3.0))).action is A.IGNORE
+
+
+def test_check_sup_has_no_bearing_and_the_result_round_trips():
+    result = act(over(), read_over())
+    assert result.bearing_deg is None
+    assert ActionResult.model_validate_json(result.model_dump_json()) == result

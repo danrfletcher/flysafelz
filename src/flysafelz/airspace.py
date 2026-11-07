@@ -32,18 +32,26 @@ Within the local area but not over the LZ (distance to the nearest boundary poin
 Every one of these carries bearing_deg (from the LZ to that nearest point) and its
 compass16 name. Beyond the local area nothing is said.
 
-Danger areas (G10) are decided by activation first, per segment:
+Danger areas (G10, G13) are decided by activation first, per segment:
     byNotam            active only while an activation for its designator covers the segment
     published hours    active inside them (schedule.py), or while activated
     H24, empty, or hours that cannot be read: active, and noted
-Inactive: IGNORE with a debug reason. Active, over the LZ, from SFC:
-    every covering activation is a read NOTAM with a phone or email contact, no prohibitive reason and
-      not a prohibitive category                        CONTACT_FIRST (permission wording)
-    an activation that is prohibitive, or has no phone or email (a radio frequency is not a contact)
-      or there is no activation at all (hours, H24)     NO_FLY
-    otherwise, an activation with no reading            UNVERIFIED, with the E text
-NO_FLY beats UNVERIFIED beats CONTACT_FIRST. An active danger area above SFC follows the
-height bands like any other volume. One finding per danger area: PR-6 only labels the
+Inactive: IGNORE with a debug reason. Active, over the LZ, from SFC, the activating NOTAMs decide the way
+notam_action() does for a danger area (the data can rule a flight out or attach a condition, never rule it in):
+    an activation whose reading gives a prohibitive reason (quoted)   NO_FLY
+    there is no activation at all (hours, H24)                        NO_FLY
+    an activation with no reading, on an area that is active alone    NO_FLY (an unread NOTAM never relaxes it)
+    an activation with no reading, on a by-NOTAM area                 UNVERIFIED, with the E text
+    a read activation with no phone or email in its original item E   CHECK_SUP  "read the SUP / AIP ENR 5.1
+                                                                      entry for <designator> before flight[; details in AIP SUP n/yyyy]"
+    a read activation with a phone or email in its original item E    CONTACT_FIRST (permission wording, SUP named)
+The reader's category never decides it: a prohibitive, cooperative or informational category with reason none
+is CONTACT_FIRST or CHECK_SUP like any other. The contact is found by code in the original item E
+(Activation.item_e_contact, filled by assess; a <PHONE_n> placeholder counts, a radio frequency, an AR reference
+or coordinates do not), never by the model. Where the reading's own contact disagrees, code decides and a note
+says so.
+Several activations on one area: NO_FLY beats UNVERIFIED beats CHECK_SUP beats CONTACT_FIRST. An active danger
+area above SFC follows the height bands like any other volume. One finding per danger area: PR-6 only labels the
 activating NOTAM's own row "activates <designator>".
 
 The polygon comes from openAIP. When the area is not in the openAIP data, the Q-circle of
@@ -54,6 +62,7 @@ FL-to-feet conversion. The only constants here are definitions (a flight level i
 """
 
 import math
+import re
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from enum import StrEnum
@@ -63,7 +72,6 @@ from pydantic import AwareDatetime, BaseModel, field_validator
 from flysafelz.clients.openaip import ARC_MINUTES_PER_DEGREE, Airspace
 from flysafelz.contracts import (
     STRICT,
-    Category,
     Circle,
     ContactKind,
     Datum,
@@ -81,8 +89,10 @@ from flysafelz.geo import (
     shape_edge_distance_nm,
     shape_over,
 )
+from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import parse_schedule
+from flysafelz.sup_refs import sup_detail
 
 LatLon = tuple[float, float]
 
@@ -107,8 +117,9 @@ class Outcome(StrEnum):
     WARNING = "WARNING"
     AWARENESS = "AWARENESS"
     AVOID_SECTOR = "AVOID_SECTOR"
-    CONTACT_FIRST = "CONTACT_FIRST"  # an active danger area, activated by a NOTAM with a phone or email contact
-    NO_FLY = "NO_FLY"  # an active danger area with no contact, a prohibitive activation, or no NOTAM
+    CONTACT_FIRST = "CONTACT_FIRST"  # an active danger area, activated by a NOTAM with a phone or email in its item E
+    CHECK_SUP = "CHECK_SUP"  # an active danger area, activated by a NOTAM with no phone or email: read the SUP
+    NO_FLY = "NO_FLY"  # an active danger area with a quoted prohibitive activation, or with no NOTAM (hours, H24)
     UNVERIFIED = "UNVERIFIED"  # an active danger area activated by a NOTAM nobody has read
     IGNORE = "IGNORE"  # debug only
 
@@ -130,7 +141,10 @@ class Activation(BaseModel):
 
     designator is normalised (D496A and EGD 496A both become EGD496A). reading is None
     when the NOTAM is unread. circle is the NOTAM's Q-circle, used only when openAIP does
-    not have the area.
+    not have the area. e_text is the redacted E text: the raw item E is never kept here.
+    item_e_contact is what code found in the NOTAM's original item E (PHONE, EMAIL or NONE;
+    see find_item_e_contact) and sup_references are the AIP SUPs it names. Both are filled
+    by code, never by the model, and decide CONTACT_FIRST against CHECK_SUP.
     """
 
     model_config = STRICT
@@ -142,6 +156,8 @@ class Activation(BaseModel):
     start: AwareDatetime
     end: AwareDatetime
     circle: Circle | None = None
+    item_e_contact: ContactKind = ContactKind.NONE
+    sup_references: list[str] = []
 
     @field_validator("designator")
     @classmethod
@@ -150,6 +166,32 @@ class Activation(BaseModel):
         if found is None:
             raise ValueError(f"{value!r} is not an airspace designator")
         return found
+
+    @field_validator("item_e_contact")
+    @classmethod
+    def _phone_email_or_none(cls, value: ContactKind) -> ContactKind:
+        if value is ContactKind.RADIO_ONLY:
+            raise ValueError("a radio frequency is not a contact: item_e_contact is PHONE, EMAIL or NONE")
+        return value
+
+
+_PLACEHOLDER = re.compile(r"<PHONE_\d+>")
+# x@y.z, or the NOTAM way of writing it, x(AT)y.z (OPS(AT)FLYLOGIX.COM). The domain needs a dot and a label after it.
+_EMAIL = re.compile(r"[A-Z0-9._%+-]+(?:@|\(AT\))[A-Z0-9-]+(?:\.[A-Z0-9-]+)+", re.IGNORECASE)
+
+
+def find_item_e_contact(item_e: str) -> ContactKind:
+    """What contact a NOTAM's item E gives: PHONE, EMAIL or NONE. Code, on the original text, never a model.
+
+    A phone is whatever redact_phones finds, or a <PHONE_n> placeholder it already put there (so redacting the text
+    first never turns a contact into no contact). An email is x@y.z or x(AT)y.z. A radio frequency (128.925MHZ),
+    an AR reference (AR-2026-7404/05) and coordinates (534732N) are not a contact. A phone wins over an email.
+    """
+    if redact_phones(item_e)[1] or _PLACEHOLDER.search(item_e):
+        return ContactKind.PHONE
+    if _EMAIL.search(item_e):
+        return ContactKind.EMAIL
+    return ContactKind.NONE
 
 
 class Activity(BaseModel):
@@ -235,7 +277,7 @@ def _sfc_outcome(area: Airspace) -> Outcome | None:
     if area.type in RADIO_TYPES:
         return Outcome.RADIO
     if area.type == DANGER:
-        return Outcome.NO_FLY  # a stand-in: G10 decides which of NO_FLY, CONTACT_FIRST, UNVERIFIED
+        return Outcome.NO_FLY  # a stand-in: G10 decides which of NO_FLY, UNVERIFIED, CHECK_SUP, CONTACT_FIRST
     return None
 
 
@@ -325,37 +367,76 @@ def danger_area_active(area: Airspace, segment: Segment | TimeSpan, activations:
     return Activity(active=False, reason=f"outside published hours {area.hours}", notes=notes)
 
 
-def _problem_with(reading: NotamReading) -> str | None:
-    """Why this reading cannot make a CONTACT_FIRST, or None when it can (F11: a contact never undoes a prohibition)."""
-    if reading.category is Category.PROHIBITIVE:
-        return "the NOTAM is prohibitive"
-    if reading.prohibitive_reason is not ProhibitiveReason.NONE:
-        return f"prohibited ({reading.prohibitive_reason.value})"
-    contact = reading.contact
-    if contact.kind not in (ContactKind.PHONE, ContactKind.EMAIL) or not (contact.value or "").strip():
-        return "no phone or email contact (a radio frequency alone is not a contact)"
-    return None
+def _prohibition(reading: NotamReading) -> str | None:
+    """Why this reading rules the flight out, or None. Only a prohibitive reason does (G13, CR2): the category alone never does.
+
+    The quote is the reader's, checked against the redacted E text; it is redacted again so no number can reach a reason.
+    """
+    if reading.prohibitive_reason is ProhibitiveReason.NONE:
+        return None
+    quote = " ".join(redact_phones(reading.prohibitive_quote or "")[0].split())
+    said = f': "{quote}"' if quote else ""
+    return f"prohibited ({reading.prohibitive_reason.value}){said}"
 
 
 def _clock(t: datetime) -> str:
     return t.astimezone(UTC).strftime("%H:%M")
 
 
+def _sup_tail(activation: Activation) -> str:
+    """"; details in AIP SUP 108/2026" for the SUPs the NOTAM names, else nothing (no empty brackets, no trailing "; ")."""
+    detail = sup_detail(activation.sup_references)
+    return f"; {detail}" if detail else ""
+
+
 def _contact_condition(label: str, activation: Activation, reading: NotamReading) -> str:
+    """The call-first wording. The contact is the reading's when it gives a phone or email, else it points at the NOTAM."""
     what = f" ({reading.activity})" if reading.activity.strip() else ""
     window = f"{_clock(activation.start)}{EN_DASH}{_clock(activation.end)}"
-    contact = f"{reading.contact.kind.value} {(reading.contact.value or '').strip()}"
-    return f"Danger area {label} active {window}{what}: {contact} and fly only if they agree"
+    if _reading_contact(reading) is ContactKind.NONE:
+        contact = f"{activation.item_e_contact.value} given in NOTAM {activation.notam_id}"
+    else:
+        contact = f"{reading.contact.kind.value} {(reading.contact.value or '').strip()}"
+    return f"Danger area {label} active {window}{what}: {contact} and fly only if they agree{_sup_tail(activation)}"
 
 
-def _danger_over_lz(area: Airspace, activity: Activity) -> Finding:
-    """An active danger area over the LZ from SFC: NO_FLY, UNVERIFIED or CONTACT_FIRST."""
+def _check_sup_condition(activation: Activation) -> str:
+    """The same words as notam_action's CHECK_SUP row, for the area this activation names."""
+    return f"read the SUP / AIP ENR 5.1 entry for {activation.designator} before flight{_sup_tail(activation)}"
+
+
+def _reading_contact(reading: NotamReading) -> ContactKind:
+    """The reading's own contact: PHONE or EMAIL with a value, else NONE (a radio frequency is not a contact)."""
+    contact = reading.contact
+    if contact.kind in (ContactKind.PHONE, ContactKind.EMAIL) and (contact.value or "").strip():
+        return contact.kind
+    return ContactKind.NONE
+
+
+def _disagreement(activation: Activation, reading: NotamReading) -> str | None:
+    """A note when the reading's contact and the code's disagree on whether the NOTAM has one. Code decides."""
+    in_reading = _reading_contact(reading) is not ContactKind.NONE
+    in_text = activation.item_e_contact is not ContactKind.NONE
+    if in_reading == in_text:
+        return None
+    if in_reading:
+        return f"NOTAM {activation.notam_id}: the reading gives a {reading.contact.kind.value} contact but code finds none in item E; code decides (CHECK_SUP)"
+    return f"NOTAM {activation.notam_id}: code finds a {activation.item_e_contact.value} in item E but the reading gives no phone or email; code decides (CONTACT_FIRST)"
+
+
+def _danger_over_lz(area: Airspace, activity: Activity, notes: list[str]) -> Finding:
+    """An active danger area over the LZ from SFC: NO_FLY, UNVERIFIED, CHECK_SUP or CONTACT_FIRST, worst first (G13).
+
+    Follows notam_action's rows 2b to 2d for the activating NOTAMs. NO_FLY needs a quoted prohibitive reason (or no
+    activation at all, or an unread one on an area that is active alone); otherwise the code-found contact decides
+    between CONTACT_FIRST and CHECK_SUP. A disagreement with the reading's contact goes into `notes`.
+    """
     label = area.designator or area.name
     activations = activity.activations
     if not activations:
         return Finding(area=area.name, outcome=Outcome.NO_FLY, reason=f"Danger area {label} is active ({activity.reason}) and no NOTAM gives a way in: do not fly")
     for activation in activations:
-        problem = _problem_with(activation.reading) if activation.reading else None
+        problem = _prohibition(activation.reading) if activation.reading else None
         if problem:
             return Finding(area=area.name, outcome=Outcome.NO_FLY, reason=f"Danger area {label} is active (NOTAM {activation.notam_id}): {problem}; do not fly")
     for activation in activations:
@@ -366,10 +447,23 @@ def _danger_over_lz(area: Airspace, activity: Activity) -> Finding:
         if activation.reading is None:
             reason = f"Danger area {label} is activated by NOTAM {activation.notam_id}, which has not been read: {activation.e_text}"
             return Finding(area=area.name, outcome=Outcome.UNVERIFIED, reason=reason)
+    for activation in activations:
+        reading = activation.reading  # read, as no activation is unread by now
+        if reading is None:
+            raise ValueError("an activation without a reading was handled above")
+        if activation.item_e_contact is ContactKind.NONE:
+            note = _disagreement(activation, reading)
+            if note:
+                notes.append(note)
+            reason = f"Danger area {label} is active by NOTAM {activation.notam_id}: no phone or email in the NOTAM text and no prohibitive wording (a radio frequency is not a contact)"
+            return Finding(area=area.name, outcome=Outcome.CHECK_SUP, reason=reason, condition=_check_sup_condition(activation))
     activation = activations[0]
-    reading = activation.reading  # read, as no activation is unread by now
+    reading = activation.reading
     if reading is None:
         raise ValueError("an activation without a reading was handled above")
+    note = _disagreement(activation, reading)
+    if note:
+        notes.append(note)
     condition = _contact_condition(label, activation, reading)
     return Finding(area=area.name, outcome=Outcome.CONTACT_FIRST, reason=f"Danger area {label} is active by NOTAM {activation.notam_id}", condition=condition)
 
@@ -453,11 +547,11 @@ def _sector(area: Airspace, outcome: Outcome, floor: float, distance: float, bea
     return Finding(area=area.name, outcome=Outcome.AWARENESS, reason=f"{label} {where}, floor {_feet(floor)} ft QNH", bearing_deg=bearing, compass=compass, floor_qnh_ft=floor)
 
 
-def _over(area: Airspace, outcome: Outcome, floor: float, activity: Activity | None) -> Finding | None:
+def _over(area: Airspace, outcome: Outcome, floor: float, activity: Activity | None, notes: list[str]) -> Finding | None:
     """A volume over the LZ. CEILING is returned as None: the caller pools those (E14)."""
     label = _label(area)
     if outcome is Outcome.NO_FLY and activity is not None:
-        return _danger_over_lz(area, activity)
+        return _danger_over_lz(area, activity, notes)
     if outcome is Outcome.NO_GO:
         return Finding(area=area.name, outcome=outcome, reason=f"over {label} from the surface", floor_qnh_ft=floor)
     if outcome is Outcome.PERMISSION:
@@ -534,7 +628,7 @@ def assess_airspace(
         elif outcome is Outcome.CEILING:
             ceilings.append((floor, area))
         else:
-            finding = _over(area, outcome, floor, activity)
+            finding = _over(area, outcome, floor, activity, notes)
             if finding is not None:
                 findings.append(finding)
 

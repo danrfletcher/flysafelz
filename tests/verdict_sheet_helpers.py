@@ -49,7 +49,7 @@ def _arc(value: float, width: int, plus: str, minus: str) -> str:
 
 
 def notam_element(notam: ParsedNotam) -> str:
-    """The PIB XML for a factories.notam() NOTAM (its id, Q line, circle and B-C times)."""
+    """The PIB XML for a factories.notam() NOTAM (its id, Q line, circle, B-C times and E text)."""
     return notam_xml(
         series=notam.series,
         number=notam.number,
@@ -63,6 +63,7 @@ def notam_element(notam: ParsedNotam) -> str:
         upper=str(notam.upper_fl),
         coordinates=_arc(notam.centre_lat, 2, "N", "S") + _arc(notam.centre_lon, 3, "E", "W"),
         radius=f"{notam.radius_nm:g}",
+        e=notam.item_e,
         start=notam.valid_from.strftime("%y%m%d%H%M"),
         end=None if notam.valid_to is None else notam.valid_to.strftime("%y%m%d%H%M"),
     )

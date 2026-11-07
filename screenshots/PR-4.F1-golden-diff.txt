@@ -1,0 +1,4 @@
+$ git diff --stat e00bc9e..HEAD -- tests/golden   (slice 4/8 against its base)
+ tests/golden/assess_blue_mill_2026-10-31.json |  2 +-
+ tests/golden/blue_mill_2026-10-31.txt         | 24 ++++++++++++------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)

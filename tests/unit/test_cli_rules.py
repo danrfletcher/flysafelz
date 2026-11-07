@@ -55,7 +55,11 @@ def test_readme_rules_table_is_byte_identical_to_the_output(capsys):
 
 def test_the_word_go_never_appears_alone_in_the_output(capsys):
     cli.main(["rules"])
-    assert not re.search(r"(?<!NO-)(?<!NO_)\bGO\b", capsys.readouterr().out)
+    printed = capsys.readouterr().out
+    # The one place "GO" stands alone is the precipitation note's "0.0 mm/h is GO" (decided by Dan, G14): a
+    # forecast reading, not a verdict. Every other use of the word would be a verdict name.
+    assert printed.count("0.0 mm/h is GO;") == 1
+    assert not re.search(r"(?<!NO-)(?<!NO_)\bGO\b", printed.replace("0.0 mm/h is GO;", ""))
 
 
 def test_unknown_command_and_missing_command_are_usage_errors():

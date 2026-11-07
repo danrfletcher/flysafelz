@@ -2,6 +2,7 @@
 
 import math
 from datetime import UTC, datetime
+from typing import Any
 
 from flysafelz.airspace import Activation, AirspaceAssessment, Finding, TimeSpan, assess_airspace
 from flysafelz.clients.openaip import Airspace
@@ -94,6 +95,16 @@ def volume(
     )
 
 
+def blue_mill_tda(**kwargs):
+    """EGD496A as a polygon around Blue Mill whose south-west edge is about 95 m from the LZ."""
+    lat, lon = LZ
+    ring = [(lat - 0.00085, lon - 0.00145), (lat - 0.00085, lon + 0.08), (lat + 0.08, lon + 0.08), (lat + 0.08, lon - 0.00145)]
+    shape = [[[*ring, ring[0]]]]
+    args: dict[str, Any] = {"type_": "danger", "name": "EGD496A", "designator": "EGD496A", "by_notam": True, "shape": shape}
+    args.update(kwargs)
+    return volume(**args)
+
+
 def assess(
     areas: list[Airspace],
     *,
@@ -121,13 +132,14 @@ def with_rules(**values: object) -> Rules:
 def reading(
     *,
     contact: ContactKind = ContactKind.PHONE,
-    value: str | None = "Flylogix 07784 546062",
+    value: str | None = "Flylogix 07700 900123",
     category: Category = Category.COOPERATIVE,
     reason: ProhibitiveReason = ProhibitiveReason.NONE,
+    quote: str | None = None,
     activity: str = "UAS BVLOS ops",
     notam_id: str = "J3857/26",
 ) -> NotamReading:
-    """A hand-written reading of J3857/26 (TDA EGD496A, SFC to 1,300 ft AMSL, 0800-1800)."""
+    """A hand-written reading of J3857/26 (TDA EGD496A, SFC to 1,300 ft AMSL, 0800-1800). The number is fiction-range."""
     return NotamReading(
         id=notam_id,
         category=category,
@@ -138,6 +150,7 @@ def reading(
         contact=Contact(kind=contact, value=value),
         activates_designators=["EGD496A"],
         prohibitive_reason=reason,
+        prohibitive_quote=quote,
     )
 
 
@@ -153,7 +166,17 @@ def activation(
     notam_id: str = "J3857/26",
     circle: Circle | None = None,
     e_text: str = E_TEXT,
+    contact: ContactKind | None = None,
+    sup: list[str] | None = None,
 ) -> Activation:
+    """An Activation. `contact` is what code found in the original item E (PHONE, EMAIL or NONE).
+
+    Left out, it follows the reading's own contact when that is a phone or email with a value, else NONE, so a
+    hand-written reading and its NOTAM agree unless a test says otherwise. `sup` is the SUP references code found.
+    """
+    if contact is None:
+        has = read is not None and read.contact.kind in (ContactKind.PHONE, ContactKind.EMAIL) and bool((read.contact.value or "").strip())
+        contact = read.contact.kind if has and read is not None else ContactKind.NONE
     return Activation(
         designator=designator,
         notam_id=notam_id,
@@ -162,4 +185,6 @@ def activation(
         start=start or utc(8),
         end=end or utc(18),
         circle=circle,
+        item_e_contact=contact,
+        sup_references=sup or [],
     )

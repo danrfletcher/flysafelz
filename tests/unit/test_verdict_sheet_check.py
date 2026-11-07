@@ -115,6 +115,12 @@ def test_g10_a_null_verdict_and_every_enum_value_are_accepted():
     assert report.errors == [] and report.labelled == 3
 
 
+def test_check_sup_is_a_valid_notam_action_and_loads_as_itself():
+    assert checked(edited(notam_actions={"A1/26": "CHECK_SUP"})).errors == []
+    assert checked(edited(notam_actions={"A1/26": "CHECK_SUP"})).unread_left == 0
+    assert "CHECK_SUP" in checked(edited(notam_actions={"A1/26": "X"})).errors[0]
+
+
 @pytest.mark.parametrize("labels", [{"verdict": "NO_GO", "approaching_limits": None}, {"verdict": None, "approaching_limits": True}])
 def test_g10_a_row_with_only_one_of_the_two_labels_is_incomplete_counted_and_not_an_error(labels):
     report = checked(with_rows(row("07:00", "08:00", **labels), row("08:00", "09:00")))
@@ -208,7 +214,7 @@ def test_gp5_check_prints_one_line_per_example_with_the_columns_and_exits_0(buil
 
 
 def test_gp5_the_counts_follow_the_labels_dan_types_and_actions_done(built, capsys):
-    root, examples, sheet = built
+    _root, _examples, sheet = built
     text = sheet.read_text(encoding="utf-8")
     text = text.replace("verdict: null\n    approaching_limits: null", "verdict: NO_GO\n    approaching_limits: true", 1).replace("actions_done: false", "actions_done: true")
     text = text.replace("X1/26: null", "X1/26: UNREAD_OVER_LZ")
@@ -252,7 +258,7 @@ def test_check_cannot_be_combined_with_the_build_mode_flags(built):
 
 
 def test_an_orphan_is_reported_not_an_error_and_a_stale_entry_is_reported_not_an_error(built, capsys):
-    root, examples, sheet = built
+    root, _examples, sheet = built
     other = examples_file(root / "other.yaml", example("somebody_else", "c", now=NOW, window=(utc(8), utc(11))))
     code = main(["--check", "--examples", str(other), "--out", str(sheet)], root=root, environ={})
     out, _err = capsys.readouterr()

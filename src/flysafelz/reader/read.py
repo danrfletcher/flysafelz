@@ -4,7 +4,7 @@
 
 One `llm.invoke` with the two strings from `render_prompt` and a strict `json_schema` response format built from
 `ReaderOutput`, sent with the `timeout_s` of settings.yaml. Code merges the coded fields into the reading, whatever the
-model said: `id` from the parsed NOTAM, `geometry` from `build_area` (None is the Q-circle), `schedule` from item D ("" when
+model said: `id` from the parsed NOTAM, `geometry` from `build_area` (None is the Q-circle; the field is kept but notam_action() no longer locates a NOTAM by it, G16), `schedule` from item D ("" when
 there is none, so notam_action() keeps using item D). The model's floor and ceiling reach the reading unchanged, null
 included. Choosing between them and F/G is notam_action()'s E10 merge, never this module's.
 

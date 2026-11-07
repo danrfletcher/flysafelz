@@ -1,0 +1,158 @@
+$ uv run python -m flysafelz.cli assess --case bamburgh_2026-10-06   (exit 0; numbers shown as [phone])
+FlySafeLZ assess – case bamburgh_2026-10-06
+LZ 55.60903936140245, -1.7128269843004924 · now 2026-10-06T06:30Z
+PIB: archive commit 9b2dd548e79d5bee92d8b9abd52d56855ac0f035, issued 2026-10-06T04:00:22Z
+Window 2026-10-06T06:30Z to 2026-10-06T23:00Z (end exclusive). All times UTC.
+
+2026-10-06 (UTC)
+06:00–07:00
+  06:00–06:20  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,614 ft QNH above the LZ
+      caution: gust spread 4.7 mph, limit 4
+      caution: low cloud 92 %, limit 90
+      caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
+      NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+  06:20–07:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,614 ft QNH above the LZ
+      caution: gust spread 4.7 mph, limit 4
+      caution: low cloud 92 %, limit 90
+      NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+07:00–08:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,622 ft QNH above the LZ
+    caution: gust spread 4.7 mph, limit 4
+    caution: low cloud 94 %, limit 90
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+08:00–09:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,639 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.5 mph, limit 4
+    caution: low cloud 94 %, limit 90
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+09:00–10:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,641 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.9 mph, limit 4
+    caution: low cloud 100 %, limit 90
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+10:00–11:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,639 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.9 mph, limit 4
+    caution: low cloud 100 %, limit 90
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+11:00–12:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,625 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.7 mph, limit 4
+    caution: low cloud 100 %, limit 90
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+12:00–13:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,625 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.7 mph, limit 4
+    caution: low cloud 98 %, limit 90
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+13:00–14:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,617 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.9 mph, limit 4
+    caution: low cloud 95 %, limit 90
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+14:00–15:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,617 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.9 mph, limit 4
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+15:00–16:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,620 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    caution: gust spread 4.1 mph, limit 4
+    NOTAM H6627/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+16:00–17:00  UNVERIFIED
+    condition: avoid the sector to the SE (EGD598A)
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,622 ft QNH above the LZ
+    unverified: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    unverified: NOTAM J3307/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD598B ACTIVATED. AIP SUP 107/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM SCOTTISH INFO 119.875MHZ. FOR INFO [phone]. AR-2026-6836/02.
+    NOTAM J3306/26 AVOID_SECTOR bearing 138.1°: NOTAM J3306/26 1.46 NM to the SE (Q-circle edge), up to 500 ft AMSL: avoid that sector
+    NOTAM J3307/26 UNREAD_OVER_LZ
+17:00–18:00
+  17:00–17:29  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,625 ft QNH above the LZ
+      caution: precipitation 0.1 mm/h, on the limit 0.1; trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown
+  17:29–18:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,625 ft QNH above the LZ
+      caution: precipitation 0.1 mm/h, on the limit 0.1; trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown
+      caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
+18:00–19:00
+  18:00–18:06  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,625 ft QNH above the LZ
+      caution: precipitation 0.1 mm/h, on the limit 0.1; trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown
+      caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
+  18:06–19:00  NO-GO
+      blocked (daylight): night: outside civil twilight
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,625 ft QNH above the LZ
+      caution: precipitation 0.1 mm/h, on the limit 0.1; trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown
+19:00–20:00  NO-GO
+    blocked (daylight): night: outside civil twilight
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,625 ft QNH above the LZ
+20:00–21:00  NO-GO
+    blocked (weather): precipitation 0.6 mm/h, limit 0.1
+    blocked (daylight): night: outside civil twilight
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,620 ft QNH above the LZ
+    caution: rain chance 67 %, limit 50
+    caution: low cloud 93 %, limit 90
+21:00–22:00  NO-GO
+    blocked (weather): precipitation 0.6 mm/h, limit 0.1
+    blocked (daylight): night: outside civil twilight
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,612 ft QNH above the LZ
+    caution: rain chance 100 %, limit 50
+    caution: low cloud 93 %, limit 90
+22:00–23:00  NO-GO
+    blocked (daylight): night: outside civil twilight
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,612 ft QNH above the LZ
+    caution: precipitation 0.1 mm/h, on the limit 0.1; trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown
+    caution: rain chance 67 %, limit 50
+
+Sources
+  weather: ok
+  airspace: ok
+  NOTAMs: ok (PIB issued 2026-10-06T04:00:22Z) (case mode: captured PIB treated as current at the case's now)
+Flyable windows (UTC)
+  2026-10-06T06:00Z to 2026-10-06T08:00Z
+  2026-10-06T17:00Z to 2026-10-06T18:06Z
+Overall: NO-GO
+Assumptions
+  EGD598A: not in the openAIP data; the Q-circle of NOTAM J3306/26 is used
+  EGD598B: not in the openAIP data; the Q-circle of NOTAM J3307/26 is used

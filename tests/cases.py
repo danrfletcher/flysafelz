@@ -18,6 +18,8 @@ from flysafelz.pib import PibResult
 FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 BLUE_MILL = "blue_mill_2026-10-31"
 WEST_SLEEKBURN = "west_sleekburn_2026-10-31"
+DRURIDGE_BAY = "druridge_bay_2026-07-22"
+BAMBURGH = "bamburgh_2026-10-06"
 TODAY = datetime(2026, 11, 6, 12, 0, tzinfo=UTC)  # frozen: after every case day
 
 

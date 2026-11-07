@@ -37,15 +37,20 @@ class ReaderOutput(BaseModel):
     contact: Contact
     activates_designators: list[str]
     prohibitive_reason: ProhibitiveReason
+    prohibitive_quote: str | None
 
 
 def merge_reading(parsed: ParsedNotam, area: Area, output: ReaderOutput) -> NotamReading:
     """The reading: the model's fields plus the coded ones code supplies (F1): id, the area (None is the Q-circle) and item D.
 
     The one place a reading is put together, for a model's answer (read.py) and for a stored row (cache.py) alike. The
-    schedule is item D as written ("" when there is none, so notam_action() keeps using item D).
+    schedule is item D as written ("" when there is none, so notam_action() keeps using item D). A quote given with the
+    reason `none` is dropped to None here (FR6: not a failure), so a fresh read and a cache load behave the same.
     """
-    return NotamReading(id=parsed.id, geometry=area, schedule=parsed.item_d or "", **output.model_dump())
+    fields = output.model_dump()
+    if output.prohibitive_reason is ProhibitiveReason.NONE:
+        fields["prohibitive_quote"] = None
+    return NotamReading(id=parsed.id, geometry=area, schedule=parsed.item_d or "", **fields)
 
 
 class ReaderStatus(StrEnum):

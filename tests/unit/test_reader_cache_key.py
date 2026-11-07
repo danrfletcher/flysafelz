@@ -145,3 +145,29 @@ def test_e11_the_same_id_with_changed_e_text_is_a_miss(tmp_path, now):
 
     assert lookup(database, edited, cache_key(edited, FAKE_MODEL)) is None
     assert not read_cached(edited, llm, database, now).hit and llm.calls == ["H7171/26"]
+
+
+def test_e6_the_prompt_version_is_v2_and_a_row_stored_under_the_v1_key_is_a_miss_so_the_notam_is_read_again(monkeypatch, tmp_path, now):
+    assert prompt_module.PROMPT_VERSION == "v2"
+    database = tmp_path / "readings.sqlite"
+    v2 = cache_key(H7171, FAKE_MODEL)
+    monkeypatch.setattr(prompt_module, "PROMPT_VERSION", "v1")
+    v1 = cache_key(H7171, FAKE_MODEL)  # the old system text: its first line says v1
+    monkeypatch.undo()
+
+    assert v1 != v2 and key_text(v1) != key_text(v2)
+    assert v1.prompt_sha256 != v2.prompt_sha256 and v1.input_sha256 == v2.input_sha256 and v1.notam_id == v2.notam_id and v1.model == v2.model
+    assert render_prompt(H7171).system.splitlines()[0] == "NOTAM reader v2."
+
+    reply = fixture_reply("H7171/26")
+    monkeypatch.setattr(prompt_module, "PROMPT_VERSION", "v1")
+    store(database, v1, read_notam(H7171, Steps(reply)), now)
+    monkeypatch.undo()
+    assert lookup(database, H7171, v1) is not None  # the row is there under its own key ...
+    assert lookup(database, H7171, v2) is None  # ... and is no use under v2
+
+    llm = PerNotam([H7171], H7171_26=[reply])
+    again = read_cached(H7171, llm, database, now)
+    assert not again.hit and llm.calls == ["H7171/26"] and again.result.prompt_version == "v2"
+    with sqlite3.connect(database) as connection:
+        assert connection.execute("SELECT count(*) FROM readings").fetchone() == (2,)  # the v1 row stays; v2 filed beside it

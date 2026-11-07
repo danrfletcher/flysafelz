@@ -18,8 +18,9 @@ Nothing is interpolated or filled forward. A value that is missing at HH or at
 HH+1 (including a timestamp the response lacks) is missing for the row.
 
 Checks (G2, G3) compare against rules.yaml with each rule's own comparison, so
-a value exactly at a limit is decided by the rule. They return blockers first,
-then cautions, each in a fixed order. They never add up or weigh anything: the
+a value exactly at a limit is decided by the rule. A value exactly on a NO_GO
+limit is a caution, never a blocker (G14): NO_GO needs a value strictly past
+its limit. They return blockers first, then cautions, each in a fixed order. They never add up or weigh anything: the
 verdict is PR-8's job.
 
 Tier (G5, E3). The VERDICT tier needs every required variable and stops after
@@ -181,6 +182,9 @@ def build_rows(forecast: Forecast, start: datetime, end: datetime) -> list[Weath
 
 # --- checks (G2, G3) -------------------------------------------------------
 
+# Added to the precipitation caution for a value exactly on the limit (0.1 mm/h, trace forecast rain).
+TRACE_RAIN_HINT = "trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown"
+
 
 def _number(x: float) -> str:
     return f"{x:.1f}".rstrip("0").rstrip(".")
@@ -194,18 +198,39 @@ def _limit(rule: Rule) -> float:
 
 
 def _finding(kind: Literal["blocker", "caution"], rule: Rule, label: str, value: float) -> Finding:
-    text = f"{label} {_number(value)} {rule.unit}, limit {_number(_limit(rule))}"
+    shown, limit = _number(value), _number(_limit(rule))
+    if kind == "blocker" and shown == limit:
+        # A value past the limit must never print as "16 mph, limit 16" (float noise, or 16.04 rounded to 16).
+        shown = f"{value:.2f}"
+    text = f"{label} {shown} {rule.unit}, limit {limit}"
     return Finding(kind=kind, rule_id=rule.id, text=text, value=value, limit=_limit(rule))
 
 
-def _band(value: float | None, label: str, no_go: Rule | None, caution: Rule | None) -> Finding | None:
-    """NO_GO if the value breaches the NO_GO rule, else a caution if it breaches the caution rule."""
+def _on_the_limit(rule: Rule, label: str, value: float, hint: str | None) -> Finding:
+    """A caution for a value exactly on a NO_GO limit that has no caution band of its own. Cites the NO_GO rule."""
+    text = f"{label} {_number(value)} {rule.unit}, on the limit {_number(_limit(rule))}"
+    if hint:
+        text = f"{text}; {hint}"
+    return Finding(kind="caution", rule_id=rule.id, text=text, value=value, limit=_limit(rule))
+
+
+def _band(
+    value: float | None, label: str, no_go: Rule | None, caution: Rule | None, on_limit_hint: str | None = None
+) -> Finding | None:
+    """NO_GO if the value breaches the NO_GO rule, else a caution if it breaches the caution rule.
+
+    NO_GO needs a value strictly past its limit. A value exactly on the NO_GO limit is a caution: the caution
+    rule gives it where there is one that is breached there, else (precipitation, CAPE) the NO_GO rule itself
+    gives an "on the limit" caution. Equality is exact, on the same number `breached` compares.
+    """
     if value is None:
         return None
     if no_go is not None and no_go.breached(value):
         return _finding("blocker", no_go, label, value)
     if caution is not None and caution.breached(value):
         return _finding("caution", caution, label, value)
+    if no_go is not None and value == _limit(no_go):
+        return _on_the_limit(no_go, label, value, on_limit_hint)
     return None
 
 
@@ -216,7 +241,7 @@ def check_row(row: WeatherRow) -> list[Finding]:
     reported by weather_tier, so a NO_GO from the values that are there still shows.
     """
     v = row.values
-    cape_no_go = v.cape is not None and RULES.cape_no_go.breached(v.cape)
+    cape_no_go = v.cape is not None and RULES.cape_no_go.breached(v.cape)  # strictly past the limit
 
     found = [
         _band(v.wind_10m, "wind at 10 m", RULES.wind_10m_no_go, RULES.wind_10m_caution),
@@ -224,13 +249,14 @@ def check_row(row: WeatherRow) -> list[Finding]:
         _band(v.wind_80m, "wind at 80 m", None, RULES.wind_aloft_caution),  # aloft: caution only
         _band(v.wind_120m, "wind at 120 m", None, RULES.wind_aloft_caution),
         _band(row.gradient, "gradient", RULES.gradient_no_go, RULES.gradient_caution),
-        _band(v.precipitation, "precipitation", RULES.precipitation_no_go, None),
+        _band(v.precipitation, "precipitation", RULES.precipitation_no_go, None, on_limit_hint=TRACE_RAIN_HINT),
         _band(v.precipitation_probability, "rain chance", None, RULES.rain_chance_caution),
         _band(v.visibility, "visibility", RULES.visibility_no_go, RULES.visibility_caution),
         _band(v.cloud_cover_low, "low cloud", None, RULES.low_cloud_caution),
         _band(v.cape, "CAPE", RULES.cape_no_go, None),
     ]
-    # Thermic caution needs shortwave AND CAPE together. CAPE at its NO_GO limit is a blocker whatever the shortwave.
+    # Thermic caution needs shortwave AND CAPE together. CAPE past its NO_GO limit is a blocker whatever the shortwave.
+    # CAPE exactly on the limit is a caution, and the thermic caution may also apply.
     if (
         not cape_no_go
         and v.shortwave_radiation is not None

@@ -28,6 +28,7 @@ from flysafelz.contracts import Assessment, IgnoredNotam, NotamAction, Segment, 
 SEVERITY: tuple[NotamAction, ...] = (
     NotamAction.NO_FLY,
     NotamAction.UNREAD_OVER_LZ,
+    NotamAction.CHECK_SUP,
     NotamAction.CONTACT_FIRST,
     NotamAction.AVOID_SECTOR,
     NotamAction.AWARENESS,
@@ -119,7 +120,7 @@ def fill_rows(rows: Sequence[dict[str, Any]], assessment: Assessment) -> list[di
 
 
 def worst_action(first: NotamAction, second: NotamAction) -> NotamAction:
-    """The more severe: NO_FLY > UNREAD_OVER_LZ > CONTACT_FIRST > AVOID_SECTOR > AWARENESS > AWARENESS_MAP > IGNORE."""
+    """The more severe: NO_FLY > UNREAD_OVER_LZ > CHECK_SUP > CONTACT_FIRST > AVOID_SECTOR > AWARENESS > AWARENESS_MAP > IGNORE."""
     return first if _RANK[first] <= _RANK[second] else second
 
 
@@ -142,7 +143,7 @@ def ignored_by_code(ignored: Iterable[IgnoredNotam], local_ids: Collection[str],
     Chosen by id only, never by matching the reason text. `local_ids` are the NOTAMs whose Q-circle passed the
     prefilter's distance check (within the local area of the LZ): the NOTAMs code dropped for distance are not
     in it, so they never reach the sheet. A NOTAM the prefilter dropped for time or height (it starts after the
-    window, say) is in it, and so is one ignored as 'beyond the local area' from a reading's own geometry (its
+    window, say) is in it, and so is one ignored as 'beyond the local area' from the shape its item E draws (its
     Q-circle is near). `superseded` are the NOTAMs replaced or cancelled. A repeated id is listed once, with its
     first reason.
     """

@@ -24,6 +24,8 @@ from flysafelz import cli
 from flysafelz.assess import assess
 from flysafelz.contracts import Assessment, NotamAction, Verdict
 from flysafelz.reader import config as reader_config
+from flysafelz.reader.contract import ReaderStatus
+from flysafelz.reader.read import read_notam
 from flysafelz.redact import redact_phones
 
 BLUE_MILL = cases.BLUE_MILL
@@ -289,3 +291,16 @@ def test_f3_no_real_number_in_the_log_the_stored_rows_or_the_assessment_json_aft
         squeezed = re.sub(r"\s+", "", text)
         assert not [digits for digits in runs if digits in squeezed], where
     assert any(digits in re.sub(r"\s+", "", out) for digits in runs)  # the real number is in captured stdout, where it belongs
+
+
+def test_v2_every_blue_mill_readings_yaml_answer_still_reads_clean_with_reason_none_and_a_null_quote():
+    """The fixture's answers say reason none and carry no quote: with the quote check in place each still gives READ, no repair."""
+    by_id, readings = notams(), fixture_readings()
+    assert readings
+    for notam_id, reading in readings.items():
+        reply = model_reply(by_id[notam_id], reading)
+        assert reply["prohibitive_reason"] == "none" and reply["prohibitive_quote"] is None, notam_id
+        llm = ScriptedChat(list(by_id.values()), **{notam_id.replace("/", "_"): [reply]})
+        result = read_notam(by_id[notam_id], llm)
+        assert (result.status, result.failed_checks, result.prompt_version) == (ReaderStatus.READ, [], "v2"), notam_id
+        assert result.reading is not None and result.reading.prohibitive_quote is None
