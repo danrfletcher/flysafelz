@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 
 from flysafelz import cli, sources
-from flysafelz.clients import open_meteo, openaip
 from flysafelz import pib as pib_module
+from flysafelz.clients import open_meteo, openaip
 
 BLUE_MILL = "blue_mill_2026-10-31"
 REPO = Path(__file__).resolve().parents[2]

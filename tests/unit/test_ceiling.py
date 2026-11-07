@@ -151,6 +151,7 @@ def test_west_sleekburn_the_ceiling_is_the_same_by_segment():
     cta = volume("cta", lower=amsl(1500), cls="D", name="NEWCASTLE CTA", shape=square(*WEST_SLEEKBURN, 5.0))
     for hour in (9, 12, 15):
         from airspace_helpers import utc
+
         from flysafelz.airspace import TimeSpan
 
         segment = TimeSpan(start=utc(hour), end=utc(hour + 1))

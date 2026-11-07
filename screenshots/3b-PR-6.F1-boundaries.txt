@@ -1,0 +1,23 @@
+$ uv run python boundaries.py   (one-off, check_row over constructed rows, probes built from RULES)
+wind_10m_no_go (> 16 mph)
+  on the limit        16: CAUTION wind_10m_caution: wind at 10 m 16 mph, limit 12
+  past the limit    16.1: BLOCKER wind_10m_no_go: wind at 10 m 16.1 mph, limit 16
+gradient_no_go (> 16 mph)
+  on the limit        16: CAUTION gradient_caution: gradient 16 mph, limit 9
+  past the limit    16.1: BLOCKER gradient_no_go: gradient 16.1 mph, limit 16
+cape_no_go (> 1000 J/kg)
+  on the limit      1000: CAUTION cape_no_go: CAPE 1000 J/kg, on the limit 1000
+  past the limit    1001: BLOCKER cape_no_go: CAPE 1001 J/kg, limit 1000
+precipitation_no_go (> 0.1 mm/h)
+  on the limit       0.1: CAUTION precipitation_no_go: precipitation 0.1 mm/h, on the limit 0.1; trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown
+  past the limit     0.2: BLOCKER precipitation_no_go: precipitation 0.2 mm/h, limit 0.1
+gust_spread_no_go (> 6 mph)
+  on the limit         6: CAUTION gust_spread_caution: gust spread 6 mph, limit 4
+  past the limit     6.1: BLOCKER gust_spread_no_go: gust spread 6.1 mph, limit 6
+visibility_caution (<= 5000 m)
+  on the limit      5000: CAUTION visibility_caution: visibility 5000 m, limit 5000
+  past the limit    5001: no finding
+visibility_no_go (< 1500 m)
+  on the limit      1500: CAUTION visibility_caution: visibility 1500 m, limit 5000
+  past the limit    1499: BLOCKER visibility_no_go: visibility 1499 m, limit 1500
+precipitation_no_go 0.0 mm/h: no finding

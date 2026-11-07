@@ -1,0 +1,43 @@
+FlySafeLZ assess – case stale_pib_constructed
+LZ 51.9, -1.1 · now 2026-10-31T07:30Z
+PIB: archive commit constructed, issued 2026-10-31T02:20:11Z
+Window 2026-10-31T08:00Z to 2026-10-31T15:00Z (end exclusive). All times UTC.
+
+2026-10-31 (UTC)
+08:00–09:00  UNVERIFIED
+    condition: drone ops 0.15 NM to the S (circle edge), up to 700 ft AGL: avoid that sector
+    unverified: notams source stale: PIB issued 2026-10-31T02:20:11Z, more than 3 h before now
+    NOTAM J9001/26 AVOID_SECTOR bearing 180.0°
+09:00–10:00  UNVERIFIED
+    condition: drone ops 0.15 NM to the S (circle edge), up to 700 ft AGL: avoid that sector
+    unverified: notams source stale: PIB issued 2026-10-31T02:20:11Z, more than 3 h before now
+    NOTAM J9001/26 AVOID_SECTOR bearing 180.0°
+10:00–11:00  UNVERIFIED
+    condition: drone ops 0.15 NM to the S (circle edge), up to 700 ft AGL: avoid that sector
+    unverified: notams source stale: PIB issued 2026-10-31T02:20:11Z, more than 3 h before now
+    NOTAM J9001/26 AVOID_SECTOR bearing 180.0°
+11:00–12:00  UNVERIFIED
+    condition: drone ops 0.15 NM to the S (circle edge), up to 700 ft AGL: avoid that sector
+    unverified: notams source stale: PIB issued 2026-10-31T02:20:11Z, more than 3 h before now
+    NOTAM J9001/26 AVOID_SECTOR bearing 180.0°
+12:00–13:00  UNVERIFIED
+    condition: drone ops 0.15 NM to the S (circle edge), up to 700 ft AGL: avoid that sector
+    unverified: notams source stale: PIB issued 2026-10-31T02:20:11Z, more than 3 h before now
+    NOTAM J9001/26 AVOID_SECTOR bearing 180.0°
+13:00–14:00  UNVERIFIED
+    condition: drone ops 0.15 NM to the S (circle edge), up to 700 ft AGL: avoid that sector
+    unverified: notams source stale: PIB issued 2026-10-31T02:20:11Z, more than 3 h before now
+    NOTAM J9001/26 AVOID_SECTOR bearing 180.0°
+14:00–15:00  UNVERIFIED
+    condition: drone ops 0.15 NM to the S (circle edge), up to 700 ft AGL: avoid that sector
+    unverified: notams source stale: PIB issued 2026-10-31T02:20:11Z, more than 3 h before now
+    NOTAM J9001/26 AVOID_SECTOR bearing 180.0°
+
+Sources
+  weather: ok
+  airspace: ok
+  NOTAMs: stale – PIB issued 2026-10-31T02:20:11Z, more than 3 h before now (PIB issued 2026-10-31T02:20:11Z)
+    check by hand: NATS AIS PIB (https://pibs.nats.co.uk)
+Flyable windows (UTC)
+  none
+Overall: UNVERIFIED

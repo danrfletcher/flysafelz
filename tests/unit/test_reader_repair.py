@@ -11,11 +11,11 @@ import re
 from types import SimpleNamespace
 
 import pytest
-from factories import LZ, circle_at, notam, segment
+from factories import LZ, circle_at, notam, pib_result, run_assess, segment, utc
 from langchain_core.messages import HumanMessage, SystemMessage
 from reader_helpers import FAKE_MODEL, Steps, message, reply_fields, scripted
 
-from flysafelz.contracts import AppliesTo, Circle, NotamAction
+from flysafelz.contracts import AppliesTo, Circle, NotamAction, ProhibitiveReason, Verdict
 from flysafelz.notam_action import notam_action
 from flysafelz.notam_area import build_area
 from flysafelz.reader import read as read_module
@@ -29,7 +29,7 @@ E_TEXT = "ALL ACFT PROHIBITED. PARAGLIDERS EXEMPT. CALL 07700 900123 FIRST. EGD4
 OVER_LZ = notam(circle=circle_at(0), item_e=E_TEXT, item_f=None, item_g=None, lower_fl=0, upper_fl=8)  # no coordinates in E, so the Q-circle over the LZ stands
 PARAPHRASE = {"quote": "EXCEPT FOR PARAGLIDING", "covers": "PARAMOTOR_CLASS"}
 VERBATIM = {"quote": "PARAGLIDERS EXEMPT", "covers": "PARAMOTOR_CLASS"}
-PROHIBITIVE = {"category": "prohibitive", "prohibitive_reason": "entry prohibited", "ceiling": {"value": 800, "unit": "ft", "datum": "AMSL"}}
+PROHIBITIVE = {"category": "prohibitive", "prohibitive_reason": "entry prohibited", "prohibitive_quote": "ALL ACFT PROHIBITED", "ceiling": {"value": 800, "unit": "ft", "datum": "AMSL"}}
 
 
 def good(**overrides):
@@ -174,7 +174,7 @@ CONDITIONAL = {"quote": "EXCEPTIONS IN THE AIC", "covers": "CONDITIONAL"}
 
 
 def e3_reply(**overrides):
-    return reply_fields(**{**PROHIBITIVE, "contact": {"kind": "none", "value": None}, "applies_to": "ALL_AIRCRAFT", **overrides})
+    return reply_fields(**{**PROHIBITIVE, "contact": {"kind": "none", "value": None}, "applies_to": "ALL_AIRCRAFT", "prohibitive_quote": "APPLIES TO ALL ACFT", **overrides})
 
 
 E3_ROWS = [
@@ -313,11 +313,12 @@ def test_a_failed_check_b_never_changes_a_coded_field():
     timed = notam(item_e="UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W. CALL 07700 900123.", item_d="0800-1800")
     area = build_area(timed)[0]
     assert isinstance(area, Circle)
-    inverted = good(floor={"value": 900, "unit": "ft", "datum": "AMSL"}, ceiling={"value": 300, "unit": "ft", "datum": "AMSL"}, contact={"kind": "phone", "value": "<PHONE_1>"})
+    quote = "UAS OPR WI 0.5NM"  # the reason's quote, which is in this E text
+    inverted = good(prohibitive_quote=quote, floor={"value": 900, "unit": "ft", "datum": "AMSL"}, ceiling={"value": 300, "unit": "ft", "datum": "AMSL"}, contact={"kind": "phone", "value": "<PHONE_1>"})
     result = read_notam(timed, scripted(inverted, inverted))
     assert (result.status, result.reading) == (FAILED, None)  # no reading to "fix"
     assert "900 ft AMSL" in result.failed_checks[0] and "300 ft AMSL" in result.failed_checks[0]
-    repaired = read_notam(timed, scripted(inverted, good(floor={"value": 100, "unit": "ft", "datum": "AMSL"}, contact={"kind": "phone", "value": "<PHONE_1>"})))
+    repaired = read_notam(timed, scripted(inverted, good(prohibitive_quote=quote, floor={"value": 100, "unit": "ft", "datum": "AMSL"}, contact={"kind": "phone", "value": "<PHONE_1>"})))
     reading = repaired.reading
     assert (reading.id, reading.geometry, reading.schedule) == (timed.id, area, "0800-1800")
     assert (reading.floor.value, reading.ceiling.value) == (100, 800)  # the repair's own numbers, untouched
@@ -365,3 +366,71 @@ def test_each_failed_check_is_one_bullet_with_no_trailing_space():
     read_notam(MANY, llm)
     bullets = re.findall(r"^- .*$", user_text(llm, 1), flags=re.MULTILINE)
     assert len(bullets) == 4 and all(b == b.rstrip() for b in bullets)
+
+
+# --- E1: a prohibitive reason whose quote is not in the NOTAM text -------------------------------------------------
+
+QRD_OVER_LZ = notam("J3857/26", circle=circle_at(0), subject="RD", item_e="TEMPO DANGER AREA EGD496A ACTIVATED. ENTRY PROHIBITED BY BYELAW. CALL 07700 900123.", item_f=None, item_g=None, lower_fl=0, upper_fl=8)
+LIVE_FIRING = {"category": "prohibitive", "prohibitive_reason": "live firing", "contact": {"kind": "phone", "value": "<PHONE_1>"}, "activates_designators": ["EGD496A"]}
+
+
+def firing(quote):
+    return reply_fields(**{**LIVE_FIRING, "prohibitive_quote": quote})
+
+
+def assessed(result):
+    """The real assess() over the LZ with the reader's outcome for this NOTAM: its status when there is no reading, else the reading."""
+    pib = pib_result(QRD_OVER_LZ)
+    if result.reading is None:
+        return run_assess(window=(utc(9), utc(10)), pib=pib, reader_status={QRD_OVER_LZ.id: result.status.value})
+    return run_assess(window=(utc(9), utc(10)), pib=pib, readings={QRD_OVER_LZ.id: result.reading})
+
+
+def test_e1_a_quote_not_in_item_e_twice_fails_with_no_reading_and_the_notam_is_unverified_over_the_lz():
+    llm = scripted(firing("LIVE FIRING TAKES PLACE"), firing("DANGEROUS LIVE FIRING"))
+    result = read_notam(QRD_OVER_LZ, llm)
+    assert (result.status, result.reading, len(llm.calls)) == (FAILED, None, 2)
+    assert result.prompt_version == PROMPT_VERSION == "v2"
+    (sentence,) = result.failed_checks
+    assert sentence.startswith("your prohibitive_quote 'DANGEROUS LIVE FIRING' does not appear in the NOTAM text") and "TAKES PLACE" not in sentence
+    segments = [s for h in assessed(result).hours for s in h.segments]
+    actions = {a.action for s in segments for a in s.notam_actions}
+    assert actions == {A.UNREAD_OVER_LZ}  # never NO_FLY or CONTACT_FIRST from a reading that failed
+    assert {s.verdict for s in segments} == {Verdict.UNVERIFIED}
+
+
+def test_e1_the_repair_message_carries_the_quote_sentence_and_no_number():
+    llm = scripted(firing("LIVE FIRING TAKES PLACE"), firing("ENTRY PROHIBITED BY BYELAW"))
+    read_notam(QRD_OVER_LZ, llm)
+    sent = user_text(llm, 1)
+    assert "- your prohibitive_quote 'LIVE FIRING TAKES PLACE' does not appear in the NOTAM text; quote the words the reason rests on, word for word, or answer prohibitive_reason none" in sent
+    assert "900123" not in sent and "<PHONE_1>" in sent
+
+
+def test_e1_a_repair_with_a_correct_quote_is_repaired_and_keeps_the_reason_and_the_quote():
+    result = read_notam(QRD_OVER_LZ, scripted(firing("LIVE FIRING TAKES PLACE"), firing("entry  prohibited\nby byelaw")))
+    assert result.status is REPAIRED and result.prompt_version == "v2"
+    assert result.reading.prohibitive_reason is ProhibitiveReason.LIVE_FIRING
+    assert result.reading.prohibitive_quote == "entry  prohibited\nby byelaw"  # as the model wrote it: check_reading never changes a reading
+    (sentence,) = result.failed_checks
+    assert sentence.startswith("your prohibitive_quote 'LIVE FIRING TAKES PLACE'")
+
+
+def test_e1_a_missing_quote_with_a_reason_is_repaired_by_the_one_repair_too():
+    result = read_notam(QRD_OVER_LZ, scripted(firing(None), firing("ENTRY PROHIBITED BY BYELAW")))
+    assert result.status is REPAIRED and len(result.failed_checks) == 1 and result.failed_checks[0].startswith("your prohibitive_quote is empty")
+    twice = read_notam(QRD_OVER_LZ, scripted(firing(""), firing("   ")))
+    assert (twice.status, twice.reading) == (FAILED, None)
+
+
+def test_g8_a_quote_with_the_reason_none_is_dropped_not_a_failure_and_the_read_is_clean():
+    result = read_notam(QRD_OVER_LZ, scripted(reply_fields(prohibitive_reason="none", prohibitive_quote="ENTRY PROHIBITED BY BYELAW")))
+    assert result.status is READ and result.failed_checks == []
+    assert result.reading.prohibitive_reason is ProhibitiveReason.NONE and result.reading.prohibitive_quote is None
+
+
+def test_f3_a_reply_with_a_new_reason_value_is_a_schema_failure_that_lists_the_four_values():
+    result = read_notam(QRD_OVER_LZ, scripted(firing("x") | {"prohibitive_reason": "ordnance"}, firing("ENTRY PROHIBITED BY BYELAW")))
+    assert result.status is REPAIRED
+    assert result.failed_checks == ["your prohibitive_reason is 'ordnance', which is not allowed; use 'byelaws', 'entry prohibited', 'live firing' or 'none'"]
+    assert read_notam(QRD_OVER_LZ, scripted(firing("x") | {"prohibitive_reason": "demolition"}, firing("x") | {"prohibitive_reason": "demolition"})).status is FAILED

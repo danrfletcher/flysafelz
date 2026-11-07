@@ -85,7 +85,7 @@ def test_a_stale_pib_is_treated_like_a_failed_one():
     assert not isinstance(hours, list)
     case, _forecast, _airspace, pib, _readings = cases.load(CASE)
     old = pib.status.model_copy(update={"issued_at": case.now - timedelta(hours=hours + 1)})
-    assessment = cases.run(CASE, pib=pib.model_copy(update={"status": old}))
+    assessment = cases.run(CASE, pib=pib.model_copy(update={"status": old}), stale_rule=True)  # the live rule, asked for explicitly
     status = status_of(assessment, SourceName.NOTAMS)
     assert status.state is SourceState.STALE
     assert "PIB issued" in status.reason
@@ -101,7 +101,7 @@ def test_a_pib_exactly_at_the_stale_limit_is_not_stale():
     assert not isinstance(hours, list)
     case, _forecast, _airspace, pib, _readings = cases.load(CASE)
     edge = pib.status.model_copy(update={"issued_at": case.now - timedelta(hours=hours)})
-    assessment = cases.run(CASE, pib=pib.model_copy(update={"status": edge}))
+    assessment = cases.run(CASE, pib=pib.model_copy(update={"status": edge}), stale_rule=True)
     assert status_of(assessment, SourceName.NOTAMS).state is SourceState.OK
 
 

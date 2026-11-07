@@ -1,0 +1,1470 @@
+NOTAM id	reason (code's own words; no item E text)
+A1171/26	1 point and no radius
+A1172/26	1 point and no radius
+A1174/26	1 point and no radius
+A1207/26	1 point and no radius
+A1244/26	1 point and no radius
+A1404/26	1 point and no radius
+A1658/26	1 point and no radius
+A1827/26	1 point and no radius
+A1887/26	1 point and no radius
+A1927/26	1 point and no radius
+A1978/26	1 point and no radius
+A2074/26	1 point and no radius
+A2085/26	1 point and no radius
+A2091/26	1 point and no radius
+A2096/26	1 point and no radius
+A2185/26	1 point and no radius
+A2280/26	1 point and no radius
+A2282/26	1 point and no radius
+A2357/26	1 point and no radius
+A2367/26	1 point and no radius
+A2430/26	1 point and no radius
+A2499/26	1 point and no radius
+A2508/26	1 point and no radius
+A2509/26	1 point and no radius
+A2524/26	1 point and no radius
+A2525/26	1 point and no radius
+A2526/26	1 point and no radius
+A2527/26	1 point and no radius
+A2547/26	1 point and no radius
+A2643/26	1 point and no radius
+A2648/26	1 point and no radius
+A2656/26	1 point and no radius
+A2659/26	1 point and no radius
+A2685/26	1 point and no radius
+A2707/26	1 point and no radius
+A2842/26	1 point and no radius
+A2882/26	1 point and no radius
+A2883/26	1 point and no radius
+A2884/26	the area built from the E text reaches 1.11 NM outside the Q-circle, more than the 1 NM slack (parser miss)
+A2896/26	1 point and no radius
+A2934/26	1 point and no radius
+A2960/26	1 point and no radius
+A3011/26	1 point and no radius
+A3018/26	1 point and no radius
+A3019/26	1 point and no radius
+A3022/26	1 point and no radius
+A3023/26	1 point and no radius
+A3024/26	1 point and no radius
+A3040/26	1 point and no radius
+A3064/26	1 point and no radius
+A3078/26	1 point and no radius
+A3083/26	1 point and no radius
+A3088/26	1 point and no radius
+A3092/26	1 point and no radius
+A3140/26	1 point and no radius
+A3191/26	1 point and no radius
+A3200/26	1 point and no radius
+A3211/26	a latitude or longitude has no partner
+A3228/26	1 point and no radius
+A3292/26	1 point and no radius
+A3450/26	1 point and no radius
+A3485/26	1 point and no radius
+A3497/26	1 point and no radius
+A3506/26	1 point and no radius
+A3565/26	1 point and no radius
+A3572/26	1 point and no radius
+A3573/26	1 point and no radius
+A3590/26	1 point and no radius
+A3615/26	1 point and no radius
+A3639/26	1 point and no radius
+A3734/26	1 point and no radius
+A3764/26	1 point and no radius
+A3811/26	1 point and no radius
+A3837/26	1 point and no radius
+A3858/26	1 point and no radius
+A4000/26	1 point and no radius
+A4055/26	1 point and no radius
+A4092/26	1 point and no radius
+A4122/26	1 point and no radius
+A4129/26	1 point and no radius
+A4130/26	1 point and no radius
+A4154/26	1 point and no radius
+A4223/26	1 point and no radius
+A4315/26	1 point and no radius
+A4352/26	1 point and no radius
+A6661/26	the word RADIUS is there but no radius could be read
+A7166/26	1 point and no radius
+B1149/26	1 point and no radius
+B1160/26	the outline crosses itself
+B1168/26	1 point and no radius
+B1192/26	1 point and no radius
+B1197/26	the E text describes a corridor, buffer or arc
+B1201/26	the E text describes a corridor, buffer or arc
+B1206/26	1 point and no radius
+B1219/26	the E text describes a corridor, buffer or arc
+B1226/26	the E text describes a corridor, buffer or arc
+B1230/26	1 point and no radius
+B1262/26	1 point and no radius
+B1511/26	1 point and no radius
+B1590/26	1 point and no radius
+B1591/26	1 point and no radius
+B1619/26	1 point and no radius
+B1634/26	1 point and no radius
+B1690/26	1 point and no radius
+B1700/26	1 point and no radius
+B1702/26	1 point and no radius
+B1738/26	1 point and no radius
+B651/26	1 point and no radius
+C2347/26	1 point and no radius
+C3092/26	1 point and no radius
+C3160/26	1 point and no radius
+C3250/26	1 point and no radius
+C3254/26	2 points and no radius
+C3269/26	1 point and no radius
+C3271/26	1 point and no radius
+C3316/26	1 point and no radius
+C3414/26	1 point and no radius
+C3585/26	1 point and no radius
+C3662/26	1 point and no radius
+C3686/26	1 point and no radius
+C3720/26	1 point and no radius
+C3768/26	1 point and no radius
+C3771/26	1 point and no radius
+C3772/26	1 point and no radius
+C3775/26	1 point and no radius
+C3808/26	1 point and no radius
+C3841/26	2 points and no radius
+C3856/26	1 point and no radius
+C3859/26	1 point and no radius
+C3870/26	1 point and no radius
+C3892/26	1 point and no radius
+C3896/26	1 point and no radius
+C3909/26	1 point and no radius
+C3924/26	1 point and no radius
+C3956/26	1 point and no radius
+C4051/26	1 point and no radius
+C4082/26	1 point and no radius
+C4083/26	1 point and no radius
+C4122/26	the E text describes a corridor, buffer or arc
+C4125/26	1 point and no radius
+C4175/26	1 point and no radius
+C4178/26	1 point and no radius
+C4222/26	1 point and no radius
+C4255/26	1 point and no radius
+C4262/26	1 point and no radius
+C4263/26	1 point and no radius
+C4279/26	1 point and no radius
+C4304/26	1 point and no radius
+C4309/26	1 point and no radius
+C4335/26	1 point and no radius
+C4340/26	1 point and no radius
+C4341/26	1 point and no radius
+C4342/26	1 point and no radius
+C4344/26	1 point and no radius
+C4377/26	1 point and no radius
+C4445/26	1 point and no radius
+C4468/26	1 point and no radius
+C4476/26	1 point and no radius
+C4482/26	1 point and no radius
+C4483/26	1 point and no radius
+C4485/26	1 point and no radius
+C4510/26	1 point and no radius
+C4533/26	1 point and no radius
+C4542/26	1 point and no radius
+C4543/26	1 point and no radius
+C4545/26	1 point and no radius
+C4553/26	the area built from the E text reaches 8.27 NM outside the Q-circle, more than the 1 NM slack (parser miss)
+C4573/26	1 point and no radius
+C4581/26	1 point and no radius
+C4582/26	1 point and no radius
+C4586/26	1 point and no radius
+C4592/26	1 point and no radius
+C4600/26	1 point and no radius
+C4652/26	1 point and no radius
+C4676/26	1 point and no radius
+C4677/26	1 point and no radius
+C4687/26	the E text describes a corridor, buffer or arc
+C4720/26	the area built from the E text reaches 3.08 NM outside the Q-circle, more than the 1 NM slack (parser miss)
+C4722/26	1 point and no radius
+C4764/26	1 point and no radius
+C4765/26	1 point and no radius
+C4835/26	1 point and no radius
+C4842/26	1 point and no radius
+C4843/26	1 point and no radius
+C4844/26	1 point and no radius
+C4845/26	1 point and no radius
+C4847/26	1 point and no radius
+C4856/26	1 point and no radius
+C4858/26	1 point and no radius
+C4884/26	1 point and no radius
+C4908/26	1 point and no radius
+C4909/26	1 point and no radius
+C4925/26	1 point and no radius
+C4933/26	1 point and no radius
+C4934/26	1 point and no radius
+C4935/26	1 point and no radius
+C4936/26	1 point and no radius
+C4988/26	1 point and no radius
+C4992/26	1 point and no radius
+C4996/26	1 point and no radius
+C4999/26	1 point and no radius
+C5006/26	1 point and no radius
+C5029/26	1 point and no radius
+C5110/26	1 point and no radius
+C5112/26	1 point and no radius
+C5114/26	1 point and no radius
+C5122/26	1 point and no radius
+C5161/26	1 point and no radius
+C5174/26	1 point and no radius
+C5177/26	1 point and no radius
+C5179/26	1 point and no radius
+C5180/26	1 point and no radius
+C5183/26	1 point and no radius
+C5192/26	1 point and no radius
+C5195/26	1 point and no radius
+C5212/26	1 point and no radius
+C5232/26	1 point and no radius
+C5247/26	1 point and no radius
+C5265/26	1 point and no radius
+C5321/26	the word RADIUS is there but no radius could be read
+C5324/26	1 point and no radius
+C5339/26	1 point and no radius
+C5340/26	1 point and no radius
+C5341/26	1 point and no radius
+C5342/26	1 point and no radius
+C5343/26	1 point and no radius
+C5367/26	1 point and no radius
+C5372/26	1 point and no radius
+C5393/26	1 point and no radius
+C5394/26	1 point and no radius
+C5431/26	1 point and no radius
+C5432/26	1 point and no radius
+C5464/26	1 point and no radius
+C5465/26	1 point and no radius
+C5481/26	1 point and no radius
+C5494/26	1 point and no radius
+C5502/26	1 point and no radius
+C5506/26	1 point and no radius
+C5522/26	1 point and no radius
+C5524/26	1 point and no radius
+C5526/26	1 point and no radius
+C5541/26	1 point and no radius
+C5542/26	1 point and no radius
+C5550/26	1 point and no radius
+C5636/26	1 point and no radius
+C5680/26	1 point and no radius
+C5683/26	1 point and no radius
+C5684/26	1 point and no radius
+C5685/26	1 point and no radius
+C5686/26	1 point and no radius
+C5757/26	1 point and no radius
+C5803/26	the E text describes a corridor, buffer or arc
+C5814/26	1 point and no radius
+C5820/26	1 point and no radius
+C5829/26	1 point and no radius
+C5837/26	1 point and no radius
+C5838/26	1 point and no radius
+C5881/26	1 point and no radius
+C5885/26	1 point and no radius
+C5887/26	1 point and no radius
+C5915/26	1 point and no radius
+C5920/26	1 point and no radius
+C5930/26	1 point and no radius
+C5943/26	1 point and no radius
+C5960/26	1 point and no radius
+C5967/26	1 point and no radius
+C5968/26	1 point and no radius
+C5976/26	1 point and no radius
+C5979/26	1 point and no radius
+C5994/26	1 point and no radius
+C5997/26	1 point and no radius
+C6002/26	1 point and no radius
+C6004/26	1 point and no radius
+C6005/26	1 point and no radius
+C6016/26	1 point and no radius
+C6087/26	1 point and no radius
+C6115/26	1 point and no radius
+C6131/26	1 point and no radius
+C6139/26	1 point and no radius
+C6140/26	1 point and no radius
+C6147/26	1 point and no radius
+C6149/26	1 point and no radius
+C6153/26	1 point and no radius
+C6186/26	1 point and no radius
+C6190/26	1 point and no radius
+C6224/26	1 point and no radius
+C6241/26	1 point and no radius
+C6242/26	1 point and no radius
+C6243/26	1 point and no radius
+C6244/26	1 point and no radius
+C6249/26	1 point and no radius
+C6279/26	1 point and no radius
+C6292/26	1 point and no radius
+C6304/26	1 point and no radius
+C6309/26	1 point and no radius
+C6313/26	the outline crosses itself
+C6332/26	1 point and no radius
+C6335/26	1 point and no radius
+C6376/26	1 point and no radius
+C6381/26	1 point and no radius
+C6397/26	1 point and no radius
+C6437/26	the E text repeats a point inside the shape (two separate areas)
+C6441/26	the E text repeats a point inside the shape (two separate areas)
+C6463/26	the E text repeats a point inside the shape (two separate areas)
+C6468/26	1 point and no radius
+C6549/26	1 point and no radius
+C6594/26	1 point and no radius
+C6602/26	the area built from the E text reaches 8.15 NM outside the Q-circle, more than the 1 NM slack (parser miss)
+C6606/26	1 point and no radius
+C6616/26	1 point and no radius
+C6625/26	1 point and no radius
+C6643/26	1 point and no radius
+C6650/26	1 point and no radius
+C6726/26	1 point and no radius
+C6727/26	1 point and no radius
+C6743/26	the E text repeats a point inside the shape (two separate areas)
+C6745/26	the E text repeats a point inside the shape (two separate areas)
+C6746/26	the E text repeats a point inside the shape (two separate areas)
+C6747/26	1 point and no radius
+C6753/26	1 point and no radius
+C6755/26	1 point and no radius
+C6762/26	1 point and no radius
+C6786/26	1 point and no radius
+C6803/26	1 point and no radius
+C6851/26	1 point and no radius
+C6910/26	1 point and no radius
+C6913/26	1 point and no radius
+C6943/26	1 point and no radius
+C6981/26	1 point and no radius
+C6982/26	1 point and no radius
+C7038/26	1 point and no radius
+C7058/26	1 point and no radius
+C7085/26	1 point and no radius
+C7112/26	1 point and no radius
+C7122/26	1 point and no radius
+C7147/26	1 point and no radius
+C7149/26	1 point and no radius
+C7160/26	1 point and no radius
+C7189/26	1 point and no radius
+E112/26	1 point and no radius
+E170/26	1 point and no radius
+E197/26	1 point and no radius
+E199/26	1 point and no radius
+E201/26	1 point and no radius
+E210/26	1 point and no radius
+E212/26	1 point and no radius
+E213/26	1 point and no radius
+E228/26	1 point and no radius
+E233/26	1 point and no radius
+E234/26	1 point and no radius
+E236/26	1 point and no radius
+E240/26	1 point and no radius
+E258/26	1 point and no radius
+E262/26	1 point and no radius
+E263/26	1 point and no radius
+E267/26	1 point and no radius
+E2739/26	a latitude or longitude has no partner
+E281/26	1 point and no radius
+E287/26	1 point and no radius
+E307/26	1 point and no radius
+H1510/26	1 point and no radius
+H2546/26	1 point and no radius
+H2753/26	1 point and no radius
+H2986/26	1 point and no radius
+H3083/26	1 point and no radius
+H3256/26	1 point and no radius
+H3662/26	the E text describes a corridor, buffer or arc
+H3688/26	the E text repeats a point inside the shape (two separate areas)
+H3765/26	the E text describes a corridor, buffer or arc
+H3833/26	1 point and no radius
+H3910/26	the E text repeats a point inside the shape (two separate areas)
+H4126/26	the outline crosses itself
+H4145/26	1 point and no radius
+H4175/26	the E text describes a corridor, buffer or arc
+H4311/26	the outline crosses itself
+H4381/26	the E text describes a corridor, buffer or arc
+H4421/26	the E text repeats a point inside the shape (two separate areas)
+H4422/26	the E text describes a corridor, buffer or arc
+H4428/26	the E text describes a corridor, buffer or arc
+H4447/26	the E text describes a corridor, buffer or arc
+H4587/26	the E text describes a corridor, buffer or arc
+H4637/26	the E text repeats a point inside the shape (two separate areas)
+H4668/26	the outline crosses itself
+H4689/26	1 point and no radius
+H4693/26	1 point and no radius
+H4700/26	the E text repeats a point inside the shape (two separate areas)
+H4725/26	the E text describes a corridor, buffer or arc
+H4734/26	1 point and no radius
+H4741/26	1 point and no radius
+H4765/26	the E text describes a corridor, buffer or arc
+H4771/26	the E text describes a corridor, buffer or arc
+H4806/26	the E text repeats a point inside the shape (two separate areas)
+H4844/26	1 point and no radius
+H4846/26	1 point and no radius
+H4891/26	1 point and no radius
+H4913/26	2 points and no radius
+H4939/26	the E text describes a corridor, buffer or arc
+H5038/26	the E text repeats a point inside the shape (two separate areas)
+H5055/26	the E text describes a corridor, buffer or arc
+H5118/26	the outline crosses itself
+H5205/26	the E text repeats a point inside the shape (two separate areas)
+H5242/26	the E text repeats a point inside the shape (two separate areas)
+H5245/26	the E text describes a corridor, buffer or arc
+H5270/26	the E text describes a corridor, buffer or arc
+H5329/26	the E text describes a corridor, buffer or arc
+H5335/26	the E text describes a corridor, buffer or arc
+H5344/26	the E text describes a corridor, buffer or arc
+H5384/26	the E text describes a corridor, buffer or arc
+H5406/26	the E text describes a corridor, buffer or arc
+H5464/26	the E text describes a corridor, buffer or arc
+H5469/26	the E text repeats a point inside the shape (two separate areas)
+H5473/26	the E text gives more than one radius
+H5480/26	the E text describes a corridor, buffer or arc
+H5484/26	the E text gives more than one radius
+H5499/26	the E text gives more than one radius
+H5502/26	the E text gives more than one radius
+H5544/26	1 point and no radius
+H5598/26	the outline crosses itself
+H5608/26	a latitude or longitude has no partner
+H5661/26	the E text describes a corridor, buffer or arc
+H5665/26	the E text repeats a point inside the shape (two separate areas)
+H5745/26	the E text gives more than one radius
+H5748/26	the E text describes a corridor, buffer or arc
+H5749/26	the E text describes a corridor, buffer or arc
+H5777/26	1 point and no radius
+H5790/26	the E text describes a corridor, buffer or arc
+H5793/26	the E text describes a corridor, buffer or arc
+H5795/26	the E text repeats a point inside the shape (two separate areas)
+H5809/26	1 point and no radius
+H5887/26	the E text describes a corridor, buffer or arc
+H5912/26	the E text gives more than one radius
+H5913/26	the E text gives more than one radius
+H5984/26	the E text describes a corridor, buffer or arc
+H6020/26	the E text repeats a point inside the shape (two separate areas)
+H6046/26	the E text describes a corridor, buffer or arc
+H6096/26	the E text describes a corridor, buffer or arc
+H6114/26	the E text describes a corridor, buffer or arc
+H6162/26	the E text describes a corridor, buffer or arc
+H6172/26	the E text describes a corridor, buffer or arc
+H6220/26	the E text describes a corridor, buffer or arc
+H6300/26	the E text repeats a point inside the shape (two separate areas)
+H6303/26	the E text repeats a point inside the shape (two separate areas)
+H6318/26	the E text describes a corridor, buffer or arc
+H6321/26	the E text describes a corridor, buffer or arc
+H6531/26	the outline crosses itself
+H6615/26	the E text describes a corridor, buffer or arc
+H6651/26	the E text describes a corridor, buffer or arc
+H6692/26	a latitude or longitude has no partner
+H6753/26	the E text describes a corridor, buffer or arc
+H6816/26	the E text describes a corridor, buffer or arc
+H6906/26	the E text describes a corridor, buffer or arc
+H6907/26	the E text describes a corridor, buffer or arc
+H6949/26	the E text describes a corridor, buffer or arc
+H6968/26	the E text describes a corridor, buffer or arc
+H6969/26	the E text describes a corridor, buffer or arc
+H7004/26	the E text describes a corridor, buffer or arc
+H7040/26	the E text describes a corridor, buffer or arc
+H7041/26	the E text gives more than one radius
+H7042/26	the E text describes a corridor, buffer or arc
+H7074/26	the E text describes a corridor, buffer or arc
+H7092/26	the E text repeats a point inside the shape (two separate areas)
+H7100/26	the E text describes a corridor, buffer or arc
+H7131/26	1 point and no radius
+H7149/26	the E text describes a corridor, buffer or arc
+H7152/26	1 point and no radius
+H7159/26	the E text describes a corridor, buffer or arc
+H7166/26	the E text repeats a point inside the shape (two separate areas)
+H7196/26	the E text describes a corridor, buffer or arc
+H7231/26	the E text describes a corridor, buffer or arc
+H7285/26	the E text describes a corridor, buffer or arc
+I2629/26	1 point and no radius
+I2932/26	1 point and no radius
+I3460/26	1 point and no radius
+I3533/26	1 point and no radius
+I3534/26	1 point and no radius
+I3550/26	1 point and no radius
+I3662/26	1 point and no radius
+I3663/26	1 point and no radius
+I3665/26	1 point and no radius
+I3667/26	1 point and no radius
+I3755/26	1 point and no radius
+I3793/26	1 point and no radius
+I383/26	1 point and no radius
+I3918/26	1 point and no radius
+I3952/26	1 point and no radius
+I3960/26	1 point and no radius
+I3981/26	1 point and no radius
+I4012/26	1 point and no radius
+I4031/26	1 point and no radius
+I4058/26	1 point and no radius
+I4090/26	1 point and no radius
+I4136/26	1 point and no radius
+I4247/26	1 point and no radius
+I4259/26	1 point and no radius
+I4263/26	1 point and no radius
+I4306/26	1 point and no radius
+I4314/26	1 point and no radius
+I4346/26	1 point and no radius
+I4468/26	1 point and no radius
+I4503/26	1 point and no radius
+I4533/26	1 point and no radius
+I4535/26	1 point and no radius
+I4536/26	1 point and no radius
+I4560/26	1 point and no radius
+I4617/26	1 point and no radius
+I4627/26	1 point and no radius
+I4633/26	1 point and no radius
+I4653/26	1 point and no radius
+I4657/26	1 point and no radius
+I4790/26	1 point and no radius
+I4793/26	1 point and no radius
+I4796/26	1 point and no radius
+I4805/26	1 point and no radius
+I4819/26	1 point and no radius
+I4868/26	1 point and no radius
+I4876/26	1 point and no radius
+I4936/26	1 point and no radius
+I4947/26	1 point and no radius
+I4964/26	1 point and no radius
+I4966/26	1 point and no radius
+I4985/26	1 point and no radius
+I5013/26	1 point and no radius
+I5025/26	1 point and no radius
+I5036/26	1 point and no radius
+I5037/26	1 point and no radius
+I5049/26	1 point and no radius
+I5093/26	1 point and no radius
+I5105/26	1 point and no radius
+I5111/26	1 point and no radius
+I5137/26	1 point and no radius
+I5142/26	1 point and no radius
+I5143/26	1 point and no radius
+I5163/26	1 point and no radius
+I5166/26	1 point and no radius
+I5167/26	1 point and no radius
+I5170/26	1 point and no radius
+I5215/26	1 point and no radius
+I5226/26	1 point and no radius
+I5259/26	1 point and no radius
+I5266/26	1 point and no radius
+I5284/26	1 point and no radius
+I5299/26	1 point and no radius
+I5315/26	1 point and no radius
+I5329/26	1 point and no radius
+I5333/26	1 point and no radius
+I5335/26	1 point and no radius
+I5337/26	1 point and no radius
+I5360/26	1 point and no radius
+I5371/26	1 point and no radius
+I5405/26	1 point and no radius
+I5409/26	1 point and no radius
+I5416/26	1 point and no radius
+I5418/26	1 point and no radius
+I5444/26	1 point and no radius
+I5457/26	1 point and no radius
+I5506/26	1 point and no radius
+I5569/26	1 point and no radius
+I5582/26	1 point and no radius
+I5588/26	1 point and no radius
+I5637/26	1 point and no radius
+I5639/26	1 point and no radius
+I5660/26	1 point and no radius
+I5665/26	1 point and no radius
+I5702/26	1 point and no radius
+I5750/26	1 point and no radius
+I5769/26	1 point and no radius
+I5789/26	1 point and no radius
+I5823/26	1 point and no radius
+I5828/26	1 point and no radius
+I5829/26	1 point and no radius
+I5830/26	1 point and no radius
+I5857/26	1 point and no radius
+I5860/26	1 point and no radius
+I5914/26	1 point and no radius
+I5948/26	1 point and no radius
+I5953/26	1 point and no radius
+I5956/26	1 point and no radius
+I5966/26	1 point and no radius
+I5970/26	1 point and no radius
+I5975/26	1 point and no radius
+I5994/26	1 point and no radius
+I6009/26	1 point and no radius
+I6043/26	1 point and no radius
+I6048/26	1 point and no radius
+I6051/26	1 point and no radius
+I6080/26	1 point and no radius
+I6093/26	1 point and no radius
+I6111/26	1 point and no radius
+I6113/26	1 point and no radius
+I6127/26	1 point and no radius
+I6130/26	1 point and no radius
+I6161/26	1 point and no radius
+I6175/26	1 point and no radius
+I6344/26	1 point and no radius
+I6357/26	1 point and no radius
+I6360/26	1 point and no radius
+I6371/26	1 point and no radius
+I6389/26	1 point and no radius
+I6420/26	1 point and no radius
+I6471/26	1 point and no radius
+I6490/26	1 point and no radius
+I6491/26	1 point and no radius
+I6495/26	1 point and no radius
+I6523/26	1 point and no radius
+I6530/26	1 point and no radius
+I6558/26	1 point and no radius
+I6560/26	1 point and no radius
+I6576/26	1 point and no radius
+I6622/26	1 point and no radius
+I6624/26	1 point and no radius
+I6628/26	1 point and no radius
+I6630/26	1 point and no radius
+I6720/26	1 point and no radius
+I6732/26	1 point and no radius
+I6734/26	1 point and no radius
+I6815/26	1 point and no radius
+I6843/26	1 point and no radius
+I6851/26	1 point and no radius
+I6862/26	1 point and no radius
+I6908/26	1 point and no radius
+I6933/26	1 point and no radius
+I6974/26	1 point and no radius
+I6977/26	1 point and no radius
+I7030/26	1 point and no radius
+I7031/26	1 point and no radius
+I7062/26	1 point and no radius
+I7065/26	1 point and no radius
+I7068/26	1 point and no radius
+I7076/26	1 point and no radius
+I7101/26	1 point and no radius
+I7161/26	1 point and no radius
+I7162/26	the E text describes a corridor, buffer or arc
+I7172/26	1 point and no radius
+I7191/26	1 point and no radius
+I7199/26	1 point and no radius
+I7200/26	1 point and no radius
+I7201/26	1 point and no radius
+I7202/26	1 point and no radius
+I7215/26	1 point and no radius
+I7217/26	1 point and no radius
+I7223/26	1 point and no radius
+I7230/26	1 point and no radius
+I7233/26	1 point and no radius
+I7235/26	1 point and no radius
+I7236/26	1 point and no radius
+I7244/26	1 point and no radius
+I7271/26	1 point and no radius
+I7281/26	1 point and no radius
+I7285/26	1 point and no radius
+I7304/26	1 point and no radius
+I7312/26	1 point and no radius
+I7482/26	1 point and no radius
+I7489/26	1 point and no radius
+I7492/26	1 point and no radius
+I7509/26	1 point and no radius
+J1677/26	the E text describes a corridor, buffer or arc
+J1844/26	the E text describes a corridor, buffer or arc
+J1847/26	the E text describes a corridor, buffer or arc
+J1848/26	the E text describes a corridor, buffer or arc
+J1985/26	2 points and no radius
+J2054/26	the outline crosses itself
+J2061/26	the E text describes a corridor, buffer or arc
+J2315/26	the E text describes a corridor, buffer or arc
+J2317/26	the E text describes a corridor, buffer or arc
+J2318/26	the E text describes a corridor, buffer or arc
+J2762/26	the E text describes a corridor, buffer or arc
+J2763/26	the E text describes a corridor, buffer or arc
+J2769/26	the E text describes a corridor, buffer or arc
+J2770/26	the E text describes a corridor, buffer or arc
+J2830/26	a radius with more than one point (separate areas)
+J3516/26	the E text describes a corridor, buffer or arc
+J3761/26	the E text describes a corridor, buffer or arc
+J3764/26	the E text describes a corridor, buffer or arc
+J3765/26	the E text describes a corridor, buffer or arc
+J3766/26	the E text describes a corridor, buffer or arc
+J3767/26	the E text describes a corridor, buffer or arc
+J3768/26	the E text describes a corridor, buffer or arc
+J3769/26	the E text describes a corridor, buffer or arc
+J3770/26	the E text describes a corridor, buffer or arc
+J3771/26	the E text describes a corridor, buffer or arc
+J3772/26	the E text describes a corridor, buffer or arc
+J3800/26	the E text describes a corridor, buffer or arc
+J3806/26	the E text describes a corridor, buffer or arc
+J3831/26	the E text describes a corridor, buffer or arc
+J3834/26	the E text describes a corridor, buffer or arc
+J499/26	the E text describes a corridor, buffer or arc
+J775/26	the E text describes a corridor, buffer or arc
+J776/26	the E text describes a corridor, buffer or arc
+J783/26	the E text describes a corridor, buffer or arc
+J785/26	the E text describes a corridor, buffer or arc
+J786/26	the E text describes a corridor, buffer or arc
+J787/26	the E text describes a corridor, buffer or arc
+J788/26	the E text describes a corridor, buffer or arc
+J789/26	the E text describes a corridor, buffer or arc
+L2379/26	1 point and no radius
+L2493/26	1 point and no radius
+L2685/26	1 point and no radius
+L2714/26	1 point and no radius
+L2721/26	1 point and no radius
+L2877/26	1 point and no radius
+L3071/26	a radius with more than one point (separate areas)
+L3106/26	1 point and no radius
+L3107/26	1 point and no radius
+L3445/26	1 point and no radius
+L3454/26	1 point and no radius
+L3498/26	1 point and no radius
+L3508/26	1 point and no radius
+L3612/26	1 point and no radius
+L3639/26	1 point and no radius
+L3655/26	1 point and no radius
+L3657/26	1 point and no radius
+L3707/26	1 point and no radius
+L3708/26	1 point and no radius
+L3773/26	1 point and no radius
+L3823/26	1 point and no radius
+L3837/26	1 point and no radius
+L3861/26	1 point and no radius
+L3925/26	1 point and no radius
+L3953/26	1 point and no radius
+L3982/26	1 point and no radius
+L4022/26	1 point and no radius
+L4040/26	1 point and no radius
+L4050/26	1 point and no radius
+L4120/26	1 point and no radius
+L4127/26	1 point and no radius
+L4137/26	1 point and no radius
+L4156/26	1 point and no radius
+L4157/26	1 point and no radius
+L4158/26	1 point and no radius
+L4175/26	1 point and no radius
+L4210/26	1 point and no radius
+L4213/26	1 point and no radius
+L4222/26	a latitude or longitude has no partner
+L4244/26	1 point and no radius
+L4249/26	1 point and no radius
+L4255/26	a latitude or longitude has no partner
+L4278/26	1 point and no radius
+L4299/26	1 point and no radius
+L4308/26	1 point and no radius
+L4313/26	1 point and no radius
+L4314/26	1 point and no radius
+L4360/26	1 point and no radius
+L4361/26	1 point and no radius
+L4364/26	1 point and no radius
+L4384/26	1 point and no radius
+L4388/26	1 point and no radius
+L4397/26	1 point and no radius
+L4450/26	1 point and no radius
+L4457/26	1 point and no radius
+L4459/26	1 point and no radius
+L4497/26	1 point and no radius
+L4523/26	1 point and no radius
+L4540/26	1 point and no radius
+L4559/26	1 point and no radius
+L4561/26	1 point and no radius
+L4566/26	1 point and no radius
+L4585/26	1 point and no radius
+L4587/26	1 point and no radius
+L4614/26	1 point and no radius
+L4625/26	1 point and no radius
+L4667/26	1 point and no radius
+L4671/26	1 point and no radius
+L4680/26	1 point and no radius
+L4687/26	1 point and no radius
+L4697/26	1 point and no radius
+L4725/26	1 point and no radius
+L4741/26	1 point and no radius
+L4755/26	1 point and no radius
+L4778/26	1 point and no radius
+L4788/26	1 point and no radius
+L4799/26	1 point and no radius
+L4814/26	1 point and no radius
+L4816/26	1 point and no radius
+L4839/26	1 point and no radius
+L4867/26	1 point and no radius
+L4893/26	1 point and no radius
+L4904/26	1 point and no radius
+L4924/26	1 point and no radius
+L4930/26	1 point and no radius
+L4933/26	1 point and no radius
+L4961/26	1 point and no radius
+L4988/26	the E text gives more than one radius
+L5028/26	1 point and no radius
+L5030/26	a latitude or longitude has no partner
+L5042/26	1 point and no radius
+L5043/26	1 point and no radius
+L5044/26	1 point and no radius
+L5045/26	1 point and no radius
+L5046/26	1 point and no radius
+L5047/26	1 point and no radius
+L5051/26	1 point and no radius
+L5053/26	1 point and no radius
+L5124/26	1 point and no radius
+L5212/26	1 point and no radius
+L5243/26	1 point and no radius
+L5246/26	1 point and no radius
+L5247/26	1 point and no radius
+L5340/26	1 point and no radius
+L5353/26	1 point and no radius
+L5394/26	1 point and no radius
+L5413/26	1 point and no radius
+L5417/26	1 point and no radius
+L5421/26	1 point and no radius
+L5472/26	1 point and no radius
+L5473/26	1 point and no radius
+L5507/26	1 point and no radius
+L5513/26	1 point and no radius
+L5694/26	1 point and no radius
+L5701/26	1 point and no radius
+L5713/26	1 point and no radius
+L5754/26	1 point and no radius
+L5770/26	1 point and no radius
+L5774/26	1 point and no radius
+L5785/26	1 point and no radius
+L5790/26	1 point and no radius
+L5800/26	2 points and no radius
+L5871/26	1 point and no radius
+L5909/26	1 point and no radius
+L5911/26	1 point and no radius
+L5916/26	1 point and no radius
+L5917/26	1 point and no radius
+L5920/26	1 point and no radius
+L5934/26	1 point and no radius
+L5938/26	1 point and no radius
+L5941/26	1 point and no radius
+L5945/26	1 point and no radius
+L5947/26	1 point and no radius
+L5949/26	1 point and no radius
+L5968/26	1 point and no radius
+L5971/26	1 point and no radius
+L5972/26	1 point and no radius
+L6036/26	1 point and no radius
+L6048/26	1 point and no radius
+L6052/26	1 point and no radius
+L6136/26	1 point and no radius
+L6140/26	1 point and no radius
+L6260/26	1 point and no radius
+L6266/26	1 point and no radius
+L6269/26	1 point and no radius
+L6270/26	1 point and no radius
+L6396/26	1 point and no radius
+L6407/26	1 point and no radius
+L6416/26	1 point and no radius
+L6417/26	1 point and no radius
+L6418/26	1 point and no radius
+L6471/26	1 point and no radius
+L6492/26	1 point and no radius
+L6496/26	1 point and no radius
+L6497/26	the word RADIUS is there but no radius could be read
+L6521/26	1 point and no radius
+L6605/26	1 point and no radius
+L6629/26	1 point and no radius
+L6689/26	1 point and no radius
+L6713/26	1 point and no radius
+L6714/26	1 point and no radius
+L6729/26	1 point and no radius
+L6770/26	1 point and no radius
+L6799/26	1 point and no radius
+L6840/26	1 point and no radius
+L6842/26	1 point and no radius
+L6874/26	1 point and no radius
+N14/26	1 point and no radius
+N263/26	1 point and no radius
+N270/26	1 point and no radius
+N274/26	1 point and no radius
+N275/26	1 point and no radius
+N277/26	1 point and no radius
+N278/26	1 point and no radius
+N282/26	1 point and no radius
+N284/26	1 point and no radius
+N286/26	1 point and no radius
+N287/26	1 point and no radius
+N288/26	1 point and no radius
+N289/26	1 point and no radius
+N299/26	1 point and no radius
+N300/26	1 point and no radius
+N302/26	1 point and no radius
+N303/26	1 point and no radius
+N308/26	1 point and no radius
+N315/26	1 point and no radius
+N316/26	1 point and no radius
+N317/26	1 point and no radius
+N318/26	1 point and no radius
+N320/26	1 point and no radius
+N331/26	1 point and no radius
+N333/26	1 point and no radius
+N336/26	1 point and no radius
+N340/26	1 point and no radius
+N345/26	1 point and no radius
+N346/26	1 point and no radius
+N348/26	1 point and no radius
+N352/26	1 point and no radius
+N360/26	1 point and no radius
+N364/26	1 point and no radius
+N365/26	1 point and no radius
+N366/26	1 point and no radius
+N369/26	1 point and no radius
+N375/26	1 point and no radius
+N381/25	1 point and no radius
+N384/26	1 point and no radius
+N385/26	1 point and no radius
+N386/26	1 point and no radius
+N388/26	1 point and no radius
+N391/26	1 point and no radius
+N394/26	1 point and no radius
+N395/26	1 point and no radius
+N398/26	1 point and no radius
+N401/26	1 point and no radius
+N404/26	1 point and no radius
+N410/26	1 point and no radius
+N412/26	1 point and no radius
+N413/26	1 point and no radius
+N417/26	1 point and no radius
+N418/26	1 point and no radius
+N421/26	1 point and no radius
+N422/26	1 point and no radius
+N424/26	1 point and no radius
+N430/26	1 point and no radius
+N434/26	1 point and no radius
+N443/26	1 point and no radius
+N446/26	1 point and no radius
+N448/26	1 point and no radius
+N450/26	1 point and no radius
+N452/26	1 point and no radius
+N455/26	1 point and no radius
+N456/26	1 point and no radius
+N457/26	1 point and no radius
+N458/26	1 point and no radius
+N459/26	1 point and no radius
+N460/26	1 point and no radius
+N466/26	1 point and no radius
+N471/26	1 point and no radius
+N473/26	1 point and no radius
+N474/26	1 point and no radius
+N475/26	1 point and no radius
+N476/26	1 point and no radius
+N481/26	1 point and no radius
+N482/26	1 point and no radius
+N483/26	1 point and no radius
+N484/26	1 point and no radius
+N485/26	1 point and no radius
+N486/26	1 point and no radius
+N487/26	1 point and no radius
+N490/26	1 point and no radius
+N495/26	1 point and no radius
+N496/26	1 point and no radius
+N498/26	1 point and no radius
+N499/26	1 point and no radius
+N500/26	1 point and no radius
+N501/26	1 point and no radius
+N502/26	1 point and no radius
+N503/26	1 point and no radius
+N504/26	1 point and no radius
+N508/26	1 point and no radius
+N509/26	1 point and no radius
+N511/26	1 point and no radius
+N513/26	1 point and no radius
+N514/26	1 point and no radius
+N515/26	1 point and no radius
+N516/26	1 point and no radius
+N517/26	1 point and no radius
+N518/26	1 point and no radius
+N519/26	1 point and no radius
+N521/26	1 point and no radius
+N522/26	1 point and no radius
+N523/26	1 point and no radius
+N524/26	1 point and no radius
+N526/26	1 point and no radius
+N527/26	1 point and no radius
+N528/26	1 point and no radius
+N529/26	1 point and no radius
+N530/26	1 point and no radius
+N531/26	1 point and no radius
+N532/26	1 point and no radius
+N533/26	1 point and no radius
+N534/26	1 point and no radius
+N535/26	1 point and no radius
+N538/26	1 point and no radius
+N539/26	1 point and no radius
+N540/26	1 point and no radius
+N541/26	1 point and no radius
+N542/26	1 point and no radius
+N543/26	1 point and no radius
+N544/26	1 point and no radius
+N545/26	1 point and no radius
+N546/26	1 point and no radius
+N547/26	1 point and no radius
+N550/26	1 point and no radius
+N551/26	1 point and no radius
+N552/26	2 points and no radius
+N555/26	1 point and no radius
+N556/26	1 point and no radius
+N557/26	1 point and no radius
+N558/26	1 point and no radius
+N559/26	1 point and no radius
+N560/26	1 point and no radius
+N561/26	1 point and no radius
+N562/26	1 point and no radius
+N563/26	1 point and no radius
+N565/26	1 point and no radius
+N566/26	1 point and no radius
+N567/26	1 point and no radius
+N568/26	1 point and no radius
+N569/26	1 point and no radius
+N570/26	1 point and no radius
+N571/26	1 point and no radius
+N572/26	1 point and no radius
+N573/26	1 point and no radius
+N574/26	1 point and no radius
+N575/26	1 point and no radius
+N576/26	1 point and no radius
+N577/26	1 point and no radius
+N578/26	1 point and no radius
+N579/26	1 point and no radius
+N580/26	1 point and no radius
+N581/26	1 point and no radius
+N582/26	1 point and no radius
+N583/26	1 point and no radius
+N584/26	1 point and no radius
+N586/26	1 point and no radius
+N587/26	1 point and no radius
+N589/26	1 point and no radius
+N590/26	1 point and no radius
+N591/26	1 point and no radius
+N592/26	1 point and no radius
+N593/26	1 point and no radius
+N594/26	1 point and no radius
+N595/26	1 point and no radius
+N597/26	1 point and no radius
+N598/26	1 point and no radius
+N599/26	1 point and no radius
+N600/26	1 point and no radius
+N601/26	1 point and no radius
+N602/26	1 point and no radius
+N603/26	1 point and no radius
+N604/26	1 point and no radius
+N605/26	1 point and no radius
+N606/26	1 point and no radius
+N615/26	1 point and no radius
+N616/26	1 point and no radius
+N617/26	1 point and no radius
+N618/26	1 point and no radius
+N619/26	1 point and no radius
+N620/26	1 point and no radius
+N621/26	a latitude or longitude has no partner
+N622/26	1 point and no radius
+N623/26	1 point and no radius
+N624/26	1 point and no radius
+N625/26	1 point and no radius
+N626/26	1 point and no radius
+N627/26	1 point and no radius
+N628/26	1 point and no radius
+N629/26	1 point and no radius
+N630/26	1 point and no radius
+N631/26	1 point and no radius
+N636/26	1 point and no radius
+N638/26	1 point and no radius
+N639/26	1 point and no radius
+N640/26	1 point and no radius
+N641/26	1 point and no radius
+N642/26	1 point and no radius
+N643/26	1 point and no radius
+N644/26	1 point and no radius
+N646/26	1 point and no radius
+N648/26	1 point and no radius
+N649/26	1 point and no radius
+N650/26	1 point and no radius
+N651/26	1 point and no radius
+N652/26	1 point and no radius
+N654/26	1 point and no radius
+N656/26	1 point and no radius
+N661/26	1 point and no radius
+N663/26	1 point and no radius
+N664/26	1 point and no radius
+N665/26	1 point and no radius
+N666/26	1 point and no radius
+N668/26	1 point and no radius
+N670/26	1 point and no radius
+N672/26	1 point and no radius
+N674/26	1 point and no radius
+N676/26	1 point and no radius
+N678/26	1 point and no radius
+N679/26	1 point and no radius
+N680/26	1 point and no radius
+N681/26	1 point and no radius
+N682/26	1 point and no radius
+N683/26	1 point and no radius
+N684/26	1 point and no radius
+N685/26	1 point and no radius
+N686/26	1 point and no radius
+N687/26	1 point and no radius
+N688/26	1 point and no radius
+N689/26	1 point and no radius
+N690/26	1 point and no radius
+N691/26	1 point and no radius
+N692/26	1 point and no radius
+N693/26	1 point and no radius
+N694/26	1 point and no radius
+N695/26	1 point and no radius
+N696/26	1 point and no radius
+N697/26	1 point and no radius
+N698/26	1 point and no radius
+N699/26	1 point and no radius
+N700/26	1 point and no radius
+N701/26	1 point and no radius
+N702/26	1 point and no radius
+N703/26	1 point and no radius
+N704/26	1 point and no radius
+N705/26	1 point and no radius
+N709/26	1 point and no radius
+N711/26	1 point and no radius
+N712/26	1 point and no radius
+N713/26	1 point and no radius
+N714/26	1 point and no radius
+N715/26	1 point and no radius
+N716/26	1 point and no radius
+N717/26	1 point and no radius
+N718/26	1 point and no radius
+N719/26	1 point and no radius
+N720/26	1 point and no radius
+N721/26	1 point and no radius
+N722/26	1 point and no radius
+N723/26	1 point and no radius
+N724/26	1 point and no radius
+N725/26	1 point and no radius
+N726/26	1 point and no radius
+N727/26	1 point and no radius
+N728/26	1 point and no radius
+N729/26	1 point and no radius
+N730/26	1 point and no radius
+N731/26	1 point and no radius
+N733/26	1 point and no radius
+N735/26	1 point and no radius
+N737/26	1 point and no radius
+N738/26	a latitude or longitude has no partner
+N740/26	1 point and no radius
+N741/26	1 point and no radius
+N742/26	1 point and no radius
+N743/26	1 point and no radius
+N744/26	1 point and no radius
+N745/26	1 point and no radius
+N746/26	1 point and no radius
+N747/26	1 point and no radius
+N748/26	1 point and no radius
+N749/26	1 point and no radius
+N750/26	1 point and no radius
+N751/26	1 point and no radius
+N752/26	1 point and no radius
+N753/26	1 point and no radius
+N754/26	1 point and no radius
+N755/26	1 point and no radius
+N756/26	1 point and no radius
+N757/26	1 point and no radius
+N758/26	1 point and no radius
+N759/26	1 point and no radius
+N760/26	1 point and no radius
+N761/26	1 point and no radius
+N764/26	1 point and no radius
+N765/26	1 point and no radius
+N766/26	1 point and no radius
+N767/26	1 point and no radius
+N768/26	1 point and no radius
+N769/26	1 point and no radius
+N770/26	1 point and no radius
+N771/26	1 point and no radius
+N772/26	1 point and no radius
+N773/26	1 point and no radius
+N774/26	1 point and no radius
+N775/26	1 point and no radius
+N776/26	1 point and no radius
+N777/26	1 point and no radius
+N778/26	1 point and no radius
+N779/26	1 point and no radius
+N780/26	1 point and no radius
+N781/26	1 point and no radius
+N782/26	1 point and no radius
+N783/26	1 point and no radius
+N784/26	1 point and no radius
+N785/26	1 point and no radius
+N786/26	1 point and no radius
+N787/26	1 point and no radius
+N788/26	1 point and no radius
+N789/26	1 point and no radius
+N790/26	1 point and no radius
+N791/26	1 point and no radius
+N793/26	1 point and no radius
+N794/26	1 point and no radius
+N795/26	1 point and no radius
+N796/26	1 point and no radius
+N797/26	2 points and no radius
+N798/26	1 point and no radius
+N799/26	the E text describes a corridor, buffer or arc
+N800/26	1 point and no radius
+N801/26	1 point and no radius
+N802/26	1 point and no radius
+N803/26	1 point and no radius
+N804/26	1 point and no radius
+N805/26	1 point and no radius
+N806/26	1 point and no radius
+N807/26	1 point and no radius
+N808/26	1 point and no radius
+N809/26	1 point and no radius
+N810/26	1 point and no radius
+N811/26	1 point and no radius
+N812/26	1 point and no radius
+N813/26	1 point and no radius
+N814/26	1 point and no radius
+N815/26	1 point and no radius
+N816/26	1 point and no radius
+N817/26	1 point and no radius
+N818/26	1 point and no radius
+N819/26	1 point and no radius
+N820/26	1 point and no radius
+N821/26	1 point and no radius
+N822/26	1 point and no radius
+N824/26	1 point and no radius
+N825/26	1 point and no radius
+N826/26	1 point and no radius
+N827/26	1 point and no radius
+N828/26	1 point and no radius
+N829/26	1 point and no radius
+N830/26	1 point and no radius
+N831/26	1 point and no radius
+N832/26	1 point and no radius
+N833/26	1 point and no radius
+N834/26	1 point and no radius
+N835/26	1 point and no radius
+N838/26	1 point and no radius
+N839/26	1 point and no radius
+N840/26	1 point and no radius
+N841/26	1 point and no radius
+N842/26	1 point and no radius
+N844/26	1 point and no radius
+N845/26	1 point and no radius
+N846/26	1 point and no radius
+N847/26	1 point and no radius
+N848/26	1 point and no radius
+N849/26	1 point and no radius
+N850/26	1 point and no radius
+N851/26	1 point and no radius
+N852/26	1 point and no radius
+N853/26	1 point and no radius
+N854/26	1 point and no radius
+N855/26	1 point and no radius
+N856/26	1 point and no radius
+N857/26	1 point and no radius
+N859/26	1 point and no radius
+N860/26	1 point and no radius
+N861/26	1 point and no radius
+N862/26	1 point and no radius
+N863/26	1 point and no radius
+N864/26	1 point and no radius
+N865/26	1 point and no radius
+N871/26	1 point and no radius
+N872/26	1 point and no radius
+N873/26	1 point and no radius
+N876/26	1 point and no radius
+N879/26	1 point and no radius
+N880/26	1 point and no radius
+N881/26	1 point and no radius
+N882/26	1 point and no radius
+N883/26	1 point and no radius
+N884/26	1 point and no radius
+N885/26	1 point and no radius
+N886/26	1 point and no radius
+N887/26	1 point and no radius
+N888/26	1 point and no radius
+N890/26	1 point and no radius
+N891/26	1 point and no radius
+N892/26	1 point and no radius
+N893/26	1 point and no radius
+N896/26	1 point and no radius
+N898/26	1 point and no radius
+N900/26	1 point and no radius
+N901/26	1 point and no radius
+N902/26	1 point and no radius
+N903/26	1 point and no radius
+N904/26	1 point and no radius
+N905/26	1 point and no radius
+N906/26	1 point and no radius
+N907/26	1 point and no radius
+N908/26	1 point and no radius
+N909/26	1 point and no radius
+N910/26	1 point and no radius
+N912/26	2 points and no radius
+N914/26	1 point and no radius
+N916/26	1 point and no radius
+Q109/26	1 point and no radius
+Q113/26	1 point and no radius
+Q127/26	1 point and no radius
+Q141/26	1 point and no radius
+Q156/26	1 point and no radius
+Q161/26	1 point and no radius
+Q189/26	1 point and no radius
+Q62/26	1 point and no radius
+Q75/26	1 point and no radius
+Q86/26	the E text describes a corridor, buffer or arc
+Q93/26	1 point and no radius
+U2867/26	the E text describes a corridor, buffer or arc
+U2937/26	1 point and no radius
+U3491/26	1 point and no radius
+U3905/26	1 point and no radius
+U3961/26	1 point and no radius
+U3988/26	the E text describes a corridor, buffer or arc
+U4165/26	1 point and no radius
+U4604/26	1 point and no radius
+U4605/26	1 point and no radius
+U4632/26	1 point and no radius
+U4902/26	2 points and no radius
+U5010/26	1 point and no radius
+U5045/26	1 point and no radius
+U5117/26	1 point and no radius
+U5190/26	2 points and no radius
+U5322/26	1 point and no radius
+U5358/26	the E text describes a corridor, buffer or arc
+U5410/26	1 point and no radius
+U5462/26	1 point and no radius
+U5590/26	1 point and no radius
+U5614/26	1 point and no radius
+U5629/26	1 point and no radius
+U5655/26	1 point and no radius
+U5667/26	1 point and no radius
+U5712/26	2 points and no radius
+U5713/26	2 points and no radius
+U5746/26	1 point and no radius
+U5753/26	1 point and no radius
+U5760/26	1 point and no radius
+U5800/26	1 point and no radius
+U5811/26	the word RADIUS is there but no radius could be read
+U5886/26	the word RADIUS is there but no radius could be read
+U5889/26	1 point and no radius
+U5891/26	1 point and no radius
+U5904/26	1 point and no radius
+U5932/26	1 point and no radius
+U5945/26	a latitude or longitude has no partner
+U5947/26	1 point and no radius
+U5948/26	1 point and no radius
+U5952/26	1 point and no radius
+U5967/26	1 point and no radius
+U5976/26	1 point and no radius
+U5977/26	1 point and no radius
+U5986/26	1 point and no radius
+U6001/26	1 point and no radius
+U6003/26	1 point and no radius
+U6057/26	the word RADIUS is there but no radius could be read
+U6060/26	the word RADIUS is there but no radius could be read
+U6065/26	1 point and no radius
+U6104/26	1 point and no radius
+U6108/26	1 point and no radius
+U6109/26	1 point and no radius
+U6112/26	a latitude or longitude has no partner
+U6113/26	1 point and no radius
+U6118/26	1 point and no radius
+U6140/26	1 point and no radius
+U6147/26	1 point and no radius
+U6181/26	1 point and no radius
+U6203/26	1 point and no radius
+U6220/26	1 point and no radius
+U6221/26	1 point and no radius
+U6222/26	1 point and no radius
+U6226/26	1 point and no radius
+U6239/26	1 point and no radius
+U6244/26	1 point and no radius
+U6253/26	1 point and no radius
+U6268/26	1 point and no radius
+U6309/26	1 point and no radius
+U6317/26	1 point and no radius
+U6321/26	1 point and no radius
+U6333/26	1 point and no radius
+U6353/26	1 point and no radius
+U6401/26	the word RADIUS is there but no radius could be read
+U6441/26	1 point and no radius
+U6469/26	1 point and no radius
+U6483/26	1 point and no radius
+U6552/26	1 point and no radius
+U6576/26	1 point and no radius
+U6596/26	1 point and no radius
+U6647/26	1 point and no radius
+U6730/26	1 point and no radius
+U6743/26	1 point and no radius
+U6744/26	1 point and no radius
+U6764/26	1 point and no radius
+U6772/26	1 point and no radius
+U6886/26	1 point and no radius
+U6887/26	1 point and no radius
+U6896/26	1 point and no radius
+U6943/26	1 point and no radius
+U6961/26	1 point and no radius
+U7032/26	1 point and no radius
+U7033/26	1 point and no radius
+U7036/26	1 point and no radius
+U7045/26	the word RADIUS is there but no radius could be read
+U7081/26	1 point and no radius
+U7106/26	1 point and no radius
+U7107/26	1 point and no radius
+U7118/26	1 point and no radius
+U7119/26	1 point and no radius
+U7149/26	1 point and no radius
+U7186/26	1 point and no radius
+U7195/26	1 point and no radius
+U7197/26	1 point and no radius
+U7225/26	1 point and no radius
+U7228/26	1 point and no radius
+U7264/26	1 point and no radius
+U7273/26	1 point and no radius
+U7279/26	1 point and no radius
+U7290/26	1 point and no radius
+U7293/26	the E text gives more than one radius
+U7321/26	1 point and no radius
+U7330/26	1 point and no radius
+U7374/26	1 point and no radius
+U7414/26	the outline crosses itself
+U7457/26	1 point and no radius
+U7495/26	1 point and no radius
+U7499/26	the E text gives more than one radius
+U7542/26	1 point and no radius
+U7557/26	1 point and no radius
+U7585/26	1 point and no radius
+U7673/26	1 point and no radius
+U7708/26	1 point and no radius
+U7795/26	1 point and no radius
+U7904/26	1 point and no radius
+U7919/26	1 point and no radius
+U7920/26	1 point and no radius
+U7927/26	1 point and no radius
+U8007/26	1 point and no radius
+U8025/26	1 point and no radius
+U8028/26	1 point and no radius
+U8029/26	1 point and no radius
+U8030/26	1 point and no radius
+U8073/26	1 point and no radius
+U8074/26	1 point and no radius
+U8161/26	1 point and no radius
+U8215/26	1 point and no radius
+U8239/26	1 point and no radius
+U8272/26	1 point and no radius
+U8273/26	1 point and no radius
+U8290/26	1 point and no radius
+U8338/26	1 point and no radius
+U8350/26	1 point and no radius
+U8357/26	1 point and no radius
+U8368/26	1 point and no radius
+U8388/26	1 point and no radius
+U8418/26	1 point and no radius
+U8419/26	1 point and no radius
+U8453/26	1 point and no radius
+U8476/26	the E text describes a corridor, buffer or arc
+U8498/26	1 point and no radius
+U8512/26	1 point and no radius
+U8515/26	1 point and no radius
+U8526/26	1 point and no radius
+U8572/26	1 point and no radius
+U8604/26	1 point and no radius
+U8626/26	1 point and no radius
+U8637/26	1 point and no radius
+U8691/26	1 point and no radius
+U8713/26	1 point and no radius
+U8714/26	1 point and no radius
+U8796/26	1 point and no radius
+U8798/26	1 point and no radius
+U8806/26	1 point and no radius
+U8812/26	1 point and no radius
+U8814/26	1 point and no radius
+U8832/26	1 point and no radius
+U8845/26	1 point and no radius
+U8858/26	1 point and no radius
+U8896/26	1 point and no radius
+V30/26	the area built from the E text reaches 2667.90 NM outside the Q-circle, more than the 1 NM slack (parser miss)
+V32/26	the area built from the E text reaches 2848.94 NM outside the Q-circle, more than the 1 NM slack (parser miss)

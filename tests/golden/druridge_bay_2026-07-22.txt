@@ -1,0 +1,68 @@
+FlySafeLZ assess – case druridge_bay_2026-07-22
+LZ 55.295620798241295, -1.5741095087575143 · now 2026-07-22T06:30Z
+PIB: archive commit 877ce67752d86894ce27cb816ef5c5cbf84416dd, issued 2026-07-22T05:00:07Z
+Window 2026-07-22T11:00Z to 2026-07-22T17:00Z (end exclusive). All times UTC.
+
+2026-07-22 (UTC)
+11:00–12:00
+  11:00–11:30  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+      condition: military high energy manoeuvres (Ex Storm Warrior) over the LZ from the surface: contact phone [phone] / [phone] first and fly only if they agree
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,852 ft QNH above the LZ
+      caution: gust spread 6 mph, limit 4
+      caution: low cloud 100 %, limit 90
+      NOTAM H2483/26 CONTACT_FIRST
+      NOTAM H4466/26 AWARENESS: radius 999 NM is area-wide
+  11:30–12:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+      condition: military high energy manoeuvres (Ex Storm Warrior) over the LZ from the surface: contact phone [phone] / [phone] first and fly only if they agree
+      condition: NOTAM H4420/26 over the LZ from 1,000 ft AMSL (1,000 ft QNH): stay below 800 ft QNH
+      condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,852 ft QNH above the LZ
+      caution: gust spread 6 mph, limit 4
+      caution: low cloud 100 %, limit 90
+      NOTAM H2483/26 CONTACT_FIRST
+      NOTAM H4466/26 AWARENESS: radius 999 NM is area-wide
+      NOTAM H4420/26 AVOID_SECTOR
+12:00–13:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: NOTAM H4420/26 over the LZ from 1,000 ft AMSL (1,000 ft QNH): stay below 800 ft QNH
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,836 ft QNH above the LZ
+    caution: gust spread 4.9 mph, limit 4
+    caution: low cloud 100 %, limit 90
+    NOTAM H4466/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM H4420/26 AVOID_SECTOR
+13:00–14:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: NOTAM H4420/26 over the LZ from 1,000 ft AMSL (1,000 ft QNH): stay below 800 ft QNH
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,836 ft QNH above the LZ
+    caution: gust spread 5.2 mph, limit 4
+    NOTAM H4466/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM H4420/26 AVOID_SECTOR
+14:00–15:00  UNVERIFIED
+    condition: NOTAM H4420/26 over the LZ from 1,000 ft AMSL (1,000 ft QNH): stay below 800 ft QNH
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,833 ft QNH above the LZ
+    unverified: NOTAM H4464/26 is over the LZ from the surface and has not been read: CIVIL ACFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR IN LOW FLYING AREA 12 WI 2NM RADIUS OF PSN 551755N 0013349W (DRURIDGE BAY, NORTHUMBERLAND). 2000FT AGL. CTC [phone]. 26/07/287/LFC
+    caution: gust spread 5.2 mph, limit 4
+    NOTAM H4466/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM H4420/26 AVOID_SECTOR
+    NOTAM H4464/26 UNREAD_OVER_LZ
+15:00–16:00  UNVERIFIED
+    condition: NOTAM H4420/26 over the LZ from 1,000 ft AMSL (1,000 ft QNH): stay below 800 ft QNH
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,822 ft QNH above the LZ
+    unverified: NOTAM H4464/26 is over the LZ from the surface and has not been read: CIVIL ACFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR IN LOW FLYING AREA 12 WI 2NM RADIUS OF PSN 551755N 0013349W (DRURIDGE BAY, NORTHUMBERLAND). 2000FT AGL. CTC [phone]. 26/07/287/LFC
+    caution: gust spread 5.2 mph, limit 4
+    NOTAM H4466/26 AWARENESS: radius 999 NM is area-wide
+    NOTAM H4420/26 AVOID_SECTOR
+    NOTAM H4464/26 UNREAD_OVER_LZ
+16:00–17:00  UNVERIFIED
+    condition: NOTAM H4420/26 over the LZ from 1,000 ft AMSL (1,000 ft QNH): stay below 800 ft QNH
+    condition: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,811 ft QNH above the LZ
+    unverified: NOTAM H4464/26 is over the LZ from the surface and has not been read: CIVIL ACFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR IN LOW FLYING AREA 12 WI 2NM RADIUS OF PSN 551755N 0013349W (DRURIDGE BAY, NORTHUMBERLAND). 2000FT AGL. CTC [phone]. 26/07/287/LFC
+    caution: gust spread 4.4 mph, limit 4
+    caution: low cloud 91 %, limit 90
+    NOTAM H4420/26 AVOID_SECTOR
+    NOTAM H4464/26 UNREAD_OVER_LZ
+
+Sources
+  weather: ok
+  airspace: ok
+  NOTAMs: ok (PIB issued 2026-07-22T05:00:07Z) (case mode: captured PIB treated as current at the case's now)
+Flyable windows (UTC)
+  2026-07-22T11:00Z to 2026-07-22T14:00Z
+Overall: UNVERIFIED

@@ -65,6 +65,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Literal
 
 import httpx
 import yaml
@@ -157,6 +158,11 @@ class Case(BaseModel):
     window: Window
     archive_sha: str | None = None  # pins the archive commit; without it the last commit at or before `now` is used
     capture: Captured | None = None
+    # Which PIB-age rule a replay of this case uses. `case` (absent): the captured PIB is treated as current at `now`
+    # (the archive snapshots it only about twice a day). `live`: the live 3 h rule applies; only a constructed old-PIB case sets it.
+    stale_rule: Literal["case", "live"] = "case"
+    # True: the files are made up, not captured from the archive (so make fixtures refuses to capture over them).
+    constructed: bool = False
 
     @field_validator("lat")
     @classmethod
@@ -667,6 +673,8 @@ def capture(name: str, case_dir: Path, key: str, client: httpx.Client, *, today:
     """Capture one case. Returns the summary lines. Raises CaptureError."""
     refuse_leftover_backups(case_dir)
     case, raw = load_case(case_dir / "case.yaml", today=today)
+    if case.constructed:
+        raise CaptureError(f"{case_dir / 'case.yaml'}: constructed: true; a constructed case is made up and is never captured")
     refuse_a_day_that_has_not_ended(case_dir / "case.yaml", case, today)  # before any request
     fetched = fetch_case(name, case, key, client)
     readings = case_dir / "readings.yaml"

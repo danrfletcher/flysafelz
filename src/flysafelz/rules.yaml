@@ -22,10 +22,10 @@ wind_10m_caution:
 wind_10m_no_go:
   value: 16
   unit: mph
-  comparison: ">="
+  comparison: ">"
   source: "FlySafeLZ Spec s2, Plan 2 G22 (Dan, Q3); typical paramotor school wind limits"
   confidence: best practice
-  note: "Mean wind at 10 m. 16.0 mph is NO_GO."
+  note: "Mean wind at 10 m. 16.0 mph is APPROACHING LIMITS; NO_GO needs more than 16.0 mph."
 
 gust_spread_caution:
   value: 4
@@ -62,18 +62,18 @@ gradient_caution:
 gradient_no_go:
   value: 16
   unit: mph
-  comparison: ">="
+  comparison: ">"
   source: "FlySafeLZ Spec s2, Plan 2 G2/G22 (Dan, Q3)"
   confidence: educated guess
-  note: "Absolute difference between 120 m and 10 m wind."
+  note: "Absolute difference between 120 m and 10 m wind. Exactly 16.0 mph is APPROACHING LIMITS; NO_GO needs more than 16.0 mph; the comparison is strict."
 
 precipitation_no_go:
   value: 0.1
   unit: mm/h
-  comparison: ">="
+  comparison: ">"
   source: "FlySafeLZ Spec s2, Plan 2 G22"
   confidence: educated guess
-  note: "Any measurable rain in the preceding hour. Applies to the hour's closing timestamp."
+  note: "Rain in the preceding hour, read at the hour's closing timestamp. 0.0 mm/h is GO; 0.1 mm/h (trace forecast rain) is APPROACHING LIMITS; 0.2 mm/h or more (sustained rain) is NO_GO because of wet-wing deep-stall risk and prop erosion."
 
 rain_chance_caution:
   value: 50
@@ -86,10 +86,10 @@ rain_chance_caution:
 visibility_caution:
   value: 5000
   unit: m
-  comparison: "<"
+  comparison: "<="
   source: "Standard 5 km VFR visibility figure (UK SERA.5001 is the reference to check); Plan 2 G22"
   confidence: best practice
-  note: "Not checked against the regulation text."
+  note: "Not checked against the regulation text. Exactly 5000 m is APPROACHING LIMITS; the comparison includes the limit."
 
 visibility_no_go:
   value: 1500
@@ -126,10 +126,10 @@ thermic_cape_caution:
 cape_no_go:
   value: 1000
   unit: J/kg
-  comparison: ">="
+  comparison: ">"
   source: "Common convention that CAPE of about 1,000 J/kg or more is meaningful convective instability; Plan 2 G22 (Dan, Q2)"
   confidence: best practice
-  note: "Convective instability and thunderstorm risk."
+  note: "Convective instability and thunderstorm risk. Exactly 1000 J/kg is APPROACHING LIMITS; NO_GO needs more than 1000 J/kg; the comparison is strict."
 
 ceiling_left_no_go:
   value: 300
@@ -217,7 +217,7 @@ pib_stale_hours:
   comparison: "="
   source: "FlySafeLZ Spec s2, Plan 2 E2"
   confidence: educated guess
-  note: "A PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED."
+  note: "Live mode: a PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED. Case mode treats the captured PIB as current at the case's now, because the archive snapshots it only about twice a day."
 
 uk_bounds_lat_min:
   value: 49.8

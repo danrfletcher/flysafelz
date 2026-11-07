@@ -10,6 +10,9 @@ from typing import Annotated, Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
+from flysafelz.designators import find_designators
+from flysafelz.sup_refs import find_sup_references
+
 STRICT = ConfigDict(extra="forbid")
 _Q_CODE = re.compile(r"Q?(?P<subject>..)(?P<condition>..)")
 
@@ -139,6 +142,16 @@ class ParsedNotam(BaseModel):
         match = _Q_CODE.match(self.q_code)
         return match.group("condition") if match else ""
 
+    @property
+    def sup_references(self) -> list[str]:
+        """The AIP SUP references in item E ("AIP SUP 108/2026"), found by code. Not a field: never serialised, never model-filled."""
+        return find_sup_references(self.item_e)
+
+    @property
+    def designators(self) -> list[str]:
+        """The airspace designators in item E (EGD496A), found by code, for display only. Activation uses NotamReading.activates_designators."""
+        return find_designators(self.item_e)
+
 
 class Category(StrEnum):
     PROHIBITIVE = "prohibitive"
@@ -248,7 +261,7 @@ class NotamReading(BaseModel):
     id: str
     category: Category
     activity: str
-    geometry: Annotated[Circle | Polygon, Field(discriminator="kind")] | None = None  # None: use the Q-circle
+    geometry: Annotated[Circle | Polygon, Field(discriminator="kind")] | None = None  # no longer used to locate a NOTAM (G16): notam_action() reads item E itself
     floor: Limit | None  # as the E text states it; None: E states none
     ceiling: Limit | None  # as the E text states it; None: E states none
     schedule: str  # D-item text, normalised
@@ -257,25 +270,37 @@ class NotamReading(BaseModel):
     contact: Contact
     activates_designators: list[str] = Field(default_factory=list)  # e.g. ["EGD496A"]
     prohibitive_reason: ProhibitiveReason = ProhibitiveReason.NONE
+    prohibitive_quote: str | None = None  # the E-text words the reason rests on, word for word; None when the reason is none
 
 
 class NotamAction(StrEnum):
     """What a NOTAM means for the pilot in one segment. notam_action() (PR-6) owns the logic.
 
-    First match wins:
-      IGNORE            not active in the slot, beyond the local area, exempts paramotors, or irrelevant
-      NO_FLY            over the LZ from the surface and prohibitive (or cooperative with no phone or email)
-      CONTACT_FIRST     over the LZ from the surface, cooperative, with a phone or email contact
-      AVOID_SECTOR      within the local area but not over the LZ, or over it with a floor of 0-5,000 ft
-      AWARENESS         floor 5,000-10,000 ft: shown in the answer
-      AWARENESS_MAP     floor above 10,000 ft: shown on the map and the collapsed list only
-      UNREAD_OVER_LZ    no reading, and the NOTAM lies over the LZ from the surface (Q8):
-                        the segment is UNVERIFIED and the E text is printed
+    First match wins (row 1 first; rows 2a-2d and 3 only over the LZ from the surface). The Q-code
+    subject (ParsedNotam.subject) keys rows 2a-2d; a danger area (RD) is never ruled in by the data:
+      IGNORE            1   not active in the slot, beyond the local area, exempts paramotors, or irrelevant
+      NO_FLY            2a  subject RR, RP or RT (restricted, prohibited or temporary restricted area)
+                        2b  subject RD with a prohibitive reason (live firing, entry prohibited, byelaws),
+                            quoted from the E text
+                        2   any other subject: prohibitive (category or reason), or cooperative with no
+                            phone or email contact
+      CONTACT_FIRST     2c  subject RD, no prohibitive reason, with a phone or email contact
+                        3   any other subject: cooperative (or a conditional exemption), with a phone or
+                            email contact
+      CHECK_SUP         2d  subject RD, no prohibitive reason, no phone or email contact: read the SUP /
+                            AIP ENR 5.1 entry before flight (shows as PILOT DISCRETION - WITH CONDITIONS)
+      AVOID_SECTOR      4   within the local area but not over the LZ, or over it with a floor of 0-5,000 ft
+      AWARENESS         5   floor 5,000-10,000 ft: shown in the answer
+      AWARENESS_MAP     6   floor above 10,000 ft: shown on the map and the collapsed list only
+      UNREAD_OVER_LZ        no reading, and the NOTAM lies over the LZ from the surface (Q8):
+                            the segment is UNVERIFIED and the E text is printed
+    For a danger area the reader's category is ignored: only prohibitive_reason and the contact decide.
     """
 
     IGNORE = "IGNORE"
     NO_FLY = "NO_FLY"
     CONTACT_FIRST = "CONTACT_FIRST"
+    CHECK_SUP = "CHECK_SUP"
     AVOID_SECTOR = "AVOID_SECTOR"
     AWARENESS = "AWARENESS"
     AWARENESS_MAP = "AWARENESS_MAP"

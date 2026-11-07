@@ -1,0 +1,5 @@
+src/flysafelz/weather.py                119      0   100%
+-------------------------------------------------------------------
+TOTAL                                  3358     40    99%
+Required test coverage of 90% reached. Total coverage: 98.81%
+================== 7335 passed, 7 xfailed in 64.40s (0:01:04) ==================

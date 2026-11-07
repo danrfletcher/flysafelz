@@ -33,13 +33,14 @@ def served(body):
 
 
 def old_load(name):
+    """The inputs as the tests loaded them by hand, with case mode's PIB rule (the captured PIB is current at the case's now)."""
     folder = cases.case_dir(name)
     case, _raw = load_case(folder / "case.yaml", today=cases.TODAY)
     forecast = parse_response(json.loads((folder / "weather.json").read_text(encoding="utf-8")), case.now)
     airspace = fetch_airspace(
         case.lat, case.lon, api_key="not-a-real-key", client=served(json.loads((folder / "airspace.json").read_text(encoding="utf-8"))), now=case.now
     )
-    pib = load_pib("live", case.now, client=served((folder / "pib.xml").read_bytes()))
+    pib = load_pib("live", case.now, client=served((folder / "pib.xml").read_bytes()), stale_rule=False)
     entries = yaml.safe_load((folder / "readings.yaml").read_text(encoding="utf-8")) or []
     readings = {r.id: r for r in (NotamReading.model_validate(item) for item in entries)}
     return case, forecast, airspace, pib, readings

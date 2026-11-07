@@ -1,6 +1,6 @@
 """Turn fetched sources into an Assessment (G15 to G19). Plain functions, no model, no network.
 
-    assess(lat, lon, *, now, forecast, airspace, pib, readings, reader_status, window, live) -> Assessment
+    assess(lat, lon, *, now, forecast, airspace, pib, readings, reader_status, window, live, stale_rule) -> Assessment
     fetch_horizon(now)       the UTC time (exclusive) up to which weather is worth fetching
     default_window(now)      the window used when none is given
     assessed_span(...)       the hour-aligned span assess looks at (the window the NOTAM reader is asked about)
@@ -24,7 +24,8 @@ VERDICT (and UNVERIFIED), the rest OUTLOOK.
 
 The verdict of a segment (G17, Q6), no scores, no weights:
     any blocker from weather, daylight, airspace or a NOTAM action       NO_GO
-    else a source that is failed or stale, a hole in the weather, or an
+    else a source that is failed or stale (live mode: a PIB older than pib_stale_hours; case mode
+      treats the captured PIB as current at the case's now), a hole in the weather, or an
       unread NOTAM over the LZ from SFC                                   UNVERIFIED
     else                                                                  PILOT_DISCRETION
 approaching_limits is true when the segment has any caution (Q11). Every reason is kept, so
@@ -34,8 +35,9 @@ Danger areas that a NOTAM activates are decided by airspace.py (G10), which owns
 conditions. The activating NOTAM still appears in the segment with its action, but adds no
 second condition (a NO_FLY or unread result still counts, so nothing is lost).
 
-Conditions come in a fixed order: CONTACT_FIRST, then permission and radio, then ceilings,
-then sectors, then warnings, and the order inside each group is the order found.
+Conditions come in a fixed order: CHECK_SUP (read the SUP), then CONTACT_FIRST, then permission and radio,
+then ceilings, then sectors, then warnings, and the order inside each group is the order found. A CHECK_SUP
+NOTAM adds a condition and no blocker, so a segment with only that finding is PILOT_DISCRETION WITH CONDITIONS.
 
 A NOTAM the reader was asked about and got no reading for is named in `reader_status` ("failed" or "unavailable"). It is
 unread, like any NOTAM without a reading (Q8): over the LZ from SFC it is UNREAD_OVER_LZ and the segment UNVERIFIED, anywhere
@@ -54,7 +56,7 @@ from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Literal, get_args
 
-from flysafelz.airspace import Activation, Outcome, TimeSpan, assess_airspace
+from flysafelz.airspace import Activation, Outcome, TimeSpan, assess_airspace, find_item_e_contact
 from flysafelz.clients.open_meteo import Forecast
 from flysafelz.clients.openaip import AirspaceFetch, metres_to_feet
 from flysafelz.clients.pib_source import utc_text
@@ -99,7 +101,7 @@ from flysafelz.rules import RULES, Rule
 from flysafelz.weather import HourTier, WeatherRow, build_rows, check_row, weather_tier
 
 # Condition groups, in the order a pilot reads them (G17).
-CONDITION_ORDER = ("contact", "permission", "ceiling", "sector", "warning")
+CONDITION_ORDER = ("check_sup", "contact", "permission", "ceiling", "sector", "warning")
 
 # Worst first. The index decides which of two verdicts is the worse.
 WORST_FIRST = (Verdict.NO_GO, Verdict.UNVERIFIED, Verdict.PILOT_DISCRETION)
@@ -111,6 +113,7 @@ INFORMATIONAL_OVER_LZ = "informational over the LZ from the surface"
 UNVERIFIED_PREFIX = "UNVERIFIED: "
 
 AIRSPACE_CONDITION_GROUP = {
+    Outcome.CHECK_SUP: "check_sup",
     Outcome.CONTACT_FIRST: "contact",
     Outcome.PERMISSION: "permission",
     Outcome.RADIO: "permission",
@@ -175,8 +178,13 @@ def assessed_span(start: datetime, end: datetime, now: datetime, live: bool) -> 
 # --- sources (E1, E2) -----------------------------------------------------------------
 
 
-def _checked_notam_status(status: SourceStatus, now: datetime) -> SourceStatus:
-    """The NOTAM status, marked stale here too when its PIB was issued too long before now (E2)."""
+def _checked_notam_status(status: SourceStatus, now: datetime, *, stale_rule: bool = True) -> SourceStatus:
+    """The NOTAM status, marked stale here too when its PIB was issued too long before now (E2).
+
+    stale_rule False (case mode) leaves an ok status ok: the case's captured PIB is treated as current at its now.
+    """
+    if not stale_rule:
+        return status
     limit = _number(RULES.pib_stale_hours)
     if status.state is SourceState.OK and status.issued_at is not None and now - status.issued_at > timedelta(hours=limit):
         reason = f"PIB issued {utc_text(status.issued_at)}, more than {limit:g} h before now"
@@ -256,6 +264,8 @@ def _notam_findings(
             unverified.append(result.reason)
         elif result.notam_id in owned_by_airspace:
             continue
+        elif result.action is NotamAction.CHECK_SUP:
+            conditions.append(("check_sup", result.reason))
         elif result.action is NotamAction.CONTACT_FIRST:
             conditions.append(("contact", result.reason))
         elif result.action is NotamAction.AVOID_SECTOR:
@@ -309,11 +319,14 @@ def _activations(
     """The NOTAMs that activate a danger area, one Activation for each designator and active span (G10).
 
     The designators come from the reading when there is one, else from item E of a restriction NOTAM. The E text kept
-    for an unread reason is the redacted one (no real phone number in an Assessment).
+    for an unread reason is the redacted one (no real phone number in an Assessment). Whether the NOTAM gives a phone or
+    email is found by code in the original item E and kept as a kind only (find_item_e_contact), with the SUP references.
     """
     activations = []
     for notam in notams:
         reading = readings.get(notam.id)
+        item_e_contact = find_item_e_contact(notam.item_e)
+        sup_references = notam.sup_references
         if reading is not None:
             found = reading.activates_designators
         else:
@@ -324,7 +337,17 @@ def _activations(
         for designator in dict.fromkeys(designators):
             for span_start, span_end in active_intervals(notam, reading, lz, start, end):
                 activations.append(
-                    Activation(designator=designator, notam_id=notam.id, reading=reading, e_text=" ".join(redact_phones(notam.item_e)[0].split()), start=span_start, end=span_end, circle=circle)
+                    Activation(
+                        designator=designator,
+                        notam_id=notam.id,
+                        reading=reading,
+                        e_text=" ".join(redact_phones(notam.item_e)[0].split()),
+                        start=span_start,
+                        end=span_end,
+                        circle=circle,
+                        item_e_contact=item_e_contact,
+                        sup_references=sup_references,
+                    )
                 )
     return activations
 
@@ -493,6 +516,7 @@ def assess(
     reader_status: Mapping[str, ReaderStatus] | None = None,
     window: tuple[datetime, datetime] | None = None,
     live: bool = False,
+    stale_rule: bool | None = None,
 ) -> Assessment:
     """Assess every UTC hour of the window [start, end) for the LZ at lat, lon.
 
@@ -501,6 +525,9 @@ def assess(
     the NOTAMs the reader was asked about and got no reading for ("failed" or "unavailable"):
     they are unread too, and each "unavailable" one is listed in an assumption. With no window the
     default one is used and noted. live drops hours that ended before now.
+    stale_rule says whether the PIB-age rule is applied again here to an ok PIB status (it is applied
+    when the PIB is loaded too, pib.load_pib). None follows live: live mode applies it, case mode does
+    not (the case's captured PIB is treated as current at its now). A status that is already stale stays stale.
     Raises ValueError outside UK coverage, for a naive time, for an empty or reversed window, and
     when a NOTAM is in both readings and reader_status or has a status other than the two above.
     """
@@ -527,7 +554,7 @@ def assess(
 
     hour_starts = _hour_starts(start, end, now, live)
 
-    statuses = [forecast.status, airspace.status, _checked_notam_status(pib.status, now)]
+    statuses = [forecast.status, airspace.status, _checked_notam_status(pib.status, now, stale_rule=live if stale_rule is None else stale_rule)]
     problems = _unavailable(statuses)
     weather_ok = forecast.status.state is SourceState.OK
     rows = build_rows(forecast, hour_starts[0], hour_starts[-1] + ONE_HOUR) if weather_ok and hour_starts else []

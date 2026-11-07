@@ -3,10 +3,9 @@
 No real request is made: sockets are disabled for the whole suite (pyproject addopts).
 """
 
+import re
 from datetime import UTC, datetime
 from types import SimpleNamespace
-
-import re
 
 import cases
 import httpx
@@ -69,13 +68,15 @@ def test_live_run_prints_the_table_with_a_live_header_and_the_three_sources_fetc
 
 def test_live_run_has_no_readings_so_a_notam_that_needs_one_is_unverified_not_acted_on(capsys, served):
     out = live(capsys, *WINDOW)
-    assert "CONTACT_FIRST" not in out and "AVOID_SECTOR" not in out
-    # 10:00 is not a weather NO-GO hour: both NOTAMs are over the LZ from the surface and unread, so it reads UNVERIFIED
+    assert "CONTACT_FIRST" not in out
+    # 10:00 is not a weather NO-GO hour: J3857 is over the LZ from the surface and unread, so it reads UNVERIFIED. H7171's E text
+    # draws a circle 0.15 NM from the LZ (G16: code reads it, no reading needed), so it is a sector to avoid, not unread.
     row = out.split("10:00\u201311:00  ", 1)[1].splitlines()
     assert row[0] == "UNVERIFIED"
-    assert any(line.startswith("    unverified: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS") for line in row)
+    assert not any("NOTAM H7171/26 is over the LZ" in line for line in row)
+    assert "    NOTAM H7171/26 AVOID_SECTOR bearing 168.6\u00b0" in row
     assert any("TEMPO DANGER AREA (TDA) EGD496A ACTIVATED" in line for line in row)  # the NOTAM's E text is printed
-    assert "    NOTAM H7171/26 UNREAD_OVER_LZ" in row and "    NOTAM J3857/26 UNREAD_OVER_LZ" in row
+    assert "    NOTAM J3857/26 UNREAD_OVER_LZ" in row and not any("H7171/26 UNREAD_OVER_LZ" in line for line in row)
     assert "08:00\u201309:00  NO-GO" in out  # a weather NO-GO stays NO-GO
 
 

@@ -23,7 +23,7 @@ from factories import (
 )
 
 from flysafelz.assess import display as display_of
-from flysafelz.contracts import Category, SourceName, SourceState, Verdict
+from flysafelz.contracts import Category, ContactKind, SourceName, SourceState, Verdict
 from flysafelz.rules import RULES
 
 # What a segment can be hit by. "source" is which source is down (or stale).
@@ -80,7 +80,7 @@ def build(blocker: bool, source: str, unread: bool, condition: bool, window):
         pib = pib_result(*notams, issued=stale_issue)
     else:
         pib = pib_result(*notams)
-    return run_assess(window=window, forecast=forecast, airspace=airspace, pib=pib, readings=readings)
+    return run_assess(window=window, forecast=forecast, airspace=airspace, pib=pib, readings=readings, stale_rule=True)  # the live PIB-age rule
 
 
 @pytest.mark.parametrize(("blocker", "source", "unread", "caution", "condition"), cases())
@@ -119,3 +119,34 @@ def test_a_stale_status_from_the_client_is_treated_like_a_failed_one():
     pib = pib.model_copy(update={"status": status(SourceName.NOTAMS, SourceState.STALE, "PIB older than the client allows", issued_at=utc(7))})
     segment = the_segment(run_assess(pib=pib), utc(9))
     assert segment.verdict is Verdict.UNVERIFIED
+
+
+# --- ticket 3b PR-3: a CHECK_SUP NOTAM is a condition, so it sits in the precedence rule where CONTACT_FIRST does ----------------
+
+
+def check_sup_pair():
+    """A constructed danger area over the LZ from SFC with no contact: CHECK_SUP."""
+    circle = circle_at(0)
+    return notam("J4/26", circle=circle, subject="RD", item_f="SFC", item_e="DANGER AREA EGD496A. SEE AIP SUP 108/2026."), reading(
+        notam_id="J4/26", geometry=circle, contact=ContactKind.NONE, value=None
+    )
+
+
+@pytest.mark.parametrize("blocker", [False, True])
+@pytest.mark.parametrize("unread", [False, True])
+@pytest.mark.parametrize("caution", [False, True])
+def test_a_check_sup_notam_never_changes_the_precedence_rule_it_only_adds_a_condition(blocker, unread, caution):
+    window = TWILIGHT_WINDOW if caution else DAY_WINDOW
+    notams, readings = [], {}
+    if blocker:
+        notams.append(notam("J1/26", circle=circle_at(0)))
+        readings["J1/26"] = reading(notam_id="J1/26", geometry=circle_at(0), category=Category.PROHIBITIVE)
+    if unread:
+        notams.append(notam("J2/26", circle=circle_at(0)))
+    parsed, read = check_sup_pair()
+    notams.append(parsed)
+    readings[parsed.id] = read
+    segment = the_segment(run_assess(window=window, pib=pib_result(*notams), readings=readings), window[0])
+    verdict, approaching, display = expected(blocker, "ok", unread, caution, True)
+    assert (segment.verdict, segment.approaching_limits, display_of(segment)) == (verdict, approaching, display)
+    assert any("read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026" in c for c in segment.conditions)

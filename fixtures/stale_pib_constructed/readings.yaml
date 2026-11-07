@@ -1,0 +1,24 @@
+# Hand-written NotamReading entries for this constructed case (see flysafelz.contracts.NotamReading).
+# J9001/26: a made-up drone area 0.5 NM round a point 0.65 NM south of the LZ, so the LZ is 0.15 NM outside it:
+# the action is AVOID_SECTOR. No contact, no phone number anywhere.
+- id: J9001/26
+  category: cooperative
+  activity: drone ops
+  geometry:
+    kind: circle
+    lat: 51.88916667
+    lon: -1.1
+    radius_nm: 0.5
+  floor:
+    value: 0
+    unit: ft
+    datum: SFC
+  ceiling:
+    value: 700
+    unit: ft
+    datum: AGL
+  schedule: 0800-1800
+  contact:
+    kind: none
+  activates_designators: []
+  prohibitive_reason: none

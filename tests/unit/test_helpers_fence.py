@@ -11,7 +11,6 @@ from pathlib import Path
 
 import pytest
 import yaml
-
 from fence_scan import REVIEWED_NAMED_CONSTANTS, hard_coded_rule_values
 
 from flysafelz.rules import DEFAULT_PATH

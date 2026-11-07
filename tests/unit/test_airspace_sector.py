@@ -9,8 +9,8 @@ import math
 import pytest
 from airspace_helpers import LZ, activation, amsl, assess, offset, only, reading, square, utc, volume, with_rules
 
-from flysafelz.contracts import Circle, ContactKind
 from flysafelz.airspace import Outcome, TimeSpan
+from flysafelz.contracts import Circle, ContactKind
 from flysafelz.geo import COMPASS_POINTS, compass16, shape_edge_bearing_deg, shape_edge_distance_nm
 
 TINY = 0.003  # half-width in NM: small enough that the nearest point is in the direction of the centre
@@ -18,17 +18,17 @@ CENTRES = [(k * 22.5, COMPASS_POINTS[k]) for k in range(len(COMPASS_POINTS))]
 
 # The non-AWARENESS outcomes of G8: what the same volume over the LZ would be, and what it is beside the LZ.
 VOLUMES = [
-    ("ctr from the surface", dict(type_="ctr"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("prohibited from the surface", dict(type_="prohibited"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("restricted from the surface", dict(type_="restricted"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("tmz from the surface", dict(type_="tmz"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("atz from the surface", dict(type_="atz"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("matz from the surface", dict(type_="matz"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("rmz from the surface", dict(type_="rmz"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("cta from the surface", dict(type_="cta", cls="D"), Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
-    ("ctr with a low floor", dict(type_="ctr", lower=amsl(2000)), Outcome.CEILING, "stay below 1,800 ft QNH"),
-    ("cta with a low floor", dict(type_="cta", cls="D", lower=amsl(1500)), Outcome.CEILING, "stay below 1,300 ft QNH"),
-    ("atz with a mid floor", dict(type_="atz", lower=amsl(7000)), Outcome.WARNING, "{name}"),
+    ("ctr from the surface", {"type_": "ctr"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("prohibited from the surface", {"type_": "prohibited"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("restricted from the surface", {"type_": "restricted"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("tmz from the surface", {"type_": "tmz"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("atz from the surface", {"type_": "atz"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("matz from the surface", {"type_": "matz"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("rmz from the surface", {"type_": "rmz"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("cta from the surface", {"type_": "cta", "cls": "D"}, Outcome.AVOID_SECTOR, "avoid the sector to the {compass}"),
+    ("ctr with a low floor", {"type_": "ctr", "lower": amsl(2000)}, Outcome.CEILING, "stay below 1,800 ft QNH"),
+    ("cta with a low floor", {"type_": "cta", "cls": "D", "lower": amsl(1500)}, Outcome.CEILING, "stay below 1,300 ft QNH"),
+    ("atz with a mid floor", {"type_": "atz", "lower": amsl(7000)}, Outcome.WARNING, "{name}"),
 ]
 
 
@@ -160,7 +160,7 @@ def test_an_h24_danger_area_has_no_inactive_segment():
     assert only(assess([danger_beside(hours="H24")], segment=night)).outcome is Outcome.AVOID_SECTOR
 
 
-@pytest.mark.parametrize("area_args", [dict(hours=None), dict(hours="WHENEVER WE FEEL LIKE IT"), dict(hours="oops", hours_readable=False)])
+@pytest.mark.parametrize("area_args", [{"hours": None}, {"hours": "WHENEVER WE FEEL LIKE IT"}, {"hours": "oops", "hours_readable": False}])
 def test_a_danger_area_with_empty_or_unreadable_hours_beside_the_lz_is_active_and_noted(area_args):
     result = assess([danger_beside(**area_args)])
     assert only(result).outcome is Outcome.AVOID_SECTOR

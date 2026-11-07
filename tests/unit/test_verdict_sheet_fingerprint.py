@@ -60,33 +60,33 @@ def moved(case_dir, mode, **how) -> list[str]:
 
 BOTH_INPUTS = ([fp.PART_INPUTS], [fp.PART_INPUTS])
 BOTH_ROWS = ([fp.PART_ROWS], [fp.PART_ROWS])
-DRAFT_ONLY = lambda name: ([], [name])  # noqa: E731
+DRAFT_ONLY = lambda name: ([], [name])
 
 # field changed alone -> (parts that move in blind mode, parts that move in draft mode)
 TABLE = {
-    "lat": (dict(ex=example(lat=53.9)), *BOTH_INPUTS),
-    "lon": (dict(ex=example(lon=-0.09)), *BOTH_INPUTS),
-    "now": (dict(ex=example(now=NOW.replace(minute=45))), *BOTH_INPUTS),
-    "window end": (dict(ex=example(window=(WINDOW[0], WINDOW[1].replace(hour=17)))), *BOTH_INPUTS),
-    "window start (07:30 as written, not 07:00)": (dict(ex=example(window=(WINDOW[0].replace(minute=30), WINDOW[1]))), *BOTH_INPUTS),
-    "window null instead of set": (dict(ex=example(window=None)), *BOTH_INPUTS),
-    "reference.path": (dict(ex=example(path="explain")), *BOTH_INPUTS),
-    "fixtures.drop": (dict(ex=example(drop=("weather",))), *BOTH_INPUTS),
-    "case name": (dict(ex=example(case="b_case")), *BOTH_INPUTS),
-    "row start": (dict(rows=with_row(1, start="2026-10-31T08:30:00Z")), *BOTH_ROWS),
-    "row end": (dict(rows=with_row(1, end="2026-10-31T09:30:00Z")), *BOTH_ROWS),
-    "row tier": (dict(rows=with_row(2, tier="TOO_FAR")), *BOTH_ROWS),
-    "an extra row": (dict(rows=[*ROWS, {"start": "2026-10-31T10:00:00Z", "end": "2026-10-31T11:00:00Z", "edge": "hour"}]), *BOTH_ROWS),
-    "weather.json bytes": (dict(edit=("weather.json", b"changed\n")), *DRAFT_ONLY("weather.json")),
-    "airspace.json bytes": (dict(edit=("airspace.json", b"changed\n")), *DRAFT_ONLY("airspace.json")),
-    "pib.xml bytes": (dict(edit=("pib.xml", b"changed\n")), *DRAFT_ONLY("pib.xml")),
-    "readings.yaml bytes": (dict(edit=("readings.yaml", b"changed\n")), *DRAFT_ONLY("readings.yaml")),
+    "lat": ({"ex": example(lat=53.9)}, *BOTH_INPUTS),
+    "lon": ({"ex": example(lon=-0.09)}, *BOTH_INPUTS),
+    "now": ({"ex": example(now=NOW.replace(minute=45))}, *BOTH_INPUTS),
+    "window end": ({"ex": example(window=(WINDOW[0], WINDOW[1].replace(hour=17)))}, *BOTH_INPUTS),
+    "window start (07:30 as written, not 07:00)": ({"ex": example(window=(WINDOW[0].replace(minute=30), WINDOW[1]))}, *BOTH_INPUTS),
+    "window null instead of set": ({"ex": example(window=None)}, *BOTH_INPUTS),
+    "reference.path": ({"ex": example(path="explain")}, *BOTH_INPUTS),
+    "fixtures.drop": ({"ex": example(drop=("weather",))}, *BOTH_INPUTS),
+    "case name": ({"ex": example(case="b_case")}, *BOTH_INPUTS),
+    "row start": ({"rows": with_row(1, start="2026-10-31T08:30:00Z")}, *BOTH_ROWS),
+    "row end": ({"rows": with_row(1, end="2026-10-31T09:30:00Z")}, *BOTH_ROWS),
+    "row tier": ({"rows": with_row(2, tier="TOO_FAR")}, *BOTH_ROWS),
+    "an extra row": ({"rows": [*ROWS, {"start": "2026-10-31T10:00:00Z", "end": "2026-10-31T11:00:00Z", "edge": "hour"}]}, *BOTH_ROWS),
+    "weather.json bytes": ({"edit": ("weather.json", b"changed\n")}, *DRAFT_ONLY("weather.json")),
+    "airspace.json bytes": ({"edit": ("airspace.json", b"changed\n")}, *DRAFT_ONLY("airspace.json")),
+    "pib.xml bytes": ({"edit": ("pib.xml", b"changed\n")}, *DRAFT_ONLY("pib.xml")),
+    "readings.yaml bytes": ({"edit": ("readings.yaml", b"changed\n")}, *DRAFT_ONLY("readings.yaml")),
     # not inputs: nothing may move
-    "id": (dict(ex=example(id="renamed")), [], []),
-    "blind flag alone (the stored mode carries it)": (dict(ex=example(blind=False)), [], []),
-    "row edge name": (dict(rows=with_row(1, edge="J1/26 starts")), [], []),
-    "a label typed into a row": (dict(rows=with_row(0, verdict="NO_GO", approaching_limits=True)), [], []),
-    "key order within a row": (dict(rows=[dict(reversed(list(r.items()))) for r in ROWS]), [], []),
+    "id": ({"ex": example(id="renamed")}, [], []),
+    "blind flag alone (the stored mode carries it)": ({"ex": example(blind=False)}, [], []),
+    "row edge name": ({"rows": with_row(1, edge="J1/26 starts")}, [], []),
+    "a label typed into a row": ({"rows": with_row(0, verdict="NO_GO", approaching_limits=True)}, [], []),
+    "key order within a row": ({"rows": [dict(reversed(list(r.items()))) for r in ROWS]}, [], []),
 }
 
 
