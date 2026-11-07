@@ -210,7 +210,7 @@ def test_every_danger_area_has_an_activation_field_set(name, designators, notam_
 
 def test_west_sleekburn_case_yaml_and_empty_readings():
     case, _raw = load_case(case_dir(WEST_SLEEKBURN) / "case.yaml", today=TODAY)
-    assert (case.lat, case.lon) == (55.155, -1.565)
+    assert (case.lat, case.lon) == (55.1576, -1.5699)
     assert yaml.safe_load((case_dir(WEST_SLEEKBURN) / "readings.yaml").read_text(encoding="utf-8")) == []
     assert re.match(r"#", (case_dir(WEST_SLEEKBURN) / "readings.yaml").read_text(encoding="utf-8"))  # header comment
 
