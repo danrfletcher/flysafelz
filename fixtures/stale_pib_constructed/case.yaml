@@ -1,0 +1,15 @@
+# CONSTRUCTED case (not captured from the archive): a made-up landing zone in open country, a made-up PIB and made-up
+# weather, built to keep the live stale-PIB rule tested end to end. `stale_rule: live` switches the case-mode default off:
+# the PIB was issued at 02:20Z, 5 h 10 min before `now`, so the live 3 h rule makes the NOTAMs source stale.
+# Remove the `stale_rule` line and the same files read NOTAMs ok (the case-mode default). The PIB holds no phone number.
+constructed: true
+lat: 51.9
+lon: -1.1
+now: '2026-10-31T07:30:00Z'
+stale_rule: live
+capture:
+  pib_issued: '2026-10-31T02:20:11Z'
+  sha: constructed  # not an archive commit: this PIB is made up
+window:
+  end: '2026-10-31T15:00:00Z'
+  start: '2026-10-31T08:00:00Z'

@@ -100,7 +100,7 @@ Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
 Sources
   weather: ok
   airspace: ok
-  NOTAMs: ok (PIB issued 2026-10-31T07:00:37Z)
+  NOTAMs: ok (PIB issued 2026-10-31T07:00:37Z) (case mode: captured PIB treated as current at the case's now)
 Flyable windows (UTC)
   2026-10-31T07:00Z to 2026-10-31T08:00Z
   2026-10-31T10:00Z to 2026-10-31T17:06Z

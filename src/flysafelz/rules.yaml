@@ -217,7 +217,7 @@ pib_stale_hours:
   comparison: "="
   source: "FlySafeLZ Spec s2, Plan 2 E2"
   confidence: educated guess
-  note: "A PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED."
+  note: "Live mode: a PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED. Case mode treats the captured PIB as current at the case's now, because the archive snapshots it only about twice a day."
 
 uk_bounds_lat_min:
   value: 49.8

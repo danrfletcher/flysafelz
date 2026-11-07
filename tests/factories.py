@@ -222,6 +222,7 @@ def run_assess(
     lat: float = LZ.lat,
     lon: float = LZ.lon,
     live: bool = False,
+    stale_rule: bool | None = None,
 ) -> Assessment:
     """assess() at Blue Mill on a calm day. By default: 09:00-12:00Z, calm weather, no airspace, no NOTAMs, all sources ok.
 
@@ -241,6 +242,7 @@ def run_assess(
         reader_status=reader_status,
         window=window,
         live=live,
+        stale_rule=stale_rule,
     )
 
 

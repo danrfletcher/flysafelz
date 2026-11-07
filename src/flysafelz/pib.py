@@ -49,7 +49,7 @@ The flow:
     read_notams(xml)            -> issued_at, NOTAMs deduped by id (first seen; every section kept)
     drop_superseded(notams)     -> NOTAMs without those an R replaces or a C cancels
     parse_pib(xml)              -> both of the above in one call
-    load_pib(source, now)       -> fetch + parse + the source status (ok | failed | stale)
+    load_pib(source, now)       -> fetch + parse + the source status (ok | failed | stale; case mode never stale)
     prefilter(notams, lz, window)       -> kept, dropped with reasons (G13)
     sort_notam(notam, span, lz)         -> IGNORE | VIA_AIRSPACE | AWARENESS | TO_READER (G23)
 
@@ -88,6 +88,8 @@ MINUTES_PER_DEGREE = 60
 SECURITY_SERIES = "V"  # series V carries security advice (subject RO) and volcanic ash (kept)
 PERMANENT = "PERM"
 ESTIMATE = "EST"
+# The ok-status reason in case mode, where the stale rule is off: the archive snapshots the PIB only about twice a day.
+CASE_MODE_NOTE = "case mode: captured PIB treated as current at the case's now"
 
 _TIME = re.compile(r"(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)\s*(EST)?", re.IGNORECASE)
 _COORDINATES = re.compile(r"(\d\d)(\d\d)([NS])\s?(\d\d\d)(\d\d)([EW])(?:\s?(\d\d\d))?")
@@ -345,11 +347,18 @@ def _number(rule: Rule) -> float:
     return rule.value
 
 
-def load_pib(source: Source, now: datetime, *, client: httpx.Client | None = None, rules: Rules = RULES) -> PibResult:
+def load_pib(
+    source: Source, now: datetime, *, client: httpx.Client | None = None, rules: Rules = RULES, stale_rule: bool = True
+) -> PibResult:
     """Fetch the PIB and read it. The status is ok, stale (issued too long before now) or failed.
 
     A stale PIB still returns its NOTAMs, so the verdict step can let a NO_GO
     from a working source win over UNVERIFIED. A failed one returns none.
+
+    stale_rule: True (live mode) applies the pib_stale_hours rule. False (case mode) does not: the case's
+    captured PIB is treated as current at the case's now, because the archive snapshots it only about twice
+    a day. The status is then ok whatever the PIB's age, and its reason says so. A PIB that fails to read is
+    still failed.
     """
     fetched = fetch_pib(source, now, client=client)
     if fetched.xml is None:
@@ -365,7 +374,9 @@ def load_pib(source: Source, now: datetime, *, client: httpx.Client | None = Non
     kept, dropped = drop_superseded(notams)
 
     limit = _number(rules.pib_stale_hours)
-    if now - issued > timedelta(hours=limit):
+    if not stale_rule:
+        reason, state = CASE_MODE_NOTE, SourceState.OK
+    elif now - issued > timedelta(hours=limit):
         reason = f"PIB issued {utc_text(issued)}, more than {limit:g} h before now"
         state = SourceState.STALE
     else:

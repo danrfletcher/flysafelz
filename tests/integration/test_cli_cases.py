@@ -87,6 +87,10 @@ def test_e20_west_sleekburn_reproduces_the_golden_file(capsys, update_golden):
     check_golden(WEST_SLEEKBURN, run_cli(capsys, ["assess", "--case", WEST_SLEEKBURN]), update_golden)
 
 
+def test_g15_the_constructed_old_pib_case_reproduces_its_golden_file(capsys, update_golden):
+    check_golden("stale_pib_constructed", run_cli(capsys, ["assess", "--case", "stale_pib_constructed"]), update_golden)
+
+
 def test_the_golden_files_are_utf8_text_with_one_final_newline():
     for name in (BLUE_MILL, WEST_SLEEKBURN):
         text = (GOLDEN / f"{name}.txt").read_bytes().decode("utf-8")
@@ -263,7 +267,12 @@ def test_gp6_the_17_00_row_splits_at_17_06(capsys):
 def test_gp6_the_footer_has_sources_flyable_windows_and_the_overall_line(capsys):
     lines = run_cli(capsys, BLUE_MILL_GP3).splitlines()
     footer = lines[lines.index("Sources") :]
-    assert footer[:4] == ["Sources", "  weather: ok", "  airspace: ok", "  NOTAMs: ok (PIB issued 2026-10-31T07:00:37Z)"]
+    assert footer[:4] == [
+        "Sources",
+        "  weather: ok",
+        "  airspace: ok",
+        "  NOTAMs: ok (PIB issued 2026-10-31T07:00:37Z) (case mode: captured PIB treated as current at the case's now)",
+    ]
     windows = footer[footer.index("Flyable windows (UTC)") + 1 : footer.index("Overall: NO-GO")]
     assert windows == ["  2026-10-31T07:00Z to 2026-10-31T08:00Z", "  2026-10-31T10:00Z to 2026-10-31T17:06Z"]
     assert "Overall: NO-GO" in footer

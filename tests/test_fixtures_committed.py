@@ -28,6 +28,7 @@ FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
 BLUE_MILL = "blue_mill_2026-10-31"
 WEST_SLEEKBURN = "west_sleekburn_2026-10-31"
 CASES = [BLUE_MILL, WEST_SLEEKBURN]
+CONSTRUCTED = "stale_pib_constructed"  # made up, not captured: PR-7.F1's old-PIB case
 
 SHA = "bdab14658f0270dc41460eebcd03332abfb230ec"
 TODAY = datetime(2026, 11, 6, 12, 0, tzinfo=UTC)  # frozen
@@ -115,10 +116,12 @@ def test_no_fixture_holds_the_key_variable_or_a_request_header(name):
         assert KEY_VARIABLE not in text, path.name
 
 
-def test_fixtures_dir_holds_only_the_two_cases_and_nothing_with_a_key():
-    assert sorted(p.name for p in FIXTURES.iterdir()) == sorted(CASES)
+def test_fixtures_dir_holds_only_the_two_cases_and_the_constructed_one_and_nothing_with_a_key():
+    assert sorted(p.name for p in FIXTURES.iterdir()) == sorted([*CASES, CONSTRUCTED])
     for path in FIXTURES.rglob("*"):
         assert path.is_dir() or path.name in FILES, path
+        if path.is_file():
+            assert KEY_VARIABLE not in path.read_text(encoding="utf-8"), path
 
 
 # --- Blue Mill ---------------------------------------------------------------------------------------------------------

@@ -31,6 +31,8 @@ uv run python -m flysafelz.cli assess --lat 53.802797 --lon -0.086644 # live; ne
 
 One row per UTC hour (a segment edge inside an hour prints as sub-rows), then source statuses, flyable windows and the overall line. `--start` and `--end` (ISO 8601 with a timezone, end exclusive) narrow the window; `--debug` also lists the NOTAMs that were dropped or ignored, with the reason. A live run has no NOTAM readings, so a NOTAM over the LZ that needs one reads UNVERIFIED. There is no flag that changes a limit. The committed outputs for both cases are in `tests/golden/`; `uv run pytest --update-golden` rewrites them.
 
+Case mode and the age of the PIB. The archive the cases come from (Jonty/uk-notam-archive) snapshots the PIB only about twice a day, at roughly 02:20 and 09:30 UTC, so a case's captured bulletin can be about 5 h old at the case's `now`. Case mode therefore treats the captured PIB as current at `now`: the 3 h `pib_stale_hours` rule is not applied, the NOTAMs source reads `ok`, and its line shows the PIB's issued time with a "(case mode: captured PIB treated as current at the case's now)" note so the real age is visible. Live mode keeps the 3 h rule unchanged. A case can opt back in with `stale_rule: live` in its `case.yaml`; only `fixtures/stale_pib_constructed/` does, so the stale, UNVERIFIED path stays tested end to end. Any other value is a load error.
+
 ## Rules
 
 Every threshold lives in `src/flysafelz/rules.yaml` with its source and confidence. Python code holds no limits of its own. This table is the output of `uv run python -m flysafelz.cli rules`, and a test keeps the two identical.
@@ -62,7 +64,7 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 | band_high | 10000 | ft | = | FlySafeLZ Spec s2, Plan 2 primitives (Dan) | educated guess | Airspace floors above this are awareness only (map and collapsed list). |
 | verdict_horizon_day | 3 | day | = | FlySafeLZ Spec s2, Plan 2 Q9 (Dan); day 0 is today in Europe/London | educated guess | Last day that can carry a verdict, if every required weather variable is present. |
 | outlook_horizon_day | 7 | day | = | Vector check of Open-Meteo ukmo_seamless on 2026-11-06: 10 m wind, gust, CAPE and visibility run to day 7 | sourced | Beyond this day nothing is fetched and the hour is TOO_FAR. |
-| pib_stale_hours | 3 | h | = | FlySafeLZ Spec s2, Plan 2 E2 | educated guess | A PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED. |
+| pib_stale_hours | 3 | h | = | FlySafeLZ Spec s2, Plan 2 E2 | educated guess | Live mode: a PIB issued longer ago than this makes NOTAMs stale, so UNVERIFIED. Case mode treats the captured PIB as current at the case's now, because the archive snapshots it only about twice a day. |
 | uk_bounds_lat_min | 49.8 | deg | < | Plan 2 E16 (south of the Isles of Scilly) | educated guess | A latitude below this is outside UK coverage. Exactly this latitude is inside. |
 | uk_bounds_lat_max | 61 | deg | > | Plan 2 E16 (north of Shetland) | educated guess | A latitude above this is outside UK coverage. Exactly this latitude is inside. |
 | uk_bounds_lon_min | -8.7 | deg | < | Plan 2 E16 (west of Northern Ireland) | educated guess | A longitude (east positive) below this is outside UK coverage. Exactly this longitude is inside. |
