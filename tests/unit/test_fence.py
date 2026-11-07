@@ -4,6 +4,7 @@ import ast
 import enum
 import re
 import subprocess
+import sys
 import tomllib
 from pathlib import Path
 
@@ -500,3 +501,37 @@ def test_only_the_draft_module_may_name_a_verdict_or_an_action():
             if isinstance(node, ast.ImportFrom):
                 assert not names & {a.name for a in node.names}, f"{path}:{node.lineno}"
     assert any(isinstance(n, ast.ImportFrom) and n.module == "flysafelz.verdict_sheet_draft" for n in ast.walk(_parse(SRC / "verdict_sheet.py")))
+
+
+# F4 (3b PR-2.F1): the SUP reference and the display designator list are found by code, never by a model. The two modules that find them
+# import only the standard library: no flysafelz.reader, no LLM client, nothing in FORBIDDEN_IMPORTS.
+CODE_FOUND_FILES = [SRC / "sup_refs.py", SRC / "designators.py"]
+
+
+def _non_stdlib_imports(path: Path) -> list[str]:
+    return [m for m in _imported_modules(path) if m.split(".")[0] not in sys.stdlib_module_names]
+
+
+def test_the_code_found_field_modules_import_only_the_standard_library():
+    assert all(p.exists() for p in CODE_FOUND_FILES)
+    for path in CODE_FOUND_FILES:
+        assert _imported_modules(path), path  # the scan reads real imports
+        assert _non_stdlib_imports(path) == [], path
+        assert not [m for m in _imported_modules(path) if m.startswith(FORBIDDEN_IMPORTS) or "reader" in m.lower()], path
+
+
+def test_the_standard_library_scan_catches_planted_imports(tmp_path):
+    for module in ("flysafelz.reader", "flysafelz.reader.read", "langchain_core", "openai", "anthropic", "yaml"):
+        planted = tmp_path / "planted.py"
+        planted.write_text(f"import re\nimport {module}\n", encoding="utf-8")
+        assert _non_stdlib_imports(planted) == [module], module
+    planted.write_text("import re\nfrom collections import abc\n", encoding="utf-8")
+    assert _non_stdlib_imports(planted) == []
+
+
+def test_the_sup_and_designator_properties_are_plain_properties_not_fields():
+    for name in ("sup_references", "designators"):
+        assert isinstance(vars(contracts.ParsedNotam)[name], property), name
+        assert name not in contracts.ParsedNotam.model_fields, name
+        assert name not in contracts.NotamReading.model_fields, name
+    assert "activates_designators" in contracts.NotamReading.model_fields  # activation stays the reader's field (CR5)

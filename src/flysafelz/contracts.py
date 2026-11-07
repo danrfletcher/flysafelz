@@ -10,6 +10,9 @@ from typing import Annotated, Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, model_validator
 
+from flysafelz.designators import find_designators
+from flysafelz.sup_refs import find_sup_references
+
 STRICT = ConfigDict(extra="forbid")
 _Q_CODE = re.compile(r"Q?(?P<subject>..)(?P<condition>..)")
 
@@ -138,6 +141,16 @@ class ParsedNotam(BaseModel):
         """The two-letter condition of the Q code (CA in QRDCA); empty when the code is too short."""
         match = _Q_CODE.match(self.q_code)
         return match.group("condition") if match else ""
+
+    @property
+    def sup_references(self) -> list[str]:
+        """The AIP SUP references in item E ("AIP SUP 108/2026"), found by code. Not a field: never serialised, never model-filled."""
+        return find_sup_references(self.item_e)
+
+    @property
+    def designators(self) -> list[str]:
+        """The airspace designators in item E (EGD496A), found by code, for display only. Activation uses NotamReading.activates_designators."""
+        return find_designators(self.item_e)
 
 
 class Category(StrEnum):
