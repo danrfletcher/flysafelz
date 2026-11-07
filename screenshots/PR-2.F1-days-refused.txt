@@ -1,0 +1,4 @@
+$ make fixtures CASE=f1_refusal_probe_3day   # days: 3 from 2026-11-07, so London day 2026-11-09 has not ended; a placeholder key is set in the environment
+/Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-4/fixtures/f1_refusal_probe_3day/case.yaml: days: London day 2026-11-09 has not ended yet (it ends 2026-11-10T00:00:00Z); a case replays the past
+make: *** [fixtures] Error 1
+exit=2
