@@ -146,6 +146,26 @@ def london_day_utc(day: date) -> tuple[datetime, datetime]:
     return start.astimezone(UTC), end.astimezone(UTC)
 
 
+def london_date(t_utc: datetime) -> date:
+    """The Europe/London calendar date that t falls on."""
+    return _utc(t_utc).astimezone(LONDON).date()
+
+
+def london_day_date(now_utc: datetime, day: int) -> date:
+    """The Europe/London date of day number `day` counted from now (day 0 is the day `now` is in)."""
+    return london_date(now_utc) + day * ONE_DAY
+
+
+def london_days_utc(now_utc: datetime, days: int) -> tuple[datetime, datetime]:
+    """The UTC start of London day 0 (the day `now` is in) and the UTC end (exclusive) of London day days-1.
+
+    So days=1 is today in London, and days=3 on 24 Oct 2026 (BST) is 23 Oct 23:00Z to 27 Oct 00:00Z.
+    """
+    if days < 1:
+        raise ValueError(f"days must be at least 1, got {days}")
+    return london_day_utc(london_day_date(now_utc, 0))[0], london_day_utc(london_day_date(now_utc, days - 1))[1]
+
+
 def utc_hours(start: datetime, end: datetime) -> list[datetime]:
     """UTC hour starts covering start up to end, end excluded.
 

@@ -12,8 +12,11 @@ from flysafelz.daylight import (
     Phase,
     daylight_edges,
     daylight_phase,
+    london_date,
+    london_day_date,
     london_day_offset,
     london_day_utc,
+    london_days_utc,
     round_down_minute,
     round_up_minute,
     sunrise_sunset,
@@ -252,3 +255,65 @@ def test_utc_hours_works_for_aware_non_utc_input_and_returns_utc():
     got = utc_hours(start, utc(2026, 10, 31, 9, 0))
     assert got == [utc(2026, 10, 31, 7, 0), utc(2026, 10, 31, 8, 0)]
     assert all(h.tzinfo is UTC for h in got)
+
+
+# --- London day N: the span a `days` capture covers (G11, E17) -------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("t", "expected"),
+    [
+        (utc(2026, 10, 24, 22, 59), date(2026, 10, 24)),  # BST: still 24 Oct
+        (utc(2026, 10, 24, 23, 0), date(2026, 10, 25)),  # BST midnight is 23:00 UTC
+        (utc(2026, 10, 25, 23, 30), date(2026, 10, 25)),  # GMT after the change: 25 Oct until 00:00 UTC
+        (utc(2026, 10, 26, 0, 0), date(2026, 10, 26)),
+        (utc(2026, 3, 28, 23, 30), date(2026, 3, 28)),  # before the spring change, GMT
+        (utc(2026, 3, 29, 0, 0), date(2026, 3, 29)),
+        (utc(2026, 3, 29, 23, 0), date(2026, 3, 30)),  # BST from 01:00 UTC on 29 Mar; midnight is 23:00 UTC
+        (utc(2026, 1, 15, 12, 0), date(2026, 1, 15)),
+    ],
+)
+def test_london_date_is_the_london_calendar_date(t, expected):
+    assert london_date(t) == expected
+
+
+@pytest.mark.parametrize(
+    ("now", "day", "expected"),
+    [
+        (utc(2026, 10, 24, 7, 30), 0, date(2026, 10, 24)),
+        (utc(2026, 10, 24, 7, 30), 1, date(2026, 10, 25)),  # the 25-hour day
+        (utc(2026, 10, 24, 22, 45), 0, date(2026, 10, 24)),
+        (utc(2026, 10, 24, 23, 15), 0, date(2026, 10, 25)),  # already 25 Oct in London
+        (utc(2026, 3, 28, 12, 0), 2, date(2026, 3, 30)),  # across the spring change
+        (utc(2026, 10, 31, 7, 30), 7, date(2026, 11, 7)),
+    ],
+)
+def test_london_day_date_counts_london_days_from_now(now, day, expected):
+    assert london_day_date(now, day) == expected
+    assert london_day_offset(london_day_utc(expected)[0], now) == day  # the same day the offset helper calls `day`
+
+
+@pytest.mark.parametrize(
+    ("now", "days", "start", "end", "hours"),
+    [
+        (utc(2026, 10, 31, 7, 30), 1, utc(2026, 10, 31, 0), utc(2026, 11, 1, 0), 24),  # GMT
+        (utc(2026, 10, 31, 7, 30), 5, utc(2026, 10, 31, 0), utc(2026, 11, 5, 0), 120),
+        (utc(2026, 9, 1, 7, 30), 1, utc(2026, 8, 31, 23), utc(2026, 9, 1, 23), 24),  # BST
+        (utc(2026, 9, 1, 7, 30), 5, utc(2026, 8, 31, 23), utc(2026, 9, 5, 23), 120),
+        (utc(2026, 10, 24, 7, 30), 3, utc(2026, 10, 23, 23), utc(2026, 10, 27, 0), 73),  # BST into the 25-hour day
+        (utc(2026, 10, 25, 7, 30), 1, utc(2026, 10, 24, 23), utc(2026, 10, 26, 0), 25),  # day 0 is the 25-hour day
+        (utc(2026, 3, 29, 7, 30), 1, utc(2026, 3, 29, 0), utc(2026, 3, 29, 23), 23),  # day 0 is the 23-hour day
+        (utc(2026, 3, 28, 12, 0), 3, utc(2026, 3, 28, 0), utc(2026, 3, 30, 23), 71),
+        (utc(2026, 6, 30, 23, 30), 2, utc(2026, 6, 30, 23), utc(2026, 7, 2, 23), 48),  # 23:30 UTC is already 1 July in London
+    ],
+)
+def test_london_days_utc_runs_from_the_start_of_day_0_to_the_end_of_day_n_minus_1(now, days, start, end, hours):
+    assert london_days_utc(now, days) == (start, end)
+    assert (end - start) == timedelta(hours=hours)
+
+
+def test_london_days_utc_rejects_fewer_than_one_day_and_naive_times():
+    with pytest.raises(ValueError):
+        london_days_utc(utc(2026, 10, 31, 7, 30), 0)
+    with pytest.raises(ValueError):
+        london_days_utc(datetime(2026, 10, 31, 7, 30), 1)

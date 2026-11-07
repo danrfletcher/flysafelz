@@ -1,0 +1,4 @@
+$ uv run python scripts/build_verdict_sheet.py --examples <tmp>/ex.yaml --out <tmp>/sheet.yaml --check
+blue_mill_2026-10-31 (blind): rows 13, labelled 0, unlabelled 13, unread left 0, actions done no (NOTAM actions not done), stale no
+1 entries checked: 0 errors, 0 stale, 0 orphans
+exit 0

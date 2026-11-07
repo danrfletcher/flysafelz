@@ -1,0 +1,11 @@
+# line 2 of the sheet: 'mode' indented one space short
+$ uv run python scripts/build_verdict_sheet.py --examples <tmp>/ex.yaml --out <tmp>/sheet.yaml --check
+<tmp>/sheet.yaml: invalid YAML at line 2: expected <block end>, but found '<block mapping start>'
+exit 1
+
+$ uv run python scripts/build_verdict_sheet.py --examples <tmp>/ex.yaml --out <tmp>/sheet.yaml
+<tmp>/sheet.yaml: invalid YAML at line 2: expected <block end>, but found '<block mapping start>'
+exit 1
+
+# sheet sha256 before: 548c98788bf8aaf3a1e11498ea77fc05966de4e45908631889836d96dd8055ff   mtime 1794046983
+# sheet sha256 after:  548c98788bf8aaf3a1e11498ea77fc05966de4e45908631889836d96dd8055ff   mtime 1794046983
