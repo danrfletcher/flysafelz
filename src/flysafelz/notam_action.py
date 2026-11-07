@@ -31,9 +31,10 @@ inside or exactly on the edge. "Within" is the distance to the edge being at mos
 local_area rule. A shape that cannot be used falls back to the Q-circle; with no usable
 shape the NOTAM is treated as over the LZ (fail closed) and the reason says so.
 
-Limits (E10): the reading's, else F/G, else the Q-line's lower and upper FL. When the
-reading and F/G both give a side and differ, the lower floor and the higher ceiling win
-and the reason says so. The E text is never read for limits. Floors are converted to
+Limits (E10): the reading's, else F/G, else the Q-line's lower and upper FL. A reading's
+floor or ceiling of None means its E text states none, so that side goes on to F/G and then
+the Q-line. When the reading and F/G both give a side and differ, the lower floor and the
+higher ceiling win and the reason says so. The E text is never read for limits. Floors are converted to
 feet QNH (AGL with the site elevation, FL with the segment's pressure_msl) and a floor at
 or below the site elevation is SFC. Bands are floor <= band_low, then <= band_high: a
 floor exactly on an edge belongs to the lower band, as in airspace.py (the band rules
@@ -187,14 +188,14 @@ def _merge(side: str, reading: _Bound | None, fg: _Bound | None, q_line: _Bound,
 def _limits(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, pressure: float, rules: Rules, notes: list[str]) -> tuple[_Bound, _Bound]:
     floor = _merge(
         "floor",
-        _bound(reading.floor, lz, pressure, rules) if reading else None,
+        _bound(reading.floor, lz, pressure, rules) if reading and reading.floor is not None else None,
         _parse_fg(parsed.item_f, lz, pressure, rules),
         _q_floor(parsed, lz, pressure, rules),
         notes,
     )
     ceiling = _merge(
         "ceiling",
-        _bound(reading.ceiling, lz, pressure, rules) if reading else None,
+        _bound(reading.ceiling, lz, pressure, rules) if reading and reading.ceiling is not None else None,
         _parse_fg(parsed.item_g, lz, pressure, rules),
         _q_ceiling(parsed, lz, pressure, rules),
         notes,

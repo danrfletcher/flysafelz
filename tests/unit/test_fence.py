@@ -54,16 +54,39 @@ def test_source_files_are_found():
     assert SRC / "contracts.py" in PY_FILES and SRC / "rules.py" in PY_FILES
 
 
-# F2: no agent, tool, LangGraph, LangChain, RAG or UI code.
-def test_pyproject_has_no_agent_or_llm_dependency():
+# F2: no agent, tool, LangGraph, LangChain, RAG or UI code. Narrowed for the reader (ticket 3 F2): the pyproject may declare
+# langchain-openai (and its langchain-core), and only src/flysafelz/reader/ may import them. Everything else is still banned.
+READER = SRC / "reader"
+ALLOWED_LLM_DEPENDENCIES = {"langchain-openai", "langchain-core"}
+ALLOWED_LLM_IMPORTS = ("langchain_openai", "langchain_core")
+BANNED_DEPENDENCY_PREFIXES = ("langgraph", "langchain", "openai", "anthropic")
+
+
+def _banned_dependencies(declared: list[str]) -> list[str]:
+    """The declared dependencies that are an agent or LLM client and not one of the two the reader may use."""
+    names = [re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower().replace("_", "-") for d in declared]
+    return [name for name in names if name.startswith(BANNED_DEPENDENCY_PREFIXES) and name not in ALLOWED_LLM_DEPENDENCIES]
+
+
+def _declared_dependencies() -> list[str]:
     config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     declared = list(config["project"]["dependencies"])
     for group in config.get("dependency-groups", {}).values():
         declared += [d for d in group if isinstance(d, str)]
-    names = [re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower() for d in declared]
-    assert names, "no dependencies read"
-    for name in names:
-        assert not name.startswith(("langgraph", "langchain", "openai", "anthropic")), name
+    return declared
+
+
+def test_pyproject_has_no_agent_or_llm_dependency():
+    declared = _declared_dependencies()
+    assert declared, "no dependencies read"
+    assert _banned_dependencies(declared) == []
+
+
+def test_the_dependency_scan_allows_exactly_the_two_reader_packages_and_still_catches_the_rest():
+    assert _banned_dependencies(["langchain-openai>=1.7.4", "langchain-core", "langchain_core>=1"]) == []
+    planted = ["langgraph", "langchain", "langchain-community>=0.3", "langchain-anthropic", "openai>=1", "anthropic", "openai-agents", "langchain-openai-extra"]
+    assert _banned_dependencies(planted) == [d.split(">=")[0] for d in planted]
+    assert "langchain-openai" in {re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower() for d in _declared_dependencies()}  # the reader's one new dependency is declared
 
 
 def _imported_modules(path: Path) -> list[str]:
@@ -76,10 +99,46 @@ def _imported_modules(path: Path) -> list[str]:
     return modules
 
 
+def _is_allowed_import(module: str, path: Path, reader: Path) -> bool:
+    """langchain_openai and langchain_core (and their submodules) are allowed in the reader package only."""
+    in_reader = reader in path.parents
+    return in_reader and module.split(".")[0] in ALLOWED_LLM_IMPORTS
+
+
+def _agent_imports(path: Path, reader: Path = READER) -> list[str]:
+    """The modules the file imports that are an agent or LLM client, less what the reader package may import."""
+    return [m for m in _imported_modules(path) if m.startswith(FORBIDDEN_IMPORTS) and not _is_allowed_import(m, path, reader)]
+
+
 def test_source_imports_no_agent_framework():
     for path in PY_FILES + SCRIPT_FILES:
-        for module in _imported_modules(path):
-            assert not module.startswith(FORBIDDEN_IMPORTS), (path, module)
+        assert _agent_imports(path) == [], path
+
+
+def test_only_the_reader_package_imports_an_llm_client():
+    """The reader really uses the exemption (so it is not dead), and nothing outside it does."""
+    reader_files = sorted(READER.rglob("*.py"))
+    assert reader_files
+    assert {m.split(".")[0] for path in reader_files for m in _imported_modules(path)} >= {"langchain_core"}
+    for path in PY_FILES + SCRIPT_FILES:
+        if READER not in path.parents:
+            assert not [m for m in _imported_modules(path) if m.split(".")[0] in ALLOWED_LLM_IMPORTS], path
+
+
+def test_the_import_scan_still_catches_a_planted_llm_import_outside_the_reader(tmp_path):
+    """Planted violations: langchain_core appended to a temp copy of cli.py, and the same line in the reader's place."""
+    cli_copy = tmp_path / "cli.py"
+    cli_copy.write_text((SRC / "cli.py").read_text(encoding="utf-8") + "\nimport langchain_core\n", encoding="utf-8")
+    assert _agent_imports(cli_copy, reader=tmp_path / "reader") == ["langchain_core"]
+    assert _agent_imports(SRC / "cli.py") == []  # the real file is clean, so the hit above is the planted line
+    for module in ("langchain_openai", "langchain_core.messages", "langgraph", "openai", "anthropic", "langchain_community", "langsmith"):
+        outside = tmp_path / "other.py"
+        outside.write_text(f"import {module}\n", encoding="utf-8")
+        assert _agent_imports(outside, reader=tmp_path / "reader") == [module], module
+    (tmp_path / "reader").mkdir()
+    inside = tmp_path / "reader" / "read.py"
+    inside.write_text("import langchain_core.messages\nfrom langchain_openai import ChatOpenAI\nimport langgraph\nimport openai\nimport langchain_community\n", encoding="utf-8")
+    assert _agent_imports(inside, reader=tmp_path / "reader") == ["langgraph", "openai", "langchain_community"]  # the two allowed packages pass; the rest do not
 
 
 # F1 (PR-3.F1): the verdict sheet has no model, no reader, and writes no label on a blind row.
