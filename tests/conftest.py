@@ -10,6 +10,16 @@ pytest_plugins = ["pytester"]
 FROZEN_NOW = datetime(2026, 10, 31, 7, 30, tzinfo=UTC)
 
 
+def pytest_addoption(parser: pytest.Parser) -> None:
+    """tests/golden/*.txt are rewritten only when this flag is given, never automatically."""
+    parser.addoption("--update-golden", action="store_true", default=False, help="rewrite tests/golden/*.txt from the current CLI output")
+
+
+@pytest.fixture
+def update_golden(request: pytest.FixtureRequest) -> bool:
+    return bool(request.config.getoption("--update-golden"))
+
+
 @pytest.fixture(autouse=True)
 def now() -> datetime:
     """The frozen clock every test uses: 2026-10-31T07:30Z. Code under test takes it as an argument."""
