@@ -17,8 +17,10 @@ from flysafelz.contracts import (
     Exemption,
     Limit,
     NotamReading,
+    ParsedNotam,
     ProhibitiveReason,
 )
+from flysafelz.notam_area import Area
 
 
 class ReaderOutput(BaseModel):
@@ -37,8 +39,17 @@ class ReaderOutput(BaseModel):
     prohibitive_reason: ProhibitiveReason
 
 
+def merge_reading(parsed: ParsedNotam, area: Area, output: ReaderOutput) -> NotamReading:
+    """The reading: the model's fields plus the coded ones code supplies (F1): id, the area (None is the Q-circle) and item D.
+
+    The one place a reading is put together, for a model's answer (read.py) and for a stored row (cache.py) alike. The
+    schedule is item D as written ("" when there is none, so notam_action() keeps using item D).
+    """
+    return NotamReading(id=parsed.id, geometry=area, schedule=parsed.item_d or "", **output.model_dump())
+
+
 class ReaderStatus(StrEnum):
-    """How a read ended. read_notam produces READ, REPAIRED, FAILED and UNAVAILABLE; STORED comes from a later step.
+    """How a read ended. read_notam produces READ, REPAIRED, FAILED and UNAVAILABLE; STORED is a reading loaded from the cache (cache.py).
 
     FAILED means the model answered but its answer was wrong twice. UNAVAILABLE means no usable answer came back at all.
     Either way there is no reading and the NOTAM is unread. Their values, "failed" and "unavailable", are the two literals

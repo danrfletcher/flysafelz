@@ -41,6 +41,7 @@ from flysafelz.reader.contract import (
     ReaderResult,
     ReaderStatus,
     TokenUsage,
+    merge_reading,
 )
 from flysafelz.reader.prompt import PROMPT_VERSION, render_prompt
 from flysafelz.reader.settings import SETTINGS
@@ -90,6 +91,11 @@ def _model_name(llm: BaseChatModel, reply: BaseMessage | None) -> str:
         if isinstance(name, str) and name:
             return name
     return _UNKNOWN_MODEL
+
+
+def model_name(llm: BaseChatModel) -> str:
+    """The model the endpoint is asked for (known before any reply), else "unknown". The cache key's model part."""
+    return _model_name(llm, None)
 
 
 def _tokens(reply: BaseMessage) -> TokenUsage | None:
@@ -152,7 +158,7 @@ def _judge(parsed: ParsedNotam, area: Area, redaction: dict[str, str], answer: _
         output = ReaderOutput.model_validate(data)
     except ValidationError as error:
         return _Judged(failures=tuple(schema_failures(error)))
-    reading = NotamReading(id=parsed.id, geometry=area, schedule=parsed.item_d or "", **output.model_dump())
+    reading = merge_reading(parsed, area, output)
     failures = check_reading(parsed, reading, redaction)
     return _Judged(reading=None if failures else reading, failures=tuple(failures))
 

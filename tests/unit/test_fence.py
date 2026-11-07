@@ -15,6 +15,7 @@ from fence_scan import (
     READER_REVIEWED_LITERALS,
     REVIEWED_FLOATS,
     REVIEWED_NAMED_CONSTANTS,
+    banned_words,
     hard_coded_rule_values,
     number,
     unreviewed_floats,
@@ -424,9 +425,9 @@ def test_contract_classes_subclass_only_basemodel_or_enum():
 
 
 def test_no_registry_di_or_caching_in_source():
-    pattern = re.compile(r"lru_cache|functools\.cache|\bcache\b|registry|Registry|\binject\b|Provider\b")
+    """Narrowed for the reader (ticket 3 F2): only src/flysafelz/reader/ may use the word `cache`. test_reader_cache_fence.py shows a planted one elsewhere is still caught."""
     for path in PY_FILES:
-        assert not pattern.search(path.read_text(encoding="utf-8")), path
+        assert banned_words(path, READER) == [], path
 
 
 # F8: limits and the local area cannot be adjusted by the user.
