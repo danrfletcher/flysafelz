@@ -82,8 +82,8 @@ def test_j3857_agrees_with_any_phone_or_email_contact_not_a_particular_number(lo
 def test_j3857_with_no_contact_is_a_difference_naming_both_actions_and_the_reason(loaded):
     section = run_check(loaded, J3857_26=[{**fixture_reply(J), "contact": NO_CONTACT}])
     line = section["lines"][1]
-    assert line.startswith(f"{J}: NO_FLY live vs CONTACT_FIRST fixture {DIFFER}")
-    assert "no phone or email contact" in line and "contact phone" in line
+    assert line.startswith(f"{J}: CHECK_SUP live vs CONTACT_FIRST fixture {DIFFER}")
+    assert "read the SUP / AIP ENR 5.1 entry for EGD496A before flight" in line and "the live reading has no contact" in line
     assert section["ok"] is False and entry(section, J)["agree"] is False and entry(section, H)["agree"] is True
 
 

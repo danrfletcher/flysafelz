@@ -34,8 +34,9 @@ Danger areas that a NOTAM activates are decided by airspace.py (G10), which owns
 conditions. The activating NOTAM still appears in the segment with its action, but adds no
 second condition (a NO_FLY or unread result still counts, so nothing is lost).
 
-Conditions come in a fixed order: CONTACT_FIRST, then permission and radio, then ceilings,
-then sectors, then warnings, and the order inside each group is the order found.
+Conditions come in a fixed order: CHECK_SUP (read the SUP), then CONTACT_FIRST, then permission and radio,
+then ceilings, then sectors, then warnings, and the order inside each group is the order found. A CHECK_SUP
+NOTAM adds a condition and no blocker, so a segment with only that finding is PILOT_DISCRETION WITH CONDITIONS.
 
 A NOTAM the reader was asked about and got no reading for is named in `reader_status` ("failed" or "unavailable"). It is
 unread, like any NOTAM without a reading (Q8): over the LZ from SFC it is UNREAD_OVER_LZ and the segment UNVERIFIED, anywhere
@@ -99,7 +100,7 @@ from flysafelz.rules import RULES, Rule
 from flysafelz.weather import HourTier, WeatherRow, build_rows, check_row, weather_tier
 
 # Condition groups, in the order a pilot reads them (G17).
-CONDITION_ORDER = ("contact", "permission", "ceiling", "sector", "warning")
+CONDITION_ORDER = ("check_sup", "contact", "permission", "ceiling", "sector", "warning")
 
 # Worst first. The index decides which of two verdicts is the worse.
 WORST_FIRST = (Verdict.NO_GO, Verdict.UNVERIFIED, Verdict.PILOT_DISCRETION)
@@ -256,6 +257,8 @@ def _notam_findings(
             unverified.append(result.reason)
         elif result.notam_id in owned_by_airspace:
             continue
+        elif result.action is NotamAction.CHECK_SUP:
+            conditions.append(("check_sup", result.reason))
         elif result.action is NotamAction.CONTACT_FIRST:
             conditions.append(("contact", result.reason))
         elif result.action is NotamAction.AVOID_SECTOR:

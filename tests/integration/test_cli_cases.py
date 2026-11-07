@@ -354,11 +354,9 @@ def test_f11_the_committed_reading_is_the_one_that_gives_contact_first(capsys, c
         {"prohibitive_reason": "live firing"},
         {"prohibitive_reason": "byelaws"},
         {"prohibitive_reason": "entry prohibited"},
-        {"contact": {"kind": "radio-only", "value": "Anglia Radar 128.925 MHz"}},
-        {"contact": {"kind": "none"}},
     ],
 )
-def test_f11_a_prohibitive_reason_or_a_radio_only_contact_is_no_fly_and_never_contact_first(capsys, changed_readings, changes):
+def test_f11_a_prohibitive_reason_is_no_fly_and_never_contact_first(capsys, changed_readings, changes):
     text = changed_readings(capsys, **changes)
     assert "CONTACT_FIRST" not in text
     assert "NOTAM J3857/26 NO_FLY" in text
@@ -366,6 +364,14 @@ def test_f11_a_prohibitive_reason_or_a_radio_only_contact_is_no_fly_and_never_co
     for hour in range(8, 18):
         for segment in segments_of(blocks[f"{hour:02d}"]):
             assert segment[0].split("  ", 1)[-1] == "NO-GO", (hour, segment[0])
+
+
+@pytest.mark.parametrize("contact", [{"kind": "radio-only", "value": "Anglia Radar 128.925 MHz"}, {"kind": "none"}])
+def test_f11_a_danger_area_with_a_radio_only_or_no_contact_is_check_sup_and_never_contact_first_or_ruled_in(capsys, changed_readings, contact):
+    text = changed_readings(capsys, contact=contact)
+    assert "CONTACT_FIRST" not in text
+    assert "NOTAM J3857/26 CHECK_SUP: read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026" in text
+    assert "NOTAM J3857/26 NO_FLY" not in text
 
 
 # --- E13: the clock change prints continuous UTC rows ------------------------------------------------------

@@ -14,21 +14,21 @@ Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
     caution: low cloud 100 %, limit 90
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 09:00–10:00  NO-GO
     blocked (weather): visibility 1340 m, limit 1500
     condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
     caution: low cloud 100 %, limit 90
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 10:00–11:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
     condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
     caution: visibility 2920 m, limit 5000
     caution: low cloud 98 %, limit 90
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 11:00–12:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
     condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
@@ -36,33 +36,33 @@ Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
     caution: visibility 3880 m, limit 5000
     caution: low cloud 95 %, limit 90
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 12:00–13:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
     condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
     caution: gust spread 5.2 mph, limit 4
     caution: low cloud 91 %, limit 90
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 13:00–14:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
     condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
     caution: gust spread 5.2 mph, limit 4
     caution: low cloud 91 %, limit 90
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 14:00–15:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
     condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
     caution: gust spread 4.5 mph, limit 4
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 15:00–16:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
     condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
     condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
     caution: gust spread 4.5 mph, limit 4
     NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 16:00–17:00
   16:00–16:28  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
       condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
@@ -70,7 +70,7 @@ Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
       caution: gust spread 4.3 mph, limit 4
       caution: gradient 9.7 mph, limit 9
       NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
   16:28–17:00  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
       condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
       condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
@@ -78,7 +78,7 @@ Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
       caution: gradient 9.7 mph, limit 9
       caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
       NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 17:00–18:00
   17:00–17:06  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
       condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
@@ -87,7 +87,7 @@ Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
       caution: visibility 2600 m, limit 5000
       caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk
       NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
   17:06–18:00  NO-GO
       blocked (daylight): night: outside civil twilight
       condition: Danger area EGD496A active 08:00–18:00 (UAS BVLOS ops): phone Flylogix 07784 546062 and fly only if they agree
@@ -95,7 +95,7 @@ Window 2026-10-31T07:00Z to 2026-10-31T18:00Z (end exclusive). All times UTC.
       caution: gradient 9.7 mph, limit 9
       caution: visibility 2600 m, limit 5000
       NOTAM H7171/26 AVOID_SECTOR bearing 168.6°
-      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; activates EGD496A
+      NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix 07784 546062 first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
 
 Sources
   weather: ok

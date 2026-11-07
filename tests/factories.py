@@ -128,6 +128,7 @@ def reading(
     exemptions: list[Exemption] | None = None,
     designators: list[str] | None = None,
     reason: ProhibitiveReason = ProhibitiveReason.NONE,
+    quote: str | None = None,
 ) -> NotamReading:
     return NotamReading(
         id=notam_id,
@@ -142,6 +143,7 @@ def reading(
         contact=Contact(kind=contact, value=value),
         activates_designators=designators or [],
         prohibitive_reason=reason,
+        prohibitive_quote=quote,
     )
 
 

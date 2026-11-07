@@ -1,0 +1,4 @@
+$ uv run pytest tests/unit/test_assess_notam_output.py -k gp4 -s
+GP4 verdict: PILOT DISCRETION – WITH CONDITIONS
+GP4 condition: read the SUP / AIP ENR 5.1 entry for EGD496A before flight; details in AIP SUP 108/2026
+2 passed, 14 deselected in 0.28s

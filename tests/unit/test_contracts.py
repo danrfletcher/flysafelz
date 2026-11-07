@@ -231,17 +231,20 @@ def test_notam_reading_applies_to_and_exemptions():
             NotamReading.model_validate({**h7171_reading(), **bad})
 
 
-def test_notam_action_covers_the_six_outcomes_and_the_no_reading_one():
+def test_notam_action_covers_the_seven_outcomes_and_the_no_reading_one():
     assert [a.name for a in NotamAction] == [
         "IGNORE",
         "NO_FLY",
         "CONTACT_FIRST",
+        "CHECK_SUP",
         "AVOID_SECTOR",
         "AWARENESS",
         "AWARENESS_MAP",
         "UNREAD_OVER_LZ",
     ]
     assert NotamAction.__doc__
+    for row in ("2a", "2b", "2c", "2d", "CHECK_SUP"):
+        assert row in NotamAction.__doc__
     result = NotamActionResult(notam_id="X1/26", action=NotamAction.IGNORE, reason="inactive")
     assert result.bearing_deg is None
 

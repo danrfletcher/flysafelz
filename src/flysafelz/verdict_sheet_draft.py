@@ -28,6 +28,7 @@ from flysafelz.contracts import Assessment, IgnoredNotam, NotamAction, Segment, 
 SEVERITY: tuple[NotamAction, ...] = (
     NotamAction.NO_FLY,
     NotamAction.UNREAD_OVER_LZ,
+    NotamAction.CHECK_SUP,
     NotamAction.CONTACT_FIRST,
     NotamAction.AVOID_SECTOR,
     NotamAction.AWARENESS,
@@ -119,7 +120,7 @@ def fill_rows(rows: Sequence[dict[str, Any]], assessment: Assessment) -> list[di
 
 
 def worst_action(first: NotamAction, second: NotamAction) -> NotamAction:
-    """The more severe: NO_FLY > UNREAD_OVER_LZ > CONTACT_FIRST > AVOID_SECTOR > AWARENESS > AWARENESS_MAP > IGNORE."""
+    """The more severe: NO_FLY > UNREAD_OVER_LZ > CHECK_SUP > CONTACT_FIRST > AVOID_SECTOR > AWARENESS > AWARENESS_MAP > IGNORE."""
     return first if _RANK[first] <= _RANK[second] else second
 
 
