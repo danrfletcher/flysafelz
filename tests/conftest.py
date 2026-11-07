@@ -1,4 +1,4 @@
-"""Shared test setup: a frozen clock, no API key, no dotenv, no sockets (addopts)."""
+"""Shared test setup: a frozen clock, no API key, no dotenv, no tracing, no sockets (addopts)."""
 
 import sys
 from datetime import UTC, datetime
@@ -28,8 +28,14 @@ def now() -> datetime:
 
 @pytest.fixture(autouse=True)
 def isolated_environment(monkeypatch: pytest.MonkeyPatch) -> None:
-    """No test sees a real key or reads .env: the key is removed and `import dotenv` fails."""
+    """No test sees a real key or reads .env: the key is removed and `import dotenv` fails.
+
+    LangSmith tracing is switched off too: the reader's model client would otherwise send every prompt to LangSmith
+    from a developer's shell that has it on.
+    """
     monkeypatch.delenv("OPENAIP_API_KEY", raising=False)
+    for name in ("LANGSMITH_TRACING", "LANGSMITH_TRACING_V2", "LANGCHAIN_TRACING", "LANGCHAIN_TRACING_V2"):
+        monkeypatch.delenv(name, raising=False)
     monkeypatch.setitem(sys.modules, "dotenv", None)
 
 
