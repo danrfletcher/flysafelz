@@ -22,6 +22,24 @@ DEFINITIONS = [
     "activates_designators = airspace designators the NOTAM switches on",
     "prohibitive_reason = one of: byelaws, entry prohibited, live firing, none",
 ]
+# G8: the prohibitive_quote definition, and G7: the wider criteria and the ambiguity rule, word for word.
+QUOTE_DEFINITION = "prohibitive_quote = the words of the NOTAM text the reason rests on, copied word for word; null when the reason is none"
+AMBIGUITY_RULE = "prohibitive_reason is none when the NOTAM text has no such wording, and whenever you are in any doubt"
+CRITERIA = [
+    # live firing (G7)
+    "ordnance",
+    "explosives",
+    "demolition",
+    "rockets",
+    # entry prohibited (G7)
+    '"must not enter"',
+    '"pilots are to avoid"',
+    '"no crossings"',
+    # byelaws (FR7)
+    '"byelaws apply"',
+    '"entry prohibited by byelaw"',
+    '"under byelaws"',
+]
 AREA_WORDS = re.compile(r"centre|center|radius|circle|polygon|geometry|area|latitude|longitude|\bpoint\b", re.IGNORECASE)
 E_BLOCK = re.compile(r"<notam_text>\n(.*)\n</notam_text>", re.DOTALL)
 
@@ -58,6 +76,41 @@ def test_the_system_text_holds_the_instruction_and_the_field_definitions_word_fo
         assert definition in system, definition
 
 
+@pytest.mark.parametrize("phrase", CRITERIA)
+def test_g7_every_criterion_phrase_is_in_the_system_text_word_for_word(phrase):
+    assert phrase in render_prompt(parsed()).system
+
+
+def test_g7_each_value_is_followed_by_its_own_criteria_on_one_line():
+    (line,) = [line for line in render_prompt(parsed()).system.splitlines() if line.startswith("- live firing covers")]
+    live, entry, byelaws = line.split("; ")
+    assert all(word in live for word in ("ordnance", "explosives", "demolition", "rockets"))
+    assert entry.startswith("entry prohibited covers") and all(p in entry for p in CRITERIA[4:7])
+    assert byelaws.startswith("byelaws covers") and all(p in byelaws for p in CRITERIA[7:])
+
+
+def test_g7_the_ambiguity_rule_and_the_quote_definition_are_there_and_the_quote_comes_last():
+    system = render_prompt(parsed()).system
+    assert AMBIGUITY_RULE in system
+    assert f"- {QUOTE_DEFINITION}" in system
+    lines = system.splitlines()
+    reason, rule, quote = (lines.index(f"- {text}") for text in (DEFINITIONS[-1], AMBIGUITY_RULE, QUOTE_DEFINITION))
+    assert reason < rule < quote
+
+
+def test_f3_the_reason_values_and_their_definition_line_are_unchanged():
+    from flysafelz.contracts import ProhibitiveReason
+
+    assert [r.value for r in ProhibitiveReason] == ["byelaws", "entry prohibited", "live firing", "none"]
+    assert DEFINITIONS[-1] == "prohibitive_reason = one of: byelaws, entry prohibited, live firing, none"
+
+
+def test_the_criteria_put_no_example_notam_in_the_system_text():
+    system = render_prompt(parsed()).system
+    assert not re.search(r"(?i)\bexample:|\bexamples\b|for instance:|<notam_text>\n", system)
+    assert "{" not in system and "}" not in system
+
+
 def test_the_prohibitive_reasons_in_the_system_text_are_the_enums_values():
     from flysafelz.contracts import ProhibitiveReason
 
@@ -74,6 +127,11 @@ def test_the_prompt_is_zero_shot():
     prompt = render_prompt(parsed())
     assert "{" not in prompt.system and "}" not in prompt.system  # no worked JSON example
     assert not re.search(r"(?i)\bexample:|\bexamples\b|for instance:", prompt.system)
+
+
+def test_e6_the_prompt_version_is_v2_and_the_first_line_says_so():
+    assert PROMPT_VERSION == "v2"
+    assert render_prompt(parsed()).system.splitlines()[0] == "NOTAM reader v2."
 
 
 def test_the_prompt_version_is_a_module_constant_and_is_in_the_rendered_system_text():
@@ -121,7 +179,7 @@ def test_a_matching_row_comes_with_its_meaning_and_lands_in_the_system_text(six_
 def test_an_e_text_with_no_matching_row_gets_no_table(six_rows, e_text):
     system = render_prompt(parsed(item_e=e_text), six_rows).system
     assert "Abbreviations" not in system
-    assert system.endswith("prohibitive_reason = one of: byelaws, entry prohibited, live firing, none")
+    assert system.endswith(QUOTE_DEFINITION)
 
 
 def test_rows_are_chosen_from_the_text_the_model_sees_not_the_raw_text(six_rows):

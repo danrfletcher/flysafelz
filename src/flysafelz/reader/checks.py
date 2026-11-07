@@ -4,7 +4,7 @@ A pure function: no model, no I/O, no change to the reading. It returns one plai
 naming the field and the offending value, and `[]` for a clean reading. The sentences are what the repair re-ask sends
 back to the model (G6) and what is logged, so they hold placeholders only: a model-written value goes through
 `redact_phones` before it is quoted, and a real number never reaches a sentence. The order is fixed: (b), (c), (d), (e),
-(f), and within one check the order of the reading's fields, so the same reading always gives the same list.
+(e2), (f), and within one check the order of the reading's fields, so the same reading always gives the same list.
 
 (a) area is not a check here. Code builds the area from the E text (`build_area`), and one that reaches more than
     `reader_area_slack_nm` outside the Q-circle is swapped for the Q-circle there and logged as a parser miss. That is
@@ -13,11 +13,15 @@ back to the model (G6) and what is logged, so they hold placeholders only: a mod
     datum. AGL against AMSL cannot be compared without the site's height, so that pair is skipped and the skip is logged.
     A floor or ceiling of None (the E text states none, G4) is skipped, not failed. A height that is not a finite number
     (NaN, Infinity: JSON from the model can carry them) is a failure, because no comparison with it can be trusted.
-(c) the model's text (activity, contact value, exemption quotes, designators) holds no phone number written out (a real
+(c) the model's text (activity, contact value, exemption quotes, designators, prohibitive quote) holds no phone number written out (a real
     number must come back as its <PHONE_n>), and every <PHONE_n> in it is a key of this NOTAM's redaction map.
 (d) every activates_designators entry is a designator (`normalise_designator`) that `find_designators` finds in the E text.
 (e) every exemption quote is in the redacted E text, `redact_phones(parsed.item_e)`: the text the model and Dan's sheet
     both see, compared ignoring case and whitespace. An empty quote is a failure, not a match.
+(e2) when prohibitive_reason is not `none`, prohibitive_quote is present, not empty (whitespace only is empty) and, once
+    squashed (case and whitespace ignored), a contiguous part of the same redacted E text. Words from two places in the text
+    do not match. With the reason `none` the check passes whatever the quote is: merge_reading has already dropped it (FR6).
+    No check forces a reason: an E text that says "pilots are to avoid" with the reason `none` is the reader's call (E2).
 (f) the enums and types are valid. Pydantic enforces them when a reading is built, so a model reply that breaks one never
     becomes a reading: `schema_failures` turns that error into the same kind of sentences. Inside `check_reading` the
     reading is validated again from its own dump, which catches one built around validation (`model_construct`).
@@ -32,7 +36,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from flysafelz.airspace import FEET_PER_FLIGHT_LEVEL
-from flysafelz.contracts import Datum, Limit, LimitUnit, NotamReading, ParsedNotam
+from flysafelz.contracts import Datum, Limit, LimitUnit, NotamReading, ParsedNotam, ProhibitiveReason
 from flysafelz.designators import find_designators, normalise_designator
 from flysafelz.redact import redact_phones
 
@@ -110,6 +114,8 @@ def _model_texts(reading: NotamReading) -> list[tuple[str, str]]:
         texts.append(("contact value", reading.contact.value))
     texts += [("exemption quote", exemption.quote) for exemption in reading.exemptions]
     texts += [("activates_designators entry", designator) for designator in reading.activates_designators]
+    if reading.prohibitive_quote is not None:
+        texts.append(("prohibitive quote", reading.prohibitive_quote))
     return texts
 
 
@@ -153,6 +159,26 @@ def _check_quotes(parsed: ParsedNotam, reading: NotamReading) -> list[str]:
         elif quote not in text:
             failures.append(f"your exemption quote '{_shown(exemption.quote.strip())}' does not appear in the NOTAM text; quote it word for word or leave exemptions empty")
     return failures
+
+
+# --- (e2) ----------------------------------------------------------------------------------------------------------
+
+
+def _check_prohibitive_quote(parsed: ParsedNotam, reading: NotamReading) -> list[str]:
+    """A reason other than `none` rests on words of the redacted E text; the quote must be a contiguous run of them (G9)."""
+    try:
+        reason = ProhibitiveReason(reading.prohibitive_reason)
+    except ValueError:
+        return []  # not one of the four values: a reading built around validation; (f) reports it, once
+    if reason is ProhibitiveReason.NONE:
+        return []  # a quote given with `none` is dropped by merge_reading (FR6), never a failure
+    quote = _squash(reading.prohibitive_quote or "")
+    if not quote:
+        return [f"your prohibitive_quote is empty but your prohibitive_reason is '{reason.value}'; quote the words of the NOTAM text the reason rests on, word for word, or answer prohibitive_reason none"]
+    if quote not in _squash(redact_phones(parsed.item_e)[0]):
+        shown = _shown((reading.prohibitive_quote or "").strip())
+        return [f"your prohibitive_quote '{shown}' does not appear in the NOTAM text; quote the words the reason rests on, word for word, or answer prohibitive_reason none"]
+    return []
 
 
 # --- (f) -----------------------------------------------------------------------------------------------------------
@@ -204,5 +230,6 @@ def check_reading(parsed: ParsedNotam, reading: NotamReading, redaction_map: Map
         *_check_placeholders(reading, redaction_map),
         *_check_designators(parsed, reading),
         *_check_quotes(parsed, reading),
+        *_check_prohibitive_quote(parsed, reading),
         *_check_enums(reading),
     ]
