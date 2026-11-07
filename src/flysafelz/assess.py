@@ -1,8 +1,9 @@
 """Turn fetched sources into an Assessment (G15 to G19). Plain functions, no model, no network.
 
-    assess(lat, lon, *, now, forecast, airspace, pib, readings, window, live) -> Assessment
+    assess(lat, lon, *, now, forecast, airspace, pib, readings, reader_status, window, live) -> Assessment
     fetch_horizon(now)       the UTC time (exclusive) up to which weather is worth fetching
     default_window(now)      the window used when none is given
+    assessed_span(...)       the hour-aligned span assess looks at (the window the NOTAM reader is asked about)
     display(segment)         the verdict display string of a segment
     notams_in_hour(...)      the NOTAMs an hour is cut on
     cut_points_with_reasons(...)  the minutes an hour is cut at, each with why
@@ -36,6 +37,12 @@ second condition (a NO_FLY or unread result still counts, so nothing is lost).
 Conditions come in a fixed order: CONTACT_FIRST, then permission and radio, then ceilings,
 then sectors, then warnings, and the order inside each group is the order found.
 
+A NOTAM the reader was asked about and got no reading for is named in `reader_status` ("failed" or "unavailable"). It is
+unread, like any NOTAM without a reading (Q8): over the LZ from SFC it is UNREAD_OVER_LZ and the segment UNVERIFIED, anywhere
+else it gets its code-only action. An "unavailable" one also adds an assumption line; a "failed" one does not. Real phone
+numbers never enter an Assessment: the E text in an unread reason is the redacted one, and the CLI puts the numbers back
+when it prints.
+
 The overall verdict is the worst VERDICT-tier segment. Flyable windows are runs of
 PILOT_DISCRETION segments with exact edges. Anything else, or a gap, ends a run.
 
@@ -45,6 +52,7 @@ with its reason.
 
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
+from typing import Literal, get_args
 
 from flysafelz.airspace import Activation, Outcome, TimeSpan, assess_airspace
 from flysafelz.clients.open_meteo import Forecast
@@ -86,6 +94,7 @@ from flysafelz.designators import normalise_designator
 from flysafelz.geo import check_uk_bounds
 from flysafelz.notam_action import ActionSegment, LandingZone, active_intervals, notam_action
 from flysafelz.pib import PibResult, SortAction, prefilter, sort_notam
+from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule
 from flysafelz.weather import HourTier, WeatherRow, build_rows, check_row, weather_tier
 
@@ -111,6 +120,10 @@ AIRSPACE_CONDITION_GROUP = {
 }
 
 Condition = tuple[str, str]  # (group in CONDITION_ORDER, text)
+
+# Why a NOTAM the reader was asked about has no reading: it came back checked-and-wrong twice, or no usable answer came back.
+ReaderStatus = Literal["failed", "unavailable"]
+UNAVAILABLE_STATUS: ReaderStatus = "unavailable"
 
 
 def _number(rule: Rule) -> float:
@@ -142,6 +155,21 @@ def default_window(now: datetime) -> tuple[datetime, datetime]:
     now = _aware(now, "now")
     tomorrow = now.astimezone(LONDON).date() + ONE_DAY
     return now.replace(minute=0, second=0, microsecond=0), london_day_utc(tomorrow)[1]
+
+
+def _hour_starts(start: datetime, end: datetime, now: datetime, live: bool) -> list[datetime]:
+    """The UTC hours [start, end) touches. A live run leaves out the hours that have ended."""
+    hours = utc_hours(start, end)
+    return [h for h in hours if h + ONE_HOUR > now] if live else hours
+
+
+def assessed_span(start: datetime, end: datetime, now: datetime, live: bool) -> tuple[datetime, datetime]:
+    """The span assess() looks at: from the first hour row to the end of the last (the window itself when there are no rows).
+
+    This is the window the NOTAM reader is asked about, so it reads every NOTAM assess may need a reading for.
+    """
+    hours = _hour_starts(_aware(start, "window start"), _aware(end, "window end"), _aware(now, "now"), live)
+    return (hours[0], hours[-1] + ONE_HOUR) if hours else (start, end)
 
 
 # --- sources (E1, E2) -----------------------------------------------------------------
@@ -280,7 +308,8 @@ def _activations(
 ) -> list[Activation]:
     """The NOTAMs that activate a danger area, one Activation for each designator and active span (G10).
 
-    The designators come from the reading when there is one, else from item E of a restriction NOTAM.
+    The designators come from the reading when there is one, else from item E of a restriction NOTAM. The E text kept
+    for an unread reason is the redacted one (no real phone number in an Assessment).
     """
     activations = []
     for notam in notams:
@@ -295,7 +324,7 @@ def _activations(
         for designator in dict.fromkeys(designators):
             for span_start, span_end in active_intervals(notam, reading, lz, start, end):
                 activations.append(
-                    Activation(designator=designator, notam_id=notam.id, reading=reading, e_text=" ".join(notam.item_e.split()), start=span_start, end=span_end, circle=circle)
+                    Activation(designator=designator, notam_id=notam.id, reading=reading, e_text=" ".join(redact_phones(notam.item_e)[0].split()), start=span_start, end=span_end, circle=circle)
                 )
     return activations
 
@@ -461,19 +490,30 @@ def assess(
     airspace: AirspaceFetch,
     pib: PibResult,
     readings: Mapping[str, NotamReading] | None = None,
+    reader_status: Mapping[str, ReaderStatus] | None = None,
     window: tuple[datetime, datetime] | None = None,
     live: bool = False,
 ) -> Assessment:
     """Assess every UTC hour of the window [start, end) for the LZ at lat, lon.
 
     forecast, airspace and pib are what the clients returned, failed or not. readings maps a
-    NOTAM id to its NotamReading (none given: every NOTAM is unread, Q8). With no window the
+    NOTAM id to its NotamReading (none given: every NOTAM is unread, Q8). reader_status names
+    the NOTAMs the reader was asked about and got no reading for ("failed" or "unavailable"):
+    they are unread too, and each "unavailable" one is listed in an assumption. With no window the
     default one is used and noted. live drops hours that ended before now.
-    Raises ValueError outside UK coverage, for a naive time, and for an empty or reversed window.
+    Raises ValueError outside UK coverage, for a naive time, for an empty or reversed window, and
+    when a NOTAM is in both readings and reader_status or has a status other than the two above.
     """
     check_uk_bounds(lat, lon)
     now = _aware(now, "now")
     readings = readings or {}
+    reader_status = reader_status or {}
+    both = sorted(set(readings) & set(reader_status))
+    if both:
+        raise ValueError(f"NOTAM {', '.join(both)} has a reading and a reader status: it cannot be both read and unread")
+    odd = sorted(f"{i} ({status!r})" for i, status in reader_status.items() if status not in get_args(ReaderStatus))
+    if odd:
+        raise ValueError(f"reader status must be 'failed' or 'unavailable', got {', '.join(odd)}")
     assumptions: list[str] = []
     if window is None:
         start, end = default_window(now)
@@ -485,9 +525,7 @@ def assess(
     if start >= end:
         raise ValueError(f"the window must start before it ends, got {utc_text(start)} to {utc_text(end)}")
 
-    hour_starts = utc_hours(start, end)
-    if live:
-        hour_starts = [h for h in hour_starts if h + ONE_HOUR > now]
+    hour_starts = _hour_starts(start, end, now, live)
 
     statuses = [forecast.status, airspace.status, _checked_notam_status(pib.status, now)]
     problems = _unavailable(statuses)
@@ -501,7 +539,11 @@ def assess(
         assumptions.append("Site elevation unknown (the forecast gave none): taken as 0 ft.")
     lz = LandingZone(lat=lat, lon=lon, elevation_ft=elevation_ft)
 
-    window_span = (hour_starts[0], hour_starts[-1] + ONE_HOUR) if hour_starts else (start, end)
+    unavailable = sorted(i for i, status in reader_status.items() if status == UNAVAILABLE_STATUS)
+    if unavailable:
+        assumptions.append(f"NOTAM reader unavailable for {', '.join(unavailable)}: treated as unread")
+
+    window_span = assessed_span(start, end, now, live)
     near_notams, dropped = prefilter(pib.notams, (lat, lon), window_span)
     activations = _activations(near_notams, readings, lz, *window_span)
 

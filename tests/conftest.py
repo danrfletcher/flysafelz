@@ -48,6 +48,10 @@ def isolated_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
     for name in ("LANGSMITH_TRACING", "LANGSMITH_TRACING_V2", "LANGCHAIN_TRACING", "LANGCHAIN_TRACING_V2"):
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setitem(sys.modules, "dotenv", None)
+    # The command line keeps readings in a SQLite file at the repository root; a test never touches it.
+    from flysafelz.reader import config
+
+    monkeypatch.setattr(config, "reading_store", lambda: tmp_path / "readings.sqlite")
 
 
 def pytest_report_header(config: pytest.Config) -> str:

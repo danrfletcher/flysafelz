@@ -1,9 +1,12 @@
-"""Q8: Blue Mill with readings.yaml removed. An unread NOTAM over the LZ from the surface is UNVERIFIED with its E text, never NO_FLY."""
+"""Q8: Blue Mill with readings.yaml removed. An unread NOTAM over the LZ from the surface is UNVERIFIED with its E text, never NO_FLY.
+
+The E text in an Assessment is the redacted one (<PHONE_n>, R3.5): the CLI puts the real number back when it prints."""
 
 import cases
 from factories import utc
 
 from flysafelz.contracts import NotamAction, Verdict
+from flysafelz.redact import redact_phones
 
 CASE = cases.BLUE_MILL
 
@@ -14,7 +17,7 @@ def segments(assessment):
 
 def e_text(notam_id: str) -> str:
     _case, _forecast, _airspace, pib, _readings = cases.load(CASE)
-    return " ".join(next(n for n in pib.notams if n.id == notam_id).item_e.split())
+    return " ".join(redact_phones(next(n for n in pib.notams if n.id == notam_id).item_e)[0].split())
 
 
 def test_the_danger_area_segments_are_unverified_with_the_e_text_unless_weather_or_night_blocks():

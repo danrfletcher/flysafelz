@@ -22,7 +22,7 @@ the unread path):
 
 An informational reading over the LZ from SFC is a warning, not a restriction (Q13): it
 is AWARENESS, shown in the answer, and never NO_FLY. With no reading (Q8), a NOTAM over
-the LZ from SFC is UNREAD_OVER_LZ with its E text; any other unread NOTAM gets its
+the LZ from SFC is UNREAD_OVER_LZ with its E text (phone numbers redacted to <PHONE_n>); any other unread NOTAM gets its
 code-only action (AVOID_SECTOR, AWARENESS, AWARENESS_MAP or IGNORE). An unread NOTAM is
 never NO_FLY or CONTACT_FIRST.
 
@@ -85,6 +85,7 @@ from flysafelz.geo import (
     shape_from_points,
     shape_over,
 )
+from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import Schedule, parse_schedule
 
@@ -309,8 +310,12 @@ def _prohibition(reading: NotamReading) -> str | None:
 
 
 def _checked(parsed: ParsedNotam, reading: NotamReading, debug: list[str]) -> list[Exemption]:
-    """The exemptions whose quote is really in the E text. An invented quote is dropped and logged (Q2)."""
-    e_text = _squash(parsed.item_e)
+    """The exemptions whose quote is really in the redacted E text. An invented quote is dropped and logged (Q2).
+
+    The quote is looked for in `redact_phones(parsed.item_e)`: the text the reader and the labelling sheet saw, so a quote that
+    holds a `<PHONE_n>` is kept and a real number in a quote no longer matches.
+    """
+    e_text = _squash(redact_phones(parsed.item_e)[0])
     kept = []
     for exemption in reading.exemptions:
         if exemption.covers is ExemptionCovers.OTHER:
@@ -406,7 +411,7 @@ def notam_action(
 
     if where.over and sfc:
         if reading is None:
-            reason = f"NOTAM {parsed.id} is over the LZ from the surface and has not been read: {' '.join(parsed.item_e.split())}"
+            reason = f"NOTAM {parsed.id} is over the LZ from the surface and has not been read: {' '.join(redact_phones(parsed.item_e)[0].split())}"
             return _result(parsed, NotamAction.UNREAD_OVER_LZ, reason, debug, extras)
         return _over_lz_from_sfc(parsed, reading, label, bool(conditions), debug, extras, reading.schedule.strip())
 

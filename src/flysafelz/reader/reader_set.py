@@ -2,6 +2,7 @@
 
     reader_set(parsed_notams, lz, window) -> list[ParsedNotam]
     read_for_lz(parsed_notams, lz, window, llm, cache) -> dict[id, ReaderResult]
+    failed_before(parsed_notams, lz, window, cache) -> set[id]
 
 Which NOTAMs are read is ticket 2's code-only answer and nothing else (G23). `prefilter` runs first. `sort_notam` then
 runs on each NOTAM it kept, with the whole window as the span, and a NOTAM is read when the sort says TO_READER, or
@@ -30,6 +31,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 
 from flysafelz.contracts import ParsedNotam
 from flysafelz.pib import LatLon, SortAction, Window, prefilter, sort_notam
+from flysafelz.reader.cache import CACHE_ERRORS, was_failed
 from flysafelz.reader.cached_read import read_cached
 from flysafelz.reader.contract import ReaderResult, ReaderStatus
 from flysafelz.reader.prompt import PROMPT_VERSION
@@ -84,3 +86,22 @@ def read_for_lz(
             except Exception as error:  # noqa: BLE001 - one NOTAM's failure, whatever it is, must not stop the others
                 results[parsed.id] = _unavailable(parsed, llm, error)
     return results
+
+
+def failed_before(parsed_notams: list[ParsedNotam], lz: LatLon, window: Window, cache: Path | None) -> set[str]:
+    """The ids in this reader set whose last answer was FAILED or UNAVAILABLE and that have not been read since.
+
+    Ask before `read_for_lz`. Those still not STORED afterwards are the retries of that call (R3.2, GP5). `cache` None
+    (bypass) records nothing, so it gives the empty set. A file that cannot be used gives the empty set too: the read
+    itself warns about it once and goes on without it.
+    """
+    if cache is None:
+        return set()
+    found: set[str] = set()
+    for parsed in reader_set(parsed_notams, lz, window):
+        try:
+            if was_failed(cache, parsed.id):
+                found.add(parsed.id)
+        except CACHE_ERRORS:
+            return set()
+    return found

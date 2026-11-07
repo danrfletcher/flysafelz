@@ -2,7 +2,8 @@
 
 A real phone number never goes to a model, a store, a log or a report. `redact_phones` swaps each one for
 `<PHONE_1>`, `<PHONE_2>` and so on, in order of appearance, and returns the map back to the real numbers.
-`rehydrate` puts them back with the map of the same NOTAM. Placeholders are numbered per NOTAM, so every
+`rehydrate` puts them back with the map of the same NOTAM. `redact_known` redacts a second text (a reading's contact)
+against a NOTAM's existing map. Placeholders are numbered per NOTAM, so every
 NOTAM has its own `<PHONE_1>`: rehydrate a line with its own NOTAM's map and never another's.
 
 What counts as a phone number (found by shape, not by a word like "PHONE"):
@@ -76,6 +77,30 @@ def redact_phones(text: str) -> tuple[str, dict[str, str]]:
         return placeholder_of[key]
 
     return _PHONE.sub(swap, text), mapping
+
+
+def redact_known(text: str, mapping: dict[str, str]) -> tuple[str, dict[str, str]]:
+    """(text with every phone number swapped for a placeholder, the map extended with the numbers that were new).
+
+    Like `redact_phones`, but the numbers already in `mapping` keep their placeholder, so a reading's contact that repeats a
+    number from its NOTAM's E text gets that NOTAM's `<PHONE_n>` and no other. A number not in the map is numbered after
+    the highest placeholder in the map and in the text. The map passed in is not changed.
+    """
+    placeholder_of = {_same_number(written): placeholder for placeholder, written in mapping.items()}
+    extended = dict(mapping)
+    taken = max((int(n) for n in _PLACEHOLDER.findall(text + " " + " ".join(mapping))), default=0)
+
+    def swap(match: re.Match[str]) -> str:
+        nonlocal taken
+        written = match.group(0)
+        key = _same_number(written)
+        if key not in placeholder_of:
+            taken += 1
+            placeholder_of[key] = f"<PHONE_{taken}>"
+            extended[placeholder_of[key]] = written
+        return placeholder_of[key]
+
+    return _PHONE.sub(swap, text), extended
 
 
 def rehydrate(text: str, mapping: dict[str, str]) -> str:

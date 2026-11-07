@@ -10,6 +10,7 @@ from factories import LZ, SFC, agl, amsl, notam, reading, segment, utc
 from flysafelz.contracts import Category, Circle, ContactKind, NotamAction
 from flysafelz.geo import circle_edge_distance_nm, circle_over, compass16, distance_nm
 from flysafelz.notam_action import notam_action
+from flysafelz.redact import redact_phones
 
 A = NotamAction
 SEGMENT = segment(utc(8), utc(9))
@@ -69,10 +70,12 @@ def test_j3857_read_is_contact_first_and_activates_egd496a(j3857, j3857_reading)
     assert "\n" not in result.reason
 
 
-def test_j3857_unread_is_unverified_with_the_e_text(j3857):
+def test_j3857_unread_is_unverified_with_the_redacted_e_text(j3857):
+    """The E text in the reason has its phone number swapped for <PHONE_n>; the CLI puts the number back when it prints (R3.5)."""
     result = notam_action(j3857, None, LZ, SEGMENT)
     assert result.action is A.UNREAD_OVER_LZ
-    assert J3857_E in result.reason
+    assert redact_phones(J3857_E)[0] in result.reason
+    assert redact_phones(J3857_E)[1]["<PHONE_1>"] not in result.reason and "<PHONE_1>" in result.reason
 
 
 def test_j3857_in_the_0700_to_0800_segment_is_ignored_as_inactive(j3857, j3857_reading):
@@ -101,7 +104,8 @@ def test_h7171_read_is_avoid_sector_0_15_nm_to_the_sse_up_to_700_ft_agl(h7171, h
 def test_h7171_unread_is_unverified_because_the_q_circle_covers_the_lz_from_the_surface(h7171):
     result = notam_action(h7171, None, LZ, SEGMENT)
     assert result.action is A.UNREAD_OVER_LZ
-    assert H7171_E in result.reason
+    assert redact_phones(H7171_E)[0] in result.reason  # redacted: no real number in the reason (R3.5)
+    assert redact_phones(H7171_E)[1]["<PHONE_1>"] not in result.reason
 
 
 def test_h7171_with_the_real_g_item_the_merge_rule_gives_the_higher_ceiling(h7171_reading):
