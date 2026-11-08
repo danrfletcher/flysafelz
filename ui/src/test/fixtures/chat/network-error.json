@@ -1,0 +1,41 @@
+{
+ "lat": 53.802797,
+ "lon": -0.086644,
+ "question": "Can I fly here this afternoon?",
+ "events": [
+  {
+   "event": "metadata",
+   "data": {
+    "run_id": "run-drop",
+    "attempt": 1
+   }
+  },
+  {
+   "event": "values",
+   "data": {
+    "messages": [
+     {
+      "content": "Can I fly here this afternoon?",
+      "type": "human",
+      "id": "11111111-1111-4111-8111-111111111111",
+      "additional_kwargs": {},
+      "response_metadata": {}
+     }
+    ],
+    "answer": null,
+    "guard": null,
+    "overlays": [],
+    "assessment": null
+   }
+  },
+  {
+   "event": "custom",
+   "data": "Checking weather…"
+  },
+  {
+   "event": "custom",
+   "data": "Checking airspace…"
+  }
+ ],
+ "then": "network-error"
+}

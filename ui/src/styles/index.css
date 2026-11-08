@@ -1,0 +1,222 @@
+@import 'tailwindcss';
+@import './fonts.css';
+@import './theme.css';
+
+/* Tailwind names for the theme variables. The values live in theme.css only. */
+@theme inline {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-type-restricted: var(--type-restricted);
+  --color-type-danger: var(--type-danger);
+  --color-type-controlled: var(--type-controlled);
+  --color-type-other: var(--type-other);
+  --color-type-notam: var(--type-notam);
+
+  --color-wind-light: var(--wind-light);
+  --color-wind-moderate: var(--wind-moderate);
+  --color-wind-strong: var(--wind-strong);
+  --color-wind-severe: var(--wind-severe);
+
+  --color-rain: var(--rain);
+
+  --color-verdict-no-go: var(--verdict-no-go);
+  --color-verdict-unverified: var(--verdict-unverified);
+  --color-verdict-amber: var(--verdict-amber);
+  --color-verdict-conditions: var(--verdict-conditions);
+  --color-verdict-discretion: var(--verdict-discretion);
+
+  --color-action-no-fly: var(--action-no-fly);
+  --color-action-contact-first: var(--action-contact-first);
+  --color-action-check-sup: var(--action-check-sup);
+  --color-action-avoid-sector: var(--action-avoid-sector);
+  --color-action-awareness: var(--action-awareness);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --shadow-panel: var(--shadow);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* The map shows the theme's map colour until (or if) tiles arrive, never Leaflet's default grey. When the basemap is unavailable
+   the tile layer is hidden and this colour is the whole basemap. */
+.leaflet-container,
+.leaflet-container.basemap-unavailable {
+  background: var(--map-background);
+  font-family: var(--font-sans);
+}
+
+.leaflet-container a {
+  color: var(--primary);
+}
+
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--background) 80%, transparent) !important;
+  color: var(--muted-foreground) !important;
+}
+
+/* Hover tooltips on the base layers. */
+.leaflet-tooltip.leaflet-tooltip {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  white-space: normal;
+  max-width: 18rem;
+}
+
+.map-tip__title {
+  display: block;
+  margin-bottom: 0.125rem;
+}
+
+.map-tip__label {
+  color: var(--muted-foreground);
+}
+
+/* The "approx" word on an approximate NOTAM shape: a zero-size marker with the text centred on its point. */
+.approx-label {
+  background: none;
+  border: 0;
+}
+
+.approx-label__text {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--type-notam);
+  text-shadow: 0 0 3px var(--background), 0 0 3px var(--background);
+}
+
+/* The pin dropped by a click on land: the accent colour with a dark edge. The svg's point is the icon's anchor. The drop animation moves
+   `.pick-pin__drop`, never the icon element, whose transform is Leaflet's position. */
+.pick-pin {
+  background: none;
+  border: 0;
+}
+
+.pick-pin__drop {
+  display: block;
+}
+
+.pick-pin svg {
+  display: block;
+  fill: var(--primary);
+  stroke: var(--background);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--background) 60%, black));
+}
+
+.pick-pin svg circle {
+  fill: var(--background);
+  stroke: none;
+}
+
+/* The What's-here card is a Leaflet popup (no close button) wearing the theme's surface, border and shadow. */
+.pick-card .leaflet-popup-content-wrapper,
+.pick-card .leaflet-popup-tip {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: var(--border-width) solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.pick-card .leaflet-popup-content-wrapper {
+  border-radius: var(--radius);
+}
+
+.pick-card .leaflet-popup-content {
+  margin: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* The wind layer. The particle canvas takes no pointer events, so a click or a hover on the map goes through it to the shapes and the map under it
+   (a Leaflet marker without `interactive` already takes none). Each arrow is an inline svg turned to its bearing, in its speed band's colour. */
+.velocity-overlay {
+  pointer-events: none;
+}
+
+.wind-arrow {
+  background: none;
+  border: 0;
+}
+
+.wind-arrow svg {
+  display: block;
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: currentColor;
+  stroke: currentColor;
+  filter: drop-shadow(0 0 2px var(--background));
+}
+
+.wind-arrow--light {
+  color: var(--wind-light);
+}
+
+.wind-arrow--moderate {
+  color: var(--wind-moderate);
+}
+
+.wind-arrow--strong {
+  color: var(--wind-strong);
+}
+
+.wind-arrow--severe {
+  color: var(--wind-severe);
+}
+
+/* The rain layer sits in its own pane just over the basemap (tile pane 200) and under every vector layer (overlay pane 400), so rain never covers
+   an airspace outline or an answer's shape. The pane's opacity is the zoom fade (src/map/rainFade.ts), set from code. It takes no pointer events. */
+.rain-pane--model {
+  filter: blur(10px);
+}

@@ -1,4 +1,4 @@
-.PHONY: setup test fixtures eval-reader guidance eval-guidance dev run
+.PHONY: setup test fixtures eval-reader guidance eval-guidance dev run ui test-ui
 
 # Needs no API key: installs the project and its dependencies, then stores the embedding model (name and folder from
 # src/flysafelz/agent/settings.yaml, the folder git-ignored) so the app never downloads at runtime. A second run downloads
@@ -8,9 +8,9 @@ setup:
 	uv run python -m flysafelz.guidance.embedding_model
 
 # Runs the whole suite with sockets disabled (see addopts in pyproject.toml).
-# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, agent graph, system-prompt, middleware, guard, guard flow, tracing (anonymiser, client, feedback), answer (re-check line, limit lines, rehydration), `make run`, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess, search_guidance and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model, embedder, search index, eval) and time-text modules must stay at 90% line coverage or better (the modules together).
+# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, agent graph, system-prompt, middleware, guard, guard flow, tracing (anonymiser, client, feedback), answer (re-check line, limit lines, rehydration), `make run`, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess, search_guidance and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model, embedder, search index, eval) map-data routes (airspace, NOTAMs, wind, rain grid, disk cache, app) and time-text modules must stay at 90% line coverage or better (the modules together).
 test:
-	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.graph --cov=flysafelz.agent.prompts --cov=flysafelz.agent.middleware --cov=flysafelz.agent.run --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.guard --cov=flysafelz.agent.guard_flow --cov=flysafelz.agent.tracing --cov=flysafelz.agent.answer --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov-report=term-missing --cov-fail-under=90
+	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.graph --cov=flysafelz.agent.prompts --cov=flysafelz.agent.middleware --cov=flysafelz.agent.run --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.guard --cov=flysafelz.agent.guard_flow --cov=flysafelz.agent.tracing --cov=flysafelz.agent.answer --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.mapdata --cov=flysafelz.timetext --cov-report=term-missing --cov-fail-under=90
 
 # Capture a NEW case: make fixtures CASE=blue_mill_2026-10-31_3day
 # case.yaml takes an optional `days: N` (1 to 8, Europe/London days from the day of `now`) for a multi-day window.
@@ -44,9 +44,38 @@ eval-guidance:
 	@uv run python -m flysafelz.guidance.eval
 
 # The LangGraph dev server with Studio, loading the graph named in langgraph.json and the settings in .env (AGENT_*, and LANGSMITH_* for traces).
-# It hot-reloads on a code change.
+# It hot-reloads on a code change. It serves on port 2024, which the UI's VITE_API_URL defaults to.
+SERVER = uv run langgraph dev
+
+# The UI's dependencies, installed from ui/package-lock.json only when ui/node_modules is missing.
+UI_INSTALL = if [ ! -d ui/node_modules ]; then npm --prefix ui ci; fi
+
+# Vite on 5173, the port the map routes' CORS list names. strictPort: when 5173 is taken it stops with Vite's port error rather than moving to 5174.
+UI_DEV = npm --prefix ui run dev -- --port 5173 --strictPort
+
+# The server (2024) and the UI (5173) together, each in its own process group. Ctrl-C stops both, and when either one exits the other is stopped
+# and make fails. `make -n dev` prints this and starts nothing.
 dev:
-	@uv run langgraph dev
+	@$(UI_INSTALL)
+	@set -m; \
+	$(SERVER) & server=$$!; \
+	$(UI_DEV) & ui=$$!; \
+	trap 'kill -TERM -- -$$server -$$ui 2>/dev/null; wait; exit 130' INT TERM; \
+	while kill -0 $$server 2>/dev/null && kill -0 $$ui 2>/dev/null; do sleep 1; done; \
+	kill -TERM -- -$$server -$$ui 2>/dev/null; wait; exit 1
+
+# The UI alone, on http://localhost:5173 (installs its dependencies first when ui/node_modules is missing). It reads the server from VITE_API_URL
+# (default http://localhost:2024); the map layers read /map/airspace and /map/notams from it.
+ui:
+	@$(UI_INSTALL)
+	@$(UI_DEV)
+
+# The UI's checks, with no .env, no keys and no network once ui/node_modules exists: lint, Vitest (MSW refuses any unmocked request) with the 90% line
+# floor on the map layer files and the layer panel, the production build, then the scans of ui/dist for any URL outside the allowlist, for fonts that are
+# not bundled, and (with ui/src and ui/public) for any openAIP or model key or key name.
+test-ui:
+	@$(UI_INSTALL)
+	npm --prefix ui run lint && npm --prefix ui test -- --run --coverage && npm --prefix ui run build && node ui/scripts/check-external-urls.mjs && node ui/scripts/check-no-keys.mjs
 
 # Asks the agent one question in the terminal, for when Studio is closed:
 #   make run LAT=53.802797 LON=-0.086644 Q="Can I fly here tomorrow?"
