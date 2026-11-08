@@ -422,6 +422,23 @@ def test_no_numeric_literal_equals_a_rules_yaml_value():
             pytest.fail(f"{path}:{lineno} hard-codes {value}, which is a rules.yaml value")
 
 
+EVALUATOR_FILES = sorted((ROOT / "evals" / "agent" / "evaluators").glob("*.py"))
+
+
+def test_no_numeric_literal_in_the_eval_harness_evaluators_equals_a_rules_yaml_value():
+    """5a PR-5.F1 F6: the same scan, over evals/agent/evaluators/. The horizon day is read through load_rules, not written as a 3."""
+    values = _rule_values()
+    assert len(EVALUATOR_FILES) >= 8, "the evaluator modules were not found"
+    for path in EVALUATOR_FILES:
+        for lineno, value in hard_coded_rule_values(path, _parse(path), values):
+            pytest.fail(f"{path}:{lineno} hard-codes {value}, which is a rules.yaml value")
+
+
+def test_the_evaluator_scan_flags_a_planted_horizon_literal():
+    planted = ROOT / "evals" / "agent" / "evaluators" / "planted.py"
+    assert [v for _, v in hard_coded_rule_values(planted, ast.parse("if day > 3:\n    pass\n"), _rule_values())] == [3]
+
+
 # F7 (ticket 4): the two scans above cover agent/ and guidance/ too. A knob that equals a rules.yaml value (top_k 4, the 300 token minimum, the 3 of
 # pib_stale_hours) cannot be written as a literal in code; it is read from agent/settings.yaml, which the scans do not read.
 def test_the_numeric_scans_read_a_file_from_the_agent_and_guidance_packages():
