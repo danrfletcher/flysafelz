@@ -1,4 +1,4 @@
-.PHONY: setup test fixtures eval-reader guidance eval-guidance dev run
+.PHONY: setup test fixtures eval-reader guidance eval-guidance dev run ui test-ui
 
 # Needs no API key: installs the project and its dependencies, then stores the embedding model (name and folder from
 # src/flysafelz/agent/settings.yaml, the folder git-ignored) so the app never downloads at runtime. A second run downloads
@@ -44,9 +44,37 @@ eval-guidance:
 	@uv run python -m flysafelz.guidance.eval
 
 # The LangGraph dev server with Studio, loading the graph named in langgraph.json and the settings in .env (AGENT_*, and LANGSMITH_* for traces).
-# It hot-reloads on a code change.
+# It hot-reloads on a code change. It serves on port 2024, which the UI's VITE_API_URL defaults to.
+SERVER = uv run langgraph dev
+
+# The UI's dependencies, installed from ui/package-lock.json only when ui/node_modules is missing.
+UI_INSTALL = if [ ! -d ui/node_modules ]; then npm --prefix ui ci; fi
+
+# Vite on 5173, the port the map routes' CORS list names. strictPort: when 5173 is taken it stops with Vite's port error rather than moving to 5174.
+UI_DEV = npm --prefix ui run dev -- --port 5173 --strictPort
+
+# The server (2024) and the UI (5173) together, each in its own process group. Ctrl-C stops both, and when either one exits the other is stopped
+# and make fails. `make -n dev` prints this and starts nothing.
 dev:
-	@uv run langgraph dev
+	@$(UI_INSTALL)
+	@set -m; \
+	$(SERVER) & server=$$!; \
+	$(UI_DEV) & ui=$$!; \
+	trap 'kill -TERM -- -$$server -$$ui 2>/dev/null; wait; exit 130' INT TERM; \
+	while kill -0 $$server 2>/dev/null && kill -0 $$ui 2>/dev/null; do sleep 1; done; \
+	kill -TERM -- -$$server -$$ui 2>/dev/null; wait; exit 1
+
+# The UI alone, on http://localhost:5173 (installs its dependencies first when ui/node_modules is missing). It reads the server from VITE_API_URL
+# (default http://localhost:2024); nothing in it calls the server yet.
+ui:
+	@$(UI_INSTALL)
+	@$(UI_DEV)
+
+# The UI's checks, with no .env, no keys and no network once ui/node_modules exists: lint, Vitest (MSW refuses any unmocked request), the production build,
+# then the scan of ui/dist for any URL outside the allowlist and for fonts that are not bundled.
+test-ui:
+	@$(UI_INSTALL)
+	npm --prefix ui run lint && npm --prefix ui test -- --run && npm --prefix ui run build && node ui/scripts/check-external-urls.mjs
 
 # Asks the agent one question in the terminal, for when Studio is closed:
 #   make run LAT=53.802797 LON=-0.086644 Q="Can I fly here tomorrow?"
