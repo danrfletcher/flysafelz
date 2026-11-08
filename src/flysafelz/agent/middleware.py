@@ -27,7 +27,7 @@ A setting that is missing or wrong is not a model failure. It is raised, so the 
 """
 
 import logging
-from collections.abc import Awaitable, Callable, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from typing import Any
 
 from langchain.agents.middleware import AgentMiddleware, ExtendedModelResponse, ModelRequest, ModelResponse
@@ -36,13 +36,14 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langgraph.runtime import Runtime
 from langgraph.types import Command
 
+from flysafelz.agent.guard import ASSESS_TOOL
+from flysafelz.agent.guard_flow import GuardFlow, GuardOutcome, output_update
 from flysafelz.agent.input_check import validate_request
 from flysafelz.agent.prompts import system_prompt
 from flysafelz.agent.state import DEFAULT_TZ, RequestState, RunContext, run_now
 
 log = logging.getLogger(__name__)
 
-ASSESS_TOOL = "assess"
 HTTP_PACKAGES = frozenset({"httpx", "httpcore"})
 HTTP_TRANSPORT_FAILURES = frozenset({"TimeoutException", "NetworkError"})  # httpx / httpcore base classes: timeouts, and connect/read/write/close errors
 ENDPOINT_FAILURES = frozenset({"APIConnectionError", "RateLimitError", "InternalServerError"})  # openai: unreachable or timed out (APITimeoutError is one), 429, and 5xx
@@ -102,17 +103,30 @@ def has_invalid_tool_calls(response: ModelResponse[Any]) -> bool:
     return any(isinstance(message, AIMessage) and message.invalid_tool_calls for message in response.result)
 
 
-def unavailable_response(messages: Sequence[BaseMessage], reason: str) -> ExtendedModelResponse[Any]:
-    """The model response that ends the turn with the code-built answer, with `answer` and `guard` set. `reason` goes to the log."""
+def unavailable_response(messages: Sequence[BaseMessage], reason: str, state: Mapping[str, Any] | None = None) -> ExtendedModelResponse[Any]:
+    """The model response that ends the turn with the code-built answer. `reason` goes to the log.
+
+    `answer` has the real phone numbers back (the AI message keeps its placeholders), `guard` is `fallback`, and `assessment` is this turn's `assess` result.
+    """
     log.error("The model call failed (%s); the answer is built by code.", reason)
     text = unavailable_answer(messages)
-    return ExtendedModelResponse(model_response=ModelResponse(result=[AIMessage(text)]), command=Command(update={"answer": text, "guard": "fallback"}))
+    held = state or {}
+    artifacts = [m.artifact for m in this_turn(messages) if isinstance(m, ToolMessage) and m.artifact is not None]
+    update = output_update(text, "fallback", artifacts=artifacts, phone_map=held.get("phone_map"), overlays=held.get("overlays") or [])
+    return ExtendedModelResponse(model_response=ModelResponse(result=[AIMessage(text)]), command=Command(update=update))
 
 
 class FlySafeMiddleware(AgentMiddleware[RequestState, RunContext]):
-    """The graph's one middleware. See the module doc for its hooks."""
+    """The graph's one middleware. See the module doc for its hooks.
+
+    `on_outcome`, when given, is called once for each final message the guard has dealt with, with the turn's `GuardOutcome` (PR-12.F1 sends it as feedback).
+    """
 
     state_schema = RequestState
+
+    def __init__(self, on_outcome: Callable[[GuardOutcome], None] | None = None) -> None:
+        super().__init__()
+        self.on_outcome = on_outcome
 
     @hook_config(can_jump_to=["end"])
     def before_agent(self, state: RequestState, runtime: Runtime[RunContext]) -> dict[str, Any] | None:
@@ -125,28 +139,36 @@ class FlySafeMiddleware(AgentMiddleware[RequestState, RunContext]):
         return request.override(system_message=SystemMessage(system_prompt(run_now(request.runtime.context), tz)))
 
     def wrap_model_call(self, request: ModelRequest[RunContext], handler: ModelHandler) -> ModelResponse[Any] | ExtendedModelResponse[Any]:
+        request = self._with_prompt(request)
         messages = request.state["messages"]
         try:
-            response = handler(self._with_prompt(request))
+            response = handler(request)
+            if has_invalid_tool_calls(response):
+                return unavailable_response(messages, "tool calls that could not be parsed", request.state)
+            flow = GuardFlow(request, this_turn(messages), self.on_outcome)
+            while (retry := flow.review(response)) is not None:
+                response = handler(retry)
         except Exception as error:  # anything but a model failure is raised again on the next line
             if not is_model_failure(error):
                 raise
-            return unavailable_response(messages, failure_reason(error))
-        if has_invalid_tool_calls(response):
-            return unavailable_response(messages, "tool calls that could not be parsed")
-        return response
+            return unavailable_response(messages, failure_reason(error), request.state)
+        return flow.done  # type: ignore[return-value]  # review() sets it whenever it returns None
 
     async def awrap_model_call(self, request: ModelRequest[RunContext], handler: AsyncModelHandler) -> ModelResponse[Any] | ExtendedModelResponse[Any]:
+        request = self._with_prompt(request)
         messages = request.state["messages"]
         try:
-            response = await handler(self._with_prompt(request))
+            response = await handler(request)
+            if has_invalid_tool_calls(response):
+                return unavailable_response(messages, "tool calls that could not be parsed", request.state)
+            flow = GuardFlow(request, this_turn(messages), self.on_outcome)
+            while (retry := flow.review(response)) is not None:
+                response = await handler(retry)
         except Exception as error:  # anything but a model failure is raised again on the next line
             if not is_model_failure(error):
                 raise
-            return unavailable_response(messages, failure_reason(error))
-        if has_invalid_tool_calls(response):
-            return unavailable_response(messages, "tool calls that could not be parsed")
-        return response
+            return unavailable_response(messages, failure_reason(error), request.state)
+        return flow.done  # type: ignore[return-value]  # review() sets it whenever it returns None
 
     def after_agent(self, state: RequestState, runtime: Runtime[RunContext]) -> dict[str, Any] | None:
         """Set `answer` to the final message's text, unless something set it already (the UK-only reply, the model-failure answer)."""

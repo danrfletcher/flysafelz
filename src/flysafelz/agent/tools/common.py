@@ -35,7 +35,7 @@ from flysafelz.agent.tools.artifacts import SourceInfo
 from flysafelz.agent.window import Window, WindowError, parse_window
 from flysafelz.clients.open_meteo import Forecast
 from flysafelz.clients.openaip import metres_to_feet
-from flysafelz.contracts import Limit, LimitUnit, SourceName, SourceState, SourceStatus
+from flysafelz.contracts import Limit, LimitUnit, SourceName, SourceState, SourceStatus, position_word
 from flysafelz.daylight import utc_hours
 from flysafelz.redact import redact_phones
 from flysafelz.sources import CHECK_BY_HAND
@@ -100,6 +100,15 @@ def measured(value: float, limits: Iterable[tuple[str, float]] = ()) -> str:
         if all(test(float(text), limit) == test(value, limit) for test, limit in tests):
             return text
     raise AssertionError("count() does not end")  # pragma: no cover
+
+
+def limit_phrase(value: float, limit: float, comparison: str, unit: str) -> str:
+    """Where a value sits against its limit, as the one phrase the guard reads (guard.py `_LIMIT_PHRASE`): `over the 6 mph limit`.
+
+    The word is `contracts.position_word` of the true value, the limit and the rule's comparison, never anything read from text. `value` and `limit`
+    must be in `unit`.
+    """
+    return f"{position_word(value, limit, comparison)} the {g(limit)} {unit} limit"
 
 
 def hour_label(hour: datetime, tz: str) -> str:

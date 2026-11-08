@@ -4,8 +4,9 @@
 
 `turn` is a `TurnSources`: what this turn's tools returned (text and artifact), the thread's phone placeholders, the calendar the system prompt listed and the
 landing zone. Nothing from an earlier turn is in it, so a number from an earlier turn is a number no tool printed. A finding is one plain sentence that names the
-text and says why; the sentences are fixed wording, so the retry prompt and the trace feedback are reproducible. What the retry, the fallback, the re-check line and
-`rehydrate` do with them is the middleware's job (PR-11.F1), not this module's.
+text and says why; the sentences are fixed wording, so the retry prompt and the trace feedback are reproducible. What happens with the findings (one retry with
+no tools, then `fallback_answer`; the limit lines, the re-check line and `rehydrate`) is `guard_flow.GuardFlow` (PR-11.F1), which `FlySafeMiddleware.wrap_model_call`
+drives. The checks do not know about it.
 
 (a) Verdict words
     The six display strings (`display_verdict` builds them), matched ignoring case, the kind of dash, the middle dot and the spacing. Every one the answer writes
@@ -49,7 +50,7 @@ import calendar
 import operator
 import re
 import unicodedata
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -58,6 +59,7 @@ from typing import Any, NamedTuple, Self
 from zoneinfo import ZoneInfo
 
 from flysafelz.agent.prompts import BANNED_PHRASES, BARE_VERDICT_WORD
+from flysafelz.agent.state import OverlayFeature
 from flysafelz.agent.tools.artifacts import (
     AirspaceArtifact,
     AssessArtifact,
@@ -394,7 +396,6 @@ def _number_finding(written: Quantity, sources: Iterable[Source]) -> str | None:
     return None if supported else NOT_PRINTED.format(written.written)
 
 
-
 # --- scanning text for what the guard checks ---------------------------------------------------------------------------
 
 _MONTHS = {name.lower(): abbr.lower() for name, abbr in zip(calendar.month_name, calendar.month_abbr, strict=True) if name} | {abbr.lower(): abbr.lower() for abbr in calendar.month_abbr if abbr}
@@ -677,6 +678,12 @@ def _from_assess(printed: Printed, artifact: AssessArtifact, tz: str) -> None:
         for caution in segment.cautions:
             limits = _limit_of(caution.rule_id, caution.limit, caution.unit)
             printed.numbers += _measure(caution.value, caution.unit, limits, _caution_name(caution.rule_id))
+            printed.numbers += [Source(limit.value, limit.unit, is_limit=True) for limit in limits]
+        for blocker in segment.blockers:  # a weather blocker carries its numbers like a caution; any other blocker has none (rule_id is None)
+            if blocker.rule_id is None:
+                continue
+            limits = _limit_of(blocker.rule_id, blocker.limit, blocker.unit)
+            printed.numbers += _measure(blocker.value, blocker.unit, limits, _caution_name(blocker.rule_id))
             printed.numbers += [Source(limit.value, limit.unit, is_limit=True) for limit in limits]
         for notam in segment.notams:
             printed.ids.add(notam.id)
@@ -1049,3 +1056,42 @@ def guard_answer(answer: str, turn: TurnSources) -> list[GuardFinding]:
         *_final_findings(body),
     ]
     return list(dict.fromkeys(findings))
+
+
+# --- the answer code builds when the model's answer failed twice (PR-11.F1) ------------------------------------------------------------
+
+ASSESS_TOOL = "assess"
+FALLBACK_HEADING = "The assistant's answer failed its checks; this is the raw assessment"
+RAW_HEADING = "The assistant's answer failed its checks; this is the raw tool text"
+CANNOT_HELP = "I can only help with whether to fly at this spot; ask me about a time."
+NO_FALLBACK_TEXT_PATHS = frozenset({"clarify", "decline"})  # these get the fixed line even when a tool ran (a compound clarify)
+
+
+def _published_notams(results: Iterable[ToolResult], overlays: Iterable[OverlayFeature]) -> list[tuple[str, str]]:
+    """(id, raw text as published) of every NOTAM this turn's tools carried: the `get_notams` items first, then any NOTAM overlay not among them."""
+    found: dict[str, str] = {}
+    for result in results:
+        if isinstance(result.artifact, NotamsArtifact):
+            found.update({item.id: item.e_text for item in result.artifact.notams if item.e_text})
+    for feature in overlays:
+        if feature.properties.kind == "notam" and feature.properties.text:
+            found.setdefault(feature.properties.id, feature.properties.text)
+    return list(found.items())
+
+
+def fallback_answer(results: Sequence[ToolResult], path: str | None, overlays: Sequence[OverlayFeature] = ()) -> str:
+    """The answer code builds when the model's answer failed twice (G15, FR11). Built from this turn's tool results only; nothing of a failed draft is in it.
+
+    `assess` ran: the `assess` table exactly as the tool printed it (its times are in the thread's `tz`, as the tool took it from state), then the NOTAMs as
+    published, under FALLBACK_HEADING. `assess` did not run: an explain (or an assess or unknown path) gets the raw tool text, NOTAMs as published included;
+    a clarify or decline, or a turn with no tool text, gets CANNOT_HELP. `path` is the draft's tag, used only to choose among these.
+    """
+    tables = [r.text for r in results if r.name == ASSESS_TOOL and isinstance(r.artifact, AssessArtifact)]
+    if tables:
+        notams = _published_notams(results, overlays)
+        published = ["NOTAMs as published:", *(f"{notam_id}: {text}" for notam_id, text in notams)] if notams else []
+        return "\n\n".join([f"{FALLBACK_HEADING}:", *tables, *(["\n".join(published)] if published else [])])
+    texts = [r.text for r in results if r.text.strip()]
+    if path in NO_FALLBACK_TEXT_PATHS or not texts:
+        return CANNOT_HELP
+    return "\n\n".join([f"{RAW_HEADING}:", *texts])

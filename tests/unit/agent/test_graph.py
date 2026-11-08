@@ -79,7 +79,7 @@ def test_an_injected_model_is_the_one_called_and_it_is_given_the_five_tools():
     state = ask(build_graph(model=model), "What is a good pub?")
     assert len(model.calls) == 1
     assert model.bound_tool_names == FIVE
-    assert state["answer"].startswith("[path: decline]")
+    assert state["answer"] == "I can only help with whether to fly from this spot."  # the guard took the tag off
 
 
 def test_a_server_configuration_in_the_model_place_means_no_model_was_given(built):
@@ -206,7 +206,7 @@ def test_the_output_schema_has_the_answer_and_no_private_field():
 
 
 def test_a_follow_up_may_leave_lat_lon_and_tz_out_the_threads_are_used():
-    model = FakeToolChatModel(script=[AIMessage("first."), AIMessage("second.")])
+    model = FakeToolChatModel(script=[AIMessage("[path: decline]\nfirst."), AIMessage("[path: decline]\nsecond.")])
     graph = agent_graph(model)
     ask(graph, GP3_QUESTION)
     state = graph.invoke({"messages": [HumanMessage("And later?")]}, {"configurable": {"thread_id": "thread-1"}}, context=RunContext(case="blue_mill_2026-10-31"))

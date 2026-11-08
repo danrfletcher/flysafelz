@@ -152,6 +152,12 @@ def test_the_default_window_sentence_matches_what_the_tool_does(prompt):
     assert "leave start and end out" in prompt and "rest of today and tomorrow" in prompt
 
 
+def test_the_prompt_tells_the_model_to_say_where_a_value_sits_using_the_tools_phrase(prompt):
+    """I10: the tools print `over the 6 mph limit`; the guard reads that phrase, so the model is asked to use it."""
+    assert "When a value is near or past a limit, say where it sits using the tool's phrase, e.g. 'over the 6 mph limit'. You don't need to give the value itself." in prompt
+    assert prompt.count("limit'") == 1
+
+
 def test_compound_messages_have_the_precedence_verdict_first_and_a_one_line_decline_of_only_the_out_of_scope_part(prompt):
     assert "clarify > assess > explain > decline" in prompt
     assert "verdict first, then answer every other part" in prompt
@@ -227,7 +233,7 @@ def test_the_model_is_given_the_prompt_as_its_system_message_and_the_prompt_is_n
 
 
 def test_the_prompt_is_rebuilt_every_turn_from_that_turns_now():
-    model = FakeToolChatModel(script=[AIMessage("one."), AIMessage("two.")])
+    model = FakeToolChatModel(script=[AIMessage("[path: decline]\none."), AIMessage("[path: decline]\ntwo.")])
     graph = agent_graph(model)
     ask(graph, "first", context=blue_mill_context(utc(2026, 10, 31, 7, 30)))
     ask(graph, "second", context=blue_mill_context(utc(2026, 10, 31, 11, 45)))
@@ -245,7 +251,7 @@ def test_every_model_call_of_a_turn_gets_the_prompt_including_the_one_after_a_to
 
 
 def test_the_prompt_uses_the_threads_time_zone():
-    model = FakeToolChatModel(script=[AIMessage("ok.")])
+    model = FakeToolChatModel(script=[AIMessage("[path: decline]\nok.")])
     ask(agent_graph(model), "Can I fly?", tz="America/New_York")
     [seen] = system_prompts(model)
     assert "03:30 EDT" in seen and "The pilot's time zone is America/New_York." in seen

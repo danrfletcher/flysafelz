@@ -26,7 +26,8 @@ reaches it.
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
+from typing import NamedTuple
 from zoneinfo import ZoneInfo
 
 from langchain.tools import ToolRuntime, tool
@@ -48,11 +49,11 @@ from flysafelz.agent.tools.artifacts import (
     AssessSegment,
     AssessSpan,
 )
-from flysafelz.agent.tools.common import Prepared, Redactor, WindowArgs, g, measured, prepare, reply, source_info_at, usable
+from flysafelz.agent.tools.common import Prepared, Redactor, WindowArgs, g, limit_phrase, measured, prepare, reply, source_info_at, usable
 from flysafelz.agent.tools.notams_tool import read_chosen
 from flysafelz.agent.window import Window
 from flysafelz.cli import PhoneBook, overall_display
-from flysafelz.contracts import Assessment, HourAssessment, NotamActionResult, ParsedNotam, Segment, SourceName, SourceState, SourceStatus, Tier
+from flysafelz.contracts import Assessment, Blocker, Caution, HourAssessment, NotamActionResult, ParsedNotam, Segment, SourceName, SourceState, SourceStatus, Tier
 from flysafelz.daylight import ONE_HOUR, ONE_MINUTE, london_date
 from flysafelz.reader.contract import ReaderStatus
 from flysafelz.reader.reader_set import reader_set
@@ -60,6 +61,7 @@ from flysafelz.rules import RULES
 from flysafelz.shapes import notam_geometry
 from flysafelz.sources import CHECK_BY_HAND
 from flysafelz.timetext import EN_DASH, clock_span, labelled_clock, stamp
+from flysafelz.weather import Finding, build_rows, check_row
 
 OUTLOOK_WORD = "OUTLOOK (no verdict)"
 TOO_FAR_WORD = "too far out to assess"
@@ -168,11 +170,72 @@ def _ask_again(hour: datetime, now: datetime) -> date | None:
     return day if day > london_date(now) else None
 
 
+# --- a finding's words and numbers -----------------------------------------------------------------------------------
+
+# How ticket 2 words a weather finding (weather._finding, _on_the_limit): `gust spread 4.7 mph, limit 4`, or `CAPE 1000 J/kg, on the limit 1000; <hint>`.
+# Used for one thing only: the label in front of the value (`gust spread`) and the hint after it. The numbers it finds must agree with the finding's own
+# value, limit and unit, which come from `weather.check_row` and rules.yaml; where they do not, the line keeps ticket 2's words as they are.
+_FINDING = re.compile(
+    r"\A(?P<label>.+?) (?P<shown>-?\d+(?:\.\d+)?) (?P<unit>\S+), (?:limit (?P<limit>-?\d+(?:\.\d+)?)|on the limit (?P<on>-?\d+(?:\.\d+)?)(?:; (?P<hint>.*))?)\Z",
+    re.DOTALL,
+)
+
+
+class FindingParts(NamedTuple):
+    label: str
+    hint: str | None
+
+
+def finding_parts(text: str, value: float | None, limit: float | None, unit: str | None) -> FindingParts | None:
+    """The label and hint of a weather finding's text, or None when the text is not that shape or its numbers are not `value`, `limit` and `unit`.
+
+    The value must be what the text prints once `value` is written to the same number of decimals (weather.py prints one, two for a blocker on its limit).
+    """
+    found = _FINDING.match(text)
+    if found is None or value is None or limit is None or unit is None or found["unit"] != unit:
+        return None
+    shown, printed_limit = found["shown"], found["limit"] if found["limit"] is not None else found["on"]
+    places = len(shown.rpartition(".")[-1]) if "." in shown else 0
+    if float(printed_limit) != limit or float(shown) != float(f"{value:.{places}f}"):
+        return None
+    return FindingParts(found["label"], found["hint"])
+
+
+def _value_line(label: str, rule_id: str | None, value: float | None, limit: float | None, unit: str | None, kind: str) -> str | None:
+    """`gust spread 6.04 mph: over the 6 mph limit (NO-GO)`: the value, then where it sits against its rule's limit. None when any number or the rule is not known.
+
+    The comparison is the rule's (rules.yaml); the position word is `contracts.position_word` of the true value, through `limit_phrase`.
+    """
+    rule = None if rule_id is None else getattr(RULES, rule_id, None)
+    if rule is None or value is None or limit is None or unit is None:
+        return None
+    comparison = rule.comparison.value
+    return f"{label} {measured(value, [(comparison, limit)])} {unit}: {limit_phrase(value, limit, comparison, unit)} ({kind})"
+
+
 # --- the artifact's parts --------------------------------------------------------------------------------------------
 
 
-def _segment(segment: Segment, tz: str, restore: Restore) -> AssessSegment:
+def _blocker(blocker: Blocker, hour: datetime, restore: Restore, segment: Segment, facts: Mapping[tuple[datetime, str], Finding]) -> AssessBlocker:
+    """A blocker for the artifact. A weather one also gets its rule, label and numbers from the finding `weather.check_row` made for this hour, matched by its text."""
+    text = restore.line(blocker.text, segment.notam_actions)
+    finding = facts.get((hour, blocker.text)) if blocker.source == "weather" else None
+    if finding is None:
+        return AssessBlocker(source=blocker.source, text=text)
+    unit = UNITS.get(finding.rule_id)
+    parts = finding_parts(blocker.text, finding.value, finding.limit, unit)
+    return AssessBlocker(source=blocker.source, text=text, rule_id=finding.rule_id, label=parts.label if parts else None, value=finding.value, limit=finding.limit, unit=unit)
+
+
+def _caution(caution: Caution) -> AssessCaution:
+    unit = UNITS.get(caution.rule_id)
+    parts = finding_parts(caution.text, caution.value, caution.limit, unit)
+    return AssessCaution(rule_id=caution.rule_id, text=caution.text, value=caution.value, limit=caution.limit, unit=unit, label=parts.label if parts else None)
+
+
+def _segment(segment: Segment, tz: str, restore: Restore, facts: Mapping[tuple[datetime, str], Finding]) -> AssessSegment:
     conditions = [restore.line(condition, segment.notam_actions) for condition in segment.conditions]
+    hour = segment.start.astimezone(UTC).replace(minute=0, second=0, microsecond=0)  # a segment never straddles an hour row
     return AssessSegment(
         start=_iso(segment.start, tz),
         end=_iso(segment.end, tz),
@@ -183,8 +246,8 @@ def _segment(segment: Segment, tz: str, restore: Restore) -> AssessSegment:
         with_conditions=bool(conditions),
         display=assess.display(segment),
         conditions=conditions,
-        cautions=[AssessCaution(rule_id=c.rule_id, text=c.text, value=c.value, limit=c.limit, unit=UNITS.get(c.rule_id)) for c in segment.cautions],
-        blockers=[AssessBlocker(source=b.source, text=restore.line(b.text, segment.notam_actions)) for b in segment.blockers],
+        cautions=[_caution(c) for c in segment.cautions],
+        blockers=[_blocker(b, hour, restore, segment, facts) for b in segment.blockers],
         notams=[AssessNotam(id=a.notam_id, action=a.action.value, bearing_deg=a.bearing_deg, reason=restore.action(a.notam_id, a.reason)) for a in segment.notam_actions],
     )
 
@@ -285,16 +348,31 @@ def _source_line(status: SourceStatus, tz: str) -> str:
     return f"- {name} source: {status.state.value.upper()}{why}. Check by hand: {CHECK_BY_HAND[status.source]}."
 
 
+def _blocker_line(blocker: AssessBlocker) -> str:
+    """`blocked (weather): gust spread 6.04 mph: over the 6 mph limit (NO-GO)` for a weather blocker whose numbers are known, else ticket 2's words."""
+    line = None if blocker.label is None else _value_line(blocker.label, blocker.rule_id, blocker.value, blocker.limit, blocker.unit, "NO-GO")
+    return f"{PAD}blocked ({blocker.source}): {blocker.text if line is None else line}"
+
+
+def _caution_line(caution: AssessCaution) -> str:
+    """`caution: low cloud 98 %: over the 90 % limit (caution)` for a finding that is a value against a limit, else ticket 2's words."""
+    parts = finding_parts(caution.text, caution.value, caution.limit, caution.unit)
+    line = None if parts is None else _value_line(parts.label, caution.rule_id, caution.value, caution.limit, caution.unit, "caution")
+    if line is None or parts is None:
+        return f"{PAD}caution: {caution.text}"
+    return f"{PAD}caution: {line}" + (f"; {parts.hint}" if parts.hint else "")
+
+
 def _segment_lines(segment: AssessSegment, tz: str) -> list[str]:
     label = clock_span(datetime.fromisoformat(segment.start), datetime.fromisoformat(segment.end), tz)
     lines = [f"{label}  {segment.display}"]
-    lines += [f"{PAD}blocked ({b.source}): {b.text}" for b in segment.blockers]
+    lines += [_blocker_line(b) for b in segment.blockers]
     for condition in segment.conditions:
         if condition.startswith(assess.UNVERIFIED_PREFIX):
             lines.append(f"{PAD}unverified: {condition.removeprefix(assess.UNVERIFIED_PREFIX)}")
         else:
             lines.append(f"{PAD}condition: {condition}")
-    lines += [f"{PAD}caution: {c.text}" for c in segment.cautions]
+    lines += [_caution_line(c) for c in segment.cautions]
     for notam in segment.notams:
         line = f"{PAD}NOTAM {notam.id} {notam.action}"
         if notam.bearing_deg is not None:
@@ -344,6 +422,7 @@ class Inputs:
     overlays: list[OverlayFeature]
     restore: Restore = field(default_factory=Restore)
     extra_assumptions: Sequence[str] = ()
+    facts: Mapping[tuple[datetime, str], Finding] = field(default_factory=dict)  # (UTC hour, text) -> the weather finding a weather blocker came from
 
 
 def build(assessment: Assessment, given: Inputs) -> tuple[str, AssessArtifact]:
@@ -355,7 +434,9 @@ def build(assessment: Assessment, given: Inputs) -> tuple[str, AssessArtifact]:
         fetched = None
     data_as_of = None if fetched is None else labelled_clock(fetched, tz)
 
-    every_segment = [item for hour in assessment.hours for item in ([_segment(s, tz, restore) for s in hour.segments] if hour.tier is Tier.VERDICT else [_hour_segment(hour, tz, given.now)])]
+    every_segment = [
+        item for hour in assessment.hours for item in ([_segment(s, tz, restore, given.facts) for s in hour.segments] if hour.tier is Tier.VERDICT else [_hour_segment(hour, tz, given.now)])
+    ]
     verdict_segments = [item for item in every_segment if item.tier == Tier.VERDICT.value]
     outlook = [_block(run, Tier.OUTLOOK, tz, given.now) for run in _runs(assessment.hours, Tier.OUTLOOK)]
     too_far = [_block(run, Tier.TOO_FAR, tz, given.now) for run in _runs(assessment.hours, Tier.TOO_FAR)]
@@ -457,6 +538,20 @@ def _overlays(assessment: Assessment, notams: Mapping[str, ParsedNotam], prepare
     return overlays
 
 
+def _weather_facts(assessment: Assessment, prepared: Prepared) -> dict[tuple[datetime, str], Finding]:
+    """The weather blockers of each VERDICT hour as `weather.check_row` found them, keyed by (UTC hour, text).
+
+    `assess.assess` keeps only a blocker's words. Running `check_row` again over the same forecast rows gives the same findings with their rule, value and limit,
+    so the artifact can carry the numbers behind the words without reading them out of text.
+    """
+    hours = [hour.hour for hour in assessment.hours if hour.tier is Tier.VERDICT]
+    forecast = prepared.sources.forecast
+    if not hours or not usable(forecast.status):
+        return {}
+    rows = build_rows(forecast, hours[0], hours[-1] + ONE_HOUR)
+    return {(row.hour, found.text): found for row in rows if row.hour in set(hours) for found in check_row(row) if found.kind == "blocker"}
+
+
 def assess_answer(prepared: Prepared, source_cache: SourceCache) -> tuple[str, AssessArtifact]:
     """Read the NOTAMs the window needs, assess, and write the answer. The window is always the explicit UTC one (never `None`)."""
     sources, window = prepared.sources, prepared.window
@@ -484,7 +579,7 @@ def assess_answer(prepared: Prepared, source_cache: SourceCache) -> tuple[str, A
     limited = [parsed.id for parsed in chosen if parsed.id in sources.limited]
     extra = [f"Reader limit reached: {', '.join(limited)} not read, treated as unread."] if limited else []
     overlays = _overlays(assessment, {parsed.id: parsed for parsed in sources.pib.notams}, prepared)
-    given = Inputs(tz=prepared.tz, window=window, now=prepared.now, overlays=overlays, restore=Restore(book), extra_assumptions=extra)
+    given = Inputs(tz=prepared.tz, window=window, now=prepared.now, overlays=overlays, restore=Restore(book), extra_assumptions=extra, facts=_weather_facts(assessment, prepared))
     return build(assessment, given)
 
 

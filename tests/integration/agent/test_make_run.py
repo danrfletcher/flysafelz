@@ -20,7 +20,8 @@ from flysafelz.agent import graph as graph_module
 from flysafelz.agent.run import main
 
 ROOT = Path(__file__).resolve().parents[3]
-FINAL = "[path: assess]\nPILOT DISCRETION from 10:00 GMT to 16:00 GMT, with conditions."
+BODY = "PILOT DISCRETION \u2013 APPROACHING LIMITS \u00b7 WITH CONDITIONS, flyable from 10:00 GMT to 16:00 GMT."
+FINAL = f"[path: assess]\n{BODY}"
 BLUE_MILL = {"LAT": "53.802797", "LON": "-0.086644", "Q": "Can I fly here between 10 and 4 today?", "CASE": "blue_mill_2026-10-31", "NOW": "2026-10-31T07:30:00+00:00"}
 
 
@@ -42,9 +43,9 @@ def scripted():
 def test_the_answer_goes_to_stdout_once_whole_and_the_progress_lines_to_stderr():
     code, out, err = run(BLUE_MILL, scripted())
     assert code == 0
-    assert out == FINAL + "\n"
+    assert out.startswith(BODY) and "[path" not in out and out.endswith("\n")
     assert "Assessing…" in err.splitlines()
-    assert FINAL not in err and "Assessing…" not in out
+    assert BODY not in err and "Assessing…" not in out
 
 
 def test_nothing_the_model_says_between_tool_calls_is_printed():
@@ -53,14 +54,14 @@ def test_nothing_the_model_says_between_tool_calls_is_printed():
 
 
 def test_the_optional_time_zone_reaches_the_prompt():
-    model = FakeToolChatModel(script=[AIMessage("ok.")])
+    model = FakeToolChatModel(script=[AIMessage("[path: decline]\nok.")])
     code, out, _ = run({**BLUE_MILL, "TZ": "America/New_York"}, model)
     assert code == 0 and out == "ok.\n"
     assert "The pilot's time zone is America/New_York." in str(model.calls[0][0].content)
 
 
 def test_a_question_with_quotes_and_dollar_signs_arrives_as_typed():
-    model = FakeToolChatModel(script=[AIMessage("ok.")])
+    model = FakeToolChatModel(script=[AIMessage("[path: decline]\nok.")])
     question = "Can I fly at \"2\" and 'later' $HOME `date`?"
     run({**BLUE_MILL, "Q": question}, model)
     assert model.calls[0][1].content == question
@@ -71,11 +72,11 @@ def test_a_run_with_no_clock_set_prints_no_warning_when_a_tool_is_called(tool):
     """The tools' `runtime` argument is typed with the RunContext, so pydantic does not warn as it copies the call's arguments (T1)."""
     args = {"query": "what is a danger area"} if tool == "search_guidance" else {}
     environ = {k: v for k, v in BLUE_MILL.items() if k != "NOW"}
-    model = FakeToolChatModel(script=[call(tool, **args), AIMessage(FINAL)])
+    model = FakeToolChatModel(script=[call(tool, **args), AIMessage("[path: explain]\nChecked.")])
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always")
         code, out, _ = run(environ, model)
-    assert code == 0 and out == FINAL + "\n"
+    assert code == 0 and out.startswith("Checked.")
     assert [str(w.message) for w in caught] == []
 
 

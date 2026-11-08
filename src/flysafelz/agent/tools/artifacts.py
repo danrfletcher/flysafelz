@@ -176,20 +176,34 @@ VerdictKey = Literal["NO_GO", "UNVERIFIED", "PILOT_DISCRETION"]  # contracts.Ver
 
 
 class AssessCaution(_Model):
-    """A limit being approached: the rule, the value and the limit it is checked against, and the unit rules.yaml gives that rule (None: it has none)."""
+    """A limit being approached: the rule, the value and the limit it is checked against, and the unit rules.yaml gives that rule (None: it has none).
+
+    `label` is what the value is called in `text` (`gust spread`; None: `text` is not a value against a limit, as for twilight). It is worked out once, by
+    the tool, from the finding's own text, so the limit line (`answer.limit_lines`) never reads text.
+    """
 
     rule_id: str
     text: str
     value: float | None
     limit: float | None
     unit: str | None
+    label: str | None = None
 
 
 class AssessBlocker(_Model):
-    """A reason the segment is NO-GO: the source it came from (weather, daylight, airspace, notam) and ticket 2's words."""
+    """A reason the segment is NO-GO: the source it came from (weather, daylight, airspace, notam) and ticket 2's words.
+
+    A weather blocker also carries the numbers behind its words, from the same `weather.check_row` finding the assessment used: `rule_id`, `label`,
+    `value`, `limit` and `unit` (all None for any other blocker). The text keeps ticket 2's wording.
+    """
 
     source: str
     text: str
+    rule_id: str | None = None
+    label: str | None = None
+    value: float | None = None
+    limit: float | None = None
+    unit: str | None = None
 
 
 class AssessNotam(_Model):

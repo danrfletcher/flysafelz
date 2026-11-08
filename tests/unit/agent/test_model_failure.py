@@ -16,6 +16,7 @@ from graph_helpers import GP3_QUESTION, RaisingModel, ScriptedModel, agent_graph
 from langchain.agents.middleware import ModelRequest, ModelResponse
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
+from flysafelz.agent.answer import rehydrate
 from flysafelz.agent.config import AgentConfigError
 from flysafelz.agent.middleware import UNAVAILABLE_TEXT, FlySafeMiddleware, is_model_failure, unavailable_answer
 
@@ -57,6 +58,14 @@ def unparseable() -> AIMessage:
 
 def tool_messages(state) -> list[ToolMessage]:
     return [m for m in state["messages"] if isinstance(m, ToolMessage)]
+
+
+BLUE_MILL_NUMBER = "07784 546062"  # J3857/26's contact in the case's readings.yaml (a fiction-range number); the thread's phone_map is private, so not in the returned state
+
+
+def restored(state, text: str) -> str:
+    """The tool text with the thread's real numbers back in it: what `answer` holds (P1). The AI message in `messages` keeps the placeholders."""
+    return rehydrate(text, {"<PHONE_1>": BLUE_MILL_NUMBER})
 
 
 def assert_unavailable_fixed_text(text: str) -> None:
@@ -105,24 +114,25 @@ def test_when_assess_ran_this_turn_the_answer_is_its_text_verbatim(error):
     state = ask(agent_graph(model))
     [assessed] = tool_messages(state)
     assert assessed.name == "assess" and assessed.text
-    assert state["answer"] == assessed.text
+    assert state["answer"] == restored(state, assessed.text)
     assert state["messages"][-1].content == assessed.text
     assert state["guard"] == "fallback"
     assert len(model.calls) == 2
 
 
-def test_the_assess_text_keeps_its_placeholders_for_the_step_that_puts_the_numbers_back():
+def test_the_assess_text_keeps_its_placeholders_in_messages_and_answer_has_the_number_back():
     state = ask(agent_graph(ScriptedModel(script=[assess_call(), httpx.ReadTimeout("timed out")])))
     [assessed] = tool_messages(state)
-    assert state["answer"] == assessed.text
-    assert "<PHONE_1>" in state["answer"]  # Blue Mill's contact number is still the placeholder: PR-11's rehydration puts the number back
+    assert "<PHONE_1>" in assessed.text and "<PHONE_1>" in state["messages"][-1].content
+    assert "<PHONE_1>" not in state["answer"] and BLUE_MILL_NUMBER in state["answer"]
+    assert state["answer"] == restored(state, assessed.text)
 
 
 def test_the_newest_assess_of_the_turn_is_the_one_used():
     model = ScriptedModel(script=[assess_call("call-1"), assess_call("call-2"), TimeoutError("timed out")])
     state = ask(agent_graph(model))
     _, second = tool_messages(state)
-    assert state["answer"] == second.text
+    assert state["answer"] == restored(state, second.text)
 
 
 def test_an_assess_from_an_earlier_turn_does_not_count():
@@ -151,7 +161,7 @@ def test_unparseable_tool_calls_after_assess_give_the_assess_text_verbatim():
     model = ScriptedModel(script=[assess_call(), unparseable()])
     state = ask(agent_graph(model))
     [assessed] = tool_messages(state)
-    assert state["answer"] == assessed.text and state["guard"] == "fallback"
+    assert state["answer"] == restored(state, assessed.text) and state["guard"] == "fallback"
 
 
 def test_a_message_with_one_good_call_and_one_unreadable_call_runs_neither():
@@ -213,10 +223,11 @@ def test_a_missing_agent_setting_raised_inside_the_model_call_reaches_the_caller
 
 
 def test_a_good_answer_after_a_good_run_is_untouched():
-    model = FakeToolChatModel(script=[assess_call(), AIMessage("[path: assess]\nNO-GO from 10:00.")])
+    body = "PILOT DISCRETION \u2013 APPROACHING LIMITS \u00b7 WITH CONDITIONS from 10:00."
+    model = FakeToolChatModel(script=[assess_call(), AIMessage(f"[path: assess]\n{body}")])
     state = ask(agent_graph(model))
-    assert state["answer"] == "[path: assess]\nNO-GO from 10:00."
-    assert state["guard"] is None  # the guard (PR-10, PR-11) is what sets it on a good answer
+    assert state["answer"].startswith(body)  # the guard strips the tag and adds its lines after the model's words
+    assert state["guard"] == "passed"
 
 
 # --- the unavailable answer itself ----------------------------------------------------------------------------------------------------
@@ -252,18 +263,19 @@ def test_the_async_hook_gives_the_same_unavailable_answer_for_a_failing_handler(
 
     result = finish(FlySafeMiddleware().awrap_model_call(request_for(), failing))
     assert result.model_response.result[0].content == UNAVAILABLE_TEXT
-    assert result.command.update == {"answer": UNAVAILABLE_TEXT, "guard": "fallback"}
+    assert result.command.update == {"answer": UNAVAILABLE_TEXT, "guard": "fallback", "assessment": None}
 
 
-def test_the_async_hook_gives_the_prompt_to_a_good_handler_and_returns_its_response_unchanged():
+def test_the_async_hook_gives_the_prompt_to_a_good_handler_and_checks_its_answer():
     seen = []
-    response = ModelResponse(result=[AIMessage("fine.")])
+    response = ModelResponse(result=[AIMessage("[path: decline]\nfine.")])
 
     async def good(request):
         seen.append(request.system_message.text)
         return response
 
-    assert finish(FlySafeMiddleware().awrap_model_call(request_for(), good)) is response
+    result = finish(FlySafeMiddleware().awrap_model_call(request_for(), good))
+    assert result.model_response.result[0].content == "fine." and result.command.update["guard"] == "passed"
     assert seen[0].startswith("You are the FlySafeLZ assistant")
 
 

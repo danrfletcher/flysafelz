@@ -4,11 +4,12 @@
     build_agent(model, ...)      the same graph over parts the caller chooses (tests pass a source store, a guidance index and a checkpointer)
     TOOL_NAMES                   the five tools, in the order they are registered
 
-The graph is `create_agent(model, tools=[the five], middleware=[FlySafeMiddleware()], state_schema=RequestState, context_schema=RunContext)`.
+The graph is `create_agent(model, tools=[the five], middleware=[FlySafeMiddleware(on_outcome)], state_schema=RequestState, context_schema=RunContext)`.
 Nothing else: no custom node, no sub-agent, no second middleware. The five tools are get_weather, get_airspace, get_notams, assess and
 search_guidance. The thread state is state.py's `RequestState` and the run context is its `RunContext`. The one middleware (middleware.py) runs
-the input check, gives the model its system prompt (prompts.py) and answers for the model when it fails. The guard (PR-10, PR-11) and tracing
-(PR-12) are not here.
+the input check, gives the model its system prompt (prompts.py), checks every final answer (the guard: one text-only retry, then a fallback built by
+code; guard_flow.py), adds the re-check and limit lines, puts the phone numbers back and answers for the model when it fails. Tracing (PR-12) is not
+here; `build_agent(on_outcome=...)` is where it will take each turn's guard outcome from.
 
 The model. `build_graph()` with no model uses a `LazyChatModel` (config.py): the configured ChatOpenAI, built when the first model call needs it.
 So importing this module, building the graph, and a turn that never reaches the model all work with no AGENT_* setting; the first model call
@@ -23,7 +24,7 @@ are reused for fifteen minutes within a thread, and the index reads its file onc
 """
 
 import threading
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import Any
 
 from langchain.agents import create_agent
@@ -32,6 +33,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Checkpointer
 
 from flysafelz.agent.config import LazyChatModel
+from flysafelz.agent.guard_flow import GuardOutcome
 from flysafelz.agent.middleware import FlySafeMiddleware
 from flysafelz.agent.sources import SourceCache
 from flysafelz.agent.state import RequestState, RunContext
@@ -65,8 +67,8 @@ def shared_guidance_index() -> GuidanceIndex:
         return _shared["index"]
 
 
-def build_agent(model: BaseChatModel, *, source_cache: SourceCache, index: GuidanceIndex, checkpointer: Checkpointer | None = None) -> Agent:
-    """The agent over these parts: the one `create_agent` call in the code base."""
+def build_agent(model: BaseChatModel, *, source_cache: SourceCache, index: GuidanceIndex, checkpointer: Checkpointer | None = None, on_outcome: Callable[[GuardOutcome], None] | None = None) -> Agent:
+    """The agent over these parts: the one `create_agent` call in the code base. `on_outcome` gets each turn's `GuardOutcome` (PR-12.F1 sends it as feedback)."""
     tools = [
         build_get_weather(source_cache),
         build_get_airspace(source_cache),
@@ -74,7 +76,7 @@ def build_agent(model: BaseChatModel, *, source_cache: SourceCache, index: Guida
         build_assess(source_cache),
         build_search_guidance(index),
     ]
-    return create_agent(model, tools=tools, middleware=[FlySafeMiddleware()], state_schema=RequestState, context_schema=RunContext, checkpointer=checkpointer)
+    return create_agent(model, tools=tools, middleware=[FlySafeMiddleware(on_outcome)], state_schema=RequestState, context_schema=RunContext, checkpointer=checkpointer)
 
 
 def build_graph(model: BaseChatModel | Mapping[str, Any] | None = None) -> Agent:
