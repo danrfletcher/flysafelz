@@ -11,7 +11,7 @@ export default tseslint.config(
   {
     languageOptions: { globals: { ...globals.browser, ...globals.node } },
     rules: {
-      // Nothing may log answer text. `warn` stays allowed for the one-time unknown-action notice (E11) a later PR adds.
+      // Nothing may log answer text. `warn` stays allowed for the one-time unknown-airspace-type notice (E11), which logs the type string only.
       'no-console': ['error', { allow: ['warn'] }],
     },
   },

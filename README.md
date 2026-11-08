@@ -110,12 +110,14 @@ The UI is a React + Vite + TypeScript app in `ui/` (shadcn/ui, Tailwind, Leaflet
 ```
 make dev       # the LangGraph server and the UI together; Ctrl-C stops both, and if either one exits the other is stopped
 make ui        # the UI alone; runs npm --prefix ui ci first when ui/node_modules is missing
-make test-ui   # lint, Vitest (no keys, no network), the production build, then a scan of ui/dist for outside URLs and unbundled fonts
+make test-ui   # lint, Vitest with coverage (no keys, no network), the production build, then scans of ui/dist for outside URLs, unbundled fonts and keys
 ```
 
 Ports: the LangGraph server is on 2024 and the UI's dev server on 5173. `vite preview` (the built app) is on 4173. The server's CORS list names exactly 5173 and 4173, so Vite is set to `strictPort`: with 5173 taken, `make ui` stops with Vite's port error instead of moving to 5174. Free the port, or add the new origin with `FLYSAFELZ_UI_ORIGIN`.
 
 The one setting the browser reads is `VITE_API_URL`, where the LangGraph server is (default `http://localhost:2024`). Set it in the environment when you start the UI, for example `VITE_API_URL=http://localhost:2025 make ui`. No key or model setting ever reaches the browser. The map opens on the whole UK over CARTO Dark Matter tiles, which need no key.
+
+The map draws two layers from the server's read-only routes, each coloured by type: airspace below FL100 (`GET /map/airspace`; restricted and prohibited red with a light fill, danger orange, CTR, CTA and ATZ sky blue, every other type slate) and NOTAMs below FL100 (`GET /map/notams`; violet dashed, an "approx" label where the shape is the NOTAM's Q-line circle). "Below FL100" means the lower limit is under FL100: airspace by its openAIP lower limit (a floor exactly at FL100, 10,000 ft, is not below; ground, surface and above-ground floors count as below), NOTAMs by the Q-line lower flight level. Both routes are fetched on load and every 15 minutes while the page is open; there is no refresh button. The Layers button at the top right opens the switches, the legend and each layer's "updated HH:MM" (browser time zone), "stale" and "unavailable" notes. The switches are not saved: both start on at every page load.
 
 ## Data and licences
 

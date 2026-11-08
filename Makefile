@@ -65,16 +65,17 @@ dev:
 	kill -TERM -- -$$server -$$ui 2>/dev/null; wait; exit 1
 
 # The UI alone, on http://localhost:5173 (installs its dependencies first when ui/node_modules is missing). It reads the server from VITE_API_URL
-# (default http://localhost:2024); nothing in it calls the server yet.
+# (default http://localhost:2024); the map layers read /map/airspace and /map/notams from it.
 ui:
 	@$(UI_INSTALL)
 	@$(UI_DEV)
 
-# The UI's checks, with no .env, no keys and no network once ui/node_modules exists: lint, Vitest (MSW refuses any unmocked request), the production build,
-# then the scan of ui/dist for any URL outside the allowlist and for fonts that are not bundled.
+# The UI's checks, with no .env, no keys and no network once ui/node_modules exists: lint, Vitest (MSW refuses any unmocked request) with the 90% line
+# floor on the map layer files and the layer panel, the production build, then the scans of ui/dist for any URL outside the allowlist, for fonts that are
+# not bundled, and (with ui/src and ui/public) for any openAIP or model key or key name.
 test-ui:
 	@$(UI_INSTALL)
-	npm --prefix ui run lint && npm --prefix ui test -- --run && npm --prefix ui run build && node ui/scripts/check-external-urls.mjs
+	npm --prefix ui run lint && npm --prefix ui test -- --run --coverage && npm --prefix ui run build && node ui/scripts/check-external-urls.mjs && node ui/scripts/check-no-keys.mjs
 
 # Asks the agent one question in the terminal, for when Studio is closed:
 #   make run LAT=53.802797 LON=-0.086644 Q="Can I fly here tomorrow?"

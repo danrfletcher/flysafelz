@@ -5,7 +5,7 @@ import { join, resolve } from 'node:path'
 import { ESLint } from 'eslint'
 import { describe, expect, it } from 'vitest'
 
-import { UI_ROOT, filesMatching, readUi } from '@/test/files'
+import { UI_ROOT, filesMatching, readUi, uiTextFiles } from '@/test/files'
 
 const pkg = JSON.parse(readUi('package.json')) as {
   dependencies: Record<string, string>
@@ -38,9 +38,11 @@ describe('F2: no analytics, no logging of answer text', () => {
 })
 
 describe('no half-wiring: nothing here belongs to a later PR', () => {
-  it('has no motion, wind, chat-SDK or map-geometry dependency yet', () => {
-    const later = /^(motion|framer-motion|leaflet-velocity|@langchain\/.*|@turf\/.*|react-markdown|@radix-ui\/react-(popover|switch|tooltip))$/
+  it('has no motion, wind, chat-SDK or map-geometry dependency yet (the popover and switch are this PR’s)', () => {
+    const later = /^(motion|framer-motion|leaflet-velocity|@langchain\/.*|@turf\/.*|react-markdown|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
     expect(installed.filter((name) => later.test(name))).toEqual([])
+    expect(installed).toContain('@radix-ui/react-popover')
+    expect(installed).toContain('@radix-ui/react-switch')
   })
 
   it('has no saved choices and no CARTO key', () => {
@@ -48,9 +50,49 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(filesMatching(word('VITE_', 'CARTO_KEY'))).toEqual([])
   })
 
-  it('has no layer, chat, panel or legend component', () => {
+  it('has the two layer switches and no others: no wind, rain, all-heights, answer-overlay or basemap-status switch', () => {
+    const panel = readUi('src/components/LayerPanel.tsx')
+    expect(panel.match(/<Switch\b/g)).toHaveLength(1) // one in the list the two layers map over
+    const layers = [...panel.matchAll(/id: '(\w+)', name: '([^']+)'/g)].map((match) => [match[1], match[2]])
+    expect(layers).toEqual([['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100']])
+    const switchLabels = /wind|rain|radar|all heights|answer overlays|basemap/i
+    expect(switchLabels.test(panel)).toBe(false)
+  })
+
+  it('fetches the two map routes and no other route', () => {
+    expect(filesMatching(word('/map/', 'wind'))).toEqual([])
+    expect(filesMatching(word('rain', '-grid'))).toEqual([])
+    expect(filesMatching(word('rainviewer', 'api'))).toEqual([])
+    const routes = uiTextFiles()
+      .filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
+      .flatMap((path) => [...readUi(path).matchAll(/['"`](\/map\/[a-z-]+)['"`]/g)].map((match) => match[1]))
+    expect([...new Set(routes)].sort()).toEqual(['/map/airspace', '/map/notams'])
+  })
+
+  it('has no chat, sheet, drawer, toast or pin component yet', () => {
     const names = readdirSync(resolve(UI_ROOT, 'src/components'), { recursive: true }).map(String)
-    expect(names.filter((name) => /layer|chat|panel|legend|sheet|drawer|toast|pin/i.test(name))).toEqual([])
+    expect(names.filter((name) => /chat|sheet|drawer|toast|pin/i.test(name))).toEqual([])
+  })
+
+  it('has no verdict or action colour function: the legend swatches are theme tokens', () => {
+    const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\./.test(path) && /\.tsx?$/.test(path))
+    expect(sources.filter((path) => /verdictColou?r|actionColou?r|colou?rFor/i.test(readUi(path)))).toEqual([])
+  })
+})
+
+describe('F2/F7: NOTAM text and colour', () => {
+  it('never reads a NOTAM’s `text` outside the type and the test fixtures', () => {
+    const readers = uiTextFiles()
+      .filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
+      .filter((path) => /properties\.text\b|\.text\b\s*[,)}]|\btext:/.test(readUi(path)))
+    expect(readers).toEqual(['src/map/types.ts']) // the field's declaration only
+  })
+
+  it('decides a map colour from the airspace type and nothing else: no regex or word test on a name, text or action', () => {
+    const style = readUi('src/map/airspaceStyle.ts')
+    expect(style).not.toMatch(/\.action\b|\.name\b|\.text\b|\.match\(|\.test\(/)
+    const build = readUi('src/map/BaseLayers.tsx')
+    expect(build).not.toMatch(/\.action\b|\.text\b/)
   })
 })
 
