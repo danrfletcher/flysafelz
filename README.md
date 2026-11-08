@@ -103,6 +103,29 @@ The format of `questions.yaml`: a list of questions, each with `question` and `e
 
 A question is a hit when any of the four passages returned is in the same document as any `expected` entry and in that section or a subsection of it (`3.2` matches `3.2` and `3.2.1`, not `3.20` or `13.2`). The questions may be drafted by a model that has not seen the corpus, but Dan writes every expected section; no model ever drafts one.
 
+## Running the UI
+
+The UI is a React + Vite + TypeScript app in `ui/` (shadcn/ui, Tailwind, Leaflet), dark theme only. It needs Node 22 or newer and npm.
+
+```
+make dev       # the LangGraph server and the UI together; Ctrl-C stops both, and if either one exits the other is stopped
+make ui        # the UI alone; runs npm --prefix ui ci first when ui/node_modules is missing
+make test-ui   # lint, Vitest (no keys, no network), the production build, then a scan of ui/dist for outside URLs and unbundled fonts
+```
+
+Ports: the LangGraph server is on 2024 and the UI's dev server on 5173. `vite preview` (the built app) is on 4173. The server's CORS list names exactly 5173 and 4173, so Vite is set to `strictPort`: with 5173 taken, `make ui` stops with Vite's port error instead of moving to 5174. Free the port, or add the new origin with `FLYSAFELZ_UI_ORIGIN`.
+
+The one setting the browser reads is `VITE_API_URL`, where the LangGraph server is (default `http://localhost:2024`). Set it in the environment when you start the UI, for example `VITE_API_URL=http://localhost:2025 make ui`. No key or model setting ever reaches the browser. The map opens on the whole UK over CARTO Dark Matter tiles, which need no key.
+
+## Data and licences
+
+- Open-Meteo: free API, non-commercial, CC BY 4.0.
+- openAIP: CC BY-NC 4.0, attribution required (openaip.net/legal).
+- NATS PIB: NATS (Services) Ltd terms for UK Aeronautical Information Products; no guarantee of accuracy or completeness, no liability accepted; the XML has no declared schema and may change at short notice.
+- CARTO basemap: CARTO Basemaps Terms (version 29 Sep 2026), free non-commercial tier up to 5M tile requests a month, CARTO and OpenStreetMap (ODbL) credit kept visible.
+
+This is a non-commercial demo; a production deployment would move to commercial plans (Open-Meteo API subscription, a licensed radar feed such as the Met Office's).
+
 ## Limitations
 
 - Airspace comes from openAIP only. It is not cross-checked against the official UK AIP, so a difference between the two will not be caught.

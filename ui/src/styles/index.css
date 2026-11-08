@@ -1,0 +1,83 @@
+@import 'tailwindcss';
+@import './fonts.css';
+@import './theme.css';
+
+/* Tailwind names for the theme variables. The values live in theme.css only. */
+@theme inline {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-type-restricted: var(--type-restricted);
+  --color-type-danger: var(--type-danger);
+  --color-type-controlled: var(--type-controlled);
+  --color-type-other: var(--type-other);
+  --color-type-notam: var(--type-notam);
+
+  --color-verdict-no-go: var(--verdict-no-go);
+  --color-verdict-unverified: var(--verdict-unverified);
+  --color-verdict-amber: var(--verdict-amber);
+  --color-verdict-conditions: var(--verdict-conditions);
+  --color-verdict-discretion: var(--verdict-discretion);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --shadow-panel: var(--shadow);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    overflow: hidden;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* The map shows the theme background until (or if) tiles arrive. */
+.leaflet-container {
+  background: var(--background);
+  font-family: var(--font-sans);
+}
+
+.leaflet-container a {
+  color: var(--primary);
+}
+
+.leaflet-control-attribution {
+  background: color-mix(in srgb, var(--background) 80%, transparent) !important;
+  color: var(--muted-foreground) !important;
+}
