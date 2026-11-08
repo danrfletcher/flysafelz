@@ -15,7 +15,8 @@ from unit.reader_helpers import blue_mill_notams
 from flysafelz.agent.sources import SourceCache
 from flysafelz.agent.state import RunContext
 
-FINAL = "[path: assess]\nPILOT DISCRETION from 10:00 GMT to 16:00 GMT, with conditions."
+BODY = "PILOT DISCRETION \u2013 APPROACHING LIMITS \u00b7 WITH CONDITIONS, flyable from 10:00 GMT to 16:00 GMT."
+FINAL = f"[path: assess]\n{BODY}"
 
 
 class NoFetch:
@@ -45,8 +46,8 @@ def test_gp3_the_graph_runs_end_to_end_offline_and_sets_answer():
 
     graph = agent_graph(scripted_agent(), source_cache=SourceCache(fetch=NoFetch(), reader_model=reader_model))
     state = ask(graph, GP3_QUESTION)
-    assert state["answer"] == FINAL
-    assert state["messages"][-1].content == FINAL
+    assert state["answer"].startswith(BODY)  # the tag is off, the code's own lines follow
+    assert state["messages"][-1].content == BODY
     [assessed] = [m for m in state["messages"] if isinstance(m, ToolMessage)]
     assert assessed.name == "assess" and assessed.status == "success"
     assert "Window: Saturday 31 Oct 10:00 – 16:00 GMT." in assessed.text
@@ -64,8 +65,8 @@ def test_gp3_the_progress_lines_arrive_on_the_custom_stream_and_the_answer_once(
         else:
             final = chunk
     assert "Assessing…" in custom
-    assert final["answer"] == FINAL
-    assert FINAL not in custom
+    assert final["answer"].startswith(BODY)
+    assert BODY not in custom
 
 
 def test_i3_the_same_run_with_the_live_reader_reaches_the_reader_model_through_the_graph(tmp_path):
@@ -73,11 +74,16 @@ def test_i3_the_same_run_with_the_live_reader_reaches_the_reader_model_through_t
     reader = blue_mill_reader()
     source_cache = SourceCache(fetch=NoFetch(), reader_model=lambda: reader)
     live = RunContext(now=blue_mill_context().now, case=BLUE_MILL_CASE, reader="live", reader_cache=tmp_path / "r.sqlite")
-    model = FakeToolChatModel(script=[AIMessage("", tool_calls=[{"name": "get_notams", "args": {"start": "2026-10-31 10:00", "end": "2026-10-31 16:00"}, "id": "n1"}]), AIMessage(FINAL)])
+    model = FakeToolChatModel(
+        script=[
+            AIMessage("", tool_calls=[{"name": "get_notams", "args": {"start": "2026-10-31 10:00", "end": "2026-10-31 16:00"}, "id": "n1"}]),
+            AIMessage("[path: explain]\nThe NOTAMs are listed above."),
+        ]
+    )
     state = ask(agent_graph(model, source_cache=source_cache), GP3_QUESTION, context=live)
     assert len(reader.calls) > 0
     assert set(reader.calls) >= {"H7171/26", "J3857/26"}
-    assert state["answer"] == FINAL
+    assert state["answer"].startswith("The NOTAMs are listed above.")
 
 
 def test_i3_the_assess_tool_reads_through_the_reader_too_in_a_live_run(tmp_path):
@@ -85,11 +91,11 @@ def test_i3_the_assess_tool_reads_through_the_reader_too_in_a_live_run(tmp_path)
     source_cache = SourceCache(fetch=NoFetch(), reader_model=lambda: reader)
     live = RunContext(now=blue_mill_context().now, case=BLUE_MILL_CASE, reader="live", reader_cache=tmp_path / "r.sqlite")
     state = ask(agent_graph(scripted_agent(), source_cache=source_cache), GP3_QUESTION, context=live)
-    assert len(reader.calls) > 0 and state["answer"] == FINAL
+    assert len(reader.calls) > 0 and state["answer"].startswith(BODY)
 
 
 def test_a_second_question_on_the_same_thread_uses_the_threads_landing_zone_and_the_new_turns_prompt():
-    model = FakeToolChatModel(script=[AIMessage("one."), AIMessage("two.")])
+    model = FakeToolChatModel(script=[AIMessage("[path: decline]\none."), AIMessage("[path: decline]\ntwo.")])
     graph = agent_graph(model, source_cache=SourceCache(fetch=NoFetch()))
     ask(graph, "first question")
     later = blue_mill_context().now.replace(hour=11, minute=45)

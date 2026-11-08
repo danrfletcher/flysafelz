@@ -67,10 +67,10 @@ def test_the_thermic_caution_puts_each_limit_beside_its_own_variable():
     cape_limits, shortwave_limits = found.groups()
     cape, shortwave = number(float(RULES.thermic_cape_caution.value)), number(float(RULES.thermic_shortwave_caution.value))
     assert cape_limits.startswith(f"thermic caution >= {cape} J/kg together with shortwave >= {shortwave} W/m²")
-    assert shortwave_limits == f"thermic caution >= {shortwave} W/m² together with CAPE >= {cape} J/kg"
+    assert shortwave_limits == f"thermic caution >= {shortwave} W/m² together with CAPE >= {cape} J/kg: under the {shortwave} W/m² limit"
     # and the shipped numbers, so a change to rules.yaml shows up here as a change to the briefing
-    assert cape_limits == "thermic caution >= 300 J/kg together with shortwave >= 600 W/m², no-go > 1000 J/kg"
-    assert shortwave_limits == "thermic caution >= 600 W/m² together with CAPE >= 300 J/kg"
+    assert cape_limits == "thermic caution >= 300 J/kg together with shortwave >= 600 W/m²: under the 300 J/kg limit, no-go > 1000 J/kg: under the 1000 J/kg limit"
+    assert shortwave_limits == "thermic caution >= 600 W/m² together with CAPE >= 300 J/kg: under the 600 W/m² limit"
 
 
 @pytest.mark.parametrize(
@@ -96,8 +96,8 @@ def test_a_printed_value_is_on_the_same_side_of_each_limit_as_the_true_one(value
 @pytest.mark.parametrize(
     ("changes", "wind", "rain"),
     [
-        ({"wind_10m": 11.96, "precipitation": 0.14}, "wind at 10 m 11.96 mph (caution >= 12 mph", "precipitation 0.14 mm/h (no-go > 0.1 mm/h)"),
-        ({"wind_10m": 12.04, "precipitation": 0.05}, "wind at 10 m 12 mph (caution >= 12 mph", "precipitation 0.1 mm/h (no-go > 0.1 mm/h)"),
+        ({"wind_10m": 11.96, "precipitation": 0.14}, "wind at 10 m 11.96 mph (caution >= 12 mph: under the 12 mph limit", "precipitation 0.14 mm/h (no-go > 0.1 mm/h: over the 0.1 mm/h limit)"),
+        ({"wind_10m": 12.04, "precipitation": 0.05}, "wind at 10 m 12 mph (caution >= 12 mph: over the 12 mph limit", "precipitation 0.1 mm/h (no-go > 0.1 mm/h: under the 0.1 mm/h limit)"),
     ],
 )
 def test_the_hour_text_never_prints_a_value_that_crosses_its_own_limit_when_rounded(changes, wind, rain):

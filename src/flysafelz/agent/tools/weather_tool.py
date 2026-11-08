@@ -3,7 +3,8 @@
 Each hour is `weather.build_rows` over the window, so a value is the same number the assessment uses (the worse of the hour's two timestamps
 for wind, CAPE, cloud and visibility; the hour's closing value for gusts, rain and shortwave; gust spread and gradient worked out per
 timestamp). The limits are `RULES.<rule>.value`, `.unit` and `.comparison` of the rules `weather.check_row` applies, printed as they stand in
-rules.yaml. A value the forecast does not have prints as `not forecast`, never as 0.
+rules.yaml. A value the forecast does not have prints as `not forecast`, never as 0. Each limit is followed by the value's place against it, `over the 12 mph limit`,
+worded by code from `contracts.position_word` (`common.limit_phrase`), the one phrase the guard reads.
 
 The tool gives facts, not a verdict: whether an hour is a NO-GO is `assess`'s job.
 """
@@ -29,6 +30,7 @@ from flysafelz.agent.tools.common import (
     fetch_line,
     g,
     hour_label,
+    limit_phrase,
     measured,
     prepare,
     reply,
@@ -123,12 +125,17 @@ def _together_with(spec: LimitSpec) -> str:
     return f" together with {label} {rule.comparison.value} {g(float(rule.value))} {rule.unit}"
 
 
+def _position(shown: float | None, limit: RuleLimit) -> str:
+    """`: over the 12 mph limit`, the value's place against this limit as code words it (`limit_phrase`); nothing for a value the forecast lacks."""
+    return "" if shown is None else f": {limit_phrase(shown, limit.limit, limit.comparison, limit.unit)}"
+
+
 def _value(reading: Reading, row: WeatherRow) -> tuple[WeatherValue, str]:
-    """(the value for the artifact, its text): `wind at 10 m 8 mph (caution >= 12 mph, no-go >= 16 mph)`."""
+    """(the value for the artifact, its text): `wind at 10 m 8 mph (caution >= 12 mph: under the 12 mph limit, no-go > 16 mph: under the 16 mph limit)`."""
     limits = _rule_limits(reading)
     unit = limits[0][0].unit
     shown = reading.get(row)
-    limit_words = ", ".join(words for _, words in limits)
+    limit_words = ", ".join(f"{words}{_position(shown, limit)}" for limit, words in limits)
     value_words = NOT_FORECAST if shown is None else f"{measured(shown, [(limit.comparison, limit.limit) for limit, _ in limits])} {unit}"
     value = WeatherValue(name=reading.name, label=reading.label, value=shown, unit=unit, limits=[limit for limit, _ in limits])
     return value, f"{reading.label} {value_words} ({limit_words})"
@@ -144,7 +151,11 @@ def weather_answer(prepared: Prepared) -> tuple[str, WeatherArtifact]:
         lines.append(unusable_text(SOURCE_LABEL[SourceName.WEATHER], status))
     else:
         rows = build_rows(forecast, prepared.window.start_utc, prepared.window.end_utc)
-        lines.append("Each value is followed by the limits it is checked against (rules.yaml). `" + NOT_FORECAST + "` means the forecast has no value.")
+        lines.append(
+            "Each value is followed by the limits it is checked against (rules.yaml), each with where the value sits against it (over, at or under the limit). `"
+            + NOT_FORECAST
+            + "` means the forecast has no value."
+        )
         lines.append(f"{len(rows)} hours:" if rows else "No hours in this window.")
         for row in rows:
             label = hour_label(row.hour, prepared.tz)

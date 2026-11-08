@@ -155,7 +155,7 @@ def test_blue_mill_says_2_notams_within_2_nm_and_the_gmt_labels_and_limits_besid
     assert "2 NOTAMs within 2 NM." in run.text("get_notams") and "ignored" in run.text("get_notams")
     weather = run.text("get_weather")
     assert "Sat 31 Oct 10:00 GMT:" in weather and "BST" not in weather
-    assert "wind at 10 m 4.9 mph (caution >= 12 mph, no-go > 16 mph)" in weather
+    assert "wind at 10 m 4.9 mph (caution >= 12 mph: under the 12 mph limit, no-go > 16 mph: under the 16 mph limit)" in weather
 
 
 def test_the_real_contact_number_is_in_no_text_and_no_artifact_but_is_in_phone_map():

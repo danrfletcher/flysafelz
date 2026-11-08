@@ -1,10 +1,7 @@
-"""I5: the prompt asks for a `[path: …]` first line, adds no tool, and what the model writes reaches the end of the middleware untouched.
+"""I5: the prompt asks for a `[path: …]` first line and adds no tool; the guard (PR-11.F1) strips the line, so it is in neither `messages` nor `answer`.
 
-PR-11's guard strips the line. Until it does, the tag is in the model's message and in `answer` exactly as the model wrote it: nothing here removes,
-adds or rewrites it, and the middleware's own pass-through of a good response is checked on the response object itself.
+The strip itself is tested in test_guard_path_tag.py; here the prompt side, and that a good tagged answer reaches the end with only the tag gone.
 """
-
-import re
 
 import pytest
 from fakes import FakeToolChatModel
@@ -24,12 +21,13 @@ def test_the_prompt_contains_the_tag_instruction_and_all_four_values():
 
 
 @pytest.mark.parametrize("path", PATHS)
-def test_a_final_message_with_the_tag_reaches_the_answer_and_the_messages_unchanged(path):
-    written = f"[path: {path}]\nThe answer, with 3 numbers: 5000 m, 90 %, 4.7 mph."
-    model = FakeToolChatModel(script=[AIMessage(written)])
+def test_a_final_message_with_the_tag_reaches_the_answer_and_the_messages_without_it(path):
+    body = "I can only help with whether to fly from this spot."
+    model = FakeToolChatModel(script=[AIMessage(f"[path: {path}]\n{body}")])
     state = ask(agent_graph(model), "Can I fly?")
-    assert state["messages"][-1].content == written
-    assert state["answer"] == written
+    assert state["messages"][-1].content == body
+    assert state["answer"] == body
+    assert state["guard"] == "passed"
 
 
 def test_the_tag_instruction_adds_no_tool_a_decline_makes_no_tool_call_and_an_assess_still_does():
@@ -44,8 +42,8 @@ def test_the_tag_instruction_adds_no_tool_a_decline_makes_no_tool_call_and_an_as
     assert system_prompts(assessed)[0] == system_prompts(declined)[0]
 
 
-def test_the_middleware_hands_a_good_response_on_as_the_same_object():
-    written = AIMessage("[path: explain]\nA NOTAM is a notice.")
+def test_the_middleware_hands_a_tool_call_response_on_as_the_same_object():
+    written = AIMessage("", tool_calls=assess_call().tool_calls)
     response = ModelResponse(result=[written])
     seen = []
 
@@ -60,5 +58,4 @@ def test_the_middleware_hands_a_good_response_on_as_the_same_object():
         runtime=type("Runtime", (), {"context": None})(),
     )
     assert FlySafeMiddleware().wrap_model_call(request, handler) is response
-    assert response.result[0].content == "[path: explain]\nA NOTAM is a notice."
-    assert re.match(r"\[path: (assess|explain|clarify|decline)\]\n", response.result[0].content)
+    assert len(seen) == 1

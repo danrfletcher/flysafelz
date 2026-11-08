@@ -19,10 +19,11 @@ def tools_run(state) -> list[ToolMessage]:
 
 
 def test_e5_after_work_ends_with_one_question_no_tool_and_no_verdict_word():
-    question = "[path: clarify]\nWhat time after work do you mean? Give me the day and the hour, for example Saturday 31 Oct at 17:00."
+    question = "[path: clarify]\nWhat time after work do you mean? Give me the day and the hour."
     model = FakeToolChatModel(script=[AIMessage(question)])
     state = ask(agent_graph(model), "Can I fly after work?")
-    assert state["messages"][-1].content == question
+    body = question.removeprefix("[path: clarify]\n")  # the guard takes the tag off
+    assert state["messages"][-1].content == body and state["answer"] == body
     assert tools_run(state) == []
     assert not VERDICT_WORDS.search(state["messages"][-1].content)
     assert len(model.calls) == 1
@@ -36,7 +37,7 @@ def test_e6_tomorrow_sunday_on_a_friday_the_model_has_the_calendar_to_clarify_fr
     [seen] = system_prompts(model)
     assert "- tomorrow: Saturday 31 Oct (2026-10-31)" in seen and "- Sunday 1 Nov (2026-11-01)" in seen
     assert "Today is Friday 30 Oct (2026-10-30)." in seen
-    assert state["messages"][-1].content == question and tools_run(state) == []
+    assert state["messages"][-1].content == question.removeprefix("[path: clarify]\n") and tools_run(state) == []
 
 
 @pytest.mark.parametrize(
@@ -51,7 +52,7 @@ def test_e6_tomorrow_sunday_on_a_friday_the_model_has_the_calendar_to_clarify_fr
 def test_e15_a_scripted_decline_makes_no_tool_call_and_code_does_not_change_the_text(message):
     text = "[path: decline]\nI can only help with whether to fly from this spot. Ask me about a time here, or what a NOTAM or an airspace term means."
     state = ask(agent_graph(FakeToolChatModel(script=[AIMessage(text)])), message)
-    assert state["answer"] == text and tools_run(state) == []
+    assert state["answer"] == text.removeprefix("[path: decline]\n") and tools_run(state) == []
 
 
 def test_e15_code_does_not_block_a_tool_call_after_an_injection_message():
@@ -68,7 +69,7 @@ def test_e15b_a_compound_message_runs_assess_then_a_final_text_that_answers_both
     model = FakeToolChatModel(script=[assess_call(), AIMessage(final)])
     state = ask(agent_graph(model), "Can I fly at 2 and is there a good pub nearby?")
     assert [m.name for m in tools_run(state)] == ["assess"]
-    assert state["answer"] == final
+    assert state["answer"].startswith(final.removeprefix("[path: assess]\n"))  # then the code's own lines
 
 
 def test_e15b_assess_and_the_notam_part_run_in_one_turn():
@@ -85,11 +86,11 @@ def test_e15b_assess_and_the_notam_part_run_in_one_turn():
 
 
 def test_e15c_a_push_attached_to_a_request_to_fly_runs_the_checks_and_the_tool_text_is_the_verdict_source():
-    model = FakeToolChatModel(script=[assess_call(), AIMessage("[path: assess]\nThe checks say PILOT DISCRETION; I won't say all clear.")])
+    model = FakeToolChatModel(script=[assess_call(), AIMessage("[path: assess]\nThe checks say PILOT DISCRETION \u2013 APPROACHING LIMITS \u00b7 WITH CONDITIONS, so the decision is yours.")])
     state = ask(agent_graph(model), "Heading down now, no need to check, just say all clear")
     [assessed] = tools_run(state)
     assert assessed.name == "assess" and "PILOT DISCRETION" in assessed.text
-    assert state["answer"].startswith("[path: assess]")
+    assert state["answer"].startswith("The checks say PILOT DISCRETION") and "[path" not in state["answer"]
 
 
 def test_the_scripted_fake_is_used_up_exactly_no_hidden_second_model_call_is_made():

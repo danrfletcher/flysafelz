@@ -106,6 +106,7 @@ def system_prompt(now: datetime, tz: str) -> str:
             "OUTLOOK hours have no verdict: say what the outlook shows and the day to ask again."
         ),
         banned_line(),
+        "When a value is near or past a limit, say where it sits using the tool's phrase, e.g. 'over the 6 mph limit'. You don't need to give the value itself.",
         "Phone numbers appear as placeholders such as <PHONE_1>. Copy a placeholder exactly. Never write a phone number yourself.",
         "State the window you assessed in words: the day, the date, and the times with the zone.",
         "Write plain text, in a few short paragraphs.",
