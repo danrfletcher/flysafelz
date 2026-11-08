@@ -13,6 +13,10 @@ Who can see what (LangChain's OmitFromSchema annotations decide the graph's inpu
     answer, guard, overlays, assessment   output only: code writes them, a caller cannot send them
     phone_map, thread_lz              private: kept in the thread's checkpoint, in neither schema (real phone numbers must never reach the contract)
 
+The input schema lists `lat` and `lon` as required and gives `tz` the default Europe/London, so Studio's form asks for them. That is
+the form only: LangGraph does not check a request against it. The input check does, and a follow-up turn may leave `lat` and `lon` out
+(the thread's LZ is used) or `tz` out (the thread's zone is used, else Europe/London).
+
 `lat`, `lon` and `tz` are an EphemeralValue channel: a value sent with a request is there for the input check and is gone
 after it. It is not kept in the thread, so a rejected request leaves nothing behind that would reject the next one. The
 input check copies the accepted values into `thread_lz` (the thread's one landing zone and its time zone), and every later
@@ -23,7 +27,7 @@ import math
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated, Literal, NotRequired, Self, TypedDict
+from typing import Annotated, Literal, NotRequired, Required, Self, TypedDict
 
 from langchain.agents import AgentState
 from langchain.agents.middleware.types import OmitFromInput, OmitFromOutput, PrivateStateAttr
@@ -38,6 +42,7 @@ from flysafelz.shapes import CIRCLE_VERTICES, circle_ring  # noqa: F401 - CIRCLE
 # --- run context -----------------------------------------------------------------------------------------------------
 
 
+DEFAULT_TZ = "Europe/London"  # the time zone of a request that names none
 ReaderName = Literal["fixture", "live"]
 DropName = Literal["weather", "airspace", "pib"]
 
@@ -321,9 +326,9 @@ def merge_phone_maps(current: dict[str, str] | None, update: dict[str, str] | No
 class RequestState(AgentState):
     """The thread state. Add a field here only when the plan changes: tests/unit/agent/test_state.py pins the key set."""
 
-    lat: NotRequired[Annotated[float | None, EphemeralValue, OmitFromOutput]]
-    lon: NotRequired[Annotated[float | None, EphemeralValue, OmitFromOutput]]
-    tz: NotRequired[Annotated[str | None, EphemeralValue, OmitFromOutput]]
+    lat: Required[Annotated[float | None, EphemeralValue, OmitFromOutput]]
+    lon: Required[Annotated[float | None, EphemeralValue, OmitFromOutput]]
+    tz: NotRequired[Annotated[str | None, EphemeralValue, OmitFromOutput, Field(default=DEFAULT_TZ)]]
     answer: NotRequired[Annotated[str | None, OmitFromInput]]
     guard: NotRequired[Annotated[GuardResult | None, OmitFromInput]]
     overlays: NotRequired[Annotated[list[OverlayFeature], OmitFromInput]]

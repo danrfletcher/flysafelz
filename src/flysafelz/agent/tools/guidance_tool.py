@@ -22,7 +22,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from flysafelz.agent.settings import SETTINGS
 from flysafelz.agent.tools.artifacts import GuidanceArtifact, GuidanceChunk
-from flysafelz.agent.tools.common import Redactor, reply
+from flysafelz.agent.tools.common import AgentRuntime, Redactor, reply
 from flysafelz.guidance.corpus import IndexedChunk
 from flysafelz.guidance.embedder import EmbeddingModelMissing
 from flysafelz.guidance.index import GuidanceIndex
@@ -47,7 +47,7 @@ class GuidanceArgs(BaseModel):
     model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
     query: str = Field(description="What to look up in the guidance: a short question or some key words, such as 'what is a danger area'.")
-    runtime: ToolRuntime = Field(default=None)  # type: ignore[assignment]  # injected; never part of the model-facing schema
+    runtime: AgentRuntime = Field(default=None)  # type: ignore[assignment]  # injected; never part of the model-facing schema
 
 
 def _heading(chunk: IndexedChunk) -> str:

@@ -2,6 +2,7 @@
 
     agent_config()      -> AgentConfig   the three AGENT_* values, or AgentConfigError naming every missing or bad one
     build_chat_model()  -> ChatOpenAI    a client for that endpoint; nothing is sent until it is invoked
+    LazyChatModel       a chat model that calls build_chat_model() the first time a model call needs it, not when the graph is built
 
 Nothing is read on import: the environment is read each time `agent_config()` is called, so importing this module has no
 side effect and a test can set the variables first. Only the process environment is read, never a `.env` file (the
@@ -13,11 +14,16 @@ No call is made to the endpoint's model list.
 """
 
 import os
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from typing import Any
 from urllib.parse import urlsplit
 
+from langchain_core.callbacks import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
+from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import BaseMessage
+from langchain_core.outputs import ChatResult
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel, ConfigDict, SecretStr
+from pydantic import BaseModel, ConfigDict, PrivateAttr, SecretStr
 
 from flysafelz.agent.settings import SETTINGS
 
@@ -78,3 +84,32 @@ def build_chat_model(config: AgentConfig | None = None) -> ChatOpenAI:
     """
     config = agent_config() if config is None else config
     return ChatOpenAI(base_url=config.base_url, model=config.model, api_key=config.api_key, max_retries=SETTINGS.model_max_retries)
+
+
+class LazyChatModel(BaseChatModel):
+    """The graph's model when no model is injected: the configured ChatOpenAI, built the first time a model call needs it.
+
+    A graph builds without any AGENT_* setting, and a turn that never reaches the model (a request outside the UK, a rejected one) never
+    needs them. The first `bind_tools` or generate call builds the client with `build_chat_model()`, so a missing or bad setting raises
+    AgentConfigError there, in one line naming it, and the client is then reused. `bind_tools` returns the real client's own bound model.
+    """
+
+    _real: ChatOpenAI | None = PrivateAttr(default=None)
+
+    @property
+    def _llm_type(self) -> str:
+        return "flysafelz-lazy-chat-model"
+
+    def _model(self) -> ChatOpenAI:
+        if self._real is None:
+            self._real = build_chat_model()
+        return self._real
+
+    def bind_tools(self, tools: Sequence[Any], *, tool_choice: str | None = None, **kwargs: Any) -> Any:
+        return self._model().bind_tools(tools, tool_choice=tool_choice, **kwargs)
+
+    def _generate(self, messages: list[BaseMessage], stop: list[str] | None = None, run_manager: CallbackManagerForLLMRun | None = None, **kwargs: Any) -> ChatResult:
+        return self._model()._generate(messages, stop=stop, run_manager=run_manager, **kwargs)
+
+    async def _agenerate(self, messages: list[BaseMessage], stop: list[str] | None = None, run_manager: AsyncCallbackManagerForLLMRun | None = None, **kwargs: Any) -> ChatResult:
+        return await self._model()._agenerate(messages, stop=stop, run_manager=run_manager, **kwargs)
