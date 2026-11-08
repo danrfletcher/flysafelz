@@ -16,10 +16,10 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: false,
-    // `vitest --coverage` (make test-ui): the map layer files and the layer panel keep the repo's 90% line floor.
+    // `vitest --coverage` (make test-ui): the map layer files, the What's-here card and pin code (src/pick) and the layer panel, legend and toast keep the repo's 90% line floor.
     coverage: {
       provider: 'v8',
-      include: ['src/map/**/*.{ts,tsx}', 'src/components/LayerPanel.tsx', 'src/components/Legend.tsx'],
+      include: ['src/map/**/*.{ts,tsx}', 'src/pick/**/*.{ts,tsx}', 'src/components/LayerPanel.tsx', 'src/components/Legend.tsx', 'src/components/Toast.tsx'],
       exclude: ['**/*.test.*', 'src/map/types.ts'],
       reporter: ['text'],
       thresholds: { lines: 90, perFile: true },

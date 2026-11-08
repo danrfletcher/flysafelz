@@ -79,6 +79,12 @@ describe('actionStyle', () => {
     expect(picked.fillOpacity).toBeGreaterThan(0)
   })
 
+  it('draws the airspace outcomes CEILING and WARNING in the awareness colour and does not warn about them', () => {
+    expect(actionStyle('CEILING', false, false)).toMatchObject({ token: '--action-awareness', fillOpacity: 0 })
+    expect(actionStyle('WARNING', false, false)).toMatchObject({ token: '--action-awareness', fillOpacity: 0 })
+    expect(console.warn).not.toHaveBeenCalled()
+  })
+
   it('draws a missing or unknown action in slate, and warns once about an unknown one with the value only (E11)', () => {
     const warn = vi.mocked(console.warn)
     expect(actionStyle(null, false, false).token).toBe('--type-other')

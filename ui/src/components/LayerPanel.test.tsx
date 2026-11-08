@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ACTIONS, ON_THE_MAP, VERDICTS } from '@/components/Legend'
 import { LAYERS, LayerPanel, type LayerId, type LayerSwitches } from '@/components/LayerPanel'
 import { HOW_IT_WORKS } from '@/content/howItWorks'
+import { notamStyle } from '@/map/airspaceStyle'
 import type { BasemapStatus } from '@/map/basemap'
 import { createRainView, type RainView } from '@/map/rainView'
 import type { LayerState, LayerStatus } from '@/map/useMapLayers'
@@ -155,7 +156,17 @@ describe('the legend', () => {
       'NOTAM, approx (Q-line circle)',
     ])
     expect(ON_THE_MAP[4].swatch).toContain('border-dashed')
-    expect(ON_THE_MAP[5].swatch).toContain('border-dotted')
+    // the approx swatch draws the same dash pattern the map draws for an approximate NOTAM (notamStyle), not a CSS dotted border
+    expect(ON_THE_MAP[5].dash).toBe(notamStyle(true).dashArray)
+    expect(ON_THE_MAP[5].swatch).not.toContain('border-dotted')
+  })
+
+  it('draws the approx swatch as an SVG outline with that dash pattern, and the other rows as plain boxes', async () => {
+    const { dialog } = await open()
+    const row = within(dialog).getByText('NOTAM, approx (Q-line circle)').closest('li')!
+    expect(row.querySelector('svg rect')).toHaveAttribute('stroke-dasharray', '3 7')
+    expect(row.querySelector('svg')).toHaveClass('stroke-type-notam')
+    expect(within(dialog).getByText('NOTAM').closest('li')!.querySelector('svg')).toBeNull()
   })
 
   it('lists the verdict colours most cautious first', () => {
@@ -164,7 +175,7 @@ describe('the legend', () => {
 
   it('takes every swatch colour from a theme token, never a literal', () => {
     for (const row of [...ON_THE_MAP, ...ACTIONS, ...VERDICTS]) {
-      expect(row.swatch, row.label).toMatch(/\b(border|bg)-(type|action|verdict)-[a-z-]+/)
+      expect(row.swatch, row.label).toMatch(/\b(border|bg|stroke)-(type|action|verdict)-[a-z-]+/)
       expect(row.swatch, row.label).not.toMatch(/#[0-9a-f]{3,8}|rgb|hsl|\[/i)
     }
   })

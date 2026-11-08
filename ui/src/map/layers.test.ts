@@ -5,7 +5,7 @@ import { drawnAirspace, drawnFeatures, drawnNotams } from '@/map/layers'
 import type { AirspaceProps, MapFeature, NotamProps } from '@/map/types'
 import { ALL_HEIGHTS_AIRSPACE, ALL_HEIGHTS_NOTAMS } from '@/test/handlers'
 
-// Which features each route draws for the four on/off combinations of its two switches, over the recorded "all heights" payloads
+// Which features each route draws for the four on/off combinations of its two switches, over the synthetic "all heights" payloads
 // (240 stacked airspaces, 60 NOTAMs). The rule for "below" is belowFl100.ts's; these tests count what comes out of it, not the rule itself.
 
 const AIRSPACE = ALL_HEIGHTS_AIRSPACE.features
@@ -15,7 +15,7 @@ const ids = <P extends { id: string }>(features: readonly MapFeature<P>[]) => fe
 const LOW_AIRSPACE = AIRSPACE.filter((feature) => airspaceBelowFl100(feature.properties))
 const LOW_NOTAMS = NOTAMS.filter((feature) => notamBelowFl100(feature.properties))
 
-describe('the recorded all-heights payloads', () => {
+describe('the synthetic all-heights payloads', () => {
   it('have at least 200 airspaces, with both low and high floors, and NOTAMs with Q-line floors on both sides of FL100', () => {
     expect(AIRSPACE.length).toBeGreaterThanOrEqual(200)
     expect(LOW_AIRSPACE.length).toBeGreaterThan(50)

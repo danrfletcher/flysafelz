@@ -17,7 +17,7 @@ export const NOTAMS_FIXTURE = notamsFixture as unknown as LayerPayload<NotamProp
 export const AIRSPACE_URL = () => `${apiUrl()}/map/airspace`
 export const NOTAMS_URL = () => `${apiUrl()}/map/notams`
 
-/** The recorded payloads for both routes, with any part replaced. */
+/** The made-up payloads for both routes (shaped as the routes send them), with any part replaced. */
 export function airspaceRoute(body: object = AIRSPACE_FIXTURE) {
   return http.get(AIRSPACE_URL(), () => HttpResponse.json(body))
 }
@@ -29,7 +29,7 @@ export function notamsRoute(body: object = NOTAMS_FIXTURE) {
 /** What the server says when a route has no cache and its refresh failed (src/flysafelz/mapdata/cache.py). */
 export const unavailable = (url: string) => http.get(url, () => HttpResponse.json({ reason: 'openAIP: not reachable' }, { status: 503 }))
 
-/** All the map routes with their recorded answers, and RainViewer's index with three current frames (a test of the fallback adds `rainGridRoute`). */
+/** All the map routes with their made-up answers, and RainViewer's index with three current frames (a test of the fallback adds `rainGridRoute`). */
 export function mapRoutes() {
   return [airspaceRoute(), notamsRoute(), windRoute(), rainIndexRoute()]
 }
@@ -44,7 +44,7 @@ export function blueMillRoutes() {
 }
 
 /**
- * The "all heights" payloads (PR-11.F1): 240 stacked airspaces (each cell has a low and a high shape over it; floors from SFC to FL195) and 60 NOTAMs
+ * The "all heights" payloads (PR-11.F1), synthetic and generated, not recorded from the routes: 240 stacked airspaces (each cell has a low and a high shape over it; floors from SFC to FL195) and 60 NOTAMs
  * (Q-line lower 0, 99, 100, 150, 195, 245 and none; every 5th is an approx circle), with fiction-range phone numbers. Four routes' answers: fresh, stale, and 503.
  */
 export const ALL_HEIGHTS_AIRSPACE = allHeightsAirspace as unknown as LayerPayload<AirspaceProps>
@@ -60,7 +60,7 @@ export function allHeightsStaleRoutes() {
   return [airspaceRoute(ALL_HEIGHTS_AIRSPACE_STALE), notamsRoute(ALL_HEIGHTS_NOTAMS_STALE), windRoute(), rainIndexRoute()]
 }
 
-/** `/map/notams` answers 503 with no cache; the other routes answer as recorded. */
+/** `/map/notams` answers 503 with no cache; the other routes answer as made up above. */
 export function allHeightsNotams503Routes() {
   return [airspaceRoute(ALL_HEIGHTS_AIRSPACE), unavailable(NOTAMS_URL()), windRoute(), rainIndexRoute()]
 }

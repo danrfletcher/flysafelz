@@ -17,7 +17,7 @@ function runs(text: string): string[] {
 const strings = (value: unknown): string[] =>
   typeof value === 'string' ? [value] : Array.isArray(value) ? value.flatMap(strings) : value && typeof value === 'object' ? Object.values(value).flatMap(strings) : []
 
-describe('the recorded fixtures', () => {
+describe('the map fixtures (made up, shaped as the routes send them)', () => {
   it('F5: every phone number in them is in the fiction range, and there are some', () => {
     const found = [AIRSPACE_FIXTURE, NOTAMS_FIXTURE].flatMap((payload) =>
       payload.features.flatMap((feature) => strings({ ...feature.properties, id: '' }).flatMap(runs)),

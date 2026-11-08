@@ -2,7 +2,7 @@ import { useStream } from '@langchain/langgraph-sdk/react'
 import { useEffect, useReducer, useRef, useState, useSyncExternalStore } from 'react'
 
 import { nextLine } from '@/chat/progress'
-import { pinKey, readResult, type Sessions, type Turn, type TurnResult } from '@/chat/turns'
+import { pinKey, readFinalResult, type Sessions, type Turn, type TurnResult } from '@/chat/turns'
 import { apiUrl } from '@/config'
 import type { LatLon } from '@/pick/whatsHere'
 
@@ -34,13 +34,14 @@ interface Run {
 
 /**
  * A retry's first question: does the server already hold the answer to this turn? It does when the turn's message is the thread's latest
- * question and the state carries an `answer` (code clears `answer` at the start of every turn, so one that is there belongs to the latest).
+ * question, the state carries an `answer`, and the thread ends with the reply to it (readFinalResult). `answer` alone is not enough: code clears
+ * it when the turn's input check runs, so before that it is still the previous turn's.
  */
 export function storedResult(values: unknown, turnId: string): TurnResult | null {
   const messages = (values as ChatState | null)?.messages
   if (!Array.isArray(messages)) return null
   const lastQuestion = messages.findLast((message) => message?.type === 'human')
-  return lastQuestion?.id === turnId ? readResult(values) : null
+  return lastQuestion?.id === turnId ? readFinalResult(values) : null
 }
 
 export interface LzThread {
@@ -51,16 +52,17 @@ export interface LzThread {
   running: boolean
   /** Sends a question as a new turn. Does nothing while a run is going or when the text is empty or only whitespace. The text is sent as given. */
   send: (question: string) => void
-  /** Retries the latest turn when it failed. */
+  /** Retries the latest turn when it failed or was stopped. */
   retry: () => void
 }
 
 /**
  * The conversation of one pin. Mount it keyed by the pin: one `useStream` per pin, so a different pin is a different instance. Unmounting
- * cancels a run still going (the SDK aborts the request, and the server cancels the run), and nothing from that run is written afterwards.
+ * cancels a run still going (the SDK aborts the request, and the server cancels the run), marks the turn `stopped` (not `error`: the server did nothing
+ * wrong), and nothing from that run is written afterwards.
  *
  * The thread id is kept in `sessions` for the pin, so coming back to the same coordinates reuses the thread. The first `submit` makes the
- * thread; a retry reuses it and never makes another. The run ends on the final `values` that carries `answer`: its fields become the
+ * thread; a retry reuses it and never makes another. The run ends on the final `values`, the state that carries `answer` and ends with the reply to this turn's question (readFinalResult): its fields become the
  * turn's answer, guard, assessment and overlays. Custom events only drive the status line; nothing streams into the answer.
  */
 export function useLzThread(point: LatLon, sessions: Sessions): LzThread {
@@ -100,7 +102,7 @@ export function useLzThread(point: LatLon, sessions: Sessions): LzThread {
       run.current = null
       busy.current = false
       if (current) {
-        sessions.fail(key, current.turnId)
+        sessions.stop(key, current.turnId) // the pilot left (another pin, or the sheet closed): stopped, which is not a server failure
         void stopRef.current()
       }
     }
@@ -119,7 +121,7 @@ export function useLzThread(point: LatLon, sessions: Sessions): LzThread {
   useEffect(() => {
     const current = run.current
     if (!current?.settled) return
-    finish(current, current.failed ? null : readResult(stream.values))
+    finish(current, current.failed ? null : readFinalResult(stream.values))
   })
 
   const begin = (turnId: string): Run => {
@@ -134,7 +136,9 @@ export function useLzThread(point: LatLon, sessions: Sessions): LzThread {
     try {
       await stream.submit(
         { messages: [{ type: 'human', content: question, id: current.turnId }], lat: point.lat, lon: point.lon, tz: browserTz() } as never,
-        { streamMode: ['custom', 'values'] },
+        // `onDisconnect: 'cancel'` is the SDK's default for a stream that is not resumable; it is said here so a change of that default cannot
+        // leave an old run going on the server after the pilot changed pin or closed the sheet (the server cancels a run whose client went away).
+        { streamMode: ['custom', 'values'], onDisconnect: 'cancel' },
       )
     } catch {
       current.failed = true
@@ -154,7 +158,7 @@ export function useLzThread(point: LatLon, sessions: Sessions): LzThread {
 
   const retry = () => {
     const last = session.turns.at(-1)
-    if (!last || last.status !== 'error' || busy.current) return
+    if (!last || (last.status !== 'error' && last.status !== 'stopped') || busy.current) return
     const current = begin(last.id)
     sessions.resume(key, last.id)
     void (async () => {

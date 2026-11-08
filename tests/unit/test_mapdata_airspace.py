@@ -9,10 +9,13 @@ import logging
 import httpx
 import pytest
 from mapdata_helpers import FAKE_KEY, Upstream, page
+from shapely.geometry import Polygon
 
+from flysafelz.clients.openaip import parse_airspace
 from flysafelz.contracts import Datum, Limit, LimitUnit
 from flysafelz.mapdata.airspace import airspace_features, limit_feet, limit_text
 from flysafelz.mapdata.cache import RefreshFailed
+from flysafelz.shapes import airspace_geometry
 
 PROPERTIES = {"id", "name", "type", "class", "lower", "upper", "lower_ft", "upper_ft", "hours", "action"}
 
@@ -91,6 +94,46 @@ def test_an_unknown_type_is_other_and_an_item_without_limits_is_unlimited_from_t
     widget = by_name(features())["WIDGET MYSTERY ZONE"]["properties"]
     assert (widget["type"], widget["class"]) == ("other", None)
     assert (widget["lower"], widget["upper"], widget["lower_ft"], widget["upper_ft"]) == ("SFC", "UNL", 0, None)
+
+
+def repair_page(name: str, ring: list[list[float]]) -> dict:
+    """One openAIP page with one airspace whose polygon is `ring` (lon, lat pairs), taken from a fixture item so every other field is real."""
+    body = one_item_page(None, None)
+    item = body["items"][0]
+    item.update(name=name, geometry={"type": "Polygon", "coordinates": [ring]})
+    return body
+
+
+def test_an_item_whose_invalid_polygon_parse_airspace_repairs_with_buffer_zero_keeps_its_feature_as_the_parser_gives_it():
+    bowtie = [[-1, 54], [-0.5, 54.5], [-0.5, 54], [-1, 54.5], [-1, 54]]  # two edges cross: invalid, and buffer(0) repairs it
+    body = repair_page("BOWTIE REPAIRED ZONE", bowtie)
+    parsed = parse_airspace(body["items"][0])
+    assert any("repaired with buffer(0)" in note for note in parsed.notes)
+    found = features(Upstream(airspace={"1": body}))
+    assert [f["properties"]["name"] for f in found] == ["BOWTIE REPAIRED ZONE"]
+    assert found[0]["geometry"] == airspace_geometry(parsed.shape)
+    ring = found[0]["geometry"]["coordinates"][0]
+    assert ring != bowtie and Polygon(ring).is_valid  # the repaired shape, not the item's own crossing ring
+
+
+def test_an_item_whose_invalid_polygon_falls_back_on_its_bounding_box_keeps_its_feature_with_that_box():
+    line = [[-1, 54], [-0.5, 54.5], [0, 55], [-1, 54]]  # all on one diagonal: no area, buffer(0) leaves nothing, so the bounding box is used
+    body = repair_page("DIAGONAL BOX ZONE", line)
+    parsed = parse_airspace(body["items"][0])
+    assert any("bounding box is used" in note for note in parsed.notes)
+    found = features(Upstream(airspace={"1": body}))
+    assert [f["properties"]["name"] for f in found] == ["DIAGONAL BOX ZONE"]
+    assert found[0]["geometry"] == airspace_geometry(parsed.shape)
+    ring = found[0]["geometry"]["coordinates"][0]
+    assert {tuple(point) for point in ring} == {(-1, 54), (0, 54), (0, 55), (-1, 55)}  # the box round the item's own points, in lon, lat order
+
+
+def test_an_item_with_no_polygon_is_left_out_and_the_log_gives_the_count_not_the_item(caplog):
+    body = repair_page("NO POLYGON ZONE", [])
+    body["items"][0]["geometry"] = {}
+    with caplog.at_level(logging.WARNING, logger="flysafelz.mapdata"):
+        assert features(Upstream(airspace={"1": body})) == []
+    assert "1 airspace items have no usable polygon" in caplog.text and "NO POLYGON ZONE" not in caplog.text
 
 
 def test_an_empty_page_is_an_empty_list():

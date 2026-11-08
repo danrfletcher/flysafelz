@@ -16,6 +16,9 @@ const AWARENESS: ActionPaint = { token: '--action-awareness', fillOpacity: 0 }
 // The legend's five action colours (src/components/Legend.tsx). The same meaning under another server name shares a colour:
 // NO_GO (an airspace area from the surface up) is no-fly, AWARENESS_MAP (a NOTAM floored above 10,000 ft) is awareness, PERMISSION and
 // RADIO (airspace you must contact first) are contact-first, and an unread NOTAM (UNREAD_OVER_LZ, UNVERIFIED) is the grey of awareness.
+// The airspace outcomes CEILING ("stay below ..." under a floor, which you can fly under) and WARNING (a floor in the high band) are not a ban
+// and not a call to make: they are awareness too, so they are drawn in that grey without the unknown-value warning. airspace_tool passes every
+// outcome except IGNORE on to the answer's highlighted shapes, so each outcome in src/flysafelz/airspace.py's Outcome is a key here (tests/unit/test_ui_map_layers.py checks it).
 const BY_ACTION: Record<string, ActionPaint> = {
   NO_FLY,
   NO_GO: NO_FLY,
@@ -26,6 +29,8 @@ const BY_ACTION: Record<string, ActionPaint> = {
   AVOID_SECTOR: { token: '--action-avoid-sector', fillOpacity: 0 },
   AWARENESS,
   AWARENESS_MAP: AWARENESS,
+  CEILING: AWARENESS,
+  WARNING: AWARENESS,
   UNVERIFIED: AWARENESS,
   UNREAD_OVER_LZ: AWARENESS,
 }
