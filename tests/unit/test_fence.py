@@ -460,7 +460,7 @@ def test_the_narrowed_scan_still_flags_a_planted_limit_outside_geo_py():
     assert _planted_hits("MIN_POLYGON_POINTS = 3\nMETRES_PER_KM = 1000\n", "geo.py") == []
     assert _planted_hits("MIN_POLYGON_POINTS = 4\n", "geo.py") == [4]  # a reviewed name holding another rules value
     assert _planted_hits("retries = 3\n", "pib.py") == [3]
-    assert {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3} == REVIEWED_NAMED_CONSTANTS
+    assert {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3, "QUARTER_TURN": 90} == REVIEWED_NAMED_CONSTANTS
 
 
 def test_the_narrowed_scan_exempts_structural_zero_and_one_only():
