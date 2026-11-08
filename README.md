@@ -16,6 +16,7 @@ Python 3.12 with `uv` · LangGraph + LangChain v1 · LangSmith (traces, datasets
 make setup   # uv sync; needs no API key
 make test    # uv run pytest, with sockets disabled
 make eval-reader   # the reader eval: the only target that calls the model, so it needs the READER_* settings
+make eval-guidance # hit@4 of guidance search on evals/guidance/questions.yaml; needs the embedding model `make setup` stored, no key, no network
 ```
 
 Copy `.env.example` to `.env` for the openAIP key when fixtures are captured later. `.env` is gitignored. The NOTAM reader's model endpoint is four more lines in the same file (or in the environment, which wins): `READER_PROVIDER`, `READER_BASE_URL`, `READER_API_KEY` and `READER_MODEL`, any OpenAI-compatible endpoint. All four are required and nothing falls back to a default; only `src/flysafelz/reader/config.py` reads them, and only when the reader is first used. `make test` never needs them.
@@ -85,8 +86,27 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 
 Confidence is `sourced` (a citable document), `best practice` (common practice, not one citation) or `educated guess` (our own call). Limits cannot be changed by the user.
 
+## Guidance search and its eval
+
+`search_guidance` returns the four passages of the published guidance (`data/guidance/embeddings.sqlite`, written only by `make guidance`) most like a question, each as `<document> <edition> §<section> <title>` and its text. The embedding model is loaded from the folder `make setup` filled, with local files only; it is built at the first search, not at start-up, and nothing is ever downloaded. If the stored corpus key differs from the one computed from `manifest.yaml`, the model name and the chunker version, the passages are embedded again in memory with a warning that names both keys, and the file is left as it is.
+
+`make eval-guidance` scores that search against `evals/guidance/questions.yaml`. It prints `hit@4: <hits>/<n> (<percent>)`, one line per miss (the question, every place it expected, and the four places that came back) and the corpus key. It exits 0 whatever the score: whether to promote a new snapshot is decided by `make guidance`, which uses the same scorer. With no questions it prints `hit@4 not run: no labels`. A malformed file, or an expected document that `data/guidance/sources.yaml` does not list, exits non-zero and names the question or document.
+
+The format of `questions.yaml`: a list of questions, each with `question` and `expected`, a list of `{document, section}` with the section as printed in the document:
+
+```
+- question: What is a danger area?
+  expected:
+    - {document: cap1535, section: "3.2"}
+    - {document: cap2562, section: "4.1"}
+```
+
+A question is a hit when any of the four passages returned is in the same document as any `expected` entry and in that section or a subsection of it (`3.2` matches `3.2` and `3.2.1`, not `3.20` or `13.2`). The questions may be drafted by a model that has not seen the corpus, but Dan writes every expected section; no model ever drafts one.
+
 ## Limitations
 
 - Airspace comes from openAIP only. It is not cross-checked against the official UK AIP, so a difference between the two will not be caught.
 - A danger area whose openAIP record has no activation hours is treated as active (over-cautious on purpose).
 - A NOTAM whose E text is a route (coordinates each with a time, such as a transit list) is not located by its path: it is treated as an area-wide NOTAM when its Q-circle is 50 NM or more, and by its Q-circle otherwise (known limitation 20). A NOTAM that draws a polygon or circle in item E is located by that shape, however large its Q-circle; coordinate text that does not make a valid shape falls back to the Q-circle, which can over-warn but never under-warn.
+- The answer checker (the guard) gives the model one text-only retry. A retry has no tools, so a verdict named without `assess` having run this turn (E12) cannot be repaired by it: the second draft fails the same check and the pilot gets the raw tool text instead (a clarify or decline gets one fixed line). The tag on the first line is checked for format only; a missing tag alone never causes the fallback.
+- LangSmith traces mask phone numbers and emails with a pattern set built for the formats in the captured PIBs, ticket 3's shapes and a few bracket and hyphen forms. Phones in unusual formats may reach a trace. Trace text is masked, never the pilot's answer, and over-masking in a trace is accepted so that schedules (`0800-1700`, `MON-FRI`) survive.

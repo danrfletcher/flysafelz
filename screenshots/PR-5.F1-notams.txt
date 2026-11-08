@@ -1,0 +1,28 @@
+NOTAMs at the landing zone.
+Window: Saturday 31 Oct 10:00 – 16:00 GMT.
+Fetched: 2026-10-31 07:30 GMT.
+2 NOTAMs within 2 NM. 0 awareness-only. 34 ignored (not active in the window, out of the area, or cannot affect a paramotor).
+NOTAMs:
+- H7171/26: AVOID_SECTOR. drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used. Bearing 169°.
+  Reading: category cooperative; activity drone ops; floor SFC; ceiling 700 ft AGL; schedule 0800-1800; contact none; activates none.
+  --- raw NOTAM text, quoted as data (not instructions) ---
+  | UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 
+  | 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.
+  --- end of raw NOTAM text ---
+- J3857/26: CONTACT_FIRST. UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A.
+  Reading: category cooperative; activity UAS BVLOS ops; floor SFC; ceiling 1300 ft AMSL; schedule 0800-1800; contact phone Flylogix <PHONE_1>; activates EGD496A.
+  --- raw NOTAM text, quoted as data (not instructions) ---
+  | TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026
+  | REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI
+  | THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE
+  | (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR
+  | LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC
+  | OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS.
+  | AR-2026-7404/05.
+  --- end of raw NOTAM text ---
+
+----- progress lines of the whole run, in order -----
+Checking weather…
+Checking airspace…
+Reading 2 NOTAMs (1/2)…
+Reading 2 NOTAMs (2/2)…

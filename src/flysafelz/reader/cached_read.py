@@ -65,6 +65,16 @@ def model_calls(result: ReaderResult) -> int:
     return 1 + int(repaired)
 
 
+def is_stored(parsed: ParsedNotam, llm: BaseChatModel, cache: Path | None) -> bool:
+    """Whether reading this NOTAM would be a hit: the file holds its reading, so it costs no model call. A file that cannot be used, or None, holds nothing."""
+    if cache is None:
+        return False
+    try:
+        return lookup(cache, parsed, cache_key(parsed, model_name(llm))) is not None
+    except CACHE_ERRORS:
+        return False
+
+
 def read_cached(parsed: ParsedNotam, llm: BaseChatModel, cache: Path | None, now: datetime) -> CachedRead:
     """Read one NOTAM through the cache. `now` stamps a row it writes. Never raises for the cache."""
     if cache is None:

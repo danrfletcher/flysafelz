@@ -1,0 +1,402 @@
+E21: make test with LANGSMITH_* exported in the shell (a placeholder value, not a real key). tests/conftest.py clears them, so tracing is off, no client is built and no socket is opened.
+$ (exported, key value not saved here): LANGSMITH_API_KEY, LANGSMITH_PROJECT=exported-project LANGSMITH_ENDPOINT=https://langsmith.invalid LANGSMITH_TRACING=true; then make test
+uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.graph --cov=flysafelz.agent.prompts --cov=flysafelz.agent.middleware --cov=flysafelz.agent.run --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.guard --cov=flysafelz.agent.guard_flow --cov=flysafelz.agent.tracing --cov=flysafelz.agent.answer --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov-report=term-missing --cov-fail-under=90
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+network: --disable-socket in effect
+rootdir: /Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-5
+configfile: pyproject.toml
+testpaths: tests
+plugins: langsmith-0.14.17, cov-7.1.0, socket-0.8.1, anyio-4.16.0
+collected 9889 items
+
+tests/integration/agent/test_assess_tool_cases.py ...................... [  0%]
+.                                                                        [  0%]
+tests/integration/agent/test_assess_tool_failed_sources.py ............. [  0%]
+.....                                                                    [  0%]
+tests/integration/agent/test_assess_tool_horizon.py ................     [  0%]
+tests/integration/agent/test_case_mode.py ............................   [  0%]
+tests/integration/agent/test_checkpoint_strict_msgpack.py ..             [  0%]
+tests/integration/agent/test_data_tools_blue_mill.py ................... [  1%]
+................                                                         [  1%]
+tests/integration/agent/test_graph_case.py ......                        [  1%]
+tests/integration/agent/test_guard_graph.py ...............              [  1%]
+tests/integration/agent/test_input_contract.py ......................... [  1%]
+.........                                                                [  1%]
+tests/integration/agent/test_make_run.py ............................... [  2%]
+..                                                                       [  2%]
+tests/integration/agent/test_trace_blue_mill.py ..............           [  2%]
+tests/integration/test_assess_blue_mill.py .........                     [  2%]
+tests/integration/test_assess_blue_mill_tz.py .....                      [  2%]
+tests/integration/test_assess_failed_sources.py .............            [  2%]
+tests/integration/test_assess_refactor_parity.py .......                 [  2%]
+tests/integration/test_assess_unread.py ....                             [  2%]
+tests/integration/test_assess_west_sleekburn.py ...                      [  2%]
+tests/integration/test_blue_mill_geometry.py .....                       [  2%]
+tests/integration/test_cases_loader.py ..............................    [  3%]
+tests/integration/test_cli_cases.py .................................... [  3%]
+.......                                                                  [  3%]
+tests/integration/test_cli_live.py ............                          [  3%]
+tests/integration/test_eval_guidance_cli.py .........................    [  3%]
+tests/integration/test_guidance_committed_key.py x..                     [  3%]
+tests/integration/test_guidance_gate.py .......                          [  3%]
+tests/integration/test_make_guidance.py ................................ [  4%]
+.........................                                                [  4%]
+tests/integration/test_multiday_case_tiers.py ....                       [  4%]
+tests/integration/test_notam_area_cases.py .....                         [  4%]
+tests/integration/test_reader_blue_mill.py ..............                [  4%]
+tests/integration/test_stale_pib.py ...................                  [  4%]
+tests/integration/test_verdict_sheet_blue_mill.py ....................   [  5%]
+tests/integration/test_verdict_sheet_blue_mill_draft.py ................ [  5%]
+.........                                                                [  5%]
+tests/integration/test_verdict_sheet_cli.py ...........................  [  5%]
+tests/test_capture.py .................................................. [  6%]
+................................                                         [  6%]
+tests/test_capture_days.py ............................................. [  6%]
+..................                                                       [  7%]
+tests/test_env_isolation.py ......                                       [  7%]
+tests/test_fakes.py ......                                               [  7%]
+tests/test_fixtures_committed.py ....................................    [  7%]
+tests/unit/agent/test_answer.py ...................................      [  7%]
+tests/unit/agent/test_assess_tool_artifact.py .......................    [  8%]
+tests/unit/agent/test_assess_tool_format.py ............................ [  8%]
+........                                                                 [  8%]
+tests/unit/agent/test_assess_tool_reader.py ......                       [  8%]
+tests/unit/agent/test_config.py ...........                              [  8%]
+tests/unit/agent/test_data_tool_fence.py ............................... [  9%]
+.....                                                                    [  9%]
+tests/unit/agent/test_data_tool_schemas.py ............                  [  9%]
+tests/unit/agent/test_fallback.py .....................                  [  9%]
+tests/unit/agent/test_get_airspace.py ..............                     [  9%]
+tests/unit/agent/test_get_notams.py .......................              [  9%]
+tests/unit/agent/test_get_weather.py ................................... [ 10%]
+..                                                                       [ 10%]
+tests/unit/agent/test_graph.py ..................                        [ 10%]
+tests/unit/agent/test_graph_fence.py ...................                 [ 10%]
+tests/unit/agent/test_graph_paths.py ...........                         [ 10%]
+tests/unit/agent/test_guard_feedback.py ................................ [ 11%]
+......                                                                   [ 11%]
+tests/unit/agent/test_guard_flow.py ..........................           [ 11%]
+tests/unit/agent/test_guard_golden.py ..............................     [ 11%]
+tests/unit/agent/test_guard_ids.py ..................................... [ 12%]
+.........................                                                [ 12%]
+tests/unit/agent/test_guard_numbers.py ................................. [ 12%]
+........................................................................ [ 13%]
+........................................................................ [ 14%]
+.....                                                                    [ 14%]
+tests/unit/agent/test_guard_path_tag.py .........................        [ 14%]
+tests/unit/agent/test_guard_recheck.py ................................. [ 14%]
+......................................................                   [ 15%]
+tests/unit/agent/test_guard_times.py ..................................  [ 15%]
+tests/unit/agent/test_guard_verdicts.py ................................ [ 15%]
+...............................................                          [ 16%]
+tests/unit/agent/test_input_check.py ................................... [ 16%]
+........................................................................ [ 17%]
+..                                                                       [ 17%]
+tests/unit/agent/test_langgraph_json.py ........                         [ 17%]
+tests/unit/agent/test_limit_phrase.py ...............                    [ 17%]
+tests/unit/agent/test_makefile.py .......                                [ 17%]
+tests/unit/agent/test_model_failure.py ................................. [ 18%]
+...................                                                      [ 18%]
+tests/unit/agent/test_progress.py ...................                    [ 18%]
+tests/unit/agent/test_prompt_path_tag.py .......                         [ 18%]
+tests/unit/agent/test_prompts.py ....................................... [ 18%]
+...                                                                      [ 18%]
+tests/unit/agent/test_redaction.py ................................      [ 19%]
+tests/unit/agent/test_run_context.py ..........                          [ 19%]
+tests/unit/agent/test_source_cache.py .................................. [ 19%]
+................                                                         [ 19%]
+tests/unit/agent/test_state.py ......................................... [ 20%]
+..........................                                               [ 20%]
+tests/unit/agent/test_tracing_anonymiser.py ............................ [ 20%]
+........................................................................ [ 21%]
+.....................................                                    [ 21%]
+tests/unit/agent/test_tracing_client.py ......................           [ 22%]
+tests/unit/agent/test_window.py ........................................ [ 22%]
+...                                                                      [ 22%]
+tests/unit/test_agent_config.py ....................................     [ 23%]
+tests/unit/test_agent_settings.py ...................................... [ 23%]
+...............................................................          [ 24%]
+tests/unit/test_airspace_over_lz.py .................................... [ 24%]
+........................................................................ [ 25%]
+........................................................................ [ 25%]
+........................................................................ [ 26%]
+........................................................................ [ 27%]
+........................................................................ [ 28%]
+...............                                                          [ 28%]
+tests/unit/test_airspace_sector.py ..................................... [ 28%]
+........................................................................ [ 29%]
+........................................................................ [ 30%]
+...........................................................              [ 30%]
+tests/unit/test_assess_fence.py ..............                           [ 30%]
+tests/unit/test_assess_helpers.py ...................................... [ 31%]
+......                                                                   [ 31%]
+tests/unit/test_assess_notam_output.py .....................             [ 31%]
+tests/unit/test_assess_precedence.py ................................... [ 31%]
+...........................................                              [ 32%]
+tests/unit/test_assess_reader_status.py ........................         [ 32%]
+tests/unit/test_assess_segments.py .......                               [ 32%]
+tests/unit/test_assess_tiers.py ...................                      [ 32%]
+tests/unit/test_assess_tz.py .........................                   [ 32%]
+tests/unit/test_assess_windows.py ...............................        [ 33%]
+tests/unit/test_ceiling.py ........................                      [ 33%]
+tests/unit/test_cli_args.py ............................................ [ 33%]
+............                                                             [ 34%]
+tests/unit/test_cli_format.py ....................................       [ 34%]
+tests/unit/test_cli_read.py ......................................       [ 34%]
+tests/unit/test_cli_reader_fence.py ...                                  [ 34%]
+tests/unit/test_cli_rehydrate.py ...................                     [ 35%]
+tests/unit/test_cli_rules.py ....                                        [ 35%]
+tests/unit/test_contracts.py .........................................   [ 35%]
+tests/unit/test_danger_area.py ......................................... [ 35%]
+........................................................................ [ 36%]
+.........................................................                [ 37%]
+tests/unit/test_danger_area_contact.py ................................. [ 37%]
+.................................................                        [ 38%]
+tests/unit/test_danger_area_tz.py ................                       [ 38%]
+tests/unit/test_daylight.py ............................................ [ 38%]
+........................                                                 [ 38%]
+tests/unit/test_designator_corpus.py .......                             [ 38%]
+tests/unit/test_designators.py ......................................... [ 39%]
+.................                                                        [ 39%]
+tests/unit/test_embedding_model.py .......                               [ 39%]
+tests/unit/test_fence.py ............................................... [ 40%]
+........................................................................ [ 40%]
+........................................................................ [ 41%]
+.                                                                        [ 41%]
+tests/unit/test_geo.py ................................................. [ 42%]
+...............................................                          [ 42%]
+tests/unit/test_gitignore_guidance.py ..........s                        [ 42%]
+tests/unit/test_guidance_corpus_key.py ............                      [ 42%]
+tests/unit/test_guidance_fence.py ...................................... [ 43%]
+...                                                                      [ 43%]
+tests/unit/test_guidance_hit4.py ....................................... [ 43%]
+...                                                                      [ 43%]
+tests/unit/test_guidance_index.py ......................                 [ 43%]
+tests/unit/test_guidance_sources.py .................................... [ 44%]
+.........                                                                [ 44%]
+tests/unit/test_guidance_split.py ...................................... [ 44%]
+........................................................................ [ 45%]
+............                                                             [ 45%]
+tests/unit/test_helpers_fence.py .....................................   [ 45%]
+tests/unit/test_hit_at_4.py ......................                       [ 46%]
+tests/unit/test_isolation.py ........                                    [ 46%]
+tests/unit/test_load_sheet.py ................                           [ 46%]
+tests/unit/test_notam_action.py ........................................ [ 46%]
+........................................................................ [ 47%]
+........................................................................ [ 48%]
+........................................................................ [ 48%]
+........................................................................ [ 49%]
+........................................................................ [ 50%]
+........................................................................ [ 51%]
+........................................................................ [ 51%]
+........................................................................ [ 52%]
+........................................................................ [ 53%]
+........................................................................ [ 54%]
+........................................................................ [ 54%]
+........................................................................ [ 55%]
+........................................................................ [ 56%]
+........................................................................ [ 56%]
+........................................................................ [ 57%]
+........................................................................ [ 58%]
+........................................................................ [ 59%]
+........................................................................ [ 59%]
+........................................................................ [ 60%]
+........................................................................ [ 61%]
+........................................................................ [ 62%]
+........................................................................ [ 62%]
+........................................................................ [ 63%]
+........................................................................ [ 64%]
+........................................................................ [ 64%]
+........................................................................ [ 65%]
+........................................................................ [ 66%]
+........................................................................ [ 67%]
+........................                                                 [ 67%]
+tests/unit/test_notam_action_blue_mill.py ..........                     [ 67%]
+tests/unit/test_notam_action_fence.py .................................. [ 67%]
+........................................................................ [ 68%]
+........................................................................ [ 69%]
+.......................................................................  [ 70%]
+tests/unit/test_notam_area.py .......................................... [ 70%]
+.....................................................................    [ 71%]
+tests/unit/test_notam_area_corpus.py .........                           [ 71%]
+tests/unit/test_notam_sort.py .......................................... [ 71%]
+...............................................................          [ 72%]
+tests/unit/test_open_meteo.py ...............................            [ 72%]
+tests/unit/test_openaip_client.py ...................................... [ 72%]
+........................................................................ [ 73%]
+...........                                                              [ 73%]
+tests/unit/test_parsed_notam_code_fields.py .................            [ 74%]
+tests/unit/test_phone_archive_scan.py .................................. [ 74%]
+.......................                                                  [ 74%]
+tests/unit/test_pib_fence.py .................                           [ 74%]
+tests/unit/test_pib_parse.py ........................................... [ 75%]
+................................                                         [ 75%]
+tests/unit/test_pib_prefilter.py ......................................  [ 75%]
+tests/unit/test_pib_source.py .......................................... [ 76%]
+.............                                                            [ 76%]
+tests/unit/test_pib_tz.py ...............                                [ 76%]
+tests/unit/test_reader_cache_blue_mill.py ...........                    [ 76%]
+tests/unit/test_reader_cache_fence.py .................                  [ 76%]
+tests/unit/test_reader_cache_key.py ................................     [ 77%]
+tests/unit/test_reader_cache_store.py .................................. [ 77%]
+...                                                                      [ 77%]
+tests/unit/test_reader_checks.py ....................................... [ 77%]
+........................................................................ [ 78%]
+...................................................................      [ 79%]
+tests/unit/test_reader_config.py ....................................... [ 79%]
+.....                                                                    [ 79%]
+tests/unit/test_reader_contract.py ...............                       [ 79%]
+tests/unit/test_reader_eval_blue_mill.py ................                [ 80%]
+tests/unit/test_reader_eval_downgrade.py ............................... [ 80%]
+........................................................................ [ 81%]
+.......                                                                  [ 81%]
+tests/unit/test_reader_eval_fence.py ................................... [ 81%]
+..............................................................           [ 82%]
+tests/unit/test_reader_eval_fields.py ..........................         [ 82%]
+tests/unit/test_reader_eval_labels.py .................................. [ 82%]
+.....................                                                    [ 83%]
+tests/unit/test_reader_eval_report.py .................................. [ 83%]
+                                                                         [ 83%]
+tests/unit/test_reader_eval_run.py ..................................... [ 83%]
+.                                                                        [ 83%]
+tests/unit/test_reader_eval_segment.py ................................. [ 84%]
+...............                                                          [ 84%]
+tests/unit/test_reader_eval_settings_items.py .................          [ 84%]
+tests/unit/test_reader_eval_spots.py ..............                      [ 84%]
+tests/unit/test_reader_fence.py ........................................ [ 84%]
+....................................                                     [ 85%]
+tests/unit/test_reader_items.py ........................................ [ 85%]
+...................                                                      [ 85%]
+tests/unit/test_reader_pii.py ...................                        [ 86%]
+tests/unit/test_reader_prompt.py ....................................... [ 86%]
+............................                                             [ 86%]
+tests/unit/test_reader_read.py ......................................... [ 87%]
+...                                                                      [ 87%]
+tests/unit/test_reader_repair.py ....................................... [ 87%]
+........                                                                 [ 87%]
+tests/unit/test_reader_set.py ..............................             [ 88%]
+tests/unit/test_reader_unavailable.py .................................. [ 88%]
+........................................                                 [ 88%]
+tests/unit/test_reader_wire.py .........                                 [ 88%]
+tests/unit/test_readings_hold_no_phone_in_quotes.py .......              [ 88%]
+tests/unit/test_redact.py .............................................. [ 89%]
+......................                                                   [ 89%]
+tests/unit/test_redact_archive_shapes.py ............................... [ 89%]
+.........xxxxxxx................                                         [ 90%]
+tests/unit/test_redact_corpus.py .....                                   [ 90%]
+tests/unit/test_rule_compare.py .......                                  [ 90%]
+tests/unit/test_rules_load.py ....................                       [ 90%]
+tests/unit/test_rules_notam_sort.py .................................... [ 90%]
+................                                                         [ 91%]
+tests/unit/test_rules_values.py ........................................ [ 91%]
+....                                                                     [ 91%]
+tests/unit/test_schedule.py ............................................ [ 92%]
+...............................                                          [ 92%]
+tests/unit/test_schedule_corpus.py ..................................... [ 92%]
+........................................................................ [ 93%]
+........................................................................ [ 94%]
+.........................                                                [ 94%]
+tests/unit/test_search_guidance.py ..................                    [ 94%]
+tests/unit/test_shapes.py ..........                                     [ 94%]
+tests/unit/test_socket_guard.py ..                                       [ 94%]
+tests/unit/test_sup_refs.py .......................................      [ 95%]
+tests/unit/test_timetext.py ............................................ [ 95%]
+.....................                                                    [ 95%]
+tests/unit/test_verdict_sheet_check.py ................................. [ 96%]
+...........                                                              [ 96%]
+tests/unit/test_verdict_sheet_draft.py ................................. [ 96%]
+........................................................................ [ 97%]
+                                                                         [ 97%]
+tests/unit/test_verdict_sheet_edges.py ..............................    [ 97%]
+tests/unit/test_verdict_sheet_examples.py .............................. [ 97%]
+.....                                                                    [ 97%]
+tests/unit/test_verdict_sheet_fingerprint.py ........................... [ 98%]
+...........                                                              [ 98%]
+tests/unit/test_verdict_sheet_london_days.py ...........                 [ 98%]
+tests/unit/test_verdict_sheet_rerun.py ................................. [ 98%]
+                                                                         [ 98%]
+tests/unit/test_weather_boundaries.py ..............................     [ 99%]
+tests/unit/test_weather_checks.py .....................................  [ 99%]
+tests/unit/test_weather_fence.py ...........                             [ 99%]
+tests/unit/test_weather_rows.py .............................            [ 99%]
+tests/unit/test_weather_tier.py ................                         [100%]
+
+================================ tests coverage ================================
+______________ coverage: platform darwin, python 3.12.14-final-0 _______________
+
+Name                                         Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------
+evals/reader_eval/__init__.py                    0      0   100%
+evals/reader_eval/blue_mill.py                  52      0   100%
+evals/reader_eval/downgrade.py                 148      9    94%   112-118, 124, 177
+evals/reader_eval/fields.py                     35      0   100%
+evals/reader_eval/items.py                      37      0   100%
+evals/reader_eval/labels.py                    151      3    98%   132, 155, 171
+evals/reader_eval/report.py                    131      3    98%   108, 287-288
+evals/reader_eval/run.py                       118      1    99%   221
+evals/reader_eval/settings.py                   22      1    95%   46
+evals/reader_eval/spots.py                     136      4    97%   123, 151, 174-175
+src/flysafelz/agent/answer.py                  102      2    98%   93, 97
+src/flysafelz/agent/config.py                   72      0   100%
+src/flysafelz/agent/graph.py                    40      0   100%
+src/flysafelz/agent/guard.py                   651      6    99%   481-482, 513, 597-598, 622
+src/flysafelz/agent/guard_flow.py              133      0   100%
+src/flysafelz/agent/input_check.py              97      0   100%
+src/flysafelz/agent/middleware.py              101      6    94%   93, 180-184
+src/flysafelz/agent/progress.py                 20      0   100%
+src/flysafelz/agent/prompts.py                  24      0   100%
+src/flysafelz/agent/redaction.py                46      0   100%
+src/flysafelz/agent/run.py                      67      1    99%   113
+src/flysafelz/agent/settings.py                 45      0   100%
+src/flysafelz/agent/sources.py                 150      1    99%   102
+src/flysafelz/agent/state.py                   181      7    96%   165-169, 197, 322
+src/flysafelz/agent/tools/airspace_tool.py     144      4    97%   96, 141, 190, 225
+src/flysafelz/agent/tools/artifacts.py         188      0   100%
+src/flysafelz/agent/tools/assess_tool.py       309      2    99%   211, 534
+src/flysafelz/agent/tools/common.py            150      6    96%   145, 229, 238-239, 258-259
+src/flysafelz/agent/tools/guidance_tool.py      45      1    98%   64
+src/flysafelz/agent/tools/notams_tool.py       189      4    98%   225-227, 294
+src/flysafelz/agent/tools/weather_tool.py       87      0   100%
+src/flysafelz/agent/tracing.py                 137      1    99%   103
+src/flysafelz/agent/window.py                   84      0   100%
+src/flysafelz/airspace.py                      343      4    99%   243, 452, 462, 565
+src/flysafelz/assess.py                        270      1    99%   140
+src/flysafelz/cases.py                          31      0   100%
+src/flysafelz/clients/open_meteo.py             69      0   100%
+src/flysafelz/clients/openaip.py               263      6    98%   210-211, 460-463
+src/flysafelz/clients/pib_source.py             78      0   100%
+src/flysafelz/designators.py                    12      0   100%
+src/flysafelz/guidance/__init__.py               0      0   100%
+src/flysafelz/guidance/chunker.py              209      0   100%
+src/flysafelz/guidance/corpus.py                91      4    96%   93, 97, 116, 131
+src/flysafelz/guidance/embedder.py              15      0   100%
+src/flysafelz/guidance/embedding_model.py       24      1    96%   46
+src/flysafelz/guidance/eval.py                  82      3    96%   103-104, 131
+src/flysafelz/guidance/hit4.py                  90      1    99%   93
+src/flysafelz/guidance/index.py                127      1    99%   93
+src/flysafelz/guidance/ingest.py               247      5    98%   147-148, 223, 230, 360
+src/flysafelz/guidance/sources.py               80      0   100%
+src/flysafelz/notam_action.py                  252      4    98%   285-286, 300, 336
+src/flysafelz/notam_area.py                    172      1    99%   160
+src/flysafelz/pib.py                           275      0   100%
+src/flysafelz/reader/__init__.py                 0      0   100%
+src/flysafelz/reader/cache.py                   86      0   100%
+src/flysafelz/reader/cached_read.py             61      3    95%   71, 74-75
+src/flysafelz/reader/checks.py                 128      0   100%
+src/flysafelz/reader/config.py                  67      1    99%   126
+src/flysafelz/reader/contract.py                42      0   100%
+src/flysafelz/reader/prompt.py                  62      0   100%
+src/flysafelz/reader/read.py                   115      0   100%
+src/flysafelz/reader/reader_set.py              50      3    94%   99, 105-106
+src/flysafelz/reader/settings.py                14      0   100%
+src/flysafelz/redact.py                         41      0   100%
+src/flysafelz/shapes.py                         35      0   100%
+src/flysafelz/sup_refs.py                       10      0   100%
+src/flysafelz/timetext.py                       47      0   100%
+src/flysafelz/weather.py                       119      0   100%
+--------------------------------------------------------------------------
+TOTAL                                         7499    100    99%
+Required test coverage of 90% reached. Total coverage: 98.67%
+============ 9880 passed, 1 skipped, 8 xfailed in 120.92s (0:02:00) ============
+make exit status: 0

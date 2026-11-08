@@ -31,6 +31,7 @@ REVIEWED_LITERALS = {
     24: "hours per day (unit; also the 2400 end-of-day time)",
     360: "degrees in a circle (unit)",
     180: "degrees in a half turn (unit)",
+    90: "degrees in a quarter turn (unit): geo.QUARTER_TURN only, which the equals-a-rules-value scan skips by name",
     100: "HHMM to hours and minutes (format)",
     0.5: "half (a sector's half-width, half of pi)",
     6378137.0: "WGS84 equatorial radius in metres",

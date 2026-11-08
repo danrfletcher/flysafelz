@@ -11,13 +11,16 @@ from pathlib import Path
 import pytest
 import yaml
 from fence_scan import (
+    AGENT_CONFIG,
     READER_REVIEWED_LITERALS,
     REVIEWED_FLOATS,
     REVIEWED_NAMED_CONSTANTS,
     banned_words,
     hard_coded_rule_values,
+    import_violations,
     llm_env_words,
     number,
+    tree_import_violations,
     unreviewed_floats,
     unreviewed_literals,
 )
@@ -56,39 +59,92 @@ def test_source_files_are_found():
     assert SRC / "contracts.py" in PY_FILES and SRC / "rules.py" in PY_FILES
 
 
-# F2: no agent, tool, LangGraph, LangChain, RAG or UI code. Narrowed for the reader (ticket 3 F2): the pyproject may declare
-# langchain-openai (and its langchain-core), and only src/flysafelz/reader/ may import them. Everything else is still banned.
-READER = SRC / "reader"
-ALLOWED_LLM_DEPENDENCIES = {"langchain-openai", "langchain-core"}
-ALLOWED_LLM_IMPORTS = ("langchain_openai", "langchain_core")
-BANNED_DEPENDENCY_PREFIXES = ("langgraph", "langchain", "openai", "anthropic")
+# F6: the dependency allowlist. The names declared in [project] dependencies and in each dependency group must equal these sets, so a new
+# package (openai, anthropic, chromadb, ...) fails until it is added here on purpose. langgraph-cli sits in the dev group only.
+ALLOWED_PROJECT_DEPENDENCIES = {
+    "astral",
+    "fastembed",
+    "httpx",
+    "langchain",
+    "langchain-openai",
+    "langgraph",
+    "langsmith",
+    "pydantic",
+    "pypdf",
+    "pyyaml",
+    "shapely",
+    "tzdata",
+}
+ALLOWED_GROUP_DEPENDENCIES = {"dev": {"langgraph-cli", "pytest", "pytest-cov", "pytest-socket", "ruff"}}
+READER = SRC / "reader"  # the one folder where the word `cache` and READER_* names are allowed (ticket 3)
 
 
-def _banned_dependencies(declared: list[str]) -> list[str]:
-    """The declared dependencies that are an agent or LLM client and not one of the two the reader may use."""
-    names = [re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower().replace("_", "-") for d in declared]
-    return [name for name in names if name.startswith(BANNED_DEPENDENCY_PREFIXES) and name not in ALLOWED_LLM_DEPENDENCIES]
+def _dependency_name(requirement: str) -> str:
+    """'langgraph-cli[inmem]>=0.4' -> 'langgraph-cli': lower case, `_` as `-`, without extras, version or marker."""
+    return re.split(r"[<>=!~\[ ;]", requirement, maxsplit=1)[0].lower().replace("_", "-")
 
 
-def _declared_dependencies() -> list[str]:
-    config = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    declared = list(config["project"]["dependencies"])
-    for group in config.get("dependency-groups", {}).values():
-        declared += [d for d in group if isinstance(d, str)]
-    return declared
+def _dependency_differences(config: dict) -> dict[str, dict[str, list[str]]]:
+    """{where: {"unlisted": [...], "missing": [...]}} for every place that declares dependencies, less the places that match the allowlist exactly."""
+    declared = {"project": {_dependency_name(d) for d in config["project"]["dependencies"]}}
+    for group, requirements in config.get("dependency-groups", {}).items():
+        declared[f"group {group}"] = {_dependency_name(d) for d in requirements if isinstance(d, str)}
+    allowed = {"project": ALLOWED_PROJECT_DEPENDENCIES} | {f"group {g}": names for g, names in ALLOWED_GROUP_DEPENDENCIES.items()}
+    differences = {}
+    for where in sorted(declared.keys() | allowed.keys()):
+        unlisted = sorted(declared.get(where, set()) - allowed.get(where, set()))
+        missing = sorted(allowed.get(where, set()) - declared.get(where, set()))
+        if unlisted or missing:
+            differences[where] = {"unlisted": unlisted, "missing": missing}
+    return differences
 
 
-def test_pyproject_has_no_agent_or_llm_dependency():
-    declared = _declared_dependencies()
-    assert declared, "no dependencies read"
-    assert _banned_dependencies(declared) == []
+def _pyproject() -> dict:
+    return tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
 
 
-def test_the_dependency_scan_allows_exactly_the_two_reader_packages_and_still_catches_the_rest():
-    assert _banned_dependencies(["langchain-openai>=1.7.4", "langchain-core", "langchain_core>=1"]) == []
-    planted = ["langgraph", "langchain", "langchain-community>=0.3", "langchain-anthropic", "openai>=1", "anthropic", "openai-agents", "langchain-openai-extra"]
-    assert _banned_dependencies(planted) == [d.split(">=")[0] for d in planted]
-    assert "langchain-openai" in {re.split(r"[<>=!~\[ ;]", d, maxsplit=1)[0].lower() for d in _declared_dependencies()}  # the reader's one new dependency is declared
+def test_pyproject_declares_exactly_the_allowlisted_dependencies():
+    assert _dependency_differences(_pyproject()) == {}
+
+
+def test_no_other_table_can_declare_a_dependency_the_allowlist_does_not_see():
+    config = _pyproject()
+    assert "optional-dependencies" not in config["project"]
+    assert "dev-dependencies" not in config.get("tool", {}).get("uv", {})
+    assert set(config["dependency-groups"]) == set(ALLOWED_GROUP_DEPENDENCIES)
+
+
+def test_langgraph_cli_is_in_the_dev_group_only():
+    config = _pyproject()
+    assert "langgraph-cli" not in {_dependency_name(d) for d in config["project"]["dependencies"]}
+    assert "langgraph-cli" in {_dependency_name(d) for d in config["dependency-groups"]["dev"]}
+
+
+@pytest.mark.parametrize("planted", ["openai", "openai>=1", "anthropic", "chromadb", "langchain-community", "langchain_anthropic>=1", "numpy"])
+def test_an_unlisted_package_in_the_project_or_a_group_fails_the_allowlist(planted):
+    for where, section in (("project", lambda c: c["project"]["dependencies"]), ("group dev", lambda c: c["dependency-groups"]["dev"])):
+        config = _pyproject()
+        section(config).append(planted)
+        assert _dependency_differences(config) == {where: {"unlisted": [_dependency_name(planted)], "missing": []}}, where
+    config = _pyproject()
+    config["dependency-groups"]["extra"] = [planted]  # a new group is caught too
+    assert _dependency_differences(config)["group extra"] == {"unlisted": [_dependency_name(planted)], "missing": []}
+
+
+def test_a_dropped_or_moved_package_fails_the_allowlist_too():
+    config = _pyproject()
+    config["project"]["dependencies"] = [d for d in config["project"]["dependencies"] if _dependency_name(d) != "pypdf"]
+    config["project"]["dependencies"].append("langgraph-cli[inmem]")  # the dev-only package moved into the project
+    config["dependency-groups"]["dev"] = [d for d in config["dependency-groups"]["dev"] if _dependency_name(d) != "langgraph-cli"]
+    assert _dependency_differences(config) == {
+        "project": {"unlisted": ["langgraph-cli"], "missing": ["pypdf"]},
+        "group dev": {"unlisted": [], "missing": ["langgraph-cli"]},
+    }
+
+
+def test_the_name_reader_strips_extras_versions_and_markers():
+    requirements = ("langgraph-cli[inmem]>=0.4.42", "langchain_openai>=1", "PyYAML", "a ; python_version>'3'", "b~=1.0")
+    assert [_dependency_name(d) for d in requirements] == ["langgraph-cli", "langchain-openai", "pyyaml", "a", "b"]
 
 
 def _imported_modules(path: Path) -> list[str]:
@@ -101,46 +157,159 @@ def _imported_modules(path: Path) -> list[str]:
     return modules
 
 
-def _is_allowed_import(module: str, path: Path, reader: Path) -> bool:
-    """langchain_openai and langchain_core (and their submodules) are allowed in the reader package only."""
-    in_reader = reader in path.parents
-    return in_reader and module.split(".")[0] in ALLOWED_LLM_IMPORTS
+# F6: the per-package import scan (fence_scan.import_violations). Only agent/ imports langchain*, langgraph* and langsmith (the model only through
+# langchain_openai); only guidance/ imports fastembed and pypdf, and may read flysafelz.agent.settings; reader/ keeps ticket 3's langchain_openai and
+# langchain_core; openai and anthropic are banned everywhere; no other file under src/flysafelz imports any of them, or flysafelz.agent / flysafelz.guidance.
+AGENT = SRC / "agent"
+GUIDANCE = SRC / "guidance"
 
 
-def _agent_imports(path: Path, reader: Path = READER) -> list[str]:
-    """The modules the file imports that are an agent or LLM client, less what the reader package may import."""
-    return [m for m in _imported_modules(path) if m.startswith(FORBIDDEN_IMPORTS) and not _is_allowed_import(m, path, reader)]
+def test_the_real_tree_and_the_scripts_import_only_what_their_package_may():
+    assert tree_import_violations(SRC, SCRIPT_FILES) == {}
 
 
-def test_source_imports_no_agent_framework():
-    for path in PY_FILES + SCRIPT_FILES:
-        assert _agent_imports(path) == [], path
+def test_each_package_really_uses_what_it_is_allowed():
+    """The scan reads real imports, and the allowances are not dead: agent/ imports langchain_openai, guidance/ imports fastembed and agent.settings, reader/ imports langchain_openai."""
+    agent = {m.split(".")[0] for path in AGENT.rglob("*.py") for m in _imported_modules(path)}
+    guidance = {m for path in GUIDANCE.rglob("*.py") for m in _imported_modules(path)}
+    reader = {m.split(".")[0] for path in READER.rglob("*.py") for m in _imported_modules(path)}
+    assert "langchain_openai" in agent
+    assert {"fastembed", "flysafelz.agent.settings"} <= guidance
+    assert {"langchain_openai", "langchain_core"} <= reader
 
 
-def test_only_the_reader_package_imports_an_llm_client():
-    """The reader really uses the exemption (so it is not dead), and nothing outside it does."""
-    reader_files = sorted(READER.rglob("*.py"))
-    assert reader_files
-    assert {m.split(".")[0] for path in reader_files for m in _imported_modules(path)} >= {"langchain_core"}
-    for path in PY_FILES + SCRIPT_FILES:
-        if READER not in path.parents:
-            assert not [m for m in _imported_modules(path) if m.split(".")[0] in ALLOWED_LLM_IMPORTS], path
+def _plant(root: Path, files: dict[str, str]) -> Path:
+    """A throwaway source tree: root/src/flysafelz/<relative path> for each file. Returns the flysafelz folder."""
+    package = root / "src" / "flysafelz"
+    for relative, text in files.items():
+        (package / relative).parent.mkdir(parents=True, exist_ok=True)
+        (package / relative).write_text(text, encoding="utf-8")
+    return package
 
 
-def test_the_import_scan_still_catches_a_planted_llm_import_outside_the_reader(tmp_path):
-    """Planted violations: langchain_core appended to a temp copy of cli.py, and the same line in the reader's place."""
-    cli_copy = tmp_path / "cli.py"
-    cli_copy.write_text((SRC / "cli.py").read_text(encoding="utf-8") + "\nimport langchain_core\n", encoding="utf-8")
-    assert _agent_imports(cli_copy, reader=tmp_path / "reader") == ["langchain_core"]
-    assert _agent_imports(SRC / "cli.py") == []  # the real file is clean, so the hit above is the planted line
-    for module in ("langchain_openai", "langchain_core.messages", "langgraph", "openai", "anthropic", "langchain_community", "langsmith"):
-        outside = tmp_path / "other.py"
-        outside.write_text(f"import {module}\n", encoding="utf-8")
-        assert _agent_imports(outside, reader=tmp_path / "reader") == [module], module
-    (tmp_path / "reader").mkdir()
-    inside = tmp_path / "reader" / "read.py"
-    inside.write_text("import langchain_core.messages\nfrom langchain_openai import ChatOpenAI\nimport langgraph\nimport openai\nimport langchain_community\n", encoding="utf-8")
-    assert _agent_imports(inside, reader=tmp_path / "reader") == ["langgraph", "openai", "langchain_community"]  # the two allowed packages pass; the rest do not
+def test_planted_violations_are_caught_and_the_same_imports_in_their_own_package_pass(tmp_path):
+    """The four cases of the brief: langgraph in a core module, fastembed in agent/, langchain_core in guidance/, and the same imports where they belong."""
+    wrong = _plant(tmp_path / "wrong", {"weather.py": "import langgraph\n", "agent/graph.py": "import fastembed\n", "guidance/index.py": "from langchain_core import messages\n"})
+    assert tree_import_violations(wrong) == {
+        "flysafelz/agent/graph.py": ["fastembed"],
+        "flysafelz/guidance/index.py": ["langchain_core"],
+        "flysafelz/weather.py": ["langgraph"],
+    }
+    fitting = {"weather.py": "import re\n", "agent/graph.py": "import langgraph\nfrom langchain_core import messages\n", "guidance/index.py": "import fastembed\nimport pypdf\n"}
+    right = _plant(tmp_path / "right", fitting)
+    assert tree_import_violations(right) == {}
+
+
+def test_the_tree_scan_catches_the_planted_relative_imports_of_the_review(tmp_path):
+    """R1: relative imports are resolved, not skipped, when the whole tree is scanned."""
+    wrong = _plant(
+        tmp_path,
+        {
+            "weather.py": "from .agent import config\nfrom . import guidance\n",
+            "guidance/index.py": "from ..agent.config import build_chat_model\n",
+        },
+    )
+    assert tree_import_violations(wrong) == {
+        "flysafelz/guidance/index.py": ["flysafelz.agent.config.build_chat_model"],
+        "flysafelz/weather.py": ["flysafelz.agent.config", "flysafelz.guidance"],
+    }
+
+
+def test_a_relative_import_that_cannot_be_resolved_is_ignored_not_misread(tmp_path):
+    """A script outside src, or an import climbing past the top package, names no flysafelz module: nothing to flag."""
+    package = _plant(tmp_path, {"weather.py": "from ... import agent\n"})
+    script = tmp_path / "scripts" / "tool.py"
+    script.parent.mkdir()
+    script.write_text("from .agent import config\n", encoding="utf-8")
+    assert import_violations(package / "weather.py", package) == []
+    assert import_violations(script, package) == []
+
+
+@pytest.mark.parametrize(
+    ("where", "text", "hit"),
+    [
+        ("weather.py", "import langchain\n", ["langchain"]),
+        ("clients/open_meteo.py", "from langchain_openai import ChatOpenAI\n", ["langchain_openai"]),
+        ("weather.py", "import langsmith\n", ["langsmith"]),
+        ("weather.py", "from fastembed import TextEmbedding\n", ["fastembed"]),
+        ("weather.py", "import pypdf\n", ["pypdf"]),
+        ("weather.py", "import openai\n", ["openai"]),
+        ("agent/graph.py", "import openai\n", ["openai"]),
+        ("guidance/index.py", "import anthropic\n", ["anthropic"]),
+        ("agent/graph.py", "import langchain_anthropic\n", ["langchain_anthropic"]),
+        ("agent/graph.py", "from langchain_community.chat_models import ChatOllama\n", ["langchain_community.chat_models"]),
+        ("agent/graph.py", "import pypdf\n", ["pypdf"]),
+        ("guidance/index.py", "import langsmith\n", ["langsmith"]),
+        ("guidance/index.py", "import langgraph.graph\n", ["langgraph.graph"]),
+        ("reader/read.py", "import langgraph\n", ["langgraph"]),
+        ("reader/read.py", "import fastembed\n", ["fastembed"]),
+        ("agent/graph.py", "from langchain.chat_models import init_chat_model\n", ["init_chat_model"]),
+        ("agent/graph.py", "import langchain\nmodel = langchain.chat_models.init_chat_model('x')\n", ["init_chat_model"]),
+    ],
+)
+def test_each_planted_import_is_caught_where_it_may_not_be(tmp_path, where, text, hit):
+    package = _plant(tmp_path, {where: text})
+    found = import_violations(package / where, package)
+    assert found and set(hit) <= set(found) and set(found) <= set(hit) | {"langchain.chat_models.init_chat_model"}
+
+
+@pytest.mark.parametrize(
+    ("where", "text"),
+    [
+        ("agent/graph.py", "import langchain\nfrom langchain.agents import create_agent\nfrom langchain_core.messages import AIMessage\nfrom langchain_openai import ChatOpenAI\n"),
+        ("agent/graph.py", "import langgraph\nfrom langgraph.graph import END\nimport langgraph_sdk\nimport langsmith\nfrom langsmith import Client\n"),
+        ("agent/graph.py", "from flysafelz.guidance import index\nfrom flysafelz.agent.settings import SETTINGS\n"),
+        ("guidance/index.py", "import fastembed\nfrom fastembed import TextEmbedding\nimport pypdf\n"),
+        ("guidance/index.py", "from flysafelz.agent.settings import SETTINGS\nfrom flysafelz.agent import settings\nfrom flysafelz.guidance import chunks\n"),
+        ("reader/read.py", "from langchain_openai import ChatOpenAI\nfrom langchain_core.messages import HumanMessage\n"),
+        ("weather.py", "from flysafelz.rules import RULES\nimport yaml\n"),
+    ],
+)
+def test_the_allowed_imports_pass_in_their_own_package(tmp_path, where, text):
+    package = _plant(tmp_path, {where: text})
+    assert import_violations(package / where, package) == []
+
+
+@pytest.mark.parametrize(
+    ("where", "text", "hit"),
+    [
+        ("weather.py", "from flysafelz.agent.settings import SETTINGS\n", ["flysafelz.agent.settings.SETTINGS"]),
+        ("weather.py", "from flysafelz.agent import config\n", ["flysafelz.agent.config"]),
+        ("assess.py", "import flysafelz.guidance\n", ["flysafelz.guidance"]),
+        ("cli.py", "from flysafelz import agent\n", ["flysafelz.agent"]),
+        ("reader/read.py", "from flysafelz.guidance import index\n", ["flysafelz.guidance.index"]),
+        ("guidance/index.py", "from flysafelz.agent.config import agent_config\n", ["flysafelz.agent.config.agent_config"]),
+        ("guidance/index.py", "from flysafelz.agent import graph\n", ["flysafelz.agent.graph"]),
+        # the same rules hold for relative imports, resolved against the file's own package
+        ("weather.py", "from .agent import config\n", ["flysafelz.agent.config"]),
+        ("weather.py", "from . import guidance\n", ["flysafelz.guidance"]),
+        ("weather.py", "from .guidance.index import build\n", ["flysafelz.guidance.index.build"]),
+        ("reader/read.py", "from ..agent.settings import SETTINGS\n", ["flysafelz.agent.settings.SETTINGS"]),
+        ("reader/read.py", "from .. import guidance\n", ["flysafelz.guidance"]),
+        ("clients/openaip.py", "from ..agent import config\n", ["flysafelz.agent.config"]),
+        ("guidance/index.py", "from ..agent.config import build_chat_model\n", ["flysafelz.agent.config.build_chat_model"]),
+        ("guidance/index.py", "from ..agent import graph\n", ["flysafelz.agent.graph"]),
+        ("guidance/index.py", "from .. import agent\n", ["flysafelz.agent"]),
+        ("guidance/deep/page.py", "from ...agent import config\n", ["flysafelz.agent.config"]),
+        ("guidance/deep/page.py", "from ... import agent\n", ["flysafelz.agent"]),
+        # and the allowed relative imports stay clean
+        ("weather.py", "from .rules import RULES\nfrom . import geo\nfrom .clients import openaip\n", []),
+        ("guidance/index.py", "from ..agent.settings import SETTINGS\nfrom ..agent import settings\nfrom . import chunks\nfrom .chunks import split\n", []),
+        ("agent/graph.py", "from .config import build_chat_model\nfrom ..guidance import index\n", []),
+    ],
+)
+def test_core_modules_do_not_import_agent_or_guidance_and_guidance_reads_only_the_settings(tmp_path, where, text, hit):
+    package = _plant(tmp_path, {where: text})
+    assert import_violations(package / where, package) == hit
+
+
+def test_a_script_outside_src_is_held_to_the_core_rule(tmp_path):
+    package = _plant(tmp_path, {})
+    script = tmp_path / "scripts" / "tool.py"
+    script.parent.mkdir()
+    script.write_text("import langgraph\nimport fastembed\n", encoding="utf-8")
+    assert import_violations(script, package) == ["langgraph", "fastembed"]
+    assert tree_import_violations(package, [script]) == {"tool.py": ["langgraph", "fastembed"]}
 
 
 # F1 (PR-3.F1): the verdict sheet has no model, no reader, and writes no label on a blind row.
@@ -223,14 +392,22 @@ def test_the_label_scan_catches_a_planted_label():
 
 
 # F3: no threshold literals in Python.
-def test_no_numeric_literal_in_a_comparison_other_than_0_or_1():
+def _compared_literals(path: Path) -> list[str]:
+    """'<path>:<line> compares against <n>' for every comparison against a number other than 0 or 1."""
     allowed = {0, 1}
+    found = []
+    for node in ast.walk(_parse(path)):
+        if isinstance(node, ast.Compare):
+            for operand in [node.left, *node.comparators]:
+                value = _number(operand)
+                if value is not None and value not in allowed:
+                    found.append(f"{path}:{node.lineno} compares against {value}")
+    return found
+
+
+def test_no_numeric_literal_in_a_comparison_other_than_0_or_1():
     for path in PY_FILES:
-        for node in ast.walk(_parse(path)):
-            if isinstance(node, ast.Compare):
-                for operand in [node.left, *node.comparators]:
-                    value = _number(operand)
-                    assert value is None or value in allowed, f"{path}:{node.lineno} compares against {value}"
+        assert _compared_literals(path) == []
 
 
 def test_no_numeric_literal_equals_a_rules_yaml_value():
@@ -240,6 +417,26 @@ def test_no_numeric_literal_equals_a_rules_yaml_value():
     for path in PY_FILES:
         for lineno, value in hard_coded_rule_values(path, _parse(path), values):
             pytest.fail(f"{path}:{lineno} hard-codes {value}, which is a rules.yaml value")
+
+
+# F7 (ticket 4): the two scans above cover agent/ and guidance/ too. A knob that equals a rules.yaml value (top_k 4, the 300 token minimum, the 3 of
+# pib_stale_hours) cannot be written as a literal in code; it is read from agent/settings.yaml, which the scans do not read.
+def test_the_numeric_scans_read_a_file_from_the_agent_and_guidance_packages():
+    assert SRC / "agent" / "config.py" in PY_FILES and SRC / "agent" / "settings.py" in PY_FILES
+    assert SRC / "guidance" / "embedding_model.py" in PY_FILES
+
+
+@pytest.mark.parametrize("where", ["agent/search.py", "guidance/index.py"])
+def test_a_literal_knob_in_agent_or_guidance_code_fails_the_scans(tmp_path, where):
+    rule_values = _rule_values()
+    assert {4, 300, 3} <= rule_values  # top_k's 4, the chunk band's 300 and pib_stale_hours' 3 are rules.yaml values
+    planted = tmp_path / where
+    planted.parent.mkdir()
+    planted.write_text("def search(chunks, top_k=4):\n    if len(chunks) > 4:\n        return chunks[:4]\n    return [c for c in chunks if c.tokens >= 300]\n", encoding="utf-8")
+    assert len(_compared_literals(planted)) == 2  # > 4 and >= 300
+    assert sorted(v for _, v in hard_coded_rule_values(planted, _parse(planted), rule_values)) == [4, 4, 4, 300]
+    shipped = SRC / "agent" / "settings.py"
+    assert _compared_literals(shipped) == [] and hard_coded_rule_values(shipped, _parse(shipped), rule_values) == []
 
 
 def test_the_reader_area_slack_is_a_rule_and_the_area_module_holds_no_literal_for_it():
@@ -263,7 +460,7 @@ def test_the_narrowed_scan_still_flags_a_planted_limit_outside_geo_py():
     assert _planted_hits("MIN_POLYGON_POINTS = 3\nMETRES_PER_KM = 1000\n", "geo.py") == []
     assert _planted_hits("MIN_POLYGON_POINTS = 4\n", "geo.py") == [4]  # a reviewed name holding another rules value
     assert _planted_hits("retries = 3\n", "pib.py") == [3]
-    assert {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3} == REVIEWED_NAMED_CONSTANTS
+    assert {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3, "QUARTER_TURN": 90} == REVIEWED_NAMED_CONSTANTS
 
 
 def test_the_narrowed_scan_exempts_structural_zero_and_one_only():
@@ -411,11 +608,29 @@ def test_the_key_scan_catches_a_planted_reader_key_and_ignores_an_empty_one(tmp_
     assert _files_with_a_key_value(tmp_path, names) == ["planted.env: READER_API_KEY", "other.env: OPENAIP_API_KEY"]
 
 
+@pytest.mark.parametrize("name", ["AGENT_API_" + "KEY", "LANGSMITH_API_" + "KEY"])  # split so this file never matches its own scan
+def test_the_key_scan_covers_the_agent_and_langsmith_keys(tmp_path, name):
+    (tmp_path / "planted.env").write_text(f"{name}=abc123\n", encoding="utf-8")
+    (tmp_path / "spaced.env").write_text(f"{name} = abc123\n", encoding="utf-8")
+    (tmp_path / "empty.env").write_text(f"{name}=\n{name}= # unset\n", encoding="utf-8")
+    assert _files_with_a_key_value(tmp_path, ["planted.env", "spaced.env", "empty.env"]) == [f"planted.env: {name}", f"spaced.env: {name}"]
+
+
 def test_env_is_gitignored_and_example_is_empty():
     ignored = subprocess.run(["git", "check-ignore", ".env"], cwd=ROOT, capture_output=True, text=True, check=False)
     assert ignored.returncode == 0
-    expected = ["OPENAIP_API_" + "KEY=", "READER_PROVIDER=", "READER_BASE_URL=", "READER_API_" + "KEY=", "READER_MODEL="]  # split so this file never matches the F6 scan
-    assert (ROOT / ".env.example").read_text(encoding="utf-8").splitlines() == expected
+    lines = (ROOT / ".env.example").read_text(encoding="utf-8").splitlines()
+    assert lines, "the example is empty"
+    assert all(re.fullmatch(r"[A-Z][A-Z0-9_]*=", line) for line in lines), "every line must be NAME= with nothing after it"
+    # Names split so this file never matches the F6 scan.
+    listed = {"OPENAIP_API_" + "KEY=", "READER_PROVIDER=", "READER_BASE_URL=", "READER_API_" + "KEY=", "READER_MODEL="}
+    listed |= {"AGENT_BASE_URL=", "AGENT_MODEL=", "AGENT_API_" + "KEY=", "LANGSMITH_API_" + "KEY=", "LANGSMITH_PROJECT="}
+    assert set(lines) == listed and len(lines) == len(listed)
+
+
+def test_the_example_scan_refuses_a_value_after_the_name():
+    ok = re.compile(r"[A-Z][A-Z0-9_]*=")
+    assert [bool(ok.fullmatch(line)) for line in ("AGENT_MODEL=", "AGENT_MODEL=x", "AGENT_MODEL= ", "AGENT_MODEL=#c", "AGENT_MODEL", "# AGENT_MODEL=")] == [True, False, False, False, False, False]
 
 
 # F7: plain modules and functions.
@@ -447,6 +662,12 @@ def test_cli_has_no_flag_for_rules_or_limits(flag):
     with pytest.raises(SystemExit) as exit_info:
         cli.main(["rules", flag, "x"])
     assert exit_info.value.code == 2
+
+
+def test_only_agent_config_py_names_an_agent_variable():
+    """AGENT_* is read in one place, as READER_* is read in reader/config.py."""
+    named = [path.relative_to(SRC).as_posix() for path in PY_FILES if re.search(r"AGENT_[A-Z]", path.read_text(encoding="utf-8"))]
+    assert named == [AGENT_CONFIG]
 
 
 def test_rules_module_and_cli_read_no_environment():

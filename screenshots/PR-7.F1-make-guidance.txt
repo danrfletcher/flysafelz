@@ -1,0 +1,97 @@
+# PR-7.F1 container verification (C28): make guidance against a local python -m http.server and a test register (GUIDANCE_SOURCES).
+# Re-run on slice 7 at commit 5993900 (code unchanged since ea27088), in a fresh clone of the worktree, with the real fastembed model
+# (the clone's .cache/ is a copy of the worktree's git-ignored .cache/). The committed data/guidance/ is untouched.
+# This transcript replaces the earlier one: that one omitted the register and the served files and its corpus key could not be reproduced.
+#
+# To reproduce (from a clone of the branch with the model stored by `make setup`; any free port in place of 56731, and the same port in the register):
+#   mkdir serve && cp tests/data/guidance/sample_cap.pdf serve/cap1535.pdf && cp serve/cap1535.pdf serve/cap2562.pdf
+#   (cd serve && python3 -m http.server 56731 --bind 127.0.0.1) &            # stop it by its own PID afterwards
+#   save the register below as register.yaml
+#   GUIDANCE_SOURCES=$PWD/register.yaml make guidance                         # run 1, then run 2 unchanged
+#   mv serve/cap2562.pdf elsewhere/ ; GUIDANCE_SOURCES=$PWD/register.yaml make guidance    # run 3
+# The corpus key below was produced twice, in two separate fresh clones, and was the same both times.
+
+## Served files ($ shasum -a 256 serve/*.pdf; both are tests/data/guidance/sample_cap.pdf)
+bcd994f6780746aed7bfc2a6a690e873a4eb0440455d4a57f2af10eb470c4ed8  serve/cap1535.pdf
+bcd994f6780746aed7bfc2a6a690e873a4eb0440455d4a57f2af10eb470c4ed8  serve/cap2562.pdf
+
+## Server
+$ cd serve && python3 -m http.server 56731 --bind 127.0.0.1     # scratch port, 127.0.0.1 only
+
+## Test register (register.yaml, used as GUIDANCE_SOURCES)
+documents:
+  - id: cap1535
+    title: "CAP 1535 (test copy of tests/data/guidance/sample_cap.pdf)"
+    url: http://127.0.0.1:56731/cap1535.pdf
+    edition: "test 1"
+    licence: "test register, local file"
+    review_date: 2026-11-08
+    indexed: true
+  - id: cap2562
+    title: "CAP 2562 (test copy of tests/data/guidance/sample_cap.pdf)"
+    url: http://127.0.0.1:56731/cap2562.pdf
+    edition: "test 1"
+    licence: "test register, local file"
+    review_date: 2026-11-08
+    indexed: true
+  - id: caa-rat-notam
+    title: "link-only entry"
+    url: https://www.caa.co.uk/commercial-industry/airspace/event-and-obstacle-notification/airspace-restrictions/
+    edition: "web page"
+    licence: "link-only"
+    review_date: 2026-11-08
+    indexed: false
+
+$ GUIDANCE_SOURCES=$PWD/register.yaml make guidance   # run 1: first run, nothing promoted before
+Using CPython 3.12.14
+Creating virtual environment at: .venv
+   Building flysafelz @ file:///private/var/folders/lz/4lt5vlt56xl8bdv7x6k1jqz00000gn/T/t6/clone
+      Built flysafelz @ file:///private/var/folders/lz/4lt5vlt56xl8bdv7x6k1jqz00000gn/T/t6/clone
+Installed 110 packages in 157ms
+caa-rat-notam: link-only, not downloaded
+cap1535: added, 5 sections
+cap2562: added, 5 sections
+hit@4 not run: no labels
+promoted: 2 documents, 10 sections, corpus key 6570d7d33a5b233dea24b504de6bb5a6af37565cd55d7eac416e9b9ab7e9cefa
+exit=0
+
+$ git status --porcelain --ignored data/guidance/   # after run 1
+?? data/guidance/cap1535/
+?? data/guidance/cap2562/
+?? data/guidance/embeddings.sqlite
+?? data/guidance/manifest.yaml
+
+$ GUIDANCE_SOURCES=$PWD/register.yaml make guidance   # run 2: nothing changed
+caa-rat-notam: link-only, not downloaded
+cap1535: no change
+cap2562: no change
+nothing to promote: every document is unchanged
+exit=0
+
+$ shasum -a 256 data/guidance/manifest.yaml data/guidance/embeddings.sqlite   # before run 3
+44f26256312d6d0d0d70e35e9e72a7870e24407e07b225d1bd630ddeb6ffc480  data/guidance/manifest.yaml
+0073ceae41bf9d7d07cbf1ab856162e09bd82b70047fa184a1f26b89152546e5  data/guidance/embeddings.sqlite
+$ mv serve/cap2562.pdf ..   # the server now answers 404 for /cap2562.pdf
+$ GUIDANCE_SOURCES=$PWD/register.yaml make guidance   # run 3: cap2562 returns 404
+caa-rat-notam: link-only, not downloaded
+cap1535: no change
+cap2562: download failed (404), kept current snapshot
+nothing to promote: every document is unchanged
+exit=0
+$ shasum -a 256 data/guidance/manifest.yaml data/guidance/embeddings.sqlite   # after run 3: unchanged
+44f26256312d6d0d0d70e35e9e72a7870e24407e07b225d1bd630ddeb6ffc480  data/guidance/manifest.yaml
+0073ceae41bf9d7d07cbf1ab856162e09bd82b70047fa184a1f26b89152546e5  data/guidance/embeddings.sqlite
+
+$ ls data/guidance/cap2562   # its snapshot is kept
+0000-1.md
+0001-2.md
+0002-3.md
+0003-4.md
+0004-appendix-a.md
+
+$ GUIDANCE_SOURCES=$PWD/register.yaml make guidance   # run 1 again in a second fresh clone (same commit)
+caa-rat-notam: link-only, not downloaded
+cap1535: added, 5 sections
+cap2562: added, 5 sections
+hit@4 not run: no labels
+promoted: 2 documents, 10 sections, corpus key 6570d7d33a5b233dea24b504de6bb5a6af37565cd55d7eac416e9b9ab7e9cefa

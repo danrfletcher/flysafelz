@@ -1,0 +1,16 @@
+Permanent airspace at the landing zone.
+Window: Saturday 31 Oct 10:00 – 16:00 GMT.
+Fetched: 2026-10-31 07:30 GMT.
+Findings:
+- ALDBROUGH (warning): AWARENESS. ALDBROUGH (WARNING) 0.42 NM to the N, floor 45 ft QNH. Floor SFC, ceiling 3200 ft AMSL. Bearing 358° (N).
+- D323K SOUTHERN MDA (danger): AWARENESS. D323K SOUTHERN MDA (DANGER) floor 15,506 ft QNH: awareness only. Floor FL150, ceiling FL660. Over the LZ.
+- EGD496A (danger): CONTACT_FIRST. Danger area EGD496A is active by NOTAM J3857/26. Condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026. Floor SFC, ceiling 1300 ft AMSL (as NOTAM J3857/26 states them). Over the LZ. Not in the openAIP data: located from NOTAM J3857/26, drawn as its Q-circle (approximate).
+Lowest ceiling over the LZ (ceiling_qnh_ft): none.
+Notes:
+- EGD496A: not in the openAIP data; the Q-circle of NOTAM J3857/26 is used
+
+----- progress lines of the whole run, in order -----
+Checking weather…
+Checking airspace…
+Reading 2 NOTAMs (1/2)…
+Reading 2 NOTAMs (2/2)…

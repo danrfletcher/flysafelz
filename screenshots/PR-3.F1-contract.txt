@@ -1,0 +1,42 @@
+# The test graph (PR-3.F1): create_agent with the input check only, a fake chat model, an in-memory checkpoint.
+# Run as a script file; no socket is opened (fake model, committed fixtures). Script:
+#   import sys, json
+#   sys.path.insert(0, "tests")
+#   from agent_helpers import contract_graph, thread
+#   from langchain_core.messages import HumanMessage
+#   from flysafelz.agent.input_check import RequestInvalid
+#   from flysafelz.agent.state import RunContext
+#   
+#   ctx = RunContext(case="blue_mill_2026-10-31")
+#   def ask(name, **fields):
+#       graph, model = contract_graph()
+#       print(f"--- {name}: {fields}")
+#       try:
+#           out = graph.invoke({"messages": [HumanMessage("Can I fly here today?")], **fields}, thread(name), context=ctx)
+#       except RequestInvalid as exc:
+#           print(f"RequestInvalid: {exc}")
+#       else:
+#           print(json.dumps({k: out[k] for k in ("answer", "guard", "overlays")}))
+#           print("phone_map in output:", "phone_map" in out)
+#       print("model calls:", len(model.calls))
+#   
+#   ask("no-lat", lon=-0.086644)
+#   ask("bad-tz", lat=53.802797, lon=-0.086644, tz="Mars/Olympus")
+#   ask("paris", lat=48.86, lon=2.35)
+#   ask("blue-mill", lat=53.802797, lon=-0.086644)
+
+$ uv run python contract.py
+--- no-lat: {'lon': -0.086644}
+RequestInvalid: lat is required
+model calls: 0
+--- bad-tz: {'lat': 53.802797, 'lon': -0.086644, 'tz': 'Mars/Olympus'}
+RequestInvalid: unknown time zone 'Mars/Olympus'
+model calls: 0
+--- paris: {'lat': 48.86, 'lon': 2.35}
+{"answer": "FlySafeLZ only covers the UK.", "guard": "passed", "overlays": []}
+phone_map in output: False
+model calls: 0
+--- blue-mill: {'lat': 53.802797, 'lon': -0.086644}
+{"answer": null, "guard": null, "overlays": []}
+phone_map in output: False
+model calls: 1

@@ -64,7 +64,6 @@ FL-to-feet conversion. The only constants here are definitions (a flight level i
 import math
 import re
 from collections.abc import Sequence
-from datetime import UTC, datetime
 from enum import StrEnum
 
 from pydantic import AwareDatetime, BaseModel, field_validator
@@ -93,6 +92,7 @@ from flysafelz.redact import redact_phones
 from flysafelz.rules import RULES, Rule, Rules
 from flysafelz.schedule import parse_schedule
 from flysafelz.sup_refs import sup_detail
+from flysafelz.timetext import check_tz, clock_span
 
 LatLon = tuple[float, float]
 
@@ -104,7 +104,6 @@ CONTROLLED_TYPES = frozenset({"cta", "tma", "airway"})  # relevant only when the
 CONTROLLED_CLASSES = frozenset({"A", "B", "C", "D", "E"})
 CIRCLE_VERTICES = 72
 FEET_PER_FLIGHT_LEVEL = 100  # a flight level is hundreds of feet
-EN_DASH = "\u2013"
 
 
 class Outcome(StrEnum):
@@ -379,20 +378,19 @@ def _prohibition(reading: NotamReading) -> str | None:
     return f"prohibited ({reading.prohibitive_reason.value}){said}"
 
 
-def _clock(t: datetime) -> str:
-    return t.astimezone(UTC).strftime("%H:%M")
-
-
 def _sup_tail(activation: Activation) -> str:
     """"; details in AIP SUP 108/2026" for the SUPs the NOTAM names, else nothing (no empty brackets, no trailing "; ")."""
     detail = sup_detail(activation.sup_references)
     return f"; {detail}" if detail else ""
 
 
-def _contact_condition(label: str, activation: Activation, reading: NotamReading) -> str:
-    """The call-first wording. The contact is the reading's when it gives a phone or email, else it points at the NOTAM."""
+def _contact_condition(label: str, activation: Activation, reading: NotamReading, tz: str | None = None) -> str:
+    """The call-first wording. The contact is the reading's when it gives a phone or email, else it points at the NOTAM.
+
+    The activation span is written in `tz` (None: UTC, no zone label). The Activation itself stays UTC.
+    """
     what = f" ({reading.activity})" if reading.activity.strip() else ""
-    window = f"{_clock(activation.start)}{EN_DASH}{_clock(activation.end)}"
+    window = clock_span(activation.start, activation.end, tz)
     if _reading_contact(reading) is ContactKind.NONE:
         contact = f"{activation.item_e_contact.value} given in NOTAM {activation.notam_id}"
     else:
@@ -424,12 +422,13 @@ def _disagreement(activation: Activation, reading: NotamReading) -> str | None:
     return f"NOTAM {activation.notam_id}: code finds a {activation.item_e_contact.value} in item E but the reading gives no phone or email; code decides (CONTACT_FIRST)"
 
 
-def _danger_over_lz(area: Airspace, activity: Activity, notes: list[str]) -> Finding:
+def _danger_over_lz(area: Airspace, activity: Activity, notes: list[str], tz: str | None = None) -> Finding:
     """An active danger area over the LZ from SFC: NO_FLY, UNVERIFIED, CHECK_SUP or CONTACT_FIRST, worst first (G13).
 
     Follows notam_action's rows 2b to 2d for the activating NOTAMs. NO_FLY needs a quoted prohibitive reason (or no
     activation at all, or an unread one on an area that is active alone); otherwise the code-found contact decides
-    between CONTACT_FIRST and CHECK_SUP. A disagreement with the reading's contact goes into `notes`.
+    between CONTACT_FIRST and CHECK_SUP. A disagreement with the reading's contact goes into `notes`. The activation
+    span in the CONTACT_FIRST condition is written in `tz`.
     """
     label = area.designator or area.name
     activations = activity.activations
@@ -464,7 +463,7 @@ def _danger_over_lz(area: Airspace, activity: Activity, notes: list[str]) -> Fin
     note = _disagreement(activation, reading)
     if note:
         notes.append(note)
-    condition = _contact_condition(label, activation, reading)
+    condition = _contact_condition(label, activation, reading, tz)
     return Finding(area=area.name, outcome=Outcome.CONTACT_FIRST, reason=f"Danger area {label} is active by NOTAM {activation.notam_id}", condition=condition)
 
 
@@ -547,11 +546,11 @@ def _sector(area: Airspace, outcome: Outcome, floor: float, distance: float, bea
     return Finding(area=area.name, outcome=Outcome.AWARENESS, reason=f"{label} {where}, floor {_feet(floor)} ft QNH", bearing_deg=bearing, compass=compass, floor_qnh_ft=floor)
 
 
-def _over(area: Airspace, outcome: Outcome, floor: float, activity: Activity | None, notes: list[str]) -> Finding | None:
+def _over(area: Airspace, outcome: Outcome, floor: float, activity: Activity | None, notes: list[str], tz: str | None = None) -> Finding | None:
     """A volume over the LZ. CEILING is returned as None: the caller pools those (E14)."""
     label = _label(area)
     if outcome is Outcome.NO_FLY and activity is not None:
-        return _danger_over_lz(area, activity, notes)
+        return _danger_over_lz(area, activity, notes, tz)
     if outcome is Outcome.NO_GO:
         return Finding(area=area.name, outcome=outcome, reason=f"over {label} from the surface", floor_qnh_ft=floor)
     if outcome is Outcome.PERMISSION:
@@ -590,12 +589,16 @@ def assess_airspace(
     pressure_msl: float | None = None,
     activations: Sequence[Activation] = (),
     rules: Rules = RULES,
+    tz: str | None = None,
 ) -> AirspaceAssessment:
     """What every airspace volume means for the LZ in this segment.
 
     pressure_msl is the hour's forecast pressure for flight levels; None means the
     reference pressure, and that is noted. activations are the NOTAMs that activate danger areas.
+    tz is an IANA zone name for the times written into the condition text ("active 09:00-19:00 BST"); None writes UTC.
+    Nothing structured changes with it, and an unknown name raises ValueError.
     """
+    check_tz(tz)
     lat, lon = lz
     notes: list[str] = []
     if pressure_msl is None:
@@ -628,7 +631,7 @@ def assess_airspace(
         elif outcome is Outcome.CEILING:
             ceilings.append((floor, area))
         else:
-            finding = _over(area, outcome, floor, activity, notes)
+            finding = _over(area, outcome, floor, activity, notes, tz)
             if finding is not None:
                 findings.append(finding)
 

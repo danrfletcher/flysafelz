@@ -1,0 +1,7 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agent": "./src/flysafelz/agent/graph.py:build_graph"
+  },
+  "env": ".env"
+}
