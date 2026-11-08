@@ -1,0 +1,72 @@
+# The first run was done in the repo and committed; this transcript replays it in a scratch copy of fixtures/ that holds only the two folders
+# dev already had (bamburgh_2026-10-06, druridge_bay_2026-07-22) plus the two list files, so the 21 copies show. The repo run is the second block.
+
+$ uv run python -m evals.agent.import_fixtures --src ~/.local/share/vector/inputs/flysafelz/labelled-fixtures --dest $SCRATCH/fixtures
+copied: alnwick_pastures_2026-09-13
+copied: alnwick_pastures_2026-10-06_5day
+copied: bamburgh_2026-10-10
+copied: blue_mill_2026-07-30
+copied: blue_mill_2026-09-29
+copied: blue_mill_2026-09-29_injected
+copied: blue_mill_2026-10-30
+copied: blue_mill_2026-10-31_2day
+copied: buttermere_2026-07-08
+copied: buttermere_2026-07-23
+copied: buttermere_2026-09-24
+copied: crookham_2026-08-06
+copied: crookham_2026-08-12
+copied: crookham_2026-10-06
+copied: druridge_bay_2026-09-29
+copied: sherburn_2026-09-13
+copied: sherburn_2026-10-10
+copied: town_moor_2026-07-11
+copied: town_moor_2026-09-13
+copied: west_sleekburn_2026-07-22_5day
+copied: west_sleekburn_2026-09-13
+already in fixtures/, not touched: bamburgh_2026-10-06
+already in fixtures/, not touched: druridge_bay_2026-07-22
+21 folders copied, 2 already present and left alone
+verified 23 folders, 115 files against labelled-fixtures.sha256; 1 named exception(s):
+  druridge_bay_2026-07-22/readings.yaml: 3b PR-8 appended the H2483 reading
+exit 0
+
+$ uv run python -m evals.agent.import_fixtures --src ~/.local/share/vector/inputs/flysafelz/labelled-fixtures   # the repo, as committed
+already in fixtures/, not touched: alnwick_pastures_2026-09-13
+already in fixtures/, not touched: alnwick_pastures_2026-10-06_5day
+already in fixtures/, not touched: bamburgh_2026-10-06
+already in fixtures/, not touched: bamburgh_2026-10-10
+already in fixtures/, not touched: blue_mill_2026-07-30
+already in fixtures/, not touched: blue_mill_2026-09-29
+already in fixtures/, not touched: blue_mill_2026-09-29_injected
+already in fixtures/, not touched: blue_mill_2026-10-30
+already in fixtures/, not touched: blue_mill_2026-10-31_2day
+already in fixtures/, not touched: buttermere_2026-07-08
+already in fixtures/, not touched: buttermere_2026-07-23
+already in fixtures/, not touched: buttermere_2026-09-24
+already in fixtures/, not touched: crookham_2026-08-06
+already in fixtures/, not touched: crookham_2026-08-12
+already in fixtures/, not touched: crookham_2026-10-06
+already in fixtures/, not touched: druridge_bay_2026-07-22
+already in fixtures/, not touched: druridge_bay_2026-09-29
+already in fixtures/, not touched: sherburn_2026-09-13
+already in fixtures/, not touched: sherburn_2026-10-10
+already in fixtures/, not touched: town_moor_2026-07-11
+already in fixtures/, not touched: town_moor_2026-09-13
+already in fixtures/, not touched: west_sleekburn_2026-07-22_5day
+already in fixtures/, not touched: west_sleekburn_2026-09-13
+0 folders copied, 23 already present and left alone
+verified 23 folders, 115 files against labelled-fixtures.sha256; 1 named exception(s):
+  druridge_bay_2026-07-22/readings.yaml: 3b PR-8 appended the H2483 reading
+exit 0
+
+$ cd fixtures && shasum -a 256 -c labelled-fixtures.sha256 | grep -v ': OK'
+./druridge_bay_2026-07-22/readings.yaml: FAILED
+shasum: WARNING: 1 computed checksum did NOT match
+
+$ cd fixtures && shasum -a 256 -c labelled-fixtures.sha256 | grep -c ": OK"
+114
+
+$ diff -r $SCRATCH/fixtures fixtures   # the scratch replay and the committed folders are byte-identical (only the repo-only cases differ)
+Only in fixtures: blue_mill_2026-10-31
+Only in fixtures: stale_pib_constructed
+Only in fixtures: west_sleekburn_2026-10-31

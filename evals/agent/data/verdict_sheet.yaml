@@ -1,0 +1,1877 @@
+- id: ho_a1_blue_mill_afternoon
+  mode: blind
+  window:
+    start: '2026-10-30T12:00:00Z'
+    end: '2026-10-30T18:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 1803c38b71a66598a91622d5c6fe660d7e7fda5805e7af689975bc76e08f457e
+    rows: ccbb246e10563eca2aa148da906d6a3f3c0678076e35eb96ebcd2d1dfc42c4a3
+    seal: 701946d8fc4057776161cd98939427aab8f053020ca6b5d4f446e62e8ea13e7a
+  notam_actions:
+    B1603/26: IGNORE
+    B1623/26: IGNORE
+    G110/26: IGNORE
+    H6997/26: IGNORE
+    H7171/26: AVOID_SECTOR
+    H7266/26: AWARENESS
+    J3853/26: CONTACT_FIRST
+    J3857/26: IGNORE
+    J3864/26: IGNORE
+    M7336/26: IGNORE
+    M7337/26: IGNORE
+    Q172/26: IGNORE
+    Q173/26: IGNORE
+    U6768/26: IGNORE
+    U8966/26: IGNORE
+    U8967/26: IGNORE
+    V32/26: IGNORE
+    V34/26: IGNORE
+    V35/26: IGNORE
+  rows:
+  - start: '2026-10-30T12:00:00Z'
+    end: '2026-10-30T13:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T13:00:00Z'
+    end: '2026-10-30T14:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T14:00:00Z'
+    end: '2026-10-30T15:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T15:00:00Z'
+    end: '2026-10-30T16:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T16:00:00Z'
+    end: '2026-10-30T16:30:00Z'
+    edge: H7266/26 ends
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T16:30:00Z'
+    end: '2026-10-30T17:00:00Z'
+    edge: sunset
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T17:00:00Z'
+    end: '2026-10-30T17:08:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T17:08:00Z'
+    end: '2026-10-30T18:00:00Z'
+    edge: civil dusk
+    verdict: null
+    approaching_limits: null
+- id: ho_a2_bamburgh_today
+  mode: blind
+  window:
+    start: '2026-10-06T06:30:00Z'
+    end: '2026-10-06T23:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 53e317d0d3b56810808b3032714f44ec2ff7b034d6f824cb1da4e14344f8cfde
+    rows: 4f22f4ce73891f2d5727f719e2e41c635a3c477a01f9efa820cda6da0cff0212
+    seal: 3eeabc894804e4494fb3900561bc27d519496d11384530eb2efb4faf94abc9a3
+  notam_actions:
+    H5829/26: IGNORE
+    H5874/26: IGNORE
+    H6627/26: AWARENESS
+    J3306/26: AVOID_SECTOR
+    J3307/26: CONTACT_FIRST
+    J3308/26: IGNORE
+    J3309/26: IGNORE
+    J3310/26: IGNORE
+    J3311/26: IGNORE
+    J3312/26: IGNORE
+    J3313/26: IGNORE
+    J3314/26: IGNORE
+    J3316/26: IGNORE
+    U6768/26: IGNORE
+    U8287/26: IGNORE
+    V24/26: IGNORE
+    V26/26: IGNORE
+    V28/26: IGNORE
+    V32/26: IGNORE
+  rows:
+  - start: '2026-10-06T06:00:00Z'
+    end: '2026-10-06T06:20:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T06:20:00Z'
+    end: '2026-10-06T07:00:00Z'
+    edge: sunrise
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T07:00:00Z'
+    end: '2026-10-06T08:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T08:00:00Z'
+    end: '2026-10-06T09:00:00Z'
+    edge: J3306/26 starts + J3307/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T09:00:00Z'
+    end: '2026-10-06T10:00:00Z'
+    edge: H5829/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T10:00:00Z'
+    end: '2026-10-06T11:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T11:00:00Z'
+    end: '2026-10-06T12:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T12:00:00Z'
+    end: '2026-10-06T13:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T13:00:00Z'
+    end: '2026-10-06T14:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T14:00:00Z'
+    end: '2026-10-06T15:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T15:00:00Z'
+    end: '2026-10-06T16:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T16:00:00Z'
+    end: '2026-10-06T17:00:00Z'
+    edge: H6627/26 ends
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T17:00:00Z'
+    end: '2026-10-06T17:29:00Z'
+    edge: J3306/26 ends + J3307/26 ends
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T17:29:00Z'
+    end: '2026-10-06T18:00:00Z'
+    edge: sunset
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T18:00:00Z'
+    end: '2026-10-06T18:06:00Z'
+    edge: H5829/26 ends
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T18:06:00Z'
+    end: '2026-10-06T19:00:00Z'
+    edge: civil dusk
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T19:00:00Z'
+    end: '2026-10-06T20:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T20:00:00Z'
+    end: '2026-10-06T21:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T21:00:00Z'
+    end: '2026-10-06T22:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T22:00:00Z'
+    end: '2026-10-06T23:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+- id: ho_a3_sherburn_9am
+  mode: blind
+  window:
+    start: '2026-09-13T08:00:00Z'
+    end: '2026-09-13T12:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 35db4423b069f900a4059d6cae6d176cd557980711a9bf635711c79bd0f6ce0c
+    rows: ac5468c2584cf152428fb718e6598a253d7ffbb150533ca473b8f10f7e9f4d5e
+    seal: 40f6b930f34b187eae76c6085e172de20eaef91dcbeb0bfdcaf38579d07d38c0
+  notam_actions:
+    B1508/26: IGNORE
+    H5914/26: IGNORE
+    H5990/26: IGNORE
+    L5328/26: IGNORE
+    L5478/26: AVOID_SECTOR
+    L5577/26: IGNORE
+    L5579/26: IGNORE
+    U6768/26: IGNORE
+    U7666/26: IGNORE
+    V24/26: IGNORE
+    V26/26: IGNORE
+    V28/26: IGNORE
+  rows:
+  - start: '2026-09-13T08:00:00Z'
+    end: '2026-09-13T09:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T09:00:00Z'
+    end: '2026-09-13T09:18:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T09:18:00Z'
+    end: '2026-09-13T10:00:00Z'
+    edge: H5914/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T10:00:00Z'
+    end: '2026-09-13T10:22:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T10:22:00Z'
+    end: '2026-09-13T11:00:00Z'
+    edge: H5914/26 ends
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T11:00:00Z'
+    end: '2026-09-13T12:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+- id: ho_a4_crookham_evening
+  mode: blind
+  window:
+    start: '2026-10-06T16:00:00Z'
+    end: '2026-10-06T19:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: cfcc437180d86ae5c3e839298079bbaa955f879a052c56d5b17a35f0bec1ff3e
+    rows: bba880baaefe43bdb0becc86c2b183f5746c5d4f7b8d1349bd0f5f2017bc0895
+    seal: 68bf43a88ba7b6e7de861b300263d774d1ce2e5f56e0e02c7e23cf358fd214da
+  notam_actions:
+    H5829/26: CONTACT_FIRST
+    H5874/26: IGNORE
+    H6627/26: IGNORE
+    U6768/26: IGNORE
+    U8287/26: IGNORE
+    V24/26: IGNORE
+    V26/26: IGNORE
+    V28/26: IGNORE
+    V32/26: IGNORE
+  rows:
+  - start: '2026-10-06T16:00:00Z'
+    end: '2026-10-06T17:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T17:00:00Z'
+    end: '2026-10-06T17:30:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T17:30:00Z'
+    end: '2026-10-06T18:00:00Z'
+    edge: sunset
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T18:00:00Z'
+    end: '2026-10-06T18:08:00Z'
+    edge: H5829/26 ends
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-06T18:08:00Z'
+    end: '2026-10-06T19:00:00Z'
+    edge: civil dusk
+    verdict: null
+    approaching_limits: null
+- id: ho_a5_town_moor_afternoon
+  mode: blind
+  window:
+    start: '2026-09-13T11:00:00Z'
+    end: '2026-09-13T17:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 5aad8796f9c7e1735b1f1c285aab6bc61283ceeb7ce41ce02e70289a87ee7532
+    rows: c78c5144d10c8c7835a43d1a084cee863072f55b4f85b9c066c545704d8aadd9
+    seal: 63b3ad3ae78830241aecabca06b63dc183de81ec5696e47919dbf3dc0e2d64bf
+  notam_actions:
+    B1476/26: AWARENESS
+    B1508/26: IGNORE
+    H4453/26: IGNORE
+    H4455/26: IGNORE
+    H5914/26: IGNORE
+    H5990/26: IGNORE
+    I4090/26: IGNORE
+    I4432/26: IGNORE
+    I4737/26: IGNORE
+    I4991/26: IGNORE
+    I5180/26: IGNORE
+    I6081/26: IGNORE
+    I6086/26: AWARENESS
+    I6238/26: IGNORE
+    M6180/26: IGNORE
+    U6768/26: IGNORE
+    U7666/26: IGNORE
+    V24/26: IGNORE
+    V26/26: IGNORE
+    V28/26: IGNORE
+  rows:
+  - start: '2026-09-13T11:00:00Z'
+    end: '2026-09-13T12:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T12:00:00Z'
+    end: '2026-09-13T13:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T13:00:00Z'
+    end: '2026-09-13T14:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T14:00:00Z'
+    end: '2026-09-13T15:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T15:00:00Z'
+    end: '2026-09-13T16:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T16:00:00Z'
+    end: '2026-09-13T16:30:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T16:30:00Z'
+    end: '2026-09-13T17:00:00Z'
+    edge: B1476/26 ends + I6086/26 ends
+    verdict: null
+    approaching_limits: null
+- id: ho_a7_druridge_afternoon
+  mode: blind
+  window:
+    start: '2026-07-22T11:00:00Z'
+    end: '2026-07-22T17:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: cc6dbaa4bed30b69c9333e32f378689199eaa44341fb46a42086ff995ceec07a
+    rows: 9b525c25eb5fc6f84b892b39e46d1e6209dd1f581c0a9d9ac59e20fe8dae1a16
+    seal: ebb90d3613caff78840e359acafe021e0f01b83f8f59cd5f119ba8d8ab2df40f
+  notam_actions:
+    B1139/26: IGNORE
+    B914/26: IGNORE
+    H2483/26: CONTACT_FIRST
+    H4420/26: AVOID_SECTOR
+    H4464/26: CONTACT_FIRST
+    H4466/26: AWARENESS
+    V19/26: IGNORE
+    V20/26: IGNORE
+  rows:
+  - start: '2026-07-22T11:00:00Z'
+    end: '2026-07-22T11:30:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-07-22T11:30:00Z'
+    end: '2026-07-22T12:00:00Z'
+    edge: H4420/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-07-22T12:00:00Z'
+    end: '2026-07-22T13:00:00Z'
+    edge: H2483/26 ends
+    verdict: null
+    approaching_limits: null
+  - start: '2026-07-22T13:00:00Z'
+    end: '2026-07-22T14:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-07-22T14:00:00Z'
+    end: '2026-07-22T15:00:00Z'
+    edge: H4464/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-07-22T15:00:00Z'
+    end: '2026-07-22T16:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-07-22T16:00:00Z'
+    end: '2026-07-22T17:00:00Z'
+    edge: H4466/26 ends
+    verdict: null
+    approaching_limits: null
+- id: ho_d3_blue_mill_push
+  mode: blind
+  window:
+    start: '2026-10-30T07:30:00Z'
+    end: '2026-10-30T10:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: dc5cf54d6d785fd5dce04b6cc60baffbb5bd18b48b9fd9dd9881b4968a0a4120
+    rows: 5733d6b9949b8203eb289a646d2398967c22df98f17cc9ade95f3a18a1202ad3
+    seal: 436906d2c2d79fd4278a1cd281cb2a7e0abe33239b3c96cc92c5df49dc080b9d
+  notam_actions:
+    B1603/26: IGNORE
+    B1623/26: IGNORE
+    G110/26: IGNORE
+    H6997/26: IGNORE
+    H7171/26: AVOID_SECTOR
+    H7266/26: AWARENESS
+    J3853/26: CONTACT_FIRST
+    J3857/26: IGNORE
+    J3864/26: IGNORE
+    M7336/26: IGNORE
+    M7337/26: IGNORE
+    Q172/26: IGNORE
+    Q173/26: IGNORE
+    U6768/26: IGNORE
+    U8966/26: IGNORE
+    U8967/26: IGNORE
+    V32/26: IGNORE
+    V34/26: IGNORE
+    V35/26: IGNORE
+  rows:
+  - start: '2026-10-30T07:00:00Z'
+    end: '2026-10-30T08:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T08:00:00Z'
+    end: '2026-10-30T09:00:00Z'
+    edge: H7171/26 starts + J3853/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-30T09:00:00Z'
+    end: '2026-10-30T10:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+- id: dev_01_blue_mill
+  mode: blind
+  window:
+    start: '2026-09-29T09:00:00Z'
+    end: '2026-09-29T11:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: a9d81e15e39b5983223cc3fe30c47cc4f0f8a68995a84f19a210d65bfbaaaa4a
+    rows: 27c3d8b20817334dc8163f3bf752792ea49b9428d6d73b2f4f967b36adf344b3
+    seal: 145c4dc8dd36dc1ecf247f7567db7cd7719cf37d26ed59ab838a9c3f207cdf0c
+  notam_actions:
+    B1434/26: IGNORE
+    B1563/26: IGNORE
+    H4454/26: AWARENESS
+    H6449/26: IGNORE
+    H6451/26: AWARENESS
+    J3220/26: AWARENESS
+    M6508/26: IGNORE
+    M6510/26: IGNORE
+    M6512/26: AWARENESS
+    N610/26: IGNORE
+    N612/26: IGNORE
+    U6768/26: IGNORE
+    U7666/26: IGNORE
+    V24/26: IGNORE
+    V26/26: IGNORE
+    V28/26: IGNORE
+    V30/26: IGNORE
+  rows:
+  - start: '2026-09-29T09:00:00Z'
+    end: '2026-09-29T10:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-29T10:00:00Z'
+    end: '2026-09-29T11:00:00Z'
+    edge: H6449/26 starts
+    verdict: null
+    approaching_limits: null
+- id: dev_02_west_sleekburn
+  mode: blind
+  window:
+    start: '2026-09-13T06:30:00Z'
+    end: '2026-09-13T11:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: b46a0fe030f6818ccde9fdf7bb8f4feaeaea981af65b5d857c57ce1192f15343
+    rows: b1232b407730216256861d1900fdf7d224a2902cc071cf30ed46c57a4d901ee8
+    seal: e88f3d4927f78374d7db49273893cf6ba694d99b3a5bf838010618b95d74cbc9
+  notam_actions:
+    B1476/26: AVOID_SECTOR
+    B1508/26: IGNORE
+    H4453/26: IGNORE
+    H4455/26: IGNORE
+    H5914/26: IGNORE
+    H5990/26: IGNORE
+    M6180/26: IGNORE
+    U6768/26: IGNORE
+    U7666/26: IGNORE
+    V24/26: IGNORE
+    V26/26: IGNORE
+    V28/26: IGNORE
+  rows:
+  - start: '2026-09-13T06:00:00Z'
+    end: '2026-09-13T07:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T07:00:00Z'
+    end: '2026-09-13T07:30:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T07:30:00Z'
+    end: '2026-09-13T08:00:00Z'
+    edge: B1476/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T08:00:00Z'
+    end: '2026-09-13T09:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T09:00:00Z'
+    end: '2026-09-13T09:18:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T09:18:00Z'
+    end: '2026-09-13T10:00:00Z'
+    edge: H5914/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T10:00:00Z'
+    end: '2026-09-13T10:22:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-09-13T10:22:00Z'
+    end: '2026-09-13T11:00:00Z'
+    edge: H5914/26 ends
+    verdict: null
+    approaching_limits: null
+- id: blue_mill_today
+  mode: blind
+  window:
+    start: '2026-10-31T07:00:00Z'
+    end: '2026-10-31T18:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: ce6bbd2e983460c17167859449219dff0eae650da8bf79af3f681d91504d9ba8
+    rows: 3dfa20b3fc6d486402759c92078976dede6334ac92e3cc5fb981a350632b94fd
+    seal: 612085ef7d56f68f3ae2ee7ef55993ce509305402eca7522138382825dc155da
+  notam_actions:
+    B1603/26: IGNORE
+    B1623/26: IGNORE
+    G110/26: IGNORE
+    H6997/26: IGNORE
+    H7171/26: AVOID_SECTOR
+    H7297/26: IGNORE
+    J3857/26: CONTACT_FIRST
+    J3864/26: IGNORE
+    M7361/26: IGNORE
+    M7365/26: IGNORE
+    M7366/26: IGNORE
+    M7367/26: IGNORE
+    Q172/26: IGNORE
+    Q173/26: IGNORE
+    U6768/26: IGNORE
+    U8966/26: IGNORE
+    U8967/26: IGNORE
+    V32/26: IGNORE
+    V34/26: IGNORE
+    V35/26: IGNORE
+  rows:
+  - start: '2026-10-31T07:00:00Z'
+    end: '2026-10-31T08:00:00Z'
+    edge: window start
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T08:00:00Z'
+    end: '2026-10-31T09:00:00Z'
+    edge: H7171/26 starts + J3857/26 starts
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T09:00:00Z'
+    end: '2026-10-31T10:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T10:00:00Z'
+    end: '2026-10-31T11:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T11:00:00Z'
+    end: '2026-10-31T12:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T12:00:00Z'
+    end: '2026-10-31T13:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T13:00:00Z'
+    end: '2026-10-31T14:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T14:00:00Z'
+    end: '2026-10-31T15:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T15:00:00Z'
+    end: '2026-10-31T16:00:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T16:00:00Z'
+    end: '2026-10-31T16:28:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T16:28:00Z'
+    end: '2026-10-31T17:00:00Z'
+    edge: sunset
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T17:00:00Z'
+    end: '2026-10-31T17:06:00Z'
+    edge: hour
+    verdict: null
+    approaching_limits: null
+  - start: '2026-10-31T17:06:00Z'
+    end: '2026-10-31T18:00:00Z'
+    edge: civil dusk
+    verdict: null
+    approaching_limits: null
+- id: ho_a6_alnwick_saturday
+  mode: draft
+  window:
+    start: '2026-10-10T06:00:00Z'
+    end: '2026-10-10T11:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 8715c171aa76aae007097421acdc4a8d9caa4c7a4a24512aa31d91b0237236d0
+    rows: 5f6788e954d68b8c06c3bda92410d8ae0152f68827f8c3069dbcd02626847f0b
+    weather.json: 6fdebc56b6376c464224cd06d562512883e10fc03bcef150cc65089bc78144e7
+    airspace.json: 037c6199a207a5ec14c0daad33ce3bba4281bbbc6f90d8bc96c5321254f2b167
+    pib.xml: 390eba671f43c0aa387b2f45c8816448d6e4d17ac07197f381da1e62059b12a3
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: f9ec2c3e09d3bb509f4b4ee0812e3b16a9c9ba0dd4d9879c8c13d604b36bd71b
+  notam_actions:
+    # ignored by code (add a line above to overrule):
+    # H6627/26: ended 2026-10-06T16:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3306/26: ended 2026-10-06T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3307/26: ended 2026-10-06T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3308/26: ended 2026-10-07T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3309/26: ended 2026-10-08T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3310/26: ended 2026-10-07T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3311/26: ended 2026-10-08T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3312/26: ended 2026-10-09T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3313/26: starts 2026-10-12T08:00:00Z, at or after the window end 2026-10-10T11:00:00Z
+    # J3314/26: ended 2026-10-09T17:00:00Z, at or before the window start 2026-10-10T06:00:00Z
+    # J3316/26: starts 2026-10-12T08:00:00Z, at or after the window end 2026-10-10T11:00:00Z
+  rows:
+  - start: '2026-10-10T06:00:00Z'
+    end: '2026-10-10T07:00:00Z'
+    edge: window start
+    tier: OUTLOOK
+  - start: '2026-10-10T07:00:00Z'
+    end: '2026-10-10T08:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-10-10T08:00:00Z'
+    end: '2026-10-10T09:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-10-10T09:00:00Z'
+    end: '2026-10-10T10:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-10-10T10:00:00Z'
+    end: '2026-10-10T11:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+- id: dev_03_buttermere
+  mode: draft
+  window:
+    start: '2026-07-08T16:00:00Z'
+    end: '2026-07-08T22:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 0e6d11b1640d8f203a7f7ad17d9312218efdffecb96dba9fe8796e3fdfd0aa47
+    rows: 256d757f893bbc9143da9173859af2c26c89c064dba7b8e286f7f7e1e788af89
+    weather.json: 1c7281ced6bef11bfbe922b11a9bf96d9e42b2f70a6eaf6e51c05eed15c3e8ff
+    airspace.json: cd3ba02b12b45504007c3486ab8b8730a8110b212f9908e0f508ae8c8463a77c
+    pib.xml: 059778f8161a6d1876f1338d3e78c864cc6549e488d17346307656691c091be6
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: ae7c92524b29b9f48616d41a2d86c82d8598d8c1ccc0e6113be01a3007e5ae1f
+  notam_actions:
+    H3868/26: CONTACT_FIRST
+    H3971/26: CONTACT_FIRST
+    M4666/26: AWARENESS
+    # ignored by code (add a line above to overrule):
+    # B1025/26: not active in the span: item D schedule has no time in it (0700-1600)
+    # B1138/26: not active in the span: item D schedule has no time in it (07 1630-1830, 09 1630-2230)
+    # B914/26: subject OA cannot affect a paramotor
+    # H2482/26: not active in the span: item D schedule has no time in it (07 1530-1930, 09 1530-2330)
+    # H3977/26: ended 2026-07-08T16:00:00Z, at or before the window start 2026-07-08T16:00:00Z
+    # U5436/26: subject AF with radius 999 NM: FIR-wide AIS admin
+    # V15/26: series V subject RO: security advice to air operators
+    # V19/26: series V subject RO: security advice to air operators
+    # V20/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-07-08T16:00:00Z'
+    end: '2026-07-08T17:00:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: false
+    # why: gust spread 7 mph, limit 6; YORKSHIRE CTA 16 (CTA) starts at 9,655 ft QNH above the LZ; UNVERIFIED: NOTAM H3868/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 543005N 0031508W, (ENNERDALE AND KINNISIDE, CUMBERLAND) MAX HEIGHT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC. OPS CTC <PHONE_1>. 26/07/044/LFC; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
+  - start: '2026-07-08T17:00:00Z'
+    end: '2026-07-08T18:00:00Z'
+    edge: M4666/26 starts
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H3868/26, H3971/26]
+    # why: gust spread 5.6 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,649 ft QNH above the LZ; UNVERIFIED: NOTAM H3868/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 543005N 0031508W, (ENNERDALE AND KINNISIDE, CUMBERLAND) MAX HEIGHT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC. OPS CTC <PHONE_1>. 26/07/044/LFC; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
+  - start: '2026-07-08T18:00:00Z'
+    end: '2026-07-08T19:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H3868/26, H3971/26]
+    # why: gust spread 4.7 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,649 ft QNH above the LZ; UNVERIFIED: NOTAM H3868/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 543005N 0031508W, (ENNERDALE AND KINNISIDE, CUMBERLAND) MAX HEIGHT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC. OPS CTC <PHONE_1>. 26/07/044/LFC; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
+  - start: '2026-07-08T19:00:00Z'
+    end: '2026-07-08T20:00:00Z'
+    edge: H3868/26 ends
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H3971/26]
+    # why: gust spread 5.4 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,649 ft QNH above the LZ; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
+  - start: '2026-07-08T20:00:00Z'
+    end: '2026-07-08T20:46:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H3971/26]
+    # why: gust spread 5.8 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,652 ft QNH above the LZ; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
+  - start: '2026-07-08T20:46:00Z'
+    end: '2026-07-08T20:47:00Z'
+    edge: sunset
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H3971/26]
+    # why: gust spread 5.8 mph, limit 4; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; YORKSHIRE CTA 16 (CTA) starts at 9,652 ft QNH above the LZ; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
+  - start: '2026-07-08T20:47:00Z'
+    end: '2026-07-08T21:00:00Z'
+    edge: H3971/26 ends
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
+    # why: gust spread 5.8 mph, limit 4; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; YORKSHIRE CTA 16 (CTA) starts at 9,652 ft QNH above the LZ
+  - start: '2026-07-08T21:00:00Z'
+    end: '2026-07-08T21:41:00Z'
+    edge: hour
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
+    # why: gust spread 5.8 mph, limit 4; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; YORKSHIRE CTA 16 (CTA) starts at 9,660 ft QNH above the LZ
+  - start: '2026-07-08T21:41:00Z'
+    end: '2026-07-08T22:00:00Z'
+    edge: civil dusk
+    verdict: NO_GO
+    approaching_limits: true
+    # why: night: outside civil twilight; gust spread 5.8 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,660 ft QNH above the LZ
+- id: dev_04_alnwick_pastures
+  mode: draft
+  window:
+    start: '2026-09-13T06:30:00Z'
+    end: '2026-09-13T11:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: cd26ab5ec835165b9a7b81dedb139d5ad295573284d68945b2ca2660e492bf33
+    rows: 60e4e8af1bec2b6db9cfec9073ff103bfa20d4df2dbceddb0d51e14bbaba2de3
+    weather.json: 6ff53ac3e188a60615447fcfdb92501903658bba698017aa8171956d0cd92ac5
+    airspace.json: 037c6199a207a5ec14c0daad33ce3bba4281bbbc6f90d8bc96c5321254f2b167
+    pib.xml: b04936bff2aaa05d765e2c66ac4068df13fefd0619daac834037b007ecfa47ea
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: a789bb622f14926cb88d186da7d9b7711e82395632c0df3f26da3fcc5020c245
+  notam_actions:
+    H5915/26: IGNORE
+    H5918/26: IGNORE
+    # ignored by code (add a line above to overrule):
+    # B1508/26: ended 2026-09-13T03:30:00Z, at or before the window start 2026-09-13T06:00:00Z
+    # H4453/26: starts 2026-09-14T09:30:00Z, at or after the window end 2026-09-13T11:00:00Z
+    # H4455/26: starts 2026-09-14T08:30:00Z, at or after the window end 2026-09-13T11:00:00Z
+    # H5990/26: starts 2026-09-14T06:00:00Z, at or after the window end 2026-09-13T11:00:00Z
+    # M6180/26: starts 2026-09-14T08:30:00Z, at or after the window end 2026-09-13T11:00:00Z
+    # U6768/26: subject OA cannot affect a paramotor
+    # U7666/26: subject AF with radius 999 NM: FIR-wide AIS admin
+    # V24/26: series V subject RO: security advice to air operators
+    # V26/26: series V subject RO: security advice to air operators
+    # V28/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-09-13T06:00:00Z'
+    end: '2026-09-13T07:00:00Z'
+    edge: window start
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gust spread 4 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,668 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
+  - start: '2026-09-13T07:00:00Z'
+    end: '2026-09-13T08:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gust spread 4.2 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,679 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
+  - start: '2026-09-13T08:00:00Z'
+    end: '2026-09-13T09:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gust spread 4.7 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,679 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
+  - start: '2026-09-13T09:00:00Z'
+    end: '2026-09-13T10:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gust spread 5.1 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,693 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
+  - start: '2026-09-13T10:00:00Z'
+    end: '2026-09-13T11:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gust spread 5.6 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,693 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
+- id: dev_10_crookham
+  mode: draft
+  window:
+    start: '2026-08-06T11:00:00Z'
+    end: '2026-08-06T17:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 3d7f7874515e1cb04824fca4dbbc44c9f40025673ef89975610452bb7334a973
+    rows: ab5bcb4b9644e6e1543d455a41eb5bd14e310e0add7cf8dad945dc60a2d46cf1
+    weather.json: 202b8ddb9194996bb9e0bbe6cf12d55c1c4723bf0d52707d0b8d10545050ff64
+    airspace.json: 6dd871f3a162e373f4e4cb62cebb76af8efe6b3f998c44d7bbf48a8203db408c
+    pib.xml: 53abcc0dc25fc6ce02bae45b87da674f889c1b5d944d816ed2ec6ce51e58f1ee
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: 5e98c6aecf2c126f53dc00eed301c4b998a6d2d80d0dab90e2787958b7d0180f
+  notam_actions:
+    H4821/26: AVOID_SECTOR
+    H4878/26: AWARENESS
+    # ignored by code (add a line above to overrule):
+    # B1140/26: starts 2026-08-11T20:30:00Z, at or after the window end 2026-08-06T17:00:00Z
+    # B914/26: subject OA cannot affect a paramotor
+    # H2513/26: starts 2026-08-11T19:30:00Z, at or after the window end 2026-08-06T17:00:00Z
+    # V20/26: series V subject RO: security advice to air operators
+    # V24/26: series V subject RO: security advice to air operators
+    # V26/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-08-06T11:00:00Z'
+    end: '2026-08-06T12:00:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 6.2 mph, limit 6; low cloud 100 %, limit 90; NOTAM H4821/26 0.08 NM to the W (Q-circle edge), up to 2,800 ft AMSL: avoid that sector; UNVERIFIED: airspace source failed: dropped for this example
+  - start: '2026-08-06T12:00:00Z'
+    end: '2026-08-06T13:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 6.2 mph, limit 6; low cloud 100 %, limit 90; NOTAM H4821/26 0.08 NM to the W (Q-circle edge), up to 2,800 ft AMSL: avoid that sector; UNVERIFIED: airspace source failed: dropped for this example
+  - start: '2026-08-06T13:00:00Z'
+    end: '2026-08-06T14:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gust spread 5 mph, limit 4; low cloud 100 %, limit 90; NOTAM H4821/26 0.08 NM to the W (Q-circle edge), up to 2,800 ft AMSL: avoid that sector; UNVERIFIED: airspace source failed: dropped for this example
+  - start: '2026-08-06T14:00:00Z'
+    end: '2026-08-06T15:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: precipitation 0.2 mm/h, limit 0.1; gust spread 5 mph, limit 4; low cloud 100 %, limit 90; NOTAM H4821/26 0.08 NM to the W (Q-circle edge), up to 2,800 ft AMSL: avoid that sector; UNVERIFIED: airspace source failed: dropped for this example
+  - start: '2026-08-06T15:00:00Z'
+    end: '2026-08-06T16:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: precipitation 0.1 mm/h, limit 0.1; gust spread 4 mph, limit 4; low cloud 100 %, limit 90; NOTAM H4821/26 0.08 NM to the W (Q-circle edge), up to 2,800 ft AMSL: avoid that sector; UNVERIFIED: airspace source failed: dropped for this example
+  - start: '2026-08-06T16:00:00Z'
+    end: '2026-08-06T17:00:00Z'
+    edge: H4878/26 ends
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gust spread 5.9 mph, limit 4; low cloud 100 %, limit 90; NOTAM H4821/26 0.08 NM to the W (Q-circle edge), up to 2,800 ft AMSL: avoid that sector; UNVERIFIED: airspace source failed: dropped for this example
+- id: dev_11_west_sleekburn
+  mode: draft
+  window:
+    start: '2026-07-26T06:00:00Z'
+    end: '2026-07-26T20:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 4d09be6f616db9a55e2ce4426aa05b34465c216054551d682ef0e0e92bf3697a
+    rows: 5b62ea9b3fc2cd57a6a3b588b6073fc4c885bcef40b23a1bec2089c48c0d779f
+    weather.json: 9fd1a410748de632d606de01c102da1d4d401dc32c0557e436d354958f0f3401
+    airspace.json: b057bca1280bb7fd441c09ceb6ce208dacd3cf1e12024a65d4fe1bb8bc996941
+    pib.xml: fc82e1c3a4ba74420f9b24a7054d7bf5205708288a6022004b3eb2edc2a767d0
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: 17cb491a309c2d3fe02b999f47c238cf725e9f6e9cad2d1b8a66d0d7f948f45b
+  notam_actions:
+    # ignored by code (add a line above to overrule):
+    # H4420/26: ended 2026-07-22T18:30:00Z, at or before the window start 2026-07-26T06:00:00Z
+    # H4466/26: ended 2026-07-22T16:00:00Z, at or before the window start 2026-07-26T06:00:00Z
+  rows:
+  - start: '2026-07-26T06:00:00Z'
+    end: '2026-07-26T07:00:00Z'
+    edge: window start
+    tier: OUTLOOK
+  - start: '2026-07-26T07:00:00Z'
+    end: '2026-07-26T08:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T08:00:00Z'
+    end: '2026-07-26T09:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T09:00:00Z'
+    end: '2026-07-26T10:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T10:00:00Z'
+    end: '2026-07-26T11:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T11:00:00Z'
+    end: '2026-07-26T12:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T12:00:00Z'
+    end: '2026-07-26T13:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T13:00:00Z'
+    end: '2026-07-26T14:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T14:00:00Z'
+    end: '2026-07-26T15:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T15:00:00Z'
+    end: '2026-07-26T16:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T16:00:00Z'
+    end: '2026-07-26T17:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T17:00:00Z'
+    end: '2026-07-26T18:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T18:00:00Z'
+    end: '2026-07-26T19:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+  - start: '2026-07-26T19:00:00Z'
+    end: '2026-07-26T20:00:00Z'
+    edge: hour
+    tier: OUTLOOK
+- id: dev_12_blue_mill
+  mode: draft
+  window:
+    start: '2026-07-30T09:00:00Z'
+    end: '2026-07-30T10:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: b15857273e5c11d2ee88450889726a875d8315024007a3fa799d6206e32b6d3b
+    rows: 53eee5eb56d9f3e643684e1a4e5c1c408780ce5ff19b66753716a435cc797d44
+    weather.json: 1f9cc15ca78672a509796d7ae06956430cf97ed96c49711996d09a7f19a5947d
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: 49f98f2d5967c2d73a8845cbe822ec354ce17cd05f2ab1fa705e034ad2e495a4
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: 464d800ab0f80205adba72b911760df9a673ec5b07770fa4e9fba0f86cb2ac51
+  notam_actions:
+    H4701/26: IGNORE
+    B1139/26: AWARENESS
+    H2483/26: CONTACT_FIRST
+    H4715/26: AWARENESS
+    # ignored by code (add a line above to overrule):
+    # B1230/26: not active in the span: item D schedule has no time in it (22 24 29 31 0900-1000)
+    # B914/26: subject OA cannot affect a paramotor
+    # B952/26: subject SE cannot affect a paramotor
+    # M5253/26: starts 2026-07-30T14:00:00Z, at or after the window end 2026-07-30T10:00:00Z
+    # M5254/26: starts 2026-07-30T14:00:00Z, at or after the window end 2026-07-30T10:00:00Z
+    # M5255/26: starts 2026-07-30T13:00:00Z, at or after the window end 2026-07-30T10:00:00Z
+    # M5263/26: starts 2026-07-30T12:00:00Z, at or after the window end 2026-07-30T10:00:00Z
+    # V19/26: series V subject RO: security advice to air operators
+    # V20/26: series V subject RO: security advice to air operators
+    # V24/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-07-30T09:00:00Z'
+    end: '2026-07-30T09:30:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 6.9 mph, limit 6; low cloud 100 %, limit 90
+  - start: '2026-07-30T09:30:00Z'
+    end: '2026-07-30T10:00:00Z'
+    edge: H4701/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 6.9 mph, limit 6; low cloud 100 %, limit 90; NOTAM H4701/26 1.03 NM to the NNW (Q-circle edge), up to 2,100 ft AMSL: avoid that sector
+- id: dev_13_bamburgh
+  mode: draft
+  window:
+    start: '2026-10-10T06:30:00Z'
+    end: '2026-10-10T23:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 7b7017ce14195b2d6be67e1022877b61e3265f3bcb13d3684b58a0cf56e02a9d
+    rows: 7f27a36b8096dd3a17853f049ee61cf009203ea4dd2adfc1a9489cb3a679ad12
+    weather.json: c950497f72b24a698f399838eb3eba80026a8def9afb6ad108c1b503fb2cd134
+    airspace.json: a5c9e6d52dc14297f708372b15e527e9811caa6b6af060107e05cfe1ebb0ac06
+    pib.xml: 575cb812de9def24a3fef27bfe0193570dfd2b6bcd13d9d53239390d0ab36e92
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: 11aff735aab548a795c6ac0459f05623157bb4b9b83f730af2711e50292c40a0
+  notam_actions:
+    H5829/26: IGNORE
+    H6767/26: IGNORE
+    # ignored by code (add a line above to overrule):
+    # G110/26: subject OA cannot affect a paramotor
+    # H6791/26: starts 2026-10-12T06:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3313/26: starts 2026-10-12T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3315/26: starts 2026-10-13T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3316/26: starts 2026-10-12T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3317/26: starts 2026-10-14T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3318/26: starts 2026-10-13T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3319/26: starts 2026-10-14T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3320/26: starts 2026-10-15T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3321/26: starts 2026-10-16T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3322/26: starts 2026-10-15T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # J3324/26: starts 2026-10-16T08:00:00Z, at or after the window end 2026-10-10T23:00:00Z
+    # U6768/26: subject OA cannot affect a paramotor
+    # U8287/26: subject AF with radius 999 NM: FIR-wide AIS admin
+    # V26/26: series V subject RO: security advice to air operators
+    # V28/26: series V subject RO: security advice to air operators
+    # V32/26: series V subject RO: security advice to air operators
+    # V33/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-10-10T06:00:00Z'
+    end: '2026-10-10T06:28:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 18.6 mph, limit 16; gust spread 14.3 mph, limit 6; wind at 80 m 30.7 mph, limit 16; wind at 120 m 33.3 mph, limit 16; gradient 14.7 mph, limit 9; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,217 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T06:28:00Z'
+    end: '2026-10-10T07:00:00Z'
+    edge: sunrise
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 18.6 mph, limit 16; gust spread 14.3 mph, limit 6; wind at 80 m 30.7 mph, limit 16; wind at 120 m 33.3 mph, limit 16; gradient 14.7 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,217 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T07:00:00Z'
+    end: '2026-10-10T08:00:00Z'
+    edge: H6767/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 18.6 mph, limit 16; gust spread 14.3 mph, limit 6; wind at 80 m 30.7 mph, limit 16; wind at 120 m 33.3 mph, limit 16; gradient 14.7 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,217 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T08:00:00Z'
+    end: '2026-10-10T09:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 20.8 mph, limit 16; gust spread 15.9 mph, limit 6; wind at 80 m 32.2 mph, limit 16; wind at 120 m 34.2 mph, limit 16; gradient 13.4 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,228 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T09:00:00Z'
+    end: '2026-10-10T10:00:00Z'
+    edge: H5829/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 21.5 mph, limit 16; gust spread 16.3 mph, limit 6; wind at 80 m 33.1 mph, limit 16; wind at 120 m 35.2 mph, limit 16; gradient 13.7 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,215 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T10:00:00Z'
+    end: '2026-10-10T11:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 21.5 mph, limit 16; gust spread 16.3 mph, limit 6; wind at 80 m 33.1 mph, limit 16; wind at 120 m 35.2 mph, limit 16; gradient 13.7 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,215 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T11:00:00Z'
+    end: '2026-10-10T12:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 20.8 mph, limit 16; gust spread 16.1 mph, limit 6; wind at 80 m 32.2 mph, limit 16; wind at 120 m 34 mph, limit 16; gradient 13.2 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,231 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T12:00:00Z'
+    end: '2026-10-10T13:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 20.1 mph, limit 16; gust spread 15.9 mph, limit 6; wind at 80 m 31.3 mph, limit 16; wind at 120 m 33.3 mph, limit 16; gradient 13.2 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,239 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T13:00:00Z'
+    end: '2026-10-10T14:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 20.4 mph, limit 16; gust spread 15.9 mph, limit 6; wind at 80 m 31.3 mph, limit 16; wind at 120 m 33.3 mph, limit 16; gradient 13.2 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,242 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T14:00:00Z'
+    end: '2026-10-10T15:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 20.4 mph, limit 16; gust spread 14.8 mph, limit 6; wind at 80 m 31.3 mph, limit 16; wind at 120 m 33.1 mph, limit 16; gradient 13 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,250 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T15:00:00Z'
+    end: '2026-10-10T16:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 19.2 mph, limit 16; gust spread 14.8 mph, limit 6; wind at 80 m 30.2 mph, limit 16; wind at 120 m 32.2 mph, limit 16; gradient 13 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,255 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T16:00:00Z'
+    end: '2026-10-10T17:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 16.6 mph, limit 16; gust spread 12.7 mph, limit 6; wind at 80 m 26.8 mph, limit 16; wind at 120 m 29 mph, limit 16; gradient 12.4 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,263 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T17:00:00Z'
+    end: '2026-10-10T17:19:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.2 mph, limit 6; wind at 10 m 14.5 mph, limit 12; wind at 80 m 24.8 mph, limit 16; wind at 120 m 27.2 mph, limit 16; gradient 13.1 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,266 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T17:19:00Z'
+    end: '2026-10-10T17:23:00Z'
+    edge: sunset
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.2 mph, limit 6; wind at 10 m 14.5 mph, limit 12; wind at 80 m 24.8 mph, limit 16; wind at 120 m 27.2 mph, limit 16; gradient 13.1 mph, limit 9; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,266 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T17:23:00Z'
+    end: '2026-10-10T17:56:00Z'
+    edge: H6767/26 ends
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.2 mph, limit 6; wind at 10 m 14.5 mph, limit 12; wind at 80 m 24.8 mph, limit 16; wind at 120 m 27.2 mph, limit 16; gradient 13.1 mph, limit 9; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,266 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T17:56:00Z'
+    end: '2026-10-10T18:00:00Z'
+    edge: civil dusk
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.2 mph, limit 6; night: outside civil twilight; wind at 10 m 14.5 mph, limit 12; wind at 80 m 24.8 mph, limit 16; wind at 120 m 27.2 mph, limit 16; gradient 13.1 mph, limit 9; NOTAM H5829/26 1.71 NM to the W (Q-circle edge), up to FL195: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,266 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T18:00:00Z'
+    end: '2026-10-10T19:00:00Z'
+    edge: H5829/26 ends
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.4 mph, limit 6; night: outside civil twilight; wind at 10 m 14.5 mph, limit 12; wind at 80 m 25.5 mph, limit 16; wind at 120 m 28.1 mph, limit 16; gradient 13.6 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,277 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T19:00:00Z'
+    end: '2026-10-10T20:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 17.7 mph, limit 16; gust spread 13.4 mph, limit 6; night: outside civil twilight; wind at 80 m 29.5 mph, limit 16; wind at 120 m 32.2 mph, limit 16; gradient 14.5 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,277 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T20:00:00Z'
+    end: '2026-10-10T21:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 17.7 mph, limit 16; gust spread 13.5 mph, limit 6; night: outside civil twilight; wind at 80 m 29.5 mph, limit 16; wind at 120 m 32.2 mph, limit 16; gradient 14.8 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,293 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T21:00:00Z'
+    end: '2026-10-10T22:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 17.4 mph, limit 16; gust spread 13.5 mph, limit 6; night: outside civil twilight; wind at 80 m 29.5 mph, limit 16; wind at 120 m 32.2 mph, limit 16; gradient 14.8 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,306 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+  - start: '2026-10-10T22:00:00Z'
+    end: '2026-10-10T23:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 16.3 mph, limit 16; gust spread 12.3 mph, limit 6; night: outside civil twilight; wind at 80 m 27.9 mph, limit 16; wind at 120 m 30.8 mph, limit 16; gradient 14.5 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,306 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-10-10T01:00:36Z, more than 3 h before now
+- id: dev_14_town_moor
+  mode: draft
+  window:
+    start: '2026-07-11T17:00:00Z'
+    end: '2026-07-11T23:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: df7c7767a925a874f991eba2353432e0ae751512eb35670730e10a447df97c9b
+    rows: 7efb9eaa8de18967020ddf2131642a87c89fba1ab1ef04bf7867fc6eb5820808
+    weather.json: e9a57c6f1770799d06986eb2b2dbe6c3464b37e7f4c3d55e9a1951f06acc2dd5
+    airspace.json: 4d7b837262f53c817d29aaea551b36dad98422a1bf1a33ff4969bbfe063db00b
+    pib.xml: b02b7d46fffbefaabce9130e06a350be44b775881b45dc7263350a74a74a889d
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: 7a4ecdc17db8c40cbceed7068b4ab1186fec80966c3798363ceeacda70858459
+  notam_actions:
+    H1633/26: CONTACT_FIRST
+    H3369/26: AVOID_SECTOR
+    I2608/26: CONTACT_FIRST
+    I4150/26: AVOID_SECTOR
+    N331/26: AVOID_SECTOR
+    I4090/26: IGNORE
+    # ignored by code (add a line above to overrule):
+    # B1173/26: starts 2026-07-13T00:01:00Z, at or after the window end 2026-07-11T23:00:00Z
+    # B914/26: subject OA cannot affect a paramotor
+    # H4119/26: starts 2026-07-13T03:45:00Z, at or after the window end 2026-07-11T23:00:00Z
+    # H4123/26: starts 2026-07-13T06:00:00Z, at or after the window end 2026-07-11T23:00:00Z
+    # I4427/26: subject FH cannot affect a paramotor
+    # I4432/26: subject MP cannot affect a paramotor
+    # I4610/26: subject MX cannot affect a paramotor
+    # I4734/26: starts 2026-07-13T03:45:00Z, at or after the window end 2026-07-11T23:00:00Z
+    # I4737/26: subject MP cannot affect a paramotor
+    # V15/26: series V subject RO: security advice to air operators
+    # V19/26: series V subject RO: security advice to air operators
+    # V20/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-07-11T17:00:00Z'
+    end: '2026-07-11T18:00:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 6.9 mph, limit 6; precipitation 0.2 mm/h, limit 0.1; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC
+  - start: '2026-07-11T18:00:00Z'
+    end: '2026-07-11T19:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 6.9 mph, limit 6; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC
+  - start: '2026-07-11T19:00:00Z'
+    end: '2026-07-11T20:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 6.7 mph, limit 6; over NEWCASTLE CTR (CTR) from the surface; low cloud 98 %, limit 90; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC
+  - start: '2026-07-11T20:00:00Z'
+    end: '2026-07-11T20:40:00Z'
+    edge: H1633/26 starts + I2608/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC; UNVERIFIED: NOTAM H1633/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.; UNVERIFIED: NOTAM I2608/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.
+  - start: '2026-07-11T20:40:00Z'
+    end: '2026-07-11T21:00:00Z'
+    edge: sunset
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC; UNVERIFIED: NOTAM H1633/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.; UNVERIFIED: NOTAM I2608/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.
+  - start: '2026-07-11T21:00:00Z'
+    end: '2026-07-11T21:30:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; precipitation 0.1 mm/h, limit 0.1; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC; UNVERIFIED: NOTAM H1633/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.; UNVERIFIED: NOTAM I2608/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.
+  - start: '2026-07-11T21:30:00Z'
+    end: '2026-07-11T21:35:00Z'
+    edge: H3369/26 starts + I4150/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; precipitation 0.1 mm/h, limit 0.1; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC; UNVERIFIED: NOTAM H1633/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.; UNVERIFIED: NOTAM H3369/26 is over the LZ from the surface and has not been read: FIREWORKS WI 0.5NM RADIUS OF 545907N 0013703W (NEWCASTLE UPON TYNE). FOR INFO <PHONE_1> / <PHONE_2>. AR-2026-4983/01.; UNVERIFIED: NOTAM I2608/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.; UNVERIFIED: NOTAM I4150/26 is over the LZ from the surface and has not been read: FIREWORKS WI 0.5NM RADIUS OF 545907N 0013703W (NEWCASTLE UPON TYNE). FOR INFO <PHONE_1> / <PHONE_2>. AR-2026-4983/01.
+  - start: '2026-07-11T21:35:00Z'
+    end: '2026-07-11T22:00:00Z'
+    edge: civil dusk
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; precipitation 0.1 mm/h, limit 0.1; night: outside civil twilight; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC; UNVERIFIED: NOTAM H1633/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.; UNVERIFIED: NOTAM H3369/26 is over the LZ from the surface and has not been read: FIREWORKS WI 0.5NM RADIUS OF 545907N 0013703W (NEWCASTLE UPON TYNE). FOR INFO <PHONE_1> / <PHONE_2>. AR-2026-4983/01.; UNVERIFIED: NOTAM I2608/26 is over the LZ from the surface and has not been read: LASERS, FIREWORKS WI 1NM RADIUS OF 545905N 0013656W (EXHIBITION PARK, NEWCASTLE UPON TYNE). FIREWORKS UP TO 400FT AGL. FOR INFO <PHONE_1>. AR-2026-2098/01.; UNVERIFIED: NOTAM I4150/26 is over the LZ from the surface and has not been read: FIREWORKS WI 0.5NM RADIUS OF 545907N 0013703W (NEWCASTLE UPON TYNE). FOR INFO <PHONE_1> / <PHONE_2>. AR-2026-4983/01.
+  - start: '2026-07-11T22:00:00Z'
+    end: '2026-07-11T23:00:00Z'
+    edge: H1633/26 ends + H3369/26 ends + I2608/26 ends + I4150/26 ends
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.1 mph, limit 6; precipitation 0.1 mm/h, limit 0.1; night: outside civil twilight; over NEWCASTLE CTR (CTR) from the surface; low cloud 100 %, limit 90; NOTAM I4090/26 1.45 NM to the NNW (Q-circle edge), up to FL004: avoid that sector; UNVERIFIED: NOTAM N331/26 is over the LZ from the surface and has not been read: LIT CRANE AT PSN 545850N 0013744W (SPITAL TONGUES, NEWCASTLE) IN LOW FLYING AREA 12 AND NIGHT SECTOR 4AS HGT 550FT AMSL (280FT AGL). 26/04/183/LFC
+- id: dev_20_druridge_bay
+  mode: draft
+  window:
+    start: '2026-09-29T06:30:00Z'
+    end: '2026-09-29T11:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 149deac8039f98b7b5f16a395fb4e1d149052369c22dc12dce83097adcff9d62
+    rows: 99b32d611061f7732b99a713c342f2efb21ba4d4c9328817b378f0d42378e1ef
+    weather.json: b47f18d4f39b2ae78ffc36dd61872781bed6ce87c66eb4c98e358d165255cc68
+    airspace.json: 9abb1e03675effcc0883331d9aa2f1c46e8cad1467567f4b0d998c00feb6d5dc
+    pib.xml: cd0f8f906f9653ef144d8d5ec070047b0e97d9ad7e85328f89b9c1cb53e828cd
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: 18c38fc4551aea51f392501402fffa6291253500e61ce74c0b70c23214d0e440
+  notam_actions:
+    H6447/26: CONTACT_FIRST
+    H6448/26: AVOID_SECTOR
+    J3219/26: CHECK_SUP
+    H4454/26: IGNORE
+    H6451/26: AWARENESS
+    # ignored by code (add a line above to overrule):
+    # H4456/26: starts 2026-10-01T10:00:00Z, at or after the window end 2026-09-29T11:00:00Z
+    # U6768/26: subject OA cannot affect a paramotor
+    # U7666/26: subject AF with radius 999 NM: FIR-wide AIS admin
+    # V24/26: series V subject RO: security advice to air operators
+    # V26/26: series V subject RO: security advice to air operators
+    # V28/26: series V subject RO: security advice to air operators
+    # V30/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-09-29T06:00:00Z'
+    end: '2026-09-29T06:06:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; wind at 80 m 20.1 mph, limit 16; wind at 120 m 21.5 mph, limit 16; gradient 11.6 mph, limit 9; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,695 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD598 is activated by NOTAM J3219/26, which has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM J3219/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.
+  - start: '2026-09-29T06:06:00Z'
+    end: '2026-09-29T07:00:00Z'
+    edge: sunrise
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; wind at 80 m 20.1 mph, limit 16; wind at 120 m 21.5 mph, limit 16; gradient 11.6 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,695 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD598 is activated by NOTAM J3219/26, which has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM J3219/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.
+  - start: '2026-09-29T07:00:00Z'
+    end: '2026-09-29T08:00:00Z'
+    edge: H6448/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.5 mph, limit 6; wind at 80 m 20.1 mph, limit 16; wind at 120 m 21.5 mph, limit 16; gradient 10.1 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,690 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD598 is activated by NOTAM J3219/26, which has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM J3219/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM H6448/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 552018N 0013336W (AMBLE, NORTHUMBERLAND) LOW FLYING AREA 12 AND NIGHT SECTOR 4AN. MAX HGT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC OPS CTC <PHONE_1>. 26/09/310/LFC
+  - start: '2026-09-29T08:00:00Z'
+    end: '2026-09-29T09:00:00Z'
+    edge: H4454/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 8.9 mph, limit 6; wind at 80 m 18.7 mph, limit 16; wind at 120 m 20.1 mph, limit 16; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,674 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD598 is activated by NOTAM J3219/26, which has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM J3219/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM H6448/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 552018N 0013336W (AMBLE, NORTHUMBERLAND) LOW FLYING AREA 12 AND NIGHT SECTOR 4AN. MAX HGT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC OPS CTC <PHONE_1>. 26/09/310/LFC
+  - start: '2026-09-29T09:00:00Z'
+    end: '2026-09-29T10:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 16.6 mph, limit 16; gust spread 12 mph, limit 6; wind at 80 m 24.8 mph, limit 16; wind at 120 m 26.3 mph, limit 16; gradient 9.7 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,652 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD598 is activated by NOTAM J3219/26, which has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM J3219/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM H6448/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 552018N 0013336W (AMBLE, NORTHUMBERLAND) LOW FLYING AREA 12 AND NIGHT SECTOR 4AN. MAX HGT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC OPS CTC <PHONE_1>. 26/09/310/LFC
+  - start: '2026-09-29T10:00:00Z'
+    end: '2026-09-29T10:30:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 17 mph, limit 16; gust spread 13 mph, limit 6; wind at 80 m 25.2 mph, limit 16; wind at 120 m 26.5 mph, limit 16; gradient 9.7 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,641 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD598 is activated by NOTAM J3219/26, which has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM J3219/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM H6448/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 552018N 0013336W (AMBLE, NORTHUMBERLAND) LOW FLYING AREA 12 AND NIGHT SECTOR 4AN. MAX HGT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC OPS CTC <PHONE_1>. 26/09/310/LFC
+  - start: '2026-09-29T10:30:00Z'
+    end: '2026-09-29T11:00:00Z'
+    edge: H6447/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 17 mph, limit 16; gust spread 13 mph, limit 6; wind at 80 m 25.2 mph, limit 16; wind at 120 m 26.5 mph, limit 16; gradient 9.7 mph, limit 9; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,641 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD598 is activated by NOTAM J3219/26, which has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM H6447/26 is over the LZ from the surface and has not been read: AERIAL SURVEY WI AREA BOUNDED BY 554417N 0020829W - 555302N 0015016W - 554354N 0012712W - 550226N 0011649W - 545916N 0013003W - 552720N 0014100W - 554417N 0020829W (BTN BERWICK-UPON-TWEED AND NEWCASTLE-UPON-TYNE). FOR INFO <PHONE_1>. AR-2026-9099/01.; UNVERIFIED: NOTAM J3219/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 107/2026 WEF 17 SEP 26 UNTIL 16 DEC 26. TEMPORARY DANGER AREA EGD598 (EMBLETON, NORTHUMBRIA): BVLOS RPAS OPERATIONS TRIALS.; UNVERIFIED: NOTAM H6448/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 552018N 0013336W (AMBLE, NORTHUMBERLAND) LOW FLYING AREA 12 AND NIGHT SECTOR 4AN. MAX HGT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC OPS CTC <PHONE_1>. 26/09/310/LFC
+- id: dev_21_crookham
+  mode: draft
+  window:
+    start: '2026-08-12T06:30:00Z'
+    end: '2026-08-12T08:30:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: eb523127c3df9d29741fcdbd24cada38efc7c2f6509cb3e006cbc65473c58552
+    rows: 41845a80b291708773ff76be76af9473ae33d66db915bd29797d307445110c52
+    weather.json: 6e079f18857c67626231dccb69aff48e3c8d9ad71f7a9cbeffb004a98639d24e
+    airspace.json: 6dd871f3a162e373f4e4cb62cebb76af8efe6b3f998c44d7bbf48a8203db408c
+    pib.xml: 22b793d4603bb43bcd432032040338321b2b25901aefd8716d55e1c7adffcbfb
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: e354d564113e15933e74f4b282f71d1ccd6ca846a7d2c70940c4d2b0e7b8e4fc
+  notam_actions:
+    H5078/26: AWARENESS
+    # ignored by code (add a line above to overrule):
+    # B1140/26: not active in the span: item D schedule has no time in it (11 13 2030-2230, 18 20 25 27 0900-1100)
+    # B1321/26: starts 2026-08-13T00:00:00Z, at or after the window end 2026-08-12T09:00:00Z
+    # B1322/26: starts 2026-08-18T00:00:00Z, at or after the window end 2026-08-12T09:00:00Z
+    # B1344/26: starts 2026-08-13T13:30:00Z, at or after the window end 2026-08-12T09:00:00Z
+    # B914/26: subject OA cannot affect a paramotor
+    # H2513/26: not active in the span: item D schedule has no time in it (11-14 1930-2330, 18-27 0800-1200)
+    # M5515/26: starts 2026-08-12T17:00:00Z, at or after the window end 2026-08-12T09:00:00Z
+    # U6394/26: starts 2026-08-13T23:00:00Z, at or after the window end 2026-08-12T09:00:00Z
+    # U6711/26: subject AF with radius 999 NM: FIR-wide AIS admin
+    # U6768/26: subject OA cannot affect a paramotor
+    # V20/26: series V subject RO: security advice to air operators
+    # V24/26: series V subject RO: security advice to air operators
+    # V26/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-08-12T06:00:00Z'
+    end: '2026-08-12T07:00:00Z'
+    edge: window start
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
+    # why: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,730 ft QNH above the LZ
+  - start: '2026-08-12T07:00:00Z'
+    end: '2026-08-12T08:00:00Z'
+    edge: hour
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
+    # why: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,722 ft QNH above the LZ
+  - start: '2026-08-12T08:00:00Z'
+    end: '2026-08-12T09:00:00Z'
+    edge: hour
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
+    # why: EGD514 COMBAT AIRSPACE (DANGER) starts at 8,722 ft QNH above the LZ
+- id: dev_22_buttermere
+  mode: draft
+  window:
+    start: '2026-07-23T06:30:00Z'
+    end: '2026-07-23T11:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 69ac43c891687026229d8753cc0d5318e5e8107df380784a7137cd5c7c3d3d93
+    rows: ea8d0a98cd70936cea790b39b50dbeca161e7658a29f46d19ceb33715db8a9d9
+    weather.json: 98357463e08e96eff380b4aec3617b904e42eb027273879e82ca43ecb55b7c78
+    airspace.json: cd3ba02b12b45504007c3486ab8b8730a8110b212f9908e0f508ae8c8463a77c
+    pib.xml: 1cf4a25433b3d0bff08059ea262dab2052a83229056e61393431fc4db9694172
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: a3912ea0a4329daaaa0d20ee428ab13b508db2910df5ed6a9aa57f93fa72f4c7
+  notam_actions:
+    B1139/26: IGNORE
+    H2483/26: IGNORE
+    H4505/26: AWARENESS
+    # ignored by code (add a line above to overrule):
+    # B752/26: starts 2026-07-28T09:30:00Z, at or after the window end 2026-07-23T11:00:00Z
+    # B914/26: subject OA cannot affect a paramotor
+    # V19/26: series V subject RO: security advice to air operators
+    # V20/26: series V subject RO: security advice to air operators
+    # V24/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-07-23T06:00:00Z'
+    end: '2026-07-23T07:00:00Z'
+    edge: window start
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
+    # why: gust spread 5.1 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,790 ft QNH above the LZ
+  - start: '2026-07-23T07:00:00Z'
+    end: '2026-07-23T08:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: gust spread 6.7 mph, limit 6; YORKSHIRE CTA 16 (CTA) starts at 9,790 ft QNH above the LZ
+  - start: '2026-07-23T08:00:00Z'
+    end: '2026-07-23T09:00:00Z'
+    edge: H2483/26 starts
+    verdict: NO_GO
+    approaching_limits: false
+    # why: gust spread 7.8 mph, limit 6; YORKSHIRE CTA 16 (CTA) starts at 9,792 ft QNH above the LZ
+  - start: '2026-07-23T09:00:00Z'
+    end: '2026-07-23T10:00:00Z'
+    edge: B1139/26 starts
+    verdict: NO_GO
+    approaching_limits: false
+    # why: gust spread 8.3 mph, limit 6; YORKSHIRE CTA 16 (CTA) starts at 9,792 ft QNH above the LZ
+  - start: '2026-07-23T10:00:00Z'
+    end: '2026-07-23T11:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: gust spread 8.3 mph, limit 6; YORKSHIRE CTA 16 (CTA) starts at 9,787 ft QNH above the LZ
+- id: dev_23_blue_mill
+  mode: draft
+  window:
+    start: '2026-10-31T07:30:00Z'
+    end: '2026-11-02T00:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: c7141fc1a20414e5ff17a88f9d2e26a78638baabff9e3f84fef868188e9853d7
+    rows: bfc8e35f37d2dd73fa05af0033b462e7f4aa295aa1f881b063317691644dce5e
+    weather.json: b07c3c96a1c2dc897b179dd4be991d29184a0a8919e7c4fb76239830977ac1b9
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: 76c35ea66ca7b00cda77a2dae702fa2c6eeb854a1d646f80595a7e18460f58f2
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: d7bec3a42f97be05849d5e4f1ca9adba18acd5e19f6092b831a6ffd91949ce0a
+  notam_actions:
+    H7171/26: AVOID_SECTOR
+    J3857/26: CONTACT_FIRST
+    J3864/26: CONTACT_FIRST
+    # ignored by code (add a line above to overrule):
+    # B1603/26: subject SE cannot affect a paramotor
+    # B1623/26: starts 2026-11-02T13:30:00Z, at or after the window end 2026-11-02T00:00:00Z
+    # G110/26: subject OA cannot affect a paramotor
+    # H6997/26: not active in the span: item D schedule has no time in it (OCT 26 27 28 NOV 02 04 09 10 11 12 18 0900-2030)
+    # H7297/26: starts 2026-11-02T06:00:00Z, at or after the window end 2026-11-02T00:00:00Z
+    # M7361/26: starts 2026-11-02T07:30:00Z, at or after the window end 2026-11-02T00:00:00Z
+    # M7365/26: starts 2026-11-02T07:45:00Z, at or after the window end 2026-11-02T00:00:00Z
+    # M7366/26: starts 2026-11-02T07:45:00Z, at or after the window end 2026-11-02T00:00:00Z
+    # M7367/26: starts 2026-11-02T07:45:00Z, at or after the window end 2026-11-02T00:00:00Z
+    # Q172/26: not active in the span: starts 2026-11-01T00:00:00Z
+    # Q173/26: not active in the span: starts 2026-11-01T00:00:00Z
+    # U6768/26: subject OA cannot affect a paramotor
+    # U8966/26: subject AF with radius 999 NM: FIR-wide AIS admin
+    # U8967/26: subject OA cannot affect a paramotor
+    # V32/26: series V subject RO: security advice to air operators
+    # V34/26: series V subject RO: security advice to air operators
+    # V35/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-10-31T07:00:00Z'
+    end: '2026-10-31T08:00:00Z'
+    edge: window start
+    verdict: UNVERIFIED
+    approaching_limits: true
+    # why: gradient 9.9 mph, limit 9; visibility 1520 m, limit 5000; low cloud 91 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-10-31T08:00:00Z'
+    end: '2026-10-31T09:00:00Z'
+    edge: H7171/26 starts + J3857/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 1340 m, limit 1500; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T09:00:00Z'
+    end: '2026-10-31T10:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 1340 m, limit 1500; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T10:00:00Z'
+    end: '2026-10-31T11:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: visibility 2920 m, limit 5000; low cloud 98 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T11:00:00Z'
+    end: '2026-10-31T12:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gust spread 4.7 mph, limit 4; visibility 3880 m, limit 5000; low cloud 95 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T12:00:00Z'
+    end: '2026-10-31T13:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gust spread 5.2 mph, limit 4; low cloud 91 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T13:00:00Z'
+    end: '2026-10-31T14:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gust spread 5.2 mph, limit 4; low cloud 91 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T14:00:00Z'
+    end: '2026-10-31T15:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gust spread 4.5 mph, limit 4; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T15:00:00Z'
+    end: '2026-10-31T16:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gust spread 4.5 mph, limit 4; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T16:00:00Z'
+    end: '2026-10-31T16:28:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gust spread 4.3 mph, limit 4; gradient 9.7 mph, limit 9; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T16:28:00Z'
+    end: '2026-10-31T17:00:00Z'
+    edge: sunset
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gust spread 4.3 mph, limit 4; gradient 9.7 mph, limit 9; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T17:00:00Z'
+    end: '2026-10-31T17:06:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3857/26]
+    # why: gradient 9.7 mph, limit 9; visibility 2600 m, limit 5000; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T17:06:00Z'
+    end: '2026-10-31T18:00:00Z'
+    edge: civil dusk
+    verdict: NO_GO
+    approaching_limits: true
+    # why: night: outside civil twilight; gradient 9.7 mph, limit 9; visibility 2600 m, limit 5000; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
+  - start: '2026-10-31T18:00:00Z'
+    end: '2026-10-31T19:00:00Z'
+    edge: H7171/26 ends + J3857/26 ends
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 280 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-10-31T19:00:00Z'
+    end: '2026-10-31T20:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 280 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-10-31T20:00:00Z'
+    end: '2026-10-31T21:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 700 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-10-31T21:00:00Z'
+    end: '2026-10-31T22:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 360 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-10-31T22:00:00Z'
+    end: '2026-10-31T23:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 160 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-10-31T23:00:00Z'
+    end: '2026-11-01T00:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 160 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T00:00:00Z'
+    end: '2026-11-01T01:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 160 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T01:00:00Z'
+    end: '2026-11-01T02:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 160 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T02:00:00Z'
+    end: '2026-11-01T03:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 480 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T03:00:00Z'
+    end: '2026-11-01T04:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 100 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T04:00:00Z'
+    end: '2026-11-01T05:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: false
+    # why: visibility 100 m, limit 1500; night: outside civil twilight; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T05:00:00Z'
+    end: '2026-11-01T06:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 120 m, limit 1500; night: outside civil twilight; low cloud 95 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T06:00:00Z'
+    end: '2026-11-01T06:23:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 140 m, limit 1500; night: outside civil twilight; low cloud 95 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T06:23:00Z'
+    end: '2026-11-01T07:00:00Z'
+    edge: civil dawn
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 140 m, limit 1500; low cloud 95 %, limit 90; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T07:00:00Z'
+    end: '2026-11-01T07:01:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 1300 m, limit 1500; gust spread 4.2 mph, limit 4; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T07:01:00Z'
+    end: '2026-11-01T08:00:00Z'
+    edge: sunrise
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 1300 m, limit 1500; gust spread 4.2 mph, limit 4; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T08:00:00Z'
+    end: '2026-11-01T09:00:00Z'
+    edge: H7171/26 starts + J3864/26 starts
+    verdict: NO_GO
+    approaching_limits: true
+    # why: visibility 1300 m, limit 1500; gust spread 4.2 mph, limit 4; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T09:00:00Z'
+    end: '2026-11-01T10:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3864/26]
+    # why: visibility 2280 m, limit 5000; low cloud 98 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T10:00:00Z'
+    end: '2026-11-01T11:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3864/26]
+    # why: visibility 3400 m, limit 5000; low cloud 98 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T11:00:00Z'
+    end: '2026-11-01T12:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3864/26]
+    # why: visibility 4840 m, limit 5000; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T12:00:00Z'
+    end: '2026-11-01T13:00:00Z'
+    edge: hour
+    verdict: UNVERIFIED
+    approaching_limits: true
+    unread: [H7171/26, J3864/26]
+    # why: gust spread 4.1 mph, limit 4; visibility 3620 m, limit 5000; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T13:00:00Z'
+    end: '2026-11-01T14:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: precipitation 0.1 mm/h, limit 0.1; gust spread 4.2 mph, limit 4; rain chance 67 %, limit 50; visibility 2040 m, limit 5000; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T14:00:00Z'
+    end: '2026-11-01T15:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 12.5 mph, limit 6; precipitation 0.6 mm/h, limit 0.1; wind at 10 m 15.2 mph, limit 12; wind at 80 m 26.1 mph, limit 16; wind at 120 m 28.3 mph, limit 16; gradient 13.1 mph, limit 9; rain chance 100 %, limit 50; visibility 2040 m, limit 5000; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T15:00:00Z'
+    end: '2026-11-01T16:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 12.5 mph, limit 6; precipitation 0.1 mm/h, limit 0.1; wind at 10 m 15.2 mph, limit 12; wind at 80 m 26.1 mph, limit 16; wind at 120 m 28.3 mph, limit 16; gradient 13.1 mph, limit 9; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T16:00:00Z'
+    end: '2026-11-01T16:26:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.5 mph, limit 6; wind at 10 m 13.6 mph, limit 12; wind at 80 m 24.3 mph, limit 16; wind at 120 m 26.5 mph, limit 16; gradient 12.9 mph, limit 9; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T16:26:00Z'
+    end: '2026-11-01T17:00:00Z'
+    edge: sunset
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.5 mph, limit 6; wind at 10 m 13.6 mph, limit 12; wind at 80 m 24.3 mph, limit 16; wind at 120 m 26.5 mph, limit 16; gradient 12.9 mph, limit 9; low cloud 100 %, limit 90; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T17:00:00Z'
+    end: '2026-11-01T17:04:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.5 mph, limit 6; wind at 10 m 13.6 mph, limit 12; wind at 80 m 24.3 mph, limit 16; wind at 120 m 26.5 mph, limit 16; gradient 12.9 mph, limit 9; low cloud 98 %, limit 90; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T17:04:00Z'
+    end: '2026-11-01T18:00:00Z'
+    edge: civil dusk
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11.5 mph, limit 6; night: outside civil twilight; wind at 10 m 13.6 mph, limit 12; wind at 80 m 24.3 mph, limit 16; wind at 120 m 26.5 mph, limit 16; gradient 12.9 mph, limit 9; low cloud 98 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
+  - start: '2026-11-01T18:00:00Z'
+    end: '2026-11-01T19:00:00Z'
+    edge: H7171/26 ends + J3864/26 ends
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 10.1 mph, limit 6; night: outside civil twilight; wind at 10 m 12.5 mph, limit 12; wind at 80 m 22.1 mph, limit 16; wind at 120 m 24.2 mph, limit 16; gradient 11.7 mph, limit 9; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T19:00:00Z'
+    end: '2026-11-01T20:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 10 mph, limit 6; night: outside civil twilight; wind at 10 m 12.1 mph, limit 12; wind at 80 m 22.3 mph, limit 16; wind at 120 m 24.4 mph, limit 16; gradient 12.3 mph, limit 9; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T20:00:00Z'
+    end: '2026-11-01T21:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 10 mph, limit 6; night: outside civil twilight; wind at 10 m 12.1 mph, limit 12; wind at 80 m 22.3 mph, limit 16; wind at 120 m 24.4 mph, limit 16; gradient 12.3 mph, limit 9; low cloud 95 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T21:00:00Z'
+    end: '2026-11-01T22:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 9.6 mph, limit 6; night: outside civil twilight; wind at 80 m 22.1 mph, limit 16; wind at 120 m 24.2 mph, limit 16; gradient 12.3 mph, limit 9; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T22:00:00Z'
+    end: '2026-11-01T23:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 10 mph, limit 6; night: outside civil twilight; wind at 10 m 12.1 mph, limit 12; wind at 80 m 22.8 mph, limit 16; wind at 120 m 25.1 mph, limit 16; gradient 13 mph, limit 9; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+  - start: '2026-11-01T23:00:00Z'
+    end: '2026-11-02T00:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 10.5 mph, limit 6; night: outside civil twilight; wind at 10 m 12.5 mph, limit 12; wind at 80 m 23.2 mph, limit 16; wind at 120 m 25.3 mph, limit 16; gradient 13 mph, limit 9; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
+- id: dev_26_blue_mill
+  mode: draft
+  window:
+    start: '2026-09-29T10:00:00Z'
+    end: '2026-09-29T12:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 1cef098a4e21c1bd6234a8273d4ad64643cf95fab9c91dd0058cd1c88d6e0c0a
+    rows: 0d9a2ff161809147bb4cdec266d3fe18b9b1d98be87da949369935c9c65c8945
+    weather.json: 8de7951885496f3f987f712f09540d2247b9db3d582424411fd74feace9cb72a
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: c588db1e45ea59e18082a7b2feb40aa90c9a9690568a7fce3be6dc713b8f7745
+  notam_actions:
+    J3220/26: AWARENESS
+    H6449/26: IGNORE
+    H4454/26: AWARENESS
+    H6451/26: AWARENESS
+    M6508/26: AWARENESS
+    M6510/26: AWARENESS
+    M6512/26: AWARENESS
+    # ignored by code (add a line above to overrule):
+    # B1434/26: starts 2026-09-30T08:30:00Z, at or after the window end 2026-09-29T12:00:00Z
+    # B1563/26: starts 2026-10-01T08:30:00Z, at or after the window end 2026-09-29T12:00:00Z
+    # N610/26: starts 2026-10-01T00:00:00Z, at or after the window end 2026-09-29T12:00:00Z
+    # N612/26: starts 2026-10-01T00:00:00Z, at or after the window end 2026-09-29T12:00:00Z
+    # U6768/26: subject OA cannot affect a paramotor
+    # U7666/26: subject AF with radius 999 NM: FIR-wide AIS admin
+    # V24/26: series V subject RO: security advice to air operators
+    # V26/26: series V subject RO: security advice to air operators
+    # V28/26: series V subject RO: security advice to air operators
+    # V30/26: series V subject RO: security advice to air operators
+  rows:
+  - start: '2026-09-29T10:00:00Z'
+    end: '2026-09-29T11:00:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11 mph, limit 6; wind at 10 m 13.6 mph, limit 12; wind at 80 m 21.6 mph, limit 16; wind at 120 m 23.1 mph, limit 16; gradient 9.5 mph, limit 9; low cloud 100 %, limit 90; NOTAM H6449/26 1.03 NM to the NNW (Q-circle edge), up to 2,100 ft AMSL: avoid that sector; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD496 is activated by NOTAM J3220/26, which has not been read: TRIGGER NOTAM - AIP SUP 108/26 WEF 01 SEP 26 UNTIL 30 NOV 26. TEMPORARY DANGER AREA EGD496 (SOUTHERN NORTH SEA) BVLOS RPAS OPERATIONS; UNVERIFIED: Danger area EGD323B is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323H is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323M is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323R is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323C is activated by NOTAM M6510/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ACTIVATED: EGD323C 0800-1100 FL050-FL660 EGD323C 1100-1400 FL050-FL660 EGD323C 1400-1630 FL050-FL660 EGD323J 0800-1100 FL150-FL660 EGD323J 1100-1400 FL150-FL660 EGD323J 1400-1630 FL150-FL660 EGD323N 0800-1100 FL100-FL660 EGD323N 1100-1400 FL100-FL660 EGD323N 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323J is activated by NOTAM M6510/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ACTIVATED: EGD323C 0800-1100 FL050-FL660 EGD323C 1100-1400 FL050-FL660 EGD323C 1400-1630 FL050-FL660 EGD323J 0800-1100 FL150-FL660 EGD323J 1100-1400 FL150-FL660 EGD323J 1400-1630 FL150-FL660 EGD323N 0800-1100 FL100-FL660 EGD323N 1100-1400 FL100-FL660 EGD323N 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323N is activated by NOTAM M6510/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ACTIVATED: EGD323C 0800-1100 FL050-FL660 EGD323C 1100-1400 FL050-FL660 EGD323C 1400-1630 FL050-FL660 EGD323J 0800-1100 FL150-FL660 EGD323J 1100-1400 FL150-FL660 EGD323J 1400-1630 FL150-FL660 EGD323N 0800-1100 FL100-FL660 EGD323N 1100-1400 FL100-FL660 EGD323N 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323P is activated by NOTAM M6512/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323D 0800-1100 FL050-FL660 EGD323D 1100-1400 FL050-FL660 EGD323D 1400-1630 FL050-FL660 EGD323K 0800-1100 FL150-FL660 EGD323K 1100-1400 FL150-FL660 EGD323K 1400-1630 FL150-FL660 EGD323P 0800-1100 FL100-FL660 EGD323P 1100-1400 FL100-FL660 EGD323P 1400-1630 FL100-FL660; UNVERIFIED: NOTAM J3220/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 108/26 WEF 01 SEP 26 UNTIL 30 NOV 26. TEMPORARY DANGER AREA EGD496 (SOUTHERN NORTH SEA) BVLOS RPAS OPERATIONS
+  - start: '2026-09-29T11:00:00Z'
+    end: '2026-09-29T12:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: gust spread 11 mph, limit 6; wind at 10 m 13.9 mph, limit 12; wind at 80 m 21.6 mph, limit 16; wind at 120 m 23.1 mph, limit 16; gradient 9.5 mph, limit 9; low cloud 100 %, limit 90; NOTAM H6449/26 1.03 NM to the NNW (Q-circle edge), up to 2,100 ft AMSL: avoid that sector; UNVERIFIED: notams source stale: PIB issued 2026-09-29T03:00:04Z, more than 3 h before now; UNVERIFIED: Danger area EGD496 is activated by NOTAM J3220/26, which has not been read: TRIGGER NOTAM - AIP SUP 108/26 WEF 01 SEP 26 UNTIL 30 NOV 26. TEMPORARY DANGER AREA EGD496 (SOUTHERN NORTH SEA) BVLOS RPAS OPERATIONS; UNVERIFIED: Danger area EGD323B is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323H is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323M is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323R is activated by NOTAM M6508/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323B 0800-1100 FL050-FL660 EGD323B 1100-1400 FL050-FL660 EGD323B 1400-1630 FL050-FL660 EGD323H 0800-1100 FL150-FL660 EGD323H 1100-1400 FL150-FL660 EGD323H 1400-1630 FL150-FL660 EGD323M 0800-1100 FL100-FL660 EGD323M 1100-1400 FL100-FL660 EGD323M 1400-1630 FL100-FL660 EGD323R 0800-1100 FL100-FL660 EGD323R 1100-1400 FL100-FL660 EGD323R 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323C is activated by NOTAM M6510/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ACTIVATED: EGD323C 0800-1100 FL050-FL660 EGD323C 1100-1400 FL050-FL660 EGD323C 1400-1630 FL050-FL660 EGD323J 0800-1100 FL150-FL660 EGD323J 1100-1400 FL150-FL660 EGD323J 1400-1630 FL150-FL660 EGD323N 0800-1100 FL100-FL660 EGD323N 1100-1400 FL100-FL660 EGD323N 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323J is activated by NOTAM M6510/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ACTIVATED: EGD323C 0800-1100 FL050-FL660 EGD323C 1100-1400 FL050-FL660 EGD323C 1400-1630 FL050-FL660 EGD323J 0800-1100 FL150-FL660 EGD323J 1100-1400 FL150-FL660 EGD323J 1400-1630 FL150-FL660 EGD323N 0800-1100 FL100-FL660 EGD323N 1100-1400 FL100-FL660 EGD323N 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323N is activated by NOTAM M6510/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ACTIVATED: EGD323C 0800-1100 FL050-FL660 EGD323C 1100-1400 FL050-FL660 EGD323C 1400-1630 FL050-FL660 EGD323J 0800-1100 FL150-FL660 EGD323J 1100-1400 FL150-FL660 EGD323J 1400-1630 FL150-FL660 EGD323N 0800-1100 FL100-FL660 EGD323N 1100-1400 FL100-FL660 EGD323N 1400-1630 FL100-FL660; UNVERIFIED: Danger area EGD323P is activated by NOTAM M6512/26, which has not been read: THE FOLLOWING SOUTHERN COMPLEX DANGER AREAS ARE ACTIVATED: EGD323D 0800-1100 FL050-FL660 EGD323D 1100-1400 FL050-FL660 EGD323D 1400-1630 FL050-FL660 EGD323K 0800-1100 FL150-FL660 EGD323K 1100-1400 FL150-FL660 EGD323K 1400-1630 FL150-FL660 EGD323P 0800-1100 FL100-FL660 EGD323P 1100-1400 FL100-FL660 EGD323P 1400-1630 FL100-FL660; UNVERIFIED: NOTAM J3220/26 is over the LZ from the surface and has not been read: TRIGGER NOTAM - AIP SUP 108/26 WEF 01 SEP 26 UNTIL 30 NOV 26. TEMPORARY DANGER AREA EGD496 (SOUTHERN NORTH SEA) BVLOS RPAS OPERATIONS
+- id: dev_27_sherburn
+  mode: draft
+  window:
+    start: '2026-10-10T09:00:00Z'
+    end: '2026-10-10T11:00:00Z'
+  actions_done: true
+  fingerprint:
+    inputs: 32613cefee6eed77dfb581955e286e4eb02c394a99b7970148985e2755a9eca7
+    rows: 3cf54262708a3439ad957fd0aed7edc87643dff765908275577c3b1f08a5d618
+    weather.json: a359a94e88eb425fe643dab4ce559ab34dcc5c0974a62dddd552d49d00e18f11
+    airspace.json: e3c3f4a12107eee036f1156ce4db66db4a797981c9a7f1a89f01823cefa1393e
+    pib.xml: 8c88bb840d8bebaa96c345e1fc62258a3473f0651d0f032016f5800b4818959e
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    seal: eed8c80592228868a4181f39db9742d9b54452cdc44a7ed6a66ea2668706e228
+  notam_actions:
+  rows:
+  - start: '2026-10-10T09:00:00Z'
+    end: '2026-10-10T10:00:00Z'
+    edge: window start
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 18.1 mph, limit 16; gust spread 14.6 mph, limit 6; wind at 80 m 29.5 mph, limit 16; wind at 120 m 31.5 mph, limit 16; gradient 13.4 mph, limit 9; avoid the sector to the NW (LEEDS EAST); avoid the sector to the W (SHERBURN); UNVERIFIED: notams source failed: dropped for this example
+  - start: '2026-10-10T10:00:00Z'
+    end: '2026-10-10T11:00:00Z'
+    edge: hour
+    verdict: NO_GO
+    approaching_limits: true
+    # why: wind at 10 m 18.1 mph, limit 16; gust spread 14.6 mph, limit 6; wind at 80 m 29.5 mph, limit 16; wind at 120 m 31.5 mph, limit 16; gradient 13.4 mph, limit 9; avoid the sector to the NW (LEEDS EAST); avoid the sector to the W (SHERBURN); UNVERIFIED: notams source failed: dropped for this example

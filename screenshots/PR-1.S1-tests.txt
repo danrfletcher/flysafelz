@@ -1,123 +1,16 @@
-uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov-report=term-missing --cov-fail-under=90
-============================= test session starts ==============================
-platform darwin -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
-network: --disable-socket in effect
-rootdir: /Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-4
-configfile: pyproject.toml
-testpaths: tests
-plugins: cov-7.1.0, socket-0.8.1, anyio-4.16.0
-collected 3385 items
-
-tests/integration/test_assess_blue_mill.py .........                     [  0%]
-tests/integration/test_assess_failed_sources.py .............            [  0%]
-tests/integration/test_assess_refactor_parity.py .......                 [  0%]
-tests/integration/test_assess_unread.py ....                             [  0%]
-tests/integration/test_assess_west_sleekburn.py ...                      [  1%]
-tests/integration/test_blue_mill_geometry.py .....                       [  1%]
-tests/integration/test_cases_loader.py ..............................    [  2%]
-tests/integration/test_cli_cases.py .................................... [  3%]
-...                                                                      [  3%]
-tests/integration/test_cli_live.py ............                          [  3%]
-tests/test_capture.py .................................................. [  5%]
-................................                                         [  6%]
-tests/test_fixtures_committed.py ................................        [  6%]
-tests/unit/test_airspace_over_lz.py .................................... [  8%]
-........................................................................ [ 10%]
-........................................................................ [ 12%]
-........................................................................ [ 14%]
-........................................................................ [ 16%]
-........................................................................ [ 18%]
-...............                                                          [ 19%]
-tests/unit/test_airspace_sector.py ..................................... [ 20%]
-........................................................................ [ 22%]
-........................................................................ [ 24%]
-...........................................................              [ 26%]
-tests/unit/test_assess_fence.py ..............                           [ 26%]
-tests/unit/test_assess_helpers.py ...................................... [ 27%]
-......                                                                   [ 27%]
-tests/unit/test_assess_notam_output.py .......                           [ 28%]
-tests/unit/test_assess_precedence.py ................................... [ 29%]
-...................................                                      [ 30%]
-tests/unit/test_assess_segments.py .......                               [ 30%]
-tests/unit/test_assess_tiers.py ...................                      [ 30%]
-tests/unit/test_assess_windows.py ...............................        [ 31%]
-tests/unit/test_ceiling.py ........................                      [ 32%]
-tests/unit/test_cli_args.py ............................................ [ 33%]
-............                                                             [ 34%]
-tests/unit/test_cli_format.py ....................................       [ 35%]
-tests/unit/test_cli_rules.py ....                                        [ 35%]
-tests/unit/test_contracts.py .........................                   [ 36%]
-tests/unit/test_danger_area.py ......................................... [ 37%]
-........................................................................ [ 39%]
-.............................                                            [ 40%]
-tests/unit/test_daylight.py ............................................ [ 41%]
-                                                                         [ 41%]
-tests/unit/test_designators.py ......................................... [ 42%]
-.....                                                                    [ 43%]
-tests/unit/test_fence.py ......................                          [ 43%]
-tests/unit/test_geo.py ................................................. [ 45%]
-...............................................                          [ 46%]
-tests/unit/test_helpers_fence.py ...................................     [ 47%]
-tests/unit/test_isolation.py ....                                        [ 47%]
-tests/unit/test_notam_action.py ........................................ [ 48%]
-........................................................................ [ 50%]
-........................................................................ [ 53%]
-........................................................................ [ 55%]
-........................................................................ [ 57%]
-........................................................................ [ 59%]
-........................................................................ [ 61%]
-........................................................................ [ 63%]
-........................................................................ [ 65%]
-........................................................................ [ 67%]
-........................................................................ [ 70%]
-.......................................................................  [ 72%]
-tests/unit/test_notam_action_blue_mill.py .........                      [ 72%]
-tests/unit/test_notam_action_fence.py .....                              [ 72%]
-tests/unit/test_notam_sort.py .......................................... [ 73%]
-....................................................                     [ 75%]
-tests/unit/test_open_meteo.py ...............................            [ 76%]
-tests/unit/test_openaip_client.py ...................................... [ 77%]
-........................................................................ [ 79%]
-...........                                                              [ 79%]
-tests/unit/test_pib_fence.py .................                           [ 80%]
-tests/unit/test_pib_parse.py ........................................... [ 81%]
-................................                                         [ 82%]
-tests/unit/test_pib_prefilter.py ......................................  [ 83%]
-tests/unit/test_pib_source.py .......................................... [ 84%]
-.............                                                            [ 85%]
-tests/unit/test_rule_compare.py .......                                  [ 85%]
-tests/unit/test_rules_load.py ....................                       [ 86%]
-tests/unit/test_rules_notam_sort.py .................................... [ 87%]
-................                                                         [ 87%]
-tests/unit/test_rules_values.py ........................................ [ 88%]
-...                                                                      [ 88%]
-tests/unit/test_schedule.py ............................................ [ 90%]
-...............................                                          [ 91%]
-tests/unit/test_schedule_corpus.py ..................................... [ 92%]
-........................................................................ [ 94%]
-........................................................................ [ 96%]
-.........................                                                [ 97%]
-tests/unit/test_socket_guard.py ..                                       [ 97%]
-tests/unit/test_weather_checks.py ...................................    [ 98%]
-tests/unit/test_weather_fence.py ...........                             [ 98%]
-tests/unit/test_weather_rows.py .............................            [ 99%]
-tests/unit/test_weather_tier.py ................                         [100%]
-
-================================ tests coverage ================================
-______________ coverage: platform darwin, python 3.12.14-final-0 _______________
-
-Name                                  Stmts   Miss  Cover   Missing
--------------------------------------------------------------------
-src/flysafelz/airspace.py               295      3    99%   202, 372, 472
-src/flysafelz/assess.py                 245      2    99%   118, 255
-src/flysafelz/cases.py                   31      0   100%
-src/flysafelz/clients/open_meteo.py      69      0   100%
-src/flysafelz/clients/openaip.py        263      6    98%   210-211, 460-463
-src/flysafelz/clients/pib_source.py      78      0   100%
-src/flysafelz/notam_action.py           218      2    99%   161, 283
-src/flysafelz/pib.py                    260      0   100%
-src/flysafelz/weather.py                108      0   100%
--------------------------------------------------------------------
-TOTAL                                  1567     13    99%
-Required test coverage of 90% reached. Total coverage: 99.17%
-============================ 3385 passed in 11.64s =============================
+src/flysafelz/reader/checks.py                 128      0   100%
+src/flysafelz/reader/config.py                  67      1    99%   126
+src/flysafelz/reader/contract.py                42      0   100%
+src/flysafelz/reader/prompt.py                  62      0   100%
+src/flysafelz/reader/read.py                   115      0   100%
+src/flysafelz/reader/reader_set.py              50      3    94%   99, 105-106
+src/flysafelz/reader/settings.py                14      0   100%
+src/flysafelz/redact.py                         41      0   100%
+src/flysafelz/shapes.py                         35      0   100%
+src/flysafelz/sup_refs.py                       10      0   100%
+src/flysafelz/timetext.py                       47      0   100%
+src/flysafelz/weather.py                       119      0   100%
+--------------------------------------------------------------------------
+TOTAL                                         7776    106    99%
+Required test coverage of 90% reached. Total coverage: 98.64%
+=========== 10108 passed, 1 skipped, 8 xfailed in 133.39s (0:02:13) ============

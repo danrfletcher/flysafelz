@@ -1,0 +1,72 @@
+# RAG hit@4 questions (ticket 4, evals/guidance/questions.yaml). LOCKED 2026-11-07.
+# Questions: drafted by Gemini 4 Argon blind to the corpus, picked and reworded with Titan.
+# Labels: pooled by Titan (guidance_pool.md), every candidate judged by Dan; only his ticks are here.
+# A hit = any of the top 4 retrieved chunks is in any `expected` section (or a subsection of it). Match headings case-insensitively.
+
+- question: "How far away do I legally have to stay from solitary houses, cars, and people walking on the ground?"
+  expected:
+    - {document: "CAP 2562", section: "500 ft rule"}  # Protection of people and property › 500 ft rule p3
+    - {document: "CAP 1535", section: "Low flying and congested areas"}  # Essential Rules of the Air › Low flying and congested areas p60
+
+- question: "How close can I fly to a festival or a football crowd?"
+  expected:
+    - {document: "CAP 2562", section: "Congested areas"}  # Protection of people and property › Congested areas p4
+    - {document: "CAP 1535", section: "Low flying and congested areas"}  # Essential Rules of the Air › Low flying and congested areas p60–61
+
+- question: "How do I find out how high I can go before I'm in an airport's controlled airspace?"
+  expected:
+    - {document: "CAP 1535", section: "Control zone (CTR)"}  # Controlled airspace operations › Control zone (CTR) p85
+    - {document: "CAP 1535", section: "Avoiding Airspace Infringements"}  # Safer Flying › Avoiding Airspace Infringements p134
+
+- question: "Can I fly through a military danger area if I stay low?"
+  expected:
+    - {document: "CAP 1535", section: "Hazards and airspace"}  # Planning the route › Hazards and airspace p42
+    - {document: "CAP 1535", section: "Danger areas"}  # Airspace hazards and restrictions › Danger areas p75
+
+- question: "How do I tell the difference between a temporary notice that's just a general warning and one that's a strict no-fly zone?"
+  expected:
+    - {document: "CAP 2562", section: "Temporary warnings or restrictions"}  # Airspace hazards › Temporary warnings or restrictions p7
+    - {document: "CAP 1535", section: "Restricted airspace (temporary)"}  # Pre-flight information › Restricted airspace (temporary) p32
+    - {document: "CAP 1535", section: "Prohibited or restricted areas"}  # Airspace hazards and restrictions › Prohibited or restricted areas p75
+    - {document: "CAA RA(T)", section: "(untitled introduction)"}  # (untitled introduction) p1
+    - {document: "CAA NOTAM tutorial", section: "NOTAM Series"}  # NOTAM Series
+    - {document: "CAA NOTAM tutorial", section: "NOTAM structure"}  # NOTAM structure (Example 2)
+    - {document: "BHPA", section: "Civil Aircraft Notification Procedure (CANP)"}  # Civil Aircraft Notification Procedure (CANP)
+
+- question: "What happens if a temporary no-fly zone pops up for a royal flight or an air display near my field?"
+  expected:
+    - {document: "CAP 2562", section: "Temporary warnings or restrictions"}  # Airspace hazards › Temporary warnings or restrictions p7
+    - {document: "CAP 1535", section: "Restricted airspace (temporary)"}  # Pre-flight information › Restricted airspace (temporary) p32
+    - {document: "CAP 1535", section: "Restricted airspace (temporary)"}  # Airspace hazards and restrictions › Restricted airspace (temporary) p74
+
+- question: "Where do I check for temporary airspace warnings before I head out to the field?"
+  expected:
+    - {document: "CAP 2562", section: "Pre-flight checklist"}  # Introduction › Pre-flight checklist p2
+    - {document: "CAP 2562", section: "Temporary warnings or restrictions"}  # Airspace hazards › Temporary warnings or restrictions p7
+    - {document: "CAP 1535", section: "NOTAMS"}  # Pre-flight information › NOTAMS p32
+    - {document: "CAP 1535", section: "Restricted airspace (temporary)"}  # Pre-flight information › Restricted airspace (temporary) p32
+    - {document: "CAA RA(T)", section: "Pre-flight planning"}  # How to Avoid the Risk of Infringing a RA(T) › Pre-flight planning p8
+    - {document: "CAA RA(T)", section: "Always use a VFR Moving Map"}  # How to Avoid the Risk of Infringing a RA(T) › Always use a VFR Moving Map p8
+    - {document: "CAA NOTAM tutorial", section: "Briefing Options"}  # Briefing Options
+    - {document: "BHPA", section: "Notices to Aviation (NOTAMs)"}  # Notices to Aviation (NOTAMs)
+
+- question: "When I'm looking at a temporary flight notice, how do I work out the exact times and heights it actually covers?"
+  expected:
+    - {document: "CAP 2562", section: "Altimetry"}  # Airspace › Altimetry p8
+    - {document: "CAP 1535", section: "NOTAMS"}  # Pre-flight information › NOTAMS p32
+    - {document: "CAA RA(T)", section: "(untitled introduction)"}  # (untitled introduction) p1–2
+    - {document: "CAA NOTAM tutorial", section: "Notices to Aviation (NOTAM)"}  # Notices to Aviation (NOTAM)
+    - {document: "CAA NOTAM tutorial", section: "NOTAM structure"}  # NOTAM structure
+    - {document: "CAA NOTAM tutorial", section: "What is Example 3 telling us?"}  # What is Example 3 telling us?
+
+- question: "How do I register our group's flying location so low-flying military jets and helicopters know to watch out for us?"
+  expected:
+    - {document: "BHPA", section: "Notices to Aviation (NOTAMs)"}  # Notices to Aviation (NOTAMs)
+    - {document: "BHPA", section: "Civil Aircraft Notification Procedure (CANP)"}  # Civil Aircraft Notification Procedure (CANP)
+
+- question: "How close can I legally get to the boundary of a nearby airfield before I need their permission to be there?"
+  expected:
+    - {document: "CAP 2562", section: "Air Traffic Zones"}  # Airspace hazards › Air Traffic Zones p7
+    - {document: "CAP 1535", section: "Plan to avoid infringements"}  # Planning the route › Plan to avoid infringements p45
+    - {document: "CAP 1535", section: "Aerodrome traffic zones"}  # Airspace hazards and restrictions › Aerodrome traffic zones p70
+    - {document: "CAP 1535", section: "Avoiding Airspace Infringements"}  # Safer Flying › Avoiding Airspace Infringements p134

@@ -61,7 +61,9 @@ def test_source_files_are_found():
 
 # F6: the dependency allowlist. The names declared in [project] dependencies and in each dependency group must equal these sets, so a new
 # package (openai, anthropic, chromadb, ...) fails until it is added here on purpose. langgraph-cli sits in the dev group only.
+# agentevals and scikit-learn are ticket 5a's eval harness (trajectory match, Cohen's kappa); langsmith is also its dataset and experiment client.
 ALLOWED_PROJECT_DEPENDENCIES = {
+    "agentevals",
     "astral",
     "fastembed",
     "httpx",
@@ -72,6 +74,7 @@ ALLOWED_PROJECT_DEPENDENCIES = {
     "pydantic",
     "pypdf",
     "pyyaml",
+    "scikit-learn",
     "shapely",
     "tzdata",
 }
