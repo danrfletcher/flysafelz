@@ -48,8 +48,12 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(installed).toContain('@radix-ui/react-switch')
   })
 
-  it('has no saved choices, and the CARTO key named in the one file that reads it, its type declaration and nothing else under src/', () => {
-    expect(filesMatching(word('local', 'Storage|session', 'Storage'))).toEqual([])
+  it('keeps browser storage to the one layer-choices module (F2: its key and no other store), and the CARTO key named in the one file that reads it, its type declaration and nothing else under src/', () => {
+    const sources = (paths: string[]) => paths.filter((path) => !/\.test\.|\/test\//.test(path))
+    expect(sources(filesMatching(word('local', 'Storage')))).toEqual(['src/lib/layerPrefs.ts'])
+    expect(filesMatching(word('session', 'Storage'))).toEqual([])
+    expect(filesMatching(word('addEventListener\\(.', 'storage'))).toEqual([]) // no cross-tab sync in v1
+    expect(sources(filesMatching(word('flysafelz\\.layers\\.', 'v\\d')))).toEqual(['src/lib/layerPrefs.ts']) // the one key, v1
     const naming = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path) && word('VITE_', 'CARTO_KEY').test(readUi(path)))
     expect(naming).toEqual(['src/map/basemap.ts', 'src/vite-env.d.ts'])
   })

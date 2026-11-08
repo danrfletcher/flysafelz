@@ -34,6 +34,8 @@ beforeAll(() => {
 })
 beforeEach(() => {
   unhandled = []
+  // Saved layer choices must not leak from one test into the next (a test that wants a stored value seeds it itself).
+  if (typeof window !== 'undefined') window.localStorage.clear()
   // F4: tests need no CARTO key. A key in a developer's ui/.env must not reach them either, so each test starts keyless (a test that wants a key stubs it).
   vi.stubEnv('VITE_CARTO_KEY', '')
 })

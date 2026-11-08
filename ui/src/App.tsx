@@ -3,10 +3,11 @@ import { useState } from 'react'
 import { ChatPanel } from '@/chat/ChatPanel'
 import { createSessions, pinKey } from '@/chat/turns'
 import { Footer } from '@/components/Footer'
-import { LayerPanel, type LayerSwitches } from '@/components/LayerPanel'
+import { LAYERS, LayerPanel } from '@/components/LayerPanel'
 import { NavBar } from '@/components/NavBar'
 import { UkMap } from '@/components/UkMap'
 import { useIsDesktop } from '@/lib/useIsDesktop'
+import { useLayerPrefs } from '@/lib/useLayerPrefs'
 import { AnswerOverlays } from '@/map/answerOverlays'
 import { BaseLayers } from '@/map/BaseLayers'
 import type { BasemapStatus } from '@/map/basemap'
@@ -15,9 +16,6 @@ import { PickHandler } from '@/map/PickHandler'
 import { selectTurn, useAnswerHighlight, type Selection } from '@/map/useAnswerHighlight'
 import { useMapLayers } from '@/map/useMapLayers'
 import type { LatLon } from '@/pick/whatsHere'
-
-// Airspace and NOTAMs below FL100 and the answer's highlights are on at first load. The choices are kept in memory only: a reload puts them back on.
-const DEFAULT_SWITCHES: LayerSwitches = { airspace: true, notams: true, answer: true }
 
 /**
  * Nav bar, the map in the space between (with the base layers, the click-to-pick pin and card, the layer panel and the chat), and the
@@ -28,7 +26,8 @@ const DEFAULT_SWITCHES: LayerSwitches = { airspace: true, notams: true, answer: 
  */
 export default function App() {
   const layers = useMapLayers()
-  const [shown, setShown] = useState<LayerSwitches>(DEFAULT_SWITCHES)
+  // Airspace and NOTAMs below FL100 and the answer's highlights are on at first load; a choice is kept in this browser's local storage and read back on load.
+  const [shown, setShown] = useLayerPrefs(LAYERS)
   // Whether the basemap tiles are loading: only the layer panel's note and the map's background read it, so nothing else waits on it.
   const [basemap, setBasemap] = useState<BasemapStatus>('loading')
   const [sessions] = useState(createSessions)
@@ -46,7 +45,7 @@ export default function App() {
   const showTurn = (turnId: string, notamId: string | null = null) => {
     if (!chatPoint) return
     setSelection(selectTurn(sessions.get(pinKey(chatPoint)), chatPoint, turnId, notamId))
-    setShown((current) => ({ ...current, answer: true }))
+    setShown('answer', true)
   }
 
   return (
@@ -69,7 +68,7 @@ export default function App() {
           basemap={basemap}
           shown={shown}
           chatOpen={chatPoint !== null}
-          onShownChange={(id, on) => setShown((current) => ({ ...current, [id]: on }))}
+          onShownChange={setShown}
         />
         <ChatPanel
           point={chatPoint}

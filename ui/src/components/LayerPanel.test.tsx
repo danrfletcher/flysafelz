@@ -224,8 +224,8 @@ describe('the basemap entry', () => {
   })
 })
 
-describe('no saved choices', () => {
-  it('reads and writes no browser storage while it opens and toggles', async () => {
+describe('the panel and browser storage', () => {
+  it('reads and writes no browser storage itself: it is controlled, and the saving is the page’s (src/lib/useLayerPrefs.ts)', async () => {
     const calls = [
       vi.spyOn(Storage.prototype, 'getItem'),
       vi.spyOn(Storage.prototype, 'setItem'),
@@ -237,19 +237,6 @@ describe('no saved choices', () => {
     await user.click(screen.getByRole('switch', { name: 'Airspace below FL100' }))
     await user.click(screen.getByRole('switch', { name: 'NOTAMs below FL100' }))
     for (const spy of calls) expect(spy).not.toHaveBeenCalled()
-    // The two stores are named from pieces so the repo-wide scan for a saved-choices key does not match this file.
-    for (const store of [['local', 'Storage'], ['session', 'Storage']].map((pieces) => pieces.join(''))) {
-      expect((window as unknown as Record<string, Storage>)[store].length, store).toBe(0)
-    }
-  })
-
-  it('starts with both switches on again after a remount, as after a reload', async () => {
-    const { user, view } = await open()
-    await user.click(screen.getByRole('switch', { name: 'NOTAMs below FL100' }))
-    expect(screen.getByRole('switch', { name: 'NOTAMs below FL100' })).not.toBeChecked()
-    view.unmount()
-    await open()
-    expect(screen.getByRole('switch', { name: 'NOTAMs below FL100' })).toBeChecked()
   })
 })
 
