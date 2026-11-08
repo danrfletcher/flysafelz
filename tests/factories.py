@@ -8,19 +8,28 @@ Guidance search tests (index, search_guidance, eval, gate) build their snapshots
     EmbedderSpy                   an embedder factory that counts how many times it was asked to build the embedder
     guidance_chunk(...)           one chunk of a document
     write_snapshot(folder, ...)   a data folder as `make guidance` leaves it (manifest.yaml + embeddings.sqlite, and optionally sources.yaml), built by PR-7's own writers
+
+The judge calibration tests (5a PR-8.F1) build a fake v1 experiment here:
+    fake_experiment(name, ...)    the LangSmith project and the root runs the v1 runner logs for the committed DEV examples (29 examples x 3 reps = 87 runs), as real
+                                  langsmith schema objects; `errored` and `missing` name (example id, rep) slots; `splits` overrides a run's metadata split
+    judge_feedback(run, criterion, passed)   the feedback the judge logs on a run (`judge.<criterion>`, source model)
+    dan_feedback(run, key, value, ...)       a label Dan submits in the queue (the bare criterion name, source app)
 """
 
 import hashlib
 import math
+import uuid
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import yaml
 from guidance_helpers import FakeEmbedder
+from langsmith import schemas as ls_schemas
 from pib_helpers import parsed as pib_parsed
 from weather_helpers import calm
 
+from evals.agent.loader import example_uuid, load_dataset
 from flysafelz.agent.settings import SETTINGS
 from flysafelz.assess import assess, default_window
 from flysafelz.clients.open_meteo import Forecast
@@ -328,7 +337,6 @@ def wind(mph: float) -> dict[str, float]:
     return {"wind_10m": mph, "gust_10m": mph + 2, "wind_80m": mph + 1, "wind_120m": mph + 2}
 
 
-
 # --- guidance snapshots ---------------------------------------------------------------------------------------------------
 
 
@@ -394,3 +402,101 @@ def write_questions(path: Path, *questions: tuple[str, Sequence[tuple[str, str]]
     path.write_text(yaml.safe_dump(entries, sort_keys=False), encoding="utf-8")
     return path
 
+
+# --- the fake v1 dev experiment of the judge calibration tests (5a PR-8.F1) ---------------------------------------------------------
+
+
+class FakeExperiment:
+    """A v1 dev experiment as LangSmith would hold it: the project and one root run per dev example and rep, as the runner's `create_run` logs them."""
+
+    def __init__(self, name: str, project: ls_schemas.TracerSessionResult, runs: list[ls_schemas.Run], records: list[dict]):
+        self.name, self.project, self.runs, self.records = name, project, runs, records
+        self.by_slot = {(meta(run)["example_id"], meta(run)["rep"]): run for run in runs}
+
+    def run(self, example_id: str, rep: int) -> ls_schemas.Run:
+        return self.by_slot[example_id, rep]
+
+    def record(self, example_id: str) -> dict:
+        return next(record for record in self.records if record["id"] == example_id)
+
+    def path_of(self, run: ls_schemas.Run) -> str:
+        return self.record(meta(run)["example_id"])["reference"]["path"]
+
+
+def fake_experiment(
+    name: str = "v1-dev-20261108-160700",
+    *,
+    reps: Sequence[int] = (1, 2, 3),
+    errored: Sequence[tuple[str, int]] = (),
+    missing: Sequence[tuple[str, int]] = (),
+    splits: Mapping[tuple[str, int], str] | None = None,
+    reference_dataset_id: uuid.UUID | None = None,
+    project_metadata: Mapping[str, object] | None = None,
+) -> FakeExperiment:
+    """The committed dev examples, each run in every rep of `reps`. An invented answer per run. `errored` slots carry an error and no outputs, `missing` slots have no run."""
+    records = load_dataset("dev").records
+    splits = splits or {}
+    started = datetime(2026, 11, 8, 16, 7, tzinfo=UTC)
+    runs = []
+    for rep in reps:
+        for record in records:
+            slot = (record["id"], rep)
+            if slot in missing:
+                continue
+            failed = slot in errored
+            runs.append(
+                ls_schemas.Run(
+                    id=uuid.uuid5(uuid.NAMESPACE_URL, f"{name}/{record['id']}/{rep}"),
+                    name=f"v1-{record['id']}",
+                    run_type="chain",
+                    start_time=started,
+                    end_time=started + timedelta(seconds=12 + rep),  # the run's own end time: an update that does not carry it moves the run in time
+                    trace_id=uuid.uuid5(uuid.NAMESPACE_URL, f"trace/{name}/{record['id']}/{rep}"),
+                    reference_example_id=example_uuid(record["id"]),
+                    inputs={"question": record["inputs"]["question"]},
+                    outputs=None if failed else {"answer": f"Invented answer to {record['id']} on rep {rep}.", "guard": "passed", "usage": None},
+                    error="the graph returned no final answer" if failed else None,
+                    tags=[f"rep:{rep}", "v1"],
+                    extra={"metadata": {"rep": rep, "example_id": record["id"], "experiment": name, "split": splits.get(slot, "dev"), "attempts": 1}},
+                )
+            )
+    project = ls_schemas.TracerSessionResult(
+        id=uuid.uuid5(uuid.NAMESPACE_URL, f"project/{name}"),
+        name=name,
+        start_time=started,
+        tenant_id=uuid.uuid5(uuid.NAMESPACE_URL, "tenant"),
+        reference_dataset_id=reference_dataset_id,
+        extra={"metadata": dict(project_metadata or {"agent": "v1", "split": "dev", "reps": len(reps)})},
+    )
+    return FakeExperiment(name, project, runs, records)
+
+
+def meta(run: ls_schemas.Run) -> dict:
+    """The runner's metadata on a fake run (rep, example_id, split, ...), for a test to read or change."""
+    return (run.extra or {})["metadata"]
+
+
+def _feedback(run: ls_schemas.Run, key: str, *, score: object, value: object, source: str, minute: int, comment: str | None = None) -> ls_schemas.Feedback:
+    moment = datetime(2026, 11, 8, 17, minute, tzinfo=UTC)
+    return ls_schemas.Feedback(
+        id=uuid.uuid5(uuid.NAMESPACE_URL, f"feedback/{run.id}/{key}/{source}/{minute}"),
+        run_id=run.id,
+        trace_id=None,
+        key=key,
+        score=score,
+        value=value,
+        comment=comment,
+        created_at=moment,
+        modified_at=moment,
+        feedback_source=ls_schemas.FeedbackSourceBase(type=source),
+    )
+
+
+def judge_feedback(run: ls_schemas.Run, criterion: str, passed: bool | None, *, minute: int = 0, comment: str | None = "JUDGE-REASON") -> ls_schemas.Feedback:
+    """The judge's run-1 feedback as send_feedback logs it: `judge.<criterion>`, score 1.0 or 0.0 (None for a judge error), the judge's reason as the comment, source model."""
+    return _feedback(run, f"judge.{criterion}", score=None if passed is None else float(passed), value=None, source="model", minute=minute, comment=comment)
+
+
+def dan_feedback(run: ls_schemas.Run, key: str, value: object, *, score: object = None, source: str = "app", minute: int = 1) -> ls_schemas.Feedback:
+    """A label as Dan submits it in the annotation queue: the bare criterion name, a pass/fail value, source app."""
+    return _feedback(run, key, score=score, value=value, source=source, minute=minute)
