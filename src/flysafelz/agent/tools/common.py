@@ -231,14 +231,19 @@ def window_line(prepared: Prepared) -> str:
     return words if prepared.window.assumed else f"Window: {words}."
 
 
+def source_info_at(status: SourceStatus, fetched: datetime | None) -> SourceInfo:
+    """The artifact's description of one source (see artifacts.SourceInfo), given the turn's fetch time (None: no source has one)."""
+    ok = status.state is SourceState.OK
+    return SourceInfo(source=status.source.value, state=status.state.value, reason=status.reason, fetched_at=fetched, check_by_hand=None if ok else CHECK_BY_HAND[status.source])
+
+
 def source_info(prepared: Prepared, status: SourceStatus) -> SourceInfo:
-    """The artifact's description of one source (see artifacts.SourceInfo)."""
+    """The artifact's description of one source, with the turn's fetch time (FR9) taken from the prepared sources."""
     try:
         fetched: datetime | None = fetch_time(prepared.sources.statuses)
     except ValueError:
         fetched = None
-    ok = status.state is SourceState.OK
-    return SourceInfo(source=status.source.value, state=status.state.value, reason=status.reason, fetched_at=fetched, check_by_hand=None if ok else CHECK_BY_HAND[status.source])
+    return source_info_at(status, fetched)
 
 
 def usable(status: SourceStatus) -> bool:

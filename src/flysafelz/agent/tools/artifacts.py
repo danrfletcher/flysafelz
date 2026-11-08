@@ -7,9 +7,10 @@ datums, every NOTAM with its action, and the GeoJSON Features the map draws. Bot
     WeatherArtifact   get_weather: hours, each value paired with the rule ids and limits it is checked against
     AirspaceArtifact  get_airspace: findings, the lowest ceiling over the LZ, the notes
     NotamsArtifact    get_notams: the counts and one entry per NOTAM
+    AssessArtifact    assess: every segment with its display string, conditions, cautions and NOTAM actions, the overall verdict, the flyable spans and the counts
 
-All three carry `source` (its state, reason, fetch time and the manual check), the window in UTC, and `overlays` (the LZ's local-area circle
-and, for the two that have shapes, the features to draw).
+The first three carry `source` (its state, reason, fetch time and the manual check), the window in UTC, and `overlays` (the LZ's local-area circle
+and, for the two that have shapes, the features to draw). `assess` carries all three sources in `sources` instead, since it judges them together.
 """
 
 from datetime import datetime
@@ -164,3 +165,143 @@ class NotamsArtifact(DataArtifact):
     notams: list[NotamItem]
     assumptions: list[str]
     issued_at: datetime | None
+
+
+# --- assess ---------------------------------------------------------------------------------------------------------
+
+TierKey = Literal["VERDICT", "OUTLOOK", "TOO_FAR"]  # contracts.Tier's values
+VerdictKey = Literal["NO_GO", "UNVERIFIED", "PILOT_DISCRETION"]  # contracts.Verdict's values
+
+
+class AssessCaution(_Model):
+    """A limit being approached: the rule, the value and the limit it is checked against, and the unit rules.yaml gives that rule (None: it has none)."""
+
+    rule_id: str
+    text: str
+    value: float | None
+    limit: float | None
+    unit: str | None
+
+
+class AssessBlocker(_Model):
+    """A reason the segment is NO-GO: the source it came from (weather, daylight, airspace, notam) and ticket 2's words."""
+
+    source: str
+    text: str
+
+
+class AssessNotam(_Model):
+    """A NOTAM that bears on a segment, with the action code gave it there."""
+
+    id: str
+    action: str
+    bearing_deg: float | None
+    reason: str
+
+
+class AssessSegment(_Model):
+    """One span of the assessment, as `agent.state.Segment` needs it, plus the evidence behind it.
+
+    `start` and `end` are ISO 8601 times with a UTC offset, on the clock of the thread's `tz`; `tz_abbr` is the abbreviation of that span's own instant.
+    `verdict` is the plain value of `contracts.Verdict`, and None for an OUTLOOK or TOO_FAR hour, which has no verdict and so no `display`.
+    `display` is always `display_verdict(verdict, approaching_limits, with_conditions)`. `with_conditions` is whether `conditions` is not empty.
+    An OUTLOOK hour keeps its raw wind, gust and rain chance (None: not forecast) and the day to ask again; a VERDICT or TOO_FAR hour has none.
+    """
+
+    start: str
+    end: str
+    tz_abbr: str
+    tier: TierKey
+    verdict: VerdictKey | None
+    approaching_limits: bool
+    with_conditions: bool
+    display: str | None
+    conditions: list[str]
+    cautions: list[AssessCaution]
+    blockers: list[AssessBlocker]
+    notams: list[AssessNotam]
+    wind_10m: float | None = None
+    gust_10m: float | None = None
+    rain_chance: float | None = None
+    ask_again_on: str | None = None
+
+
+class AssessOverall(_Model):
+    """The overall verdict: the worst VERDICT-tier segment's machine fields and the display string built from them."""
+
+    verdict: VerdictKey
+    approaching_limits: bool
+    with_conditions: bool
+    display: str
+
+
+class AssessBlock(_Model):
+    """A run of consecutive OUTLOOK hours of one London day, or of TOO_FAR hours, as the text prints it.
+
+    The trend of an OUTLOOK block is the lowest and highest forecast wind, gust and rain chance over its hours (None: no hour has a value), with the
+    units rules.yaml gives. `ask_again_on` is the date (YYYY-MM-DD) its hours can carry a verdict; None when they are already inside the verdict
+    horizon, which means the forecast is incomplete for them and asking again later may help.
+    """
+
+    tier: Literal["OUTLOOK", "TOO_FAR"]
+    start: str
+    end: str
+    tz_abbr: str
+    hours: int
+    wind_min: float | None = None
+    wind_max: float | None = None
+    wind_unit: str | None = None
+    gust_min: float | None = None
+    gust_max: float | None = None
+    gust_unit: str | None = None
+    rain_min: float | None = None
+    rain_max: float | None = None
+    rain_unit: str | None = None
+    ask_again_on: str | None = None
+
+
+class AssessSpan(_Model):
+    """One flyable window, in `tz`, and its length in whole minutes (the text prints it as `X h YY min`)."""
+
+    start: str
+    end: str
+    tz_abbr: str
+    minutes: int
+
+
+class AssessCounts(_Model):
+    """The numbers the text prints. `notams_within` is the distinct NOTAM ids across all segments' actions, within `local_area_nm`."""
+
+    notams_within: int
+    local_area_nm: float
+    hours_assessed: int
+    hours_outlook: int
+    hours_too_far: int
+    flyable_windows: int
+
+
+class AssessArtifact(_Model):
+    """What `assess` returns beside its text. The guard pairs each caution's value with its limit from here, never from the text.
+
+    `overall` is None when no hour has a verdict, and `overall_tier` then says why. `data_as_of` is the text's fetch time (`07:30 GMT`), from
+    `fetched_at`, the oldest fetch among the turn's sources (None: none has one). `sources` holds the three sources as `Assessment.source_statuses`
+    judged them, so a PIB that is too old is `stale` here. `tz` is the thread's zone.
+    """
+
+    tool: Literal["assess"] = "assess"
+    tz: str
+    window_start: AwareDatetime
+    window_end: AwareDatetime
+    window_assumed: bool
+    overlays: list[OverlayFeature]
+    segments: list[AssessSegment]
+    blocks: list[AssessBlock]
+    overall: AssessOverall | None
+    overall_tier: TierKey
+    flyable: list[AssessSpan]
+    counts: AssessCounts
+    sources: list[SourceInfo]
+    pib_issued_at: datetime | None
+    assumptions: list[str]
+    fetched_at: AwareDatetime | None
+    data_as_of: str | None

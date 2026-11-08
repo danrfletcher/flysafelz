@@ -1,0 +1,53 @@
+$ uv run python -c <driver: assess tool through the agent graph, case blue_mill_2026-10-31, now 2026-10-31T07:30Z, reader fixture> 2026-10-31 10:00 2026-10-31 16:00 weather
+Window: Saturday 31 Oct 10:00 – 16:00 GMT.
+Data as of 07:30 GMT.
+Overall: UNVERIFIED
+2 NOTAMs within 2 NM. 6 h assessed, 0 OUTLOOK, 0 too far.
+Flyable windows: no flyable window in this window.
+Sources:
+- weather source: FAILED (dropped for this example). Check by hand: Open-Meteo (https://open-meteo.com).
+- airspace source: ok
+- notams source: ok (PIB issued 2026-10-31 07:00 GMT)
+Do not fly on this assessment.
+Segments:
+Saturday 31 Oct:
+10:00–11:00 GMT  UNVERIFIED
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    unverified: weather source failed: dropped for this example
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+11:00–12:00 GMT  UNVERIFIED
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    unverified: weather source failed: dropped for this example
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+12:00–13:00 GMT  UNVERIFIED
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    unverified: weather source failed: dropped for this example
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+13:00–14:00 GMT  UNVERIFIED
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    unverified: weather source failed: dropped for this example
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+14:00–15:00 GMT  UNVERIFIED
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    unverified: weather source failed: dropped for this example
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+15:00–16:00 GMT  UNVERIFIED
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    unverified: weather source failed: dropped for this example
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+Assumptions:
+- Site elevation unknown (the forecast gave none): taken as 0 ft.
+- no forecast pressure: flight levels are taken at the reference pressure
+- EGD496A: not in the openAIP data; the Q-circle of NOTAM J3857/26 is used
