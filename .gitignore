@@ -12,3 +12,5 @@ data/guidance/staging/
 .coverage
 evals/reader/runs/
 .cache/
+# the eval harness's reader caches and the judge's second-pass verdicts (make agreement)
+data/eval-cache/

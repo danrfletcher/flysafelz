@@ -1,0 +1,23 @@
+# t5a-PR-8.F1: annotate refusals (real `make` targets, no key, no network)
+
+$ make annotate   (EXPERIMENT not set)
+usage: make annotate EXPERIMENT=<v1 dev experiment name>   (for example: make annotate EXPERIMENT=v1-dev-20261108-160700)
+EXPERIMENT is not set; nothing was sent to LangSmith.
+make: *** [annotate] Error 2
+[exit 2]
+
+$ make agreement   (EXPERIMENT not set)
+usage: make agreement EXPERIMENT=<v1 dev experiment name>   (for example: make agreement EXPERIMENT=v1-dev-20261108-160700)
+EXPERIMENT is not set; nothing was sent to LangSmith.
+make: *** [agreement] Error 2
+[exit 2]
+
+$ make annotate EXPERIMENT=flysafelz-held-out
+evals.agent.annotate: flysafelz-held-out is a held-out experiment: held-out answers are never queued or labelled during the build (calibration uses dev only)
+make: *** [annotate] Error 2
+[exit 2]
+
+$ make annotate EXPERIMENT=v0-dev-20261108-160700
+evals.agent.annotate: v0-dev-20261108-160700 is a v0 experiment: the judge is calibrated on v1 answers (use a v1-dev-<stamp> experiment)
+make: *** [annotate] Error 2
+[exit 2]
