@@ -48,17 +48,18 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(installed).toContain('@radix-ui/react-switch')
   })
 
-  it('has no saved choices and no CARTO key', () => {
+  it('has no saved choices, and the CARTO key named in the one file that reads it, its type declaration and nothing else under src/', () => {
     expect(filesMatching(word('local', 'Storage|session', 'Storage'))).toEqual([])
-    expect(filesMatching(word('VITE_', 'CARTO_KEY'))).toEqual([])
+    const naming = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path) && word('VITE_', 'CARTO_KEY').test(readUi(path)))
+    expect(naming).toEqual(['src/map/basemap.ts', 'src/vite-env.d.ts'])
   })
 
-  it('has the base layers’ two switches and the Answer overlays switch, and no other: no wind, rain, all-heights or basemap-status switch', () => {
+  it('has the base layers’ two switches and the Answer overlays switch, and no other: no wind, rain or all-heights switch, and the basemap entry has none', () => {
     const panel = readUi('src/components/LayerPanel.tsx')
     expect(panel.match(/<Switch\b/g)).toHaveLength(1) // one in the list the layers map over
     const layers = [...panel.matchAll(/id: '(\w+)', name: '([^']+)'/g)].map((match) => [match[1], match[2]])
     expect(layers).toEqual([['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100'], ['answer', 'Answer overlays']])
-    const switchLabels = /wind|rain|radar|all heights|basemap/i
+    const switchLabels = /wind|rain|radar|all heights/i
     expect(switchLabels.test(panel)).toBe(false)
   })
 

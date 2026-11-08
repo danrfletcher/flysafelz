@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ACTIONS, ON_THE_MAP, VERDICTS } from '@/components/Legend'
 import { LAYERS, LayerPanel, type LayerId, type LayerSwitches } from '@/components/LayerPanel'
 import { HOW_IT_WORKS } from '@/content/howItWorks'
+import type { BasemapStatus } from '@/map/basemap'
 import type { LayerState } from '@/map/useMapLayers'
 
 const UPDATED = '2026-11-08T14:32:00Z'
@@ -14,11 +15,22 @@ const loading: LayerState<unknown> = { status: 'loading', features: [], updatedA
 const unavailable: LayerState<unknown> = { status: 'unavailable', features: [], updatedAt: null, stale: false }
 
 /** The panel with its switches held in state, as App holds them. */
-function Panel({ airspace = ok(), notams = ok(), onChange }: { airspace?: LayerState<unknown>; notams?: LayerState<unknown>; onChange?: (id: LayerId, on: boolean) => void }) {
+function Panel({
+  airspace = ok(),
+  notams = ok(),
+  basemap,
+  onChange,
+}: {
+  airspace?: LayerState<unknown>
+  notams?: LayerState<unknown>
+  basemap?: BasemapStatus
+  onChange?: (id: LayerId, on: boolean) => void
+}) {
   const [shown, setShown] = useState<LayerSwitches>({ airspace: true, notams: true, answer: true })
   return (
     <LayerPanel
       states={{ airspace, notams }}
+      basemap={basemap}
       shown={shown}
       onShownChange={(id, on) => {
         onChange?.(id, on)
@@ -80,9 +92,10 @@ describe('the switches', () => {
     expect(screen.getByRole('switch', { name: 'Airspace below FL100' })).not.toBeChecked()
   })
 
-  it('has no switch for wind, rain, all heights or the basemap', async () => {
+  it('has no switch for wind, rain or all heights, and none for the basemap', async () => {
     const { dialog } = await open()
-    expect(within(dialog).queryByText(/wind|rain|radar|all heights|basemap/i)).toBeNull()
+    expect(within(dialog).queryByText(/wind|rain|radar|all heights/i)).toBeNull()
+    expect(within(dialog).queryByRole('switch', { name: /basemap/i })).toBeNull()
   })
 })
 
@@ -166,6 +179,48 @@ describe('each layer’s line', () => {
     const rows = within(dialog).getAllByRole('listitem').slice(0, 2)
     expect(rows[1]).toHaveTextContent(/updated \d\d:\d\d/)
     expect(dialog).not.toHaveTextContent('stale')
+  })
+})
+
+describe('the basemap entry', () => {
+  const entry = (dialog: HTMLElement) => within(dialog).getByText('Basemap').closest('li') as HTMLElement
+
+  it.each<[string, BasemapStatus | undefined, boolean]>([
+    ['not told anything', undefined, false],
+    ['loading', 'loading', false],
+    ['ok', 'ok', false],
+    ['unavailable', 'unavailable', true],
+  ])('says "basemap unavailable" only when unavailable (%s)', async (_label, basemap, shows) => {
+    const { dialog } = await open(<Panel basemap={basemap} />)
+    expect(within(dialog).queryByText('basemap unavailable') !== null).toBe(shows)
+    expect(entry(dialog)).toHaveTextContent('CARTO Dark Matter')
+    expect(entry(dialog).textContent?.includes('basemap unavailable')).toBe(shows)
+  })
+
+  it('has no switch and no "updated" time for the basemap, in any state', async () => {
+    const { dialog } = await open(<Panel basemap="unavailable" />)
+    expect(within(entry(dialog)).queryByRole('switch')).toBeNull()
+    expect(entry(dialog).textContent).not.toMatch(/updated|stale|loading/i)
+    expect(within(dialog).getAllByRole('switch')).toHaveLength(3)
+    expect(within(dialog).getAllByText(/^updated /)).toHaveLength(2)
+  })
+
+  it('changes nothing about the other layers: their switches, legend and stale/503 notes read the same', async () => {
+    const states = { airspace: unavailable, notams: ok({ stale: true }) }
+    const read = async (basemap: BasemapStatus) => {
+      const { dialog, view } = await open(<Panel {...states} basemap={basemap} />)
+      const text = [...dialog.querySelectorAll('li')].filter((li) => li !== entry(dialog)).map((li) => li.textContent)
+      const switches = within(dialog).getAllByRole('switch').map((s) => s.getAttribute('aria-checked'))
+      const legend = dialog.querySelector('hr')?.nextElementSibling?.textContent
+      view.unmount()
+      return { text, switches, legend }
+    }
+    const fine = await read('ok')
+    const failed = await read('unavailable')
+    expect(failed).toEqual(fine)
+    expect(fine.text.join(' ')).toContain('Airspace below FL100 unavailable')
+    expect(fine.text.join(' ')).toContain('stale')
+    expect(fine.legend).toContain('On the map')
   })
 })
 

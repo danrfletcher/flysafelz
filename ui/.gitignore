@@ -1,0 +1,3 @@
+# Vite also reads these; the repo-root .gitignore covers .env only. A basemap key is public, but a local setting is still not committed.
+.env.local
+.env.*.local

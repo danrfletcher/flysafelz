@@ -73,9 +73,11 @@
   }
 }
 
-/* The map shows the theme background until (or if) tiles arrive. */
-.leaflet-container {
-  background: var(--background);
+/* The map shows the theme's map colour until (or if) tiles arrive, never Leaflet's default grey. When the basemap is unavailable
+   the tile layer is hidden and this colour is the whole basemap. */
+.leaflet-container,
+.leaflet-container.basemap-unavailable {
+  background: var(--map-background);
   font-family: var(--font-sans);
 }
 

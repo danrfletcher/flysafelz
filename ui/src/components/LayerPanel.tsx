@@ -3,6 +3,7 @@ import { Layers } from 'lucide-react'
 import { Legend } from '@/components/Legend'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
+import type { BasemapStatus } from '@/map/basemap'
 import { formatUpdated, type LayerState } from '@/map/useMapLayers'
 
 /** The layers that come from a map route, and so have an update time and a state. */
@@ -22,6 +23,8 @@ export interface LayerPanelProps {
   states: Record<ServerLayerId, LayerState<unknown>>
   shown: LayerSwitches
   onShownChange: (id: LayerId, on: boolean) => void
+  /** Whether the map's tiles are loading; the panel adds a note under the basemap entry only when they are unavailable. */
+  basemap?: BasemapStatus
   /** The chat sheet is open: from 768 px up the button moves left to sit beside the sheet instead of under it. */
   chatOpen?: boolean
 }
@@ -42,7 +45,7 @@ function Status({ name, state }: { name: string; state: LayerState<unknown> }) {
  * The layer panel: a button at the top right of the map that opens a popover with one switch per layer, each route layer's update time
  * and state, and the legend. The popover is never wider than the viewport, and scrolls inside when it is taller than the room it has.
  */
-export function LayerPanel({ states, shown, onShownChange, chatOpen = false }: LayerPanelProps) {
+export function LayerPanel({ states, shown, onShownChange, basemap = 'loading', chatOpen = false }: LayerPanelProps) {
   return (
     <div className={`absolute top-3 right-3 z-[1000] ${chatOpen ? 'md:right-[27rem]' : ''}`}>
       <Popover>
@@ -70,6 +73,12 @@ export function LayerPanel({ states, shown, onShownChange, chatOpen = false }: L
                 <Switch id={`layer-${id}`} checked={shown[id]} onCheckedChange={(on) => onShownChange(id, on)} className="mt-0.5" />
               </li>
             ))}
+            {/* The map under the layers: no switch and no update time; a note only when its tiles fail. */}
+            <li>
+              <p className="text-sm font-medium">Basemap</p>
+              <p className="text-xs text-muted-foreground">CARTO Dark Matter</p>
+              {basemap === 'unavailable' && <p className="text-xs text-destructive">basemap unavailable</p>}
+            </li>
           </ul>
           <hr className="my-4 border-border" />
           <Legend />
