@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { KEY_NAMES, keyProblems } from './check-no-keys.mjs'
+import { BUILD_ONLY_NAMES, KEY_NAMES, keyProblems } from './check-no-keys.mjs'
 
 const SCRIPT = resolve(import.meta.dirname, 'check-no-keys.mjs')
 const UI = resolve(import.meta.dirname, '..')
@@ -36,6 +36,15 @@ describe('keyProblems', () => {
     const found = keyProblems(root)
     expect(found).toEqual([`assets/app.js: names ${word}`])
     expect(found.join('')).not.toContain('hunter2')
+  })
+
+  it.each(BUILD_ONLY_NAMES)('allows the name %s inside a build output folder only, and still finds key shapes there', (word) => {
+    const root = folder({ 'dist/assets/app.js': `var a="${word}"`, 'src/app.js': `var a="${word}"` })
+    expect(keyProblems(join(root, 'dist'))).toEqual([])
+    expect(keyProblems(join(root, 'src'))).toEqual([`app.js: names ${word}`])
+    const sk = ['sk', 'abcdefghijklmnopqrstuvwxyz0123'].join('-')
+    const shaped = folder({ 'dist/assets/app.js': `var a="${word}"; var k="${sk}"` })
+    expect(keyProblems(join(shaped, 'dist'))).toEqual(['assets/app.js: contains an sk- key'])
   })
 
   it('finds a key-shaped string', () => {

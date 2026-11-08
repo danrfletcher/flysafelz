@@ -19,6 +19,8 @@ export interface LayerPanelProps {
   states: Record<LayerId, LayerState<unknown>>
   shown: LayerSwitches
   onShownChange: (id: LayerId, on: boolean) => void
+  /** The chat sheet is open: from 768 px up the button moves left to sit beside the sheet instead of under it. */
+  chatOpen?: boolean
 }
 
 /** The line under a switch: loading, "updated HH:MM" (with "stale" when the route says so or a refetch failed), or "<layer> unavailable". */
@@ -37,9 +39,9 @@ function Status({ name, state }: { name: string; state: LayerState<unknown> }) {
  * The layer panel: a button at the top right of the map that opens a popover with one switch per layer, each layer's update time
  * and state, and the legend. The popover is never wider than the viewport, and scrolls inside when it is taller than the room it has.
  */
-export function LayerPanel({ states, shown, onShownChange }: LayerPanelProps) {
+export function LayerPanel({ states, shown, onShownChange, chatOpen = false }: LayerPanelProps) {
   return (
-    <div className="absolute top-3 right-3 z-[1000]">
+    <div className={`absolute top-3 right-3 z-[1000] ${chatOpen ? 'md:right-[27rem]' : ''}`}>
       <Popover>
         <PopoverTrigger
           aria-label="Map layers"

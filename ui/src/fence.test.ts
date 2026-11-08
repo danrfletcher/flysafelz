@@ -38,9 +38,11 @@ describe('F2: no analytics, no logging of answer text', () => {
 })
 
 describe('no half-wiring: nothing here belongs to a later PR', () => {
-  it('has no motion, wind, chat-SDK or markdown dependency yet, and the one Turf package is the point-in-polygon test', () => {
-    const later = /^(motion|framer-motion|leaflet-velocity|@langchain\/.*|react-markdown|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
+  it('has no motion, wind or extra chat dependency: the LangGraph SDK and react-markdown are the chat PR’s, and the one Turf package is the point-in-polygon test', () => {
+    const later = /^(motion|framer-motion|leaflet-velocity|vaul|rehype-raw|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
     expect(installed.filter((name) => later.test(name))).toEqual([])
+    expect(installed.filter((name) => name.startsWith('@langchain/'))).toEqual(['@langchain/langgraph-sdk'])
+    expect(installed).toContain('react-markdown')
     expect(installed.filter((name) => name.startsWith('@turf/'))).toEqual(['@turf/boolean-point-in-polygon'])
     expect(installed).toContain('@radix-ui/react-popover')
     expect(installed).toContain('@radix-ui/react-switch')
@@ -70,18 +72,20 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect([...new Set(routes)].sort()).toEqual(['/map/airspace', '/map/notams'])
   })
 
-  it('has no chat, sheet or drawer component yet (the pin, card and toast are this PR’s)', () => {
-    const names = readdirSync(resolve(UI_ROOT, 'src'), { recursive: true }).map(String)
-    expect(names.filter((name) => /chat|sheet|drawer/i.test(name))).toEqual([])
+  it('keeps the chat inside src/chat, with the Sheet and Drawer as the two components/ui shells and the 2 NM fit in src/map', () => {
+    const names = readdirSync(resolve(UI_ROOT, 'src'), { recursive: true }).map(String).filter((name) => /chat|sheet|drawer|fitlz/i.test(name))
+    const outside = names.filter((name) => !/^(chat|test[\\/]chatServer\.ts|test[\\/]fixtures[\\/]chat)/.test(name))
+    expect(outside.sort()).toEqual(['components/ui/drawer.tsx', 'components/ui/sheet.tsx', 'map/fitLz.test.ts', 'map/fitLz.ts'])
   })
 
-  it('has no pin bounce, no chat button and no answer-highlight code: PR-12.F1, PR-5.F1 and PR-6.F1 own them', () => {
+  it('has no pin bounce and no answer-highlight code (PR-12.F1 and PR-6.F1 own them), and `overlays` and `assessment` are only kept by the chat, never drawn or rendered', () => {
     const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
     const found = (pattern: RegExp) => sources.filter((path) => pattern.test(readUi(path)))
     expect(found(word('bou', 'nce|@key', 'frames|prefers-reduced-', 'motion'))).toEqual([])
-    expect(found(word('Chat about this', ' LZ|onChat|openChat'))).toEqual([])
     expect(found(word('high', 'light'))).toEqual([])
-    expect(found(word('overl', 'ays'))).toEqual([])
+    expect(found(word('overl', 'ays'))).toEqual(['src/chat/turns.ts', 'src/chat/useLzThread.ts']) // the store and the code that fills it; no map file
+    expect(found(word('assess', 'ment'))).toEqual(['src/chat/turns.ts', 'src/chat/useLzThread.ts'])
+    expect(readUi('src/chat/ChatPanel.tsx')).not.toMatch(/\.(assess|overl)/) // the panel never reads them off a turn to draw them
   })
 
   it('has no verdict or action colour function: the legend swatches are theme tokens', () => {
@@ -104,6 +108,30 @@ describe('F2/F7: NOTAM text and colour', () => {
     expect(style).not.toMatch(/\.action\b|\.name\b|\.text\b|\.match\(|\.test\(/)
     const build = readUi('src/map/BaseLayers.tsx')
     expect(build).not.toMatch(/\.action\b|\.text\b/)
+  })
+})
+
+describe('F5: the recorded chat payloads', () => {
+  const recorded = readdirSync(resolve(UI_ROOT, 'src/test/fixtures/chat')).filter((name) => name.endsWith('.json'))
+
+  it('has the five recordings the chat tests use', () => {
+    expect(recorded.sort()).toEqual(['blue-mill-assess.json', 'guard-fallback.json', 'network-error.json', 'progress-sequence.json', 'uk-only-decline.json'])
+  })
+
+  it('has only fiction-range phone numbers: 01632 960xxx, the number range Ofcom keeps for drama', () => {
+    for (const name of recorded) {
+      const text = readUi(`src/test/fixtures/chat/${name}`)
+      const numbers = text.match(/\b0[\d ]{9,12}\d\b/g) ?? []
+      for (const number of numbers) expect(number.replace(/ /g, ''), `${name}: ${number}`).toMatch(/^01632960\d{3}$/)
+    }
+    expect(readUi('src/test/fixtures/chat/blue-mill-assess.json')).toContain('01632 960003')
+  })
+
+  it('uses no West Sleekburn point (55.1576, -1.5699) and no real NOTAM text from its fixture', () => {
+    for (const name of recorded) {
+      const text = readUi(`src/test/fixtures/chat/${name}`)
+      expect(text, name).not.toMatch(/55\.157|1\.569|sleekburn/i)
+    }
   })
 })
 

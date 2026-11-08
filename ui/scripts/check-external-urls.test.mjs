@@ -46,7 +46,27 @@ describe('urlProblems', () => {
     expect(urlProblems(dist({ 'index.js': js }))).toEqual([])
   })
 
+  it('skips the link and endpoint strings of the bundled LangGraph SDK, react-markdown and langsmith client that are never requested', () => {
+    const js = [
+      'https://github.com/syntax-tree/hast-util-to-jsx-runtime',
+      'https://docs.langchain.com/oss/javascript/langchain/errors/X/',
+      'https://docs.expo.dev/versions/latest/sdk/expo/#expofetch-api',
+      'https://api.smith.langchain.com/',
+      'https://api.smith.langchain.com',
+      'https://eu.smith.langchain.com',
+      'https://smith.langchain.com/prompts',
+    ]
+      .map((url) => `a("${url}")`)
+      .join(';')
+    expect(urlProblems(dist({ 'index.js': js }))).toEqual([])
+  })
+
   it.each([
+    'https://smith.langchain.com.evil.example/x',
+    'https://evil-smith.langchain.com/x',
+    'http://api.smith.langchain.com/x',
+    'https://other.smith.langchain.com/x',
+    'https://docs.langchain.com.evil.example/x',
     'https://example.com/track.js',
     'https://www.google-analytics.com/collect',
     'https://carto.com.evil.example/x',
