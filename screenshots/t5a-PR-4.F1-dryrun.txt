@@ -1,0 +1,23 @@
+$ uv run pytest tests/integration/test_eval_runner_dev.py -s
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+network: --disable-socket in effect
+rootdir: <repo>
+configfile: pyproject.toml
+plugins: langsmith-0.14.17, cov-7.1.0, socket-0.8.1, anyio-4.16.0
+collected 8 items
+
+tests/integration/test_eval_runner_dev.py flysafelz-dev: 29 examples (29 created, 0 updated, 0 deleted, 0 unchanged)
+
+experiment v1-dev-20261108-160700 (split dev): 87 of 87 runs, one example at a time
+reader cache: <repo>/data/eval-cache/v1-dev-20261108-160700.sqlite
+  rep 1: 29 runs (dev_01_blue_mill … blue_mill_today)
+  rep 2: 29 runs (dev_01_blue_mill … blue_mill_today)
+  rep 3: 29 runs (dev_01_blue_mill … blue_mill_today)
+errored: 0 of 87 runs
+incomplete: false
+reader calls failed and became UNVERIFIED: 0 (rep 1: 0, rep 2: 0, rep 3: 0)
+examples sharing a case (they and the later reps reuse one cache file): 9 groups
+........
+
+============================== 8 passed in 4.46s ===============================

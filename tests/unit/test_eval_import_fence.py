@@ -28,6 +28,15 @@ ADDED_TESTS = [
     REPO / "tests" / "unit" / "test_eval_import_fence.py",
     REPO / "tests" / "unit" / "test_lz_allow_list.py",
     REPO / "tests" / "test_labelled_fixtures_committed.py",
+    # the runner (5a PR-4.F1): its tests, their fakes and the fence test hold fiction-range phones and invented case names only
+    REPO / "tests" / "unit" / "eval_runner_helpers.py",
+    REPO / "tests" / "unit" / "test_eval_run_v1_cli.py",
+    REPO / "tests" / "unit" / "test_eval_runner_context.py",
+    REPO / "tests" / "unit" / "test_eval_runner_errors.py",
+    REPO / "tests" / "unit" / "test_eval_runner_fence.py",
+    REPO / "tests" / "unit" / "test_eval_runner_order.py",
+    REPO / "tests" / "unit" / "test_eval_runner_usage.py",
+    REPO / "tests" / "integration" / "test_eval_runner_dev.py",
 ]
 # these two read the committed labelled cases by name on purpose; the rest of the added tests use invented names
 NAMES_REAL_CASES = {"test_labelled_fixtures_committed.py", "test_lz_allow_list.py"}
