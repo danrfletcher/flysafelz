@@ -53,14 +53,15 @@ OPENAIP_KEY_READERS = {
 }
 READER_CONFIG = "reader/config.py"
 AGENT_CONFIG = "agent/config.py"  # reads AGENT_* from os.environ, and nothing else (ticket 4 PR-1.S1)
+GUIDANCE_INGEST = "guidance/ingest.py"  # main() reads GUIDANCE_SOURCES, a different register for a test run, and nothing else (ticket 4 PR-7.F1)
 
 
 def env_read_files(src: Path, files: list[Path]) -> list[str]:
-    """The files (as paths under `src`) whose text matches an environment or `.env` read, less the reviewed openAIP key readers, reader/config.py and agent/config.py."""
+    """The files (as paths under `src`) whose text matches an environment or `.env` read, less the reviewed openAIP key readers, reader/config.py, agent/config.py and guidance/ingest.py."""
     found = []
     for path in files:
         relative = path.relative_to(src).as_posix()
-        if relative not in (READER_CONFIG, AGENT_CONFIG) and relative not in OPENAIP_KEY_READERS and ENV_READ.search(path.read_text(encoding="utf-8")):
+        if relative not in (READER_CONFIG, AGENT_CONFIG, GUIDANCE_INGEST) and relative not in OPENAIP_KEY_READERS and ENV_READ.search(path.read_text(encoding="utf-8")):
             found.append(relative)
     return found
 

@@ -6,6 +6,8 @@ node_modules/
 dist/
 .langgraph_api/
 *.sqlite
+!data/guidance/embeddings.sqlite
+data/guidance/staging/
 .DS_Store
 .coverage
 evals/reader/runs/

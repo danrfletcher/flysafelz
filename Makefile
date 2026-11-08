@@ -1,4 +1,4 @@
-.PHONY: setup test fixtures eval-reader
+.PHONY: setup test fixtures eval-reader guidance
 
 # Needs no API key: installs the project and its dependencies, then stores the embedding model (name and folder from
 # src/flysafelz/agent/settings.yaml, the folder git-ignored) so the app never downloads at runtime. A second run downloads
@@ -8,9 +8,9 @@ setup:
 	uv run python -m flysafelz.guidance.embedding_model
 
 # Runs the whole suite with sockets disabled (see addopts in pyproject.toml).
-# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess and their shared helpers), embedding-model and time-text modules must stay at 90% line coverage or better (the modules together).
+# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model) and time-text modules must stay at 90% line coverage or better (the modules together).
 test:
-	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance.embedding_model --cov=flysafelz.timetext --cov-report=term-missing --cov-fail-under=90
+	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov-report=term-missing --cov-fail-under=90
 
 # Capture a NEW case: make fixtures CASE=blue_mill_2026-10-31_3day
 # case.yaml takes an optional `days: N` (1 to 8, Europe/London days from the day of `now`) for a multi-day window.
@@ -28,3 +28,10 @@ fixtures:
 # downgrade does not fail it: it is a report, not a gate.
 eval-reader:
 	@uv run python -m evals.reader_eval.run
+
+# Fetches the documents in data/guidance/sources.yaml, splits them by their own section headings, embeds them, and promotes the new snapshot
+# (section files, manifest.yaml, embeddings.sqlite and the corpus key) only if hit@4 on evals/guidance/questions.yaml is no worse than the current one.
+# An unchanged document prints "<id>: no change". It needs the network for the documents and the embedding model that `make setup` stored (it never downloads
+# the model). GUIDANCE_SOURCES=<file> reads a different register. `make test` never runs it.
+guidance:
+	@uv run python -m flysafelz.guidance.ingest

@@ -1,0 +1,97 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 1126 >>
+stream
+BT /F1 11 Tf 56 806 Td (CAP 0000 Sample Guidance) Tj ET
+BT /F1 11 Tf 56 790 Td (Contents) Tj ET
+BT /F1 11 Tf 56 774 Td (1 Introduction .......... 2) Tj ET
+BT /F1 11 Tf 56 758 Td (2 Airspace .......... 2) Tj ET
+BT /F1 11 Tf 56 742 Td (3 Danger areas .......... 3) Tj ET
+BT /F1 11 Tf 56 726 Td (4 NOTAMs .......... 3) Tj ET
+BT /F1 11 Tf 56 710 Td (Appendix A Glossary .......... 4) Tj ET
+BT /F1 11 Tf 56 694 Td (1 Introduction) Tj ET
+BT /F1 11 Tf 56 678 Td (This guidance explains how pilots find out what airspace is active.) Tj ET
+BT /F1 11 Tf 56 662 Td (It is a sample used for testing and is not real guidance.) Tj ET
+BT /F1 11 Tf 56 646 Td (2 Airspace) Tj ET
+BT /F1 11 Tf 56 630 Td (Controlled airspace needs a clearance before a pilot enters it.) Tj ET
+BT /F1 11 Tf 56 614 Td (A pilot stays clear of it unless a clearance is given.) Tj ET
+BT /F1 11 Tf 56 598 Td (2.1 Class D) Tj ET
+BT /F1 11 Tf 56 582 Td (Class D airspace is controlled, so the pilot calls the unit first.) Tj ET
+BT /F1 11 Tf 56 566 Td (Radio failure while inside it is covered by the oper\255ator's rules.) Tj ET
+BT /F1 11 Tf 56 48 Td (Page 1 of 4) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 237 >>
+stream
+BT /F1 11 Tf 56 806 Td (CAP 0000 Sample Guidance) Tj ET
+BT /F1 11 Tf 56 790 Td (3 Danger areas) Tj ET
+BT /F1 11 Tf 56 774 Td (A danger area warns of activity that is dangerous to aircraft.) Tj ET
+BT /F1 11 Tf 56 48 Td (Page 2 of 4) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 547 >>
+stream
+BT /F1 11 Tf 56 806 Td (CAP 0000 Sample Guidance) Tj ET
+BT /F1 11 Tf 56 790 Td (3.1 Activation) Tj ET
+BT /F1 11 Tf 56 774 Td (A danger area is active when its notice says so.) Tj ET
+BT /F1 11 Tf 56 758 Td (The pilot checks the notice before every flight.) Tj ET
+BT /F1 11 Tf 310 790 Td (3.2 Contact) Tj ET
+BT /F1 11 Tf 310 774 Td (Where a notice gives a contact, the pilot calls it first.) Tj ET
+BT /F1 11 Tf 310 758 Td (4 NOTAMs) Tj ET
+BT /F1 11 Tf 310 742 Td (A NOTAM is a notice to air missions.) Tj ET
+BT /F1 11 Tf 56 48 Td (Page 3 of 4) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 341 >>
+stream
+BT /F1 11 Tf 56 806 Td (CAP 0000 Sample Guidance) Tj ET
+BT /F1 11 Tf 56 790 Td (4.1 Reading a NOTAM) Tj ET
+BT /F1 11 Tf 56 774 Td (Item E holds the text and item Q holds the area.) Tj ET
+BT /F1 11 Tf 56 758 Td (Appendix A Glossary) Tj ET
+BT /F1 11 Tf 56 742 Td (NOTAM: notice to air missions.) Tj ET
+BT /F1 11 Tf 56 48 Td (Page 4 of 4) Tj ET
+endstream
+endobj
+xref
+0 12
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000134 00000 n 
+0000000231 00000 n 
+0000000357 00000 n 
+0000001535 00000 n 
+0000001661 00000 n 
+0000001949 00000 n 
+0000002075 00000 n 
+0000002673 00000 n 
+0000002801 00000 n 
+trailer
+<< /Size 12 /Root 1 0 R >>
+startxref
+3194
+%%EOF
