@@ -1,0 +1,27 @@
+$ uv run python scripts/build_verdict_sheet.py --check
+ho_a1_blue_mill_afternoon (blind): rows 8, labelled 8, unlabelled 0, unread left 0, actions done yes, stale no
+ho_a2_bamburgh_today (blind): rows 20, labelled 20, unlabelled 0, unread left 0, actions done yes, stale no
+ho_a3_sherburn_9am (blind): rows 6, labelled 6, unlabelled 0, unread left 0, actions done yes, stale no
+ho_a4_crookham_evening (blind): rows 5, labelled 5, unlabelled 0, unread left 0, actions done yes, stale no
+ho_a5_town_moor_afternoon (blind): rows 7, labelled 7, unlabelled 0, unread left 0, actions done yes, stale no
+ho_a7_druridge_afternoon (blind): rows 7, labelled 7, unlabelled 0, unread left 0, actions done yes, stale no
+ho_d3_blue_mill_push (blind): rows 3, labelled 3, unlabelled 0, unread left 0, actions done yes, stale no
+dev_01_blue_mill (blind): rows 2, labelled 2, unlabelled 0, unread left 0, actions done yes, stale no
+dev_02_west_sleekburn (blind): rows 8, labelled 8, unlabelled 0, unread left 0, actions done yes, stale no
+blue_mill_today (blind): rows 13, labelled 13, unlabelled 0, unread left 0, actions done yes, stale no
+ho_a6_alnwick_saturday (draft): rows 5 (5 tier-only), labelled 0, unlabelled 0, unread left 0, actions done yes, stale no
+dev_03_buttermere (draft): rows 9, labelled 9, unlabelled 0, unread left 0, actions done yes, stale no
+dev_04_alnwick_pastures (draft): rows 5, labelled 5, unlabelled 0, unread left 0, actions done yes, stale no
+dev_10_crookham (draft): rows 6, labelled 6, unlabelled 0, unread left 0, actions done yes, stale no
+dev_11_west_sleekburn (draft): rows 14 (14 tier-only), labelled 0, unlabelled 0, unread left 0, actions done yes, stale no
+dev_12_blue_mill (draft): rows 2, labelled 2, unlabelled 0, unread left 0, actions done yes, stale no
+dev_13_bamburgh (draft): rows 21, labelled 21, unlabelled 0, unread left 0, actions done yes, stale no
+dev_14_town_moor (draft): rows 9, labelled 9, unlabelled 0, unread left 0, actions done yes, stale no
+dev_20_druridge_bay (draft): rows 7, labelled 7, unlabelled 0, unread left 0, actions done yes, stale no
+dev_21_crookham (draft): rows 3, labelled 3, unlabelled 0, unread left 0, actions done yes, stale no
+dev_22_buttermere (draft): rows 5, labelled 5, unlabelled 0, unread left 0, actions done yes, stale no
+dev_23_blue_mill (draft): rows 47, labelled 47, unlabelled 0, unread left 0, actions done yes, stale no
+dev_26_blue_mill (draft): rows 2, labelled 2, unlabelled 0, unread left 0, actions done yes, stale no
+dev_27_sherburn (draft): rows 2, labelled 2, unlabelled 0, unread left 0, actions done yes, stale no
+24 entries checked: 0 errors, 0 stale, 0 orphans
+exit=0

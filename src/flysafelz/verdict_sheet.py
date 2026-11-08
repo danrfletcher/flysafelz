@@ -112,6 +112,7 @@ from flysafelz.verdict_sheet_fingerprint import (
 )
 
 WINDOW_DEFAULT = "default"
+DATA_DIR = "evals/agent/data"  # under the repository root: the dataset's copy of the examples and the sheet (`make dataset`)
 EDGE_WINDOW_START = "window start"
 EDGE_HOUR = "hour"
 DROP_SOURCES = {"weather": SourceName.WEATHER, "airspace": SourceName.AIRSPACE, "pib": SourceName.NOTAMS}
@@ -619,9 +620,14 @@ def _parser() -> argparse.ArgumentParser:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--blind", action="store_true", help="build only the blind examples (metadata.blind: true); the others are skipped")
     mode.add_argument("--draft", action="store_true", help="build only the draft examples (no metadata.blind); the blind ones are skipped")
-    parser.add_argument("--check", action="store_true", help="validate the whole sheet and print the counts per example; writes nothing, exit 1 on any error")
-    parser.add_argument("--examples", required=True, type=Path, help="Dan's examples.yaml (only read)")
-    parser.add_argument("--out", required=True, type=Path, help="the sheet: created on the first run, then only appended to")
+    mode.add_argument(
+        "--finalise",
+        action="store_true",
+        help="for each entry with actions_done: true, rerun assess with Dan's NOTAM actions and write the rows' verdict and approaching_limits and a `finalised` stamp",
+    )
+    parser.add_argument("--check", action="store_true", help="validate the whole sheet and print the counts per example; writes nothing, exit 1 on any error or stale finalise")
+    parser.add_argument("--examples", type=Path, help=f"Dan's examples.yaml (only read); required except with --finalise or --check, which default to {DATA_DIR}/examples.yaml")
+    parser.add_argument("--out", type=Path, help=f"the sheet: created on the first run, then only appended to; with --finalise or --check it defaults to {DATA_DIR}/verdict_sheet.yaml")
     return parser
 
 
@@ -677,11 +683,15 @@ def _rerun(args: argparse.Namespace, root: Path, environ: Mapping[str, str] | No
     return 1 if label_errors else 0
 
 
-def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path], dict[str, Any]]) -> int:
+def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path], dict[str, Any]], code_root: Path | None = None) -> int:
     """`--check`: one line per entry (GP5) and an error line for each problem. Exit 0 when the sheet validates, 1 otherwise.
 
-    A stale entry or an orphan (an id no longer in the examples file) is reported but is not an error.
+    A stale entry (the 4b fingerprint) or an orphan (an id no longer in the examples file) is reported but is not an error.
+    An `actions_done: true` entry that is unfinalised, or finalised but stale (verdict_sheet_finalise.finalised_problems), is an
+    error: `verdict sheet is stale (<part> changed): run make dataset`. An `actions_done: false` entry is reported as not finalised.
     """
+    from flysafelz import verdict_sheet_finalise  # imported here: that module imports this one
+
     try:
         _text, entries = read_sheet(args.out)
         examples = read_examples(args.examples)
@@ -690,6 +700,7 @@ def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path]
         return 1
     by_id = {e.id: e for e in examples}
     reports = check_entries(entries, _default_windows(examples))
+    finalised = verdict_sheet_finalise.finalised_problems(args.out, root, args.examples, code_root=code_root)
     errors = stale = orphans = 0
     for entry, report in zip(entries, reports, strict=True):
         example = by_id.get(entry.id) if entry.id else None
@@ -702,6 +713,8 @@ def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path]
                 report.errors.append(str(exc))
             else:
                 status = f"({', '.join(reasons)})" if reasons else "no"
+        if entry.id in finalised:
+            report.errors.append(f"example {entry.id}: {finalised[entry.id]}")
         if entry.id is not None:
             print(report_line(report, status, orphan=orphan))
         for message in report.errors:
@@ -709,6 +722,9 @@ def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path]
         errors += len(report.errors)
         stale += status != "no"
         orphans += orphan
+    for entry in entries:
+        if entry.id is not None and isinstance(entry.data, dict) and entry.data.get("actions_done") is not True:
+            print(f"note: example {entry.id} is {verdict_sheet_finalise.NOT_FINALISED}")
     print(f"{len(entries)} entries checked: {errors} errors, {stale} stale, {orphans} orphans")
     return 1 if errors else 0
 
@@ -720,6 +736,7 @@ def main(
     environ: Mapping[str, str] | None = None,
     today: datetime | None = None,
     build: Callable[[Example, Path], dict[str, Any]] = build_entry,
+    code_root: Path | None = None,
 ) -> int:
     """Run the command. Exit 0: the sheet is as it should be (entries added, or nothing to add), 1: an error, 2: bad usage.
 
@@ -734,11 +751,29 @@ def main(
     written and the file untouched. The examples file is never written (F2).
 
     With --check: nothing is written; see _check.
+
+    With --finalise (5a PR-2.F1): see verdict_sheet_finalise. It rewrites only the labelable rows' `verdict` and `approaching_limits`
+    and the entry's `finalised` stamp, for the `actions_done: true` entries. It cannot be combined with --blind, --draft or --check.
+    --examples and --out default, for --finalise and --check, to the dataset's copy under evals/agent/data/ in `root`.
+    `code_root` is where the stamp reads the rules and module bytes from (default: this package's src/); tests point it at a copy.
     """
     parser = _parser()
     args = parser.parse_args(argv)
     if args.check and (args.blind or args.draft):
         parser.error("--check validates the whole sheet; it cannot be combined with --blind or --draft")
+    if args.check and args.finalise:
+        parser.error("--finalise writes the sheet and --check only reads it; run them one after the other")
+    if args.finalise or args.check:
+        args.examples = args.examples or root / DATA_DIR / "examples.yaml"
+        args.out = args.out or root / DATA_DIR / "verdict_sheet.yaml"
+    else:
+        missing = [flag for flag, value in (("--examples", args.examples), ("--out", args.out)) if value is None]
+        if missing:
+            parser.error(f"the following arguments are required: {', '.join(missing)}")
+    if args.finalise:
+        from flysafelz import verdict_sheet_finalise  # imported here: that module imports this one
+
+        return verdict_sheet_finalise.run_finalise(args.out, args.examples, root, code_root=code_root)
     if args.check:
-        return _check(args, root, build)
+        return _check(args, root, build, code_root)
     return _rerun(args, root, environ, today, build)

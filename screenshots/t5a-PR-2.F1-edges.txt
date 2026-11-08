@@ -1,0 +1,11 @@
+$ tmp copy of the committed sheet with one row end moved +1 minute in dev_23_blue_mill (the repo sheet is untouched)
+$ uv run python scripts/build_verdict_sheet.py --finalise --out <tmp sheet>
+example dev_23_blue_mill: code's rows no longer match the stored rows: row 1 is 2026-10-31T07:00:00Z to 2026-10-31T08:01:00Z on the sheet but code cuts 2026-10-31T07:00:00Z to 2026-10-31T08:00:00Z
+finalised 23 entries, 0 skipped (actions not done), 1 failed
+rows by verdict, before -> after:
+  NO_GO: 77 -> 77
+  UNVERIFIED: 10 -> 10
+  PILOT_DISCRETION: 63 -> 63
+0 rows moved
+exit=1
+tmp sheet bytes unchanged: yes (the failing entry is not written; the other 23 were already finalised, so nothing moved)

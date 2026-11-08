@@ -8,6 +8,36 @@
     inputs: 1803c38b71a66598a91622d5c6fe660d7e7fda5805e7af689975bc76e08f457e
     rows: ccbb246e10563eca2aa148da906d6a3f3c0678076e35eb96ebcd2d1dfc42c4a3
     seal: 701946d8fc4057776161cd98939427aab8f053020ca6b5d4f446e62e8ea13e7a
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: b524c27d3d1cfe06285da1c2d92cc410fdac4346db3a11fdfd69d5e5726ab506
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: 976856978a94df29adef9f55528877c39c9ef3af9d5b42b5dab4c987942cca8a
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 7e03cad91324e9f31c91bc75ba8460ea39823f053e3e84d97c695c55dff6e969
+    seal: 863043ede1151082c0da852f8b3ef69beadbf03e45e2c0e5af78c519422ec196
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -32,43 +62,43 @@
   - start: '2026-10-30T12:00:00Z'
     end: '2026-10-30T13:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-30T13:00:00Z'
     end: '2026-10-30T14:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-30T14:00:00Z'
     end: '2026-10-30T15:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-30T15:00:00Z'
     end: '2026-10-30T16:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
   - start: '2026-10-30T16:00:00Z'
     end: '2026-10-30T16:30:00Z'
     edge: H7266/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
   - start: '2026-10-30T16:30:00Z'
     end: '2026-10-30T17:00:00Z'
     edge: sunset
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-30T17:00:00Z'
     end: '2026-10-30T17:08:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-30T17:08:00Z'
     end: '2026-10-30T18:00:00Z'
     edge: civil dusk
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
 - id: ho_a2_bamburgh_today
   mode: blind
   window:
@@ -79,6 +109,36 @@
     inputs: 53e317d0d3b56810808b3032714f44ec2ff7b034d6f824cb1da4e14344f8cfde
     rows: 4f22f4ce73891f2d5727f719e2e41c635a3c477a01f9efa820cda6da0cff0212
     seal: 3eeabc894804e4494fb3900561bc27d519496d11384530eb2efb4faf94abc9a3
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 2c020c3bcbc262cbcbfca7dd61f640d84e395848a93ce52ee9ad23785e39531e
+    airspace.json: a5c9e6d52dc14297f708372b15e527e9811caa6b6af060107e05cfe1ebb0ac06
+    pib.xml: 18b455098935c5fc434b3bc38e2534303216536f186744e48286408333ab1789
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: c9cef5c1c67eb819858d933090d1b7523c7c77bbb2ef7cf11de12a44fcf3eaa8
+    seal: 0e1db799e64f6759a353a24bcdaba087b45423dd511f3c0fe66d002af08e6af5
   notam_actions:
     H5829/26: IGNORE
     H5874/26: IGNORE
@@ -103,103 +163,103 @@
   - start: '2026-10-06T06:00:00Z'
     end: '2026-10-06T06:20:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T06:20:00Z'
     end: '2026-10-06T07:00:00Z'
     edge: sunrise
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T07:00:00Z'
     end: '2026-10-06T08:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T08:00:00Z'
     end: '2026-10-06T09:00:00Z'
     edge: J3306/26 starts + J3307/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T09:00:00Z'
     end: '2026-10-06T10:00:00Z'
     edge: H5829/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T10:00:00Z'
     end: '2026-10-06T11:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T11:00:00Z'
     end: '2026-10-06T12:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T12:00:00Z'
     end: '2026-10-06T13:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T13:00:00Z'
     end: '2026-10-06T14:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T14:00:00Z'
     end: '2026-10-06T15:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T15:00:00Z'
     end: '2026-10-06T16:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T16:00:00Z'
     end: '2026-10-06T17:00:00Z'
     edge: H6627/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
   - start: '2026-10-06T17:00:00Z'
     end: '2026-10-06T17:29:00Z'
     edge: J3306/26 ends + J3307/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T17:29:00Z'
     end: '2026-10-06T18:00:00Z'
     edge: sunset
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T18:00:00Z'
     end: '2026-10-06T18:06:00Z'
     edge: H5829/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T18:06:00Z'
     end: '2026-10-06T19:00:00Z'
     edge: civil dusk
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-06T19:00:00Z'
     end: '2026-10-06T20:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-10-06T20:00:00Z'
     end: '2026-10-06T21:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-06T21:00:00Z'
     end: '2026-10-06T22:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-06T22:00:00Z'
     end: '2026-10-06T23:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
 - id: ho_a3_sherburn_9am
   mode: blind
   window:
@@ -210,6 +270,36 @@
     inputs: 35db4423b069f900a4059d6cae6d176cd557980711a9bf635711c79bd0f6ce0c
     rows: ac5468c2584cf152428fb718e6598a253d7ffbb150533ca473b8f10f7e9f4d5e
     seal: 40f6b930f34b187eae76c6085e172de20eaef91dcbeb0bfdcaf38579d07d38c0
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 7ed1e3e8b3b02af16c27c97b11c45bc4e3813df2864eca2af6b66f72c7a4e4da
+    airspace.json: e3c3f4a12107eee036f1156ce4db66db4a797981c9a7f1a89f01823cefa1393e
+    pib.xml: a4a08a5ee8e103b4c50ed6ba21720a3e6295baba849cafb233246af036f9148b
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: a2d909a798c2d00557a525ba53d7e821cdee73000c6fc35158efd78fdda3861d
+    seal: 6386ee4e53c43c9f9b28c7bb4f9e64cc2a4efc857532a53d39da60b5489af047
   notam_actions:
     B1508/26: IGNORE
     H5914/26: IGNORE
@@ -227,33 +317,33 @@
   - start: '2026-09-13T08:00:00Z'
     end: '2026-09-13T09:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-09-13T09:00:00Z'
     end: '2026-09-13T09:18:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-09-13T09:18:00Z'
     end: '2026-09-13T10:00:00Z'
     edge: H5914/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-09-13T10:00:00Z'
     end: '2026-09-13T10:22:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-09-13T10:22:00Z'
     end: '2026-09-13T11:00:00Z'
     edge: H5914/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-09-13T11:00:00Z'
     end: '2026-09-13T12:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
 - id: ho_a4_crookham_evening
   mode: blind
   window:
@@ -264,6 +354,36 @@
     inputs: cfcc437180d86ae5c3e839298079bbaa955f879a052c56d5b17a35f0bec1ff3e
     rows: bba880baaefe43bdb0becc86c2b183f5746c5d4f7b8d1349bd0f5f2017bc0895
     seal: 68bf43a88ba7b6e7de861b300263d774d1ce2e5f56e0e02c7e23cf358fd214da
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 95dc713f413251f2105f24fa5eefe2c545ae2d8743d2130f49f2790ea3e99649
+    airspace.json: 6dd871f3a162e373f4e4cb62cebb76af8efe6b3f998c44d7bbf48a8203db408c
+    pib.xml: 196e0798c65dbda4c8fcf389535e06649358440385ffd6691e10ffda343103ef
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: a9e10e25e323bdda2d82a72c9ec01efb3929c34ba57e281d8fc6d114de047c42
+    seal: 8bcb41257e4622fcf89015b3415bd2be7466c67845c2734ef4238632e9b281d2
   notam_actions:
     H5829/26: CONTACT_FIRST
     H5874/26: IGNORE
@@ -278,28 +398,28 @@
   - start: '2026-10-06T16:00:00Z'
     end: '2026-10-06T17:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-06T17:00:00Z'
     end: '2026-10-06T17:30:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T17:30:00Z'
     end: '2026-10-06T18:00:00Z'
     edge: sunset
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T18:00:00Z'
     end: '2026-10-06T18:08:00Z'
     edge: H5829/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-06T18:08:00Z'
     end: '2026-10-06T19:00:00Z'
     edge: civil dusk
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
 - id: ho_a5_town_moor_afternoon
   mode: blind
   window:
@@ -310,6 +430,36 @@
     inputs: 5aad8796f9c7e1735b1f1c285aab6bc61283ceeb7ce41ce02e70289a87ee7532
     rows: c78c5144d10c8c7835a43d1a084cee863072f55b4f85b9c066c545704d8aadd9
     seal: 63b3ad3ae78830241aecabca06b63dc183de81ec5696e47919dbf3dc0e2d64bf
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 89a16443f6fa3fa2f214319ace8fa8a6f7e0b9bf26d8c94b300655515efcf96b
+    airspace.json: 4d7b837262f53c817d29aaea551b36dad98422a1bf1a33ff4969bbfe063db00b
+    pib.xml: c574f9769d1eb82712fca2611682042ce2ce1f2d18c4970301829616aad083e1
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 502f4dd3b23ed75ab3f738214076bedd8ee5897c571b2bf123f9347898a908ac
+    seal: fefffb1649da7e5e221c85a6676d529d7adb8993ebdb0559663476ce37e9005b
   notam_actions:
     B1476/26: AWARENESS
     B1508/26: IGNORE
@@ -335,38 +485,38 @@
   - start: '2026-09-13T11:00:00Z'
     end: '2026-09-13T12:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-09-13T12:00:00Z'
     end: '2026-09-13T13:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-09-13T13:00:00Z'
     end: '2026-09-13T14:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-09-13T14:00:00Z'
     end: '2026-09-13T15:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-09-13T15:00:00Z'
     end: '2026-09-13T16:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-09-13T16:00:00Z'
     end: '2026-09-13T16:30:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-09-13T16:30:00Z'
     end: '2026-09-13T17:00:00Z'
     edge: B1476/26 ends + I6086/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
 - id: ho_a7_druridge_afternoon
   mode: blind
   window:
@@ -377,6 +527,36 @@
     inputs: cc6dbaa4bed30b69c9333e32f378689199eaa44341fb46a42086ff995ceec07a
     rows: 9b525c25eb5fc6f84b892b39e46d1e6209dd1f581c0a9d9ac59e20fe8dae1a16
     seal: ebb90d3613caff78840e359acafe021e0f01b83f8f59cd5f119ba8d8ab2df40f
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: b8093e2c7f9f9368e33e8cf15ba7307dcb2df519fc9718d73f64594ffe0eea42
+    airspace.json: 9abb1e03675effcc0883331d9aa2f1c46e8cad1467567f4b0d998c00feb6d5dc
+    pib.xml: 783fa385b4b2db5d86f9bfa9c1eb0b52af7c829e782efdfda2f4a32ff168488b
+    readings.yaml: 0d2a4e3afe27933e370f07473e25cb26969dfaeedcd8b1b0cb86ea1a6a64a26d
+    labels: 213409e5cb829ed6ef4f88988404522b514575be006415a8c03186a927211cca
+    seal: c8945f586ae6bff35592b28c375893d6f5f7e4dcb082bdc3766b6cdf4d19c3ab
   notam_actions:
     B1139/26: IGNORE
     B914/26: IGNORE
@@ -390,38 +570,38 @@
   - start: '2026-07-22T11:00:00Z'
     end: '2026-07-22T11:30:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: UNVERIFIED
+    approaching_limits: false
   - start: '2026-07-22T11:30:00Z'
     end: '2026-07-22T12:00:00Z'
     edge: H4420/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: UNVERIFIED
+    approaching_limits: false
   - start: '2026-07-22T12:00:00Z'
     end: '2026-07-22T13:00:00Z'
     edge: H2483/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: UNVERIFIED
+    approaching_limits: false
   - start: '2026-07-22T13:00:00Z'
     end: '2026-07-22T14:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: UNVERIFIED
+    approaching_limits: false
   - start: '2026-07-22T14:00:00Z'
     end: '2026-07-22T15:00:00Z'
     edge: H4464/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: UNVERIFIED
+    approaching_limits: false
   - start: '2026-07-22T15:00:00Z'
     end: '2026-07-22T16:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: UNVERIFIED
+    approaching_limits: false
   - start: '2026-07-22T16:00:00Z'
     end: '2026-07-22T17:00:00Z'
     edge: H4466/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: UNVERIFIED
+    approaching_limits: false
 - id: ho_d3_blue_mill_push
   mode: blind
   window:
@@ -432,6 +612,36 @@
     inputs: dc5cf54d6d785fd5dce04b6cc60baffbb5bd18b48b9fd9dd9881b4968a0a4120
     rows: 5733d6b9949b8203eb289a646d2398967c22df98f17cc9ade95f3a18a1202ad3
     seal: 436906d2c2d79fd4278a1cd281cb2a7e0abe33239b3c96cc92c5df49dc080b9d
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: b524c27d3d1cfe06285da1c2d92cc410fdac4346db3a11fdfd69d5e5726ab506
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: 976856978a94df29adef9f55528877c39c9ef3af9d5b42b5dab4c987942cca8a
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 1613e99ede9496bb4e8658a353c4d6b1d0cf579a56113251a9a80bf53530fccb
+    seal: ab209dcf9bf284aa97649634b4bf5490cf9bd389bfbf6331e81a9543049db164
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -456,18 +666,18 @@
   - start: '2026-10-30T07:00:00Z'
     end: '2026-10-30T08:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-30T08:00:00Z'
     end: '2026-10-30T09:00:00Z'
     edge: H7171/26 starts + J3853/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-30T09:00:00Z'
     end: '2026-10-30T10:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
 - id: dev_01_blue_mill
   mode: blind
   window:
@@ -478,6 +688,36 @@
     inputs: a9d81e15e39b5983223cc3fe30c47cc4f0f8a68995a84f19a210d65bfbaaaa4a
     rows: 27c3d8b20817334dc8163f3bf752792ea49b9428d6d73b2f4f967b36adf344b3
     seal: 145c4dc8dd36dc1ecf247f7567db7cd7719cf37d26ed59ab838a9c3f207cdf0c
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 8de7951885496f3f987f712f09540d2247b9db3d582424411fd74feace9cb72a
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 828c3ceacfccaebd2a442832c91656cb6564d51133dc6190a7039fe2b4d6e9e8
+    seal: 1a0ef7d5a142a60daee6c3b84dadad2c7243c89d527232ff645fc52d612ac259
   notam_actions:
     B1434/26: IGNORE
     B1563/26: IGNORE
@@ -500,13 +740,13 @@
   - start: '2026-09-29T09:00:00Z'
     end: '2026-09-29T10:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-09-29T10:00:00Z'
     end: '2026-09-29T11:00:00Z'
     edge: H6449/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
 - id: dev_02_west_sleekburn
   mode: blind
   window:
@@ -517,6 +757,36 @@
     inputs: b46a0fe030f6818ccde9fdf7bb8f4feaeaea981af65b5d857c57ce1192f15343
     rows: b1232b407730216256861d1900fdf7d224a2902cc071cf30ed46c57a4d901ee8
     seal: e88f3d4927f78374d7db49273893cf6ba694d99b3a5bf838010618b95d74cbc9
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 8d4ac6e875ac1d77d72aad0e2db90fafded514c16c3a238dbae1c98ec2ba8bcd
+    airspace.json: b057bca1280bb7fd441c09ceb6ce208dacd3cf1e12024a65d4fe1bb8bc996941
+    pib.xml: bb99ec04266071d300ab341c3f18ea0616e4475ac2a70d6d552f1b580325bad4
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 17548ee7c87734d990cbda7d56efc303d0c718a6c581f0fc41a048b60f5e4286
+    seal: b0d890d180938210251d1a2e0d82e2436f8fd8a038ef0d6aff8bc8da0c682dfa
   notam_actions:
     B1476/26: AVOID_SECTOR
     B1508/26: IGNORE
@@ -534,43 +804,43 @@
   - start: '2026-09-13T06:00:00Z'
     end: '2026-09-13T07:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
   - start: '2026-09-13T07:00:00Z'
     end: '2026-09-13T07:30:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
   - start: '2026-09-13T07:30:00Z'
     end: '2026-09-13T08:00:00Z'
     edge: B1476/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
   - start: '2026-09-13T08:00:00Z'
     end: '2026-09-13T09:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: false
   - start: '2026-09-13T09:00:00Z'
     end: '2026-09-13T09:18:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-09-13T09:18:00Z'
     end: '2026-09-13T10:00:00Z'
     edge: H5914/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-09-13T10:00:00Z'
     end: '2026-09-13T10:22:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
   - start: '2026-09-13T10:22:00Z'
     end: '2026-09-13T11:00:00Z'
     edge: H5914/26 ends
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: false
 - id: blue_mill_today
   mode: blind
   window:
@@ -581,6 +851,36 @@
     inputs: ce6bbd2e983460c17167859449219dff0eae650da8bf79af3f681d91504d9ba8
     rows: 3dfa20b3fc6d486402759c92078976dede6334ac92e3cc5fb981a350632b94fd
     seal: 612085ef7d56f68f3ae2ee7ef55993ce509305402eca7522138382825dc155da
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 0fa47f1221fcf9364fd97ba12c9c6677499397e97406ea7e64cb3c1ed171f057
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: b35d3de8898f35c830655a32c4f445c5a089636f64c559545b2cd044ba68173a
+    readings.yaml: a0d07c01e67c9b4be16e3bc5d93fcd815f216ea93e87b0339c2c7b33ddfbbdd1
+    labels: 01000eb1ab285ca50dbfb3c93f6ed336c467e96c1cc57039c8fc3336af42fdaa
+    seal: f30bad34c7f671945756e852fae53fed3ed29d5e8b3810fc2089bf6f4b0cf181
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -606,68 +906,68 @@
   - start: '2026-10-31T07:00:00Z'
     end: '2026-10-31T08:00:00Z'
     edge: window start
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T08:00:00Z'
     end: '2026-10-31T09:00:00Z'
     edge: H7171/26 starts + J3857/26 starts
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-31T09:00:00Z'
     end: '2026-10-31T10:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
   - start: '2026-10-31T10:00:00Z'
     end: '2026-10-31T11:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T11:00:00Z'
     end: '2026-10-31T12:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T12:00:00Z'
     end: '2026-10-31T13:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T13:00:00Z'
     end: '2026-10-31T14:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T14:00:00Z'
     end: '2026-10-31T15:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T15:00:00Z'
     end: '2026-10-31T16:00:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T16:00:00Z'
     end: '2026-10-31T16:28:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T16:28:00Z'
     end: '2026-10-31T17:00:00Z'
     edge: sunset
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T17:00:00Z'
     end: '2026-10-31T17:06:00Z'
     edge: hour
-    verdict: null
-    approaching_limits: null
+    verdict: PILOT_DISCRETION
+    approaching_limits: true
   - start: '2026-10-31T17:06:00Z'
     end: '2026-10-31T18:00:00Z'
     edge: civil dusk
-    verdict: null
-    approaching_limits: null
+    verdict: NO_GO
+    approaching_limits: true
 - id: ho_a6_alnwick_saturday
   mode: draft
   window:
@@ -682,6 +982,36 @@
     pib.xml: 390eba671f43c0aa387b2f45c8816448d6e4d17ac07197f381da1e62059b12a3
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: f9ec2c3e09d3bb509f4b4ee0812e3b16a9c9ba0dd4d9879c8c13d604b36bd71b
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 6fdebc56b6376c464224cd06d562512883e10fc03bcef150cc65089bc78144e7
+    airspace.json: 037c6199a207a5ec14c0daad33ce3bba4281bbbc6f90d8bc96c5321254f2b167
+    pib.xml: 390eba671f43c0aa387b2f45c8816448d6e4d17ac07197f381da1e62059b12a3
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 5ec9cc52bd09d4632f3341b1bd264a1b3aa0441d59e7434f4f65c64b413a8ce7
+    seal: 0e7eacd8ec85fabfdfc76912f0543c1edefc5aa61a2db50aca406e2c570780fa
   notam_actions:
     # ignored by code (add a line above to overrule):
     # H6627/26: ended 2026-10-06T16:00:00Z, at or before the window start 2026-10-10T06:00:00Z
@@ -730,6 +1060,36 @@
     pib.xml: 059778f8161a6d1876f1338d3e78c864cc6549e488d17346307656691c091be6
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: ae7c92524b29b9f48616d41a2d86c82d8598d8c1ccc0e6113be01a3007e5ae1f
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 1c7281ced6bef11bfbe922b11a9bf96d9e42b2f70a6eaf6e51c05eed15c3e8ff
+    airspace.json: cd3ba02b12b45504007c3486ab8b8730a8110b212f9908e0f508ae8c8463a77c
+    pib.xml: 059778f8161a6d1876f1338d3e78c864cc6549e488d17346307656691c091be6
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 6c27c1b0d9fdb50f15f16371f9aea614261796233596d336e838589814bc4ba2
+    seal: 06f362f85eddecbae9234de59fec3a8379e44dfe59e91a0bc5993a46819dadeb
   notam_actions:
     H3868/26: CONTACT_FIRST
     H3971/26: CONTACT_FIRST
@@ -754,35 +1114,35 @@
   - start: '2026-07-08T17:00:00Z'
     end: '2026-07-08T18:00:00Z'
     edge: M4666/26 starts
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H3868/26, H3971/26]
     # why: gust spread 5.6 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,649 ft QNH above the LZ; UNVERIFIED: NOTAM H3868/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 543005N 0031508W, (ENNERDALE AND KINNISIDE, CUMBERLAND) MAX HEIGHT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC. OPS CTC <PHONE_1>. 26/07/044/LFC; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
   - start: '2026-07-08T18:00:00Z'
     end: '2026-07-08T19:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H3868/26, H3971/26]
     # why: gust spread 4.7 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,649 ft QNH above the LZ; UNVERIFIED: NOTAM H3868/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - UNDERSLUNG LOADS OPR WI 2NM RADIUS OF PSN 543005N 0031508W, (ENNERDALE AND KINNISIDE, CUMBERLAND) MAX HEIGHT 500FT AGL. ACFT MAY BE RESTRICTED IN ABILITY TO MANOEUVRE AND UNABLE TO COMPLY WITH RAC. OPS CTC <PHONE_1>. 26/07/044/LFC; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
   - start: '2026-07-08T19:00:00Z'
     end: '2026-07-08T20:00:00Z'
     edge: H3868/26 ends
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H3971/26]
     # why: gust spread 5.4 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,649 ft QNH above the LZ; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
   - start: '2026-07-08T20:00:00Z'
     end: '2026-07-08T20:46:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H3971/26]
     # why: gust spread 5.8 mph, limit 4; YORKSHIRE CTA 16 (CTA) starts at 9,652 ft QNH above the LZ; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
   - start: '2026-07-08T20:46:00Z'
     end: '2026-07-08T20:47:00Z'
     edge: sunset
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H3971/26]
     # why: gust spread 5.8 mph, limit 4; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; YORKSHIRE CTA 16 (CTA) starts at 9,652 ft QNH above the LZ; UNVERIFIED: NOTAM H3971/26 is over the LZ from the surface and has not been read: CIVIL AIRCRAFT NOTIFICATION PROCEDURE - MULTIPLE PARAGLIDERS OPR WI 2NM RADIUS OF PSN 543227N 0031529W (BUTTERMERE MOSS, CUMBRIA) LOW FLYING AREA 17. 2000FT AGL. CTC <PHONE_1>. 26/07/088/LFC
@@ -818,6 +1178,36 @@
     pib.xml: b04936bff2aaa05d765e2c66ac4068df13fefd0619daac834037b007ecfa47ea
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: a789bb622f14926cb88d186da7d9b7711e82395632c0df3f26da3fcc5020c245
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 6ff53ac3e188a60615447fcfdb92501903658bba698017aa8171956d0cd92ac5
+    airspace.json: 037c6199a207a5ec14c0daad33ce3bba4281bbbc6f90d8bc96c5321254f2b167
+    pib.xml: b04936bff2aaa05d765e2c66ac4068df13fefd0619daac834037b007ecfa47ea
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 98f97139ddb07cc24cc6db4940a79f474815b99b56d9f1135dbd03b69c0ea58f
+    seal: 602b85c16d1dca84274f9fda4a6ccc66bafec48af4d6eb480bbee377c207ef60
   notam_actions:
     H5915/26: IGNORE
     H5918/26: IGNORE
@@ -836,31 +1226,31 @@
   - start: '2026-09-13T06:00:00Z'
     end: '2026-09-13T07:00:00Z'
     edge: window start
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     # why: gust spread 4 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,668 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
   - start: '2026-09-13T07:00:00Z'
     end: '2026-09-13T08:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     # why: gust spread 4.2 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,679 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
   - start: '2026-09-13T08:00:00Z'
     end: '2026-09-13T09:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     # why: gust spread 4.7 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,679 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
   - start: '2026-09-13T09:00:00Z'
     end: '2026-09-13T10:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     # why: gust spread 5.1 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,693 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
   - start: '2026-09-13T10:00:00Z'
     end: '2026-09-13T11:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     # why: gust spread 5.6 mph, limit 4; NOTAM H5915/26 1.61 NM to the E (Q-circle edge), up to 757 ft AMSL: avoid that sector; NOTAM H5918/26 1.61 NM to the E (Q-circle edge), up to 2,060 ft AMSL: avoid that sector; EGD514 COMBAT AIRSPACE (DANGER) starts at 8,693 ft QNH above the LZ; UNVERIFIED: notams source stale: PIB issued 2026-09-13T02:00:50Z, more than 3 h before now
 - id: dev_10_crookham
@@ -877,6 +1267,36 @@
     pib.xml: 53abcc0dc25fc6ce02bae45b87da674f889c1b5d944d816ed2ec6ce51e58f1ee
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: 5e98c6aecf2c126f53dc00eed301c4b998a6d2d80d0dab90e2787958b7d0180f
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 202b8ddb9194996bb9e0bbe6cf12d55c1c4723bf0d52707d0b8d10545050ff64
+    airspace.json: 6dd871f3a162e373f4e4cb62cebb76af8efe6b3f998c44d7bbf48a8203db408c
+    pib.xml: 53abcc0dc25fc6ce02bae45b87da674f889c1b5d944d816ed2ec6ce51e58f1ee
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: f6779284b6ad475cc0b8145b0c86be9715b11bbe480c6776bc8ea2018b23d419
+    seal: 9f6a9264d114fe5b32d8d17a07b47f191e0b0e67168ead600ccb171d37056d69
   notam_actions:
     H4821/26: AVOID_SECTOR
     H4878/26: AWARENESS
@@ -915,7 +1335,7 @@
   - start: '2026-08-06T15:00:00Z'
     end: '2026-08-06T16:00:00Z'
     edge: hour
-    verdict: NO_GO
+    verdict: UNVERIFIED
     approaching_limits: true
     # why: precipitation 0.1 mm/h, limit 0.1; gust spread 4 mph, limit 4; low cloud 100 %, limit 90; NOTAM H4821/26 0.08 NM to the W (Q-circle edge), up to 2,800 ft AMSL: avoid that sector; UNVERIFIED: airspace source failed: dropped for this example
   - start: '2026-08-06T16:00:00Z'
@@ -938,6 +1358,36 @@
     pib.xml: fc82e1c3a4ba74420f9b24a7054d7bf5205708288a6022004b3eb2edc2a767d0
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: 17cb491a309c2d3fe02b999f47c238cf725e9f6e9cad2d1b8a66d0d7f948f45b
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 9fd1a410748de632d606de01c102da1d4d401dc32c0557e436d354958f0f3401
+    airspace.json: b057bca1280bb7fd441c09ceb6ce208dacd3cf1e12024a65d4fe1bb8bc996941
+    pib.xml: fc82e1c3a4ba74420f9b24a7054d7bf5205708288a6022004b3eb2edc2a767d0
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: fd73e39173c3466fed851e4b393433d712e5cf5e123292841558dfc42556cbf4
+    seal: 76ea0157eca7e0888caf4c84c89b089a0a8fe80322e703626724a87fd15bf275
   notam_actions:
     # ignored by code (add a line above to overrule):
     # H4420/26: ended 2026-07-22T18:30:00Z, at or before the window start 2026-07-26T06:00:00Z
@@ -1013,6 +1463,36 @@
     pib.xml: 49f98f2d5967c2d73a8845cbe822ec354ce17cd05f2ab1fa705e034ad2e495a4
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: 464d800ab0f80205adba72b911760df9a673ec5b07770fa4e9fba0f86cb2ac51
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 1f9cc15ca78672a509796d7ae06956430cf97ed96c49711996d09a7f19a5947d
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: 49f98f2d5967c2d73a8845cbe822ec354ce17cd05f2ab1fa705e034ad2e495a4
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 8650b8f2961565efd5b9d875f5035eb27f4bf03f00effb79f48ce4b9e3be5335
+    seal: 23f00cb984667839423e14c724b5a321435210b835ddf4fe8fe822727778a83e
   notam_actions:
     H4701/26: IGNORE
     B1139/26: AWARENESS
@@ -1056,6 +1536,36 @@
     pib.xml: 575cb812de9def24a3fef27bfe0193570dfd2b6bcd13d9d53239390d0ab36e92
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: 11aff735aab548a795c6ac0459f05623157bb4b9b83f730af2711e50292c40a0
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: c950497f72b24a698f399838eb3eba80026a8def9afb6ad108c1b503fb2cd134
+    airspace.json: a5c9e6d52dc14297f708372b15e527e9811caa6b6af060107e05cfe1ebb0ac06
+    pib.xml: 575cb812de9def24a3fef27bfe0193570dfd2b6bcd13d9d53239390d0ab36e92
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 05a586c96555999d895b33be90d20154fcc571ad1bc1ed134edfdd81b20501f7
+    seal: bec9e2cb45b9c7476d86007973a893902f28f6fb15d4967c068c2b394a8e3dcf
   notam_actions:
     H5829/26: IGNORE
     H6767/26: IGNORE
@@ -1219,6 +1729,36 @@
     pib.xml: b02b7d46fffbefaabce9130e06a350be44b775881b45dc7263350a74a74a889d
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: 7a4ecdc17db8c40cbceed7068b4ab1186fec80966c3798363ceeacda70858459
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: e9a57c6f1770799d06986eb2b2dbe6c3464b37e7f4c3d55e9a1951f06acc2dd5
+    airspace.json: 4d7b837262f53c817d29aaea551b36dad98422a1bf1a33ff4969bbfe063db00b
+    pib.xml: b02b7d46fffbefaabce9130e06a350be44b775881b45dc7263350a74a74a889d
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 150763914b8a3861c4b5b1a035fe8b1d28b6a5415ddc481bd7999946120fb71f
+    seal: b78da3adfe5f75735527115015a5310465c4f6210dbc49a9e75aa4f306546ad0
   notam_actions:
     H1633/26: CONTACT_FIRST
     H3369/26: AVOID_SECTOR
@@ -1308,6 +1848,36 @@
     pib.xml: cd0f8f906f9653ef144d8d5ec070047b0e97d9ad7e85328f89b9c1cb53e828cd
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: 18c38fc4551aea51f392501402fffa6291253500e61ce74c0b70c23214d0e440
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: b47f18d4f39b2ae78ffc36dd61872781bed6ce87c66eb4c98e358d165255cc68
+    airspace.json: 9abb1e03675effcc0883331d9aa2f1c46e8cad1467567f4b0d998c00feb6d5dc
+    pib.xml: cd0f8f906f9653ef144d8d5ec070047b0e97d9ad7e85328f89b9c1cb53e828cd
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 1b9696b8f3e1b2cff95a1196e9ffae26bbb5249aacf31497aec0b492005311ea
+    seal: 61b75b827ac10c3dac28a4e7d7ac91faecafcfdb9fe07f2ed4e4cfb0dc2446dd
   notam_actions:
     H6447/26: CONTACT_FIRST
     H6448/26: AVOID_SECTOR
@@ -1379,6 +1949,36 @@
     pib.xml: 22b793d4603bb43bcd432032040338321b2b25901aefd8716d55e1c7adffcbfb
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: e354d564113e15933e74f4b282f71d1ccd6ca846a7d2c70940c4d2b0e7b8e4fc
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 6e079f18857c67626231dccb69aff48e3c8d9ad71f7a9cbeffb004a98639d24e
+    airspace.json: 6dd871f3a162e373f4e4cb62cebb76af8efe6b3f998c44d7bbf48a8203db408c
+    pib.xml: 22b793d4603bb43bcd432032040338321b2b25901aefd8716d55e1c7adffcbfb
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: e2bdff4ddfcd65340c3c6a0feb9642e17aac19fb9e8695e5cc05e627b21ae8c9
+    seal: 1c72ce054dddd5c9507e421b8443318f4e5b1424137d7e2bf0e7ee756ea0964f
   notam_actions:
     H5078/26: AWARENESS
     # ignored by code (add a line above to overrule):
@@ -1428,6 +2028,36 @@
     pib.xml: 1cf4a25433b3d0bff08059ea262dab2052a83229056e61393431fc4db9694172
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: a3912ea0a4329daaaa0d20ee428ab13b508db2910df5ed6a9aa57f93fa72f4c7
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 98357463e08e96eff380b4aec3617b904e42eb027273879e82ca43ecb55b7c78
+    airspace.json: cd3ba02b12b45504007c3486ab8b8730a8110b212f9908e0f508ae8c8463a77c
+    pib.xml: 1cf4a25433b3d0bff08059ea262dab2052a83229056e61393431fc4db9694172
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 00519bc208f2234500247493e85875a5b182f87f992868c510f257044bdb482e
+    seal: 96ce4b5d2b1dfe3ae081a866d32f94d526a47e79a1665ddc6b146ab1af217a09
   notam_actions:
     B1139/26: IGNORE
     H2483/26: IGNORE
@@ -1483,6 +2113,36 @@
     pib.xml: 76c35ea66ca7b00cda77a2dae702fa2c6eeb854a1d646f80595a7e18460f58f2
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: d7bec3a42f97be05849d5e4f1ca9adba18acd5e19f6092b831a6ffd91949ce0a
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: b07c3c96a1c2dc897b179dd4be991d29184a0a8919e7c4fb76239830977ac1b9
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: 76c35ea66ca7b00cda77a2dae702fa2c6eeb854a1d646f80595a7e18460f58f2
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 940ec802e5e09893382ea631aaf9f2cc37eca19736664d02d540a6b9faa551f6
+    seal: 8d1a0c9bc2300861662ced92d82b4a54da65e6c23b445f95f23985a0302e074e
   notam_actions:
     H7171/26: AVOID_SECTOR
     J3857/26: CONTACT_FIRST
@@ -1509,7 +2169,7 @@
   - start: '2026-10-31T07:00:00Z'
     end: '2026-10-31T08:00:00Z'
     edge: window start
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     # why: gradient 9.9 mph, limit 9; visibility 1520 m, limit 5000; low cloud 91 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now
   - start: '2026-10-31T08:00:00Z'
@@ -1527,63 +2187,63 @@
   - start: '2026-10-31T10:00:00Z'
     end: '2026-10-31T11:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: visibility 2920 m, limit 5000; low cloud 98 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T11:00:00Z'
     end: '2026-10-31T12:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gust spread 4.7 mph, limit 4; visibility 3880 m, limit 5000; low cloud 95 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T12:00:00Z'
     end: '2026-10-31T13:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gust spread 5.2 mph, limit 4; low cloud 91 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T13:00:00Z'
     end: '2026-10-31T14:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gust spread 5.2 mph, limit 4; low cloud 91 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T14:00:00Z'
     end: '2026-10-31T15:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gust spread 4.5 mph, limit 4; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T15:00:00Z'
     end: '2026-10-31T16:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gust spread 4.5 mph, limit 4; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T16:00:00Z'
     end: '2026-10-31T16:28:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gust spread 4.3 mph, limit 4; gradient 9.7 mph, limit 9; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T16:28:00Z'
     end: '2026-10-31T17:00:00Z'
     edge: sunset
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gust spread 4.3 mph, limit 4; gradient 9.7 mph, limit 9; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
   - start: '2026-10-31T17:00:00Z'
     end: '2026-10-31T17:06:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3857/26]
     # why: gradient 9.7 mph, limit 9; visibility 2600 m, limit 5000; civil twilight: between civil dawn and sunrise, or sunset and civil dusk; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3857/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3857/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/05.
@@ -1698,35 +2358,35 @@
   - start: '2026-11-01T09:00:00Z'
     end: '2026-11-01T10:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3864/26]
     # why: visibility 2280 m, limit 5000; low cloud 98 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
   - start: '2026-11-01T10:00:00Z'
     end: '2026-11-01T11:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3864/26]
     # why: visibility 3400 m, limit 5000; low cloud 98 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
   - start: '2026-11-01T11:00:00Z'
     end: '2026-11-01T12:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3864/26]
     # why: visibility 4840 m, limit 5000; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
   - start: '2026-11-01T12:00:00Z'
     end: '2026-11-01T13:00:00Z'
     edge: hour
-    verdict: UNVERIFIED
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     unread: [H7171/26, J3864/26]
     # why: gust spread 4.1 mph, limit 4; visibility 3620 m, limit 5000; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
   - start: '2026-11-01T13:00:00Z'
     end: '2026-11-01T14:00:00Z'
     edge: hour
-    verdict: NO_GO
+    verdict: PILOT_DISCRETION
     approaching_limits: true
     # why: precipitation 0.1 mm/h, limit 0.1; gust spread 4.2 mph, limit 4; rain chance 67 %, limit 50; visibility 2040 m, limit 5000; low cloud 100 %, limit 90; UNVERIFIED: notams source stale: PIB issued 2026-10-31T01:00:36Z, more than 3 h before now; UNVERIFIED: Danger area EGD496A is activated by NOTAM J3864/26, which has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.; UNVERIFIED: NOTAM H7171/26 is over the LZ from the surface and has not been read: UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W (GARTON). MAX HGT 700FT AGL. FOR INFO <PHONE_1>. AR-2026-10264/01.; UNVERIFIED: NOTAM J3864/26 is over the LZ from the surface and has not been read: TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026 REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE (SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS. AR-2026-7404/09.
   - start: '2026-11-01T14:00:00Z'
@@ -1815,6 +2475,36 @@
     pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: c588db1e45ea59e18082a7b2feb40aa90c9a9690568a7fce3be6dc713b8f7745
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: 8de7951885496f3f987f712f09540d2247b9db3d582424411fd74feace9cb72a
+    airspace.json: e079a4f50d2d2da90b93262d4a64772e53a086cdb6390b2850c58c8e99da3761
+    pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 7669af757b485dfa24a1f8745a2e06f3cd9e28077d5aaff0721415dbf7e371e2
+    seal: fa52d786d22654f01cc261eb9bc726f729a3f283b4322e8e23e53334c1c0386a
   notam_actions:
     J3220/26: AWARENESS
     H6449/26: IGNORE
@@ -1861,6 +2551,36 @@
     pib.xml: 8c88bb840d8bebaa96c345e1fc62258a3473f0651d0f032016f5800b4818959e
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     seal: eed8c80592228868a4181f39db9742d9b54452cdc44a7ed6a66ea2668706e228
+  finalised:
+    rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
+    modules:
+      src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
+      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
+      src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+      src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
+      src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
+      src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
+      src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
+      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
+      src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
+      src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
+      src/flysafelz/notam_area.py: 42726533e91a6f8a82914a70a633ba800857b24d40a4e5cf4e114768d91ccb5f
+      src/flysafelz/pib.py: b44768da1df10489b77ad55475a3cf56dceba570ebfec6d43e8195f70e5e42c9
+      src/flysafelz/redact.py: fdfcddb14316ea09743c693e6ca759fe294064edb5586ad28744163a04ce5cb8
+      src/flysafelz/rules.py: fefb096acdc0f28ffbf1712a558e0b642ff786189958b18173e97217e977a635
+      src/flysafelz/schedule.py: 207e0044ff32edcab5c9988b8a246bda2ad0e0b2209b06a90183b219b50b8203
+      src/flysafelz/sup_refs.py: b701c6ba59c368b13d37cb0642f966a9a5090fab224b7709509d6c93aab2fece
+      src/flysafelz/timetext.py: 1ef42ef452d601d3404591c17933cae3e77facd3efc04f5742b65e48e9ebe0f5
+      src/flysafelz/verdict_sheet_finalise.py: c03b7e9cf1cbab19004d6b5a56178d911fb1f52ba1559087bc582a962acd3c46
+      src/flysafelz/weather.py: a385d3218c0828bee48c2dc3bec2941e7b7cdfc96528c43f932bdd26452b4b50
+    weather.json: a359a94e88eb425fe643dab4ce559ab34dcc5c0974a62dddd552d49d00e18f11
+    airspace.json: e3c3f4a12107eee036f1156ce4db66db4a797981c9a7f1a89f01823cefa1393e
+    pib.xml: 8c88bb840d8bebaa96c345e1fc62258a3473f0651d0f032016f5800b4818959e
+    readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
+    labels: 6fb0eb93953e447f403f89dc7c8aa5380dd7326cf826d020f6d99afdbf033366
+    seal: 1521a4b030e4f70f2e11b1aa09e8cdf379e7ecf9836802d4ec2331971fece847
   notam_actions:
   rows:
   - start: '2026-10-10T09:00:00Z'

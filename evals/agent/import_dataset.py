@@ -8,7 +8,8 @@ DATASET_SRC is read from the environment, never from the command line, so the sh
 
 Everything is checked before anything is written: any missing file, differing file or bad checksum list exits 1 with a message that
 names the file, and evals/agent/data/ is left exactly as it was. Each file is then written to a temporary file in evals/agent/data/
-and renamed into place. The source is only ever opened for reading. Finalising the sheet is not done here (PR-2.F1 adds it).
+and renamed into place. The source is only ever opened for reading. Finalising the sheet is not done here: the `dataset` target runs
+`build_verdict_sheet.py --finalise` after this module (PR-2.F1).
 """
 
 import hashlib
