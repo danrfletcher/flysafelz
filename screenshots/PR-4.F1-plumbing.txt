@@ -1,0 +1,99 @@
+# PR-4.F1 plumbing on Blue Mill in case mode, now 2026-10-31T07:30Z (sockets are never used: case mode loads fixtures/)
+
+$ uv run python -c '
+from datetime import datetime, UTC
+from flysafelz.agent.window import parse_window
+now = datetime(2026, 10, 31, 7, 30, tzinfo=UTC)
+print(parse_window("2026-10-31 10:00", "2026-10-31 16:00", now=now, tz="Europe/London"))
+print(parse_window(None, None, now=now, tz="Europe/London"))
+print(parse_window(None, None, now=now, tz="America/New_York"))
+print(parse_window("2026-11-09 10:00", "2026-11-09 12:00", now=now, tz="Europe/London"))
+print(parse_window("2026-03-29 01:30", "2026-03-29 03:00", now=datetime(2026, 3, 28, 12, tzinfo=UTC), tz="Europe/London"))
+'
+Window(start_utc=datetime.datetime(2026, 10, 31, 10, 0, tzinfo=datetime.timezone.utc), end_utc=datetime.datetime(2026, 10, 31, 16, 0, tzinfo=datetime.timezone.utc), words='Saturday 31 Oct 10:00 – 16:00 GMT', assumed=False)
+Window(start_utc=datetime.datetime(2026, 10, 31, 7, 0, tzinfo=datetime.timezone.utc), end_utc=datetime.datetime(2026, 11, 2, 0, 0, tzinfo=datetime.timezone.utc), words='assumed window: Saturday 31 Oct 07:00 – Sunday 1 Nov 24:00 GMT', assumed=True)
+Window(start_utc=datetime.datetime(2026, 10, 31, 7, 0, tzinfo=datetime.timezone.utc), end_utc=datetime.datetime(2026, 11, 2, 5, 0, tzinfo=datetime.timezone.utc), words='assumed window: Saturday 31 Oct 03:00 EDT – Sunday 1 Nov 24:00 EST', assumed=True)
+WindowError(text='That window is too far out to assess: it starts beyond the forecast horizon.')
+WindowError(text='The start 2026-03-29 01:30 does not exist in Europe/London: the clocks go forward then, so that hour is skipped.')
+
+$ uv run python -c '
+from datetime import datetime, UTC, timedelta
+from flysafelz.agent import sources as agent_sources
+from flysafelz.agent.sources import SourceCache, fetch_time
+from flysafelz.agent.state import RunContext
+from flysafelz.sources import load_case_sources
+loads = []
+def counting_load(name, **kwargs):
+    loads.append(name)
+    return load_case_sources(name, **kwargs)
+def never_live(*args):
+    raise SystemExit("fetched live")
+cache = SourceCache(fetch=never_live, load_case=counting_load)
+now = datetime(2026, 10, 31, 7, 30, tzinfo=UTC)
+case = load_case_sources("blue_mill_2026-10-31").case
+def ask(turn, at):
+    return cache.get(thread_id="t1", turn=turn, lat=case.lat, lon=case.lon, ctx=RunContext(now=at, case="blue_mill_2026-10-31"))
+first = ask("turn-1", now)
+second = ask("turn-1", now + timedelta(minutes=1))
+print("same object:", first is second, "| loads after two calls:", len(loads))
+print("fetch time:", fetch_time(first.statuses).isoformat())
+ask("turn-2", now + timedelta(minutes=14)); print("14 min later, loads:", len(loads))
+ask("turn-3", now + timedelta(minutes=16)); print("16 min later, loads:", len(loads))
+print("unknown case:", cache.get(thread_id="t1", turn="x", lat=1, lon=1, ctx=RunContext(now=now, case="nope")))
+'
+same object: True | loads after two calls: 1
+fetch time: 2026-10-31T07:30:00+00:00
+14 min later, loads: 1
+16 min later, loads: 2
+unknown case: SourcesError(text="unknown case 'nope': no folder fixtures/nope/")
+
+$ uv run python -c '
+from datetime import datetime, UTC
+from flysafelz.agent.sources import SourceCache
+from flysafelz.agent.redaction import redact_artifact
+from flysafelz.agent.state import RunContext
+from flysafelz.sources import load_case_sources
+case = load_case_sources("blue_mill_2026-10-31").case
+got = SourceCache().get(thread_id="t1", turn="1", lat=case.lat, lon=case.lon, ctx=RunContext(now=datetime(2026, 10, 31, 7, 30, tzinfo=UTC), case="blue_mill_2026-10-31"))
+j3857 = next(n for n in got.pib.notams if n.id == "J3857/26")
+print("raw E text, redacted:")
+redacted, phone_map = redact_artifact(j3857, {})
+print(redacted.item_e)
+print("phone_map keys:", list(phone_map))
+'
+raw E text, redacted:
+TEMPO DANGER AREA (TDA) EGD496A ACTIVATED. AIP SUP 108/2026
+REFERS. BEYOND VISUAL LINE OF SIGHT UAS OPS CONTAINED WHOLLY WI
+THE TDA. A SPECIAL USE AIRSPACE ACTIVITY INFORMATION SERVICE
+(SUAAIS) WILL BE AVBL FM ANGLIA RADAR 128.925MHZ OR 125.275MHZ OR
+LONDON INFO 125.475MHZ. FOR INFO AND BOOKING CTC
+OPS(AT)FLYLOGIX.COM OR <PHONE_1>. SURVEYING CYGNUS.
+AR-2026-7404/05.
+phone_map keys: ['<PHONE_1>']
+
+$ uv run python -c '
+from typing import TypedDict
+from langgraph.graph import END, START, StateGraph
+from flysafelz.agent.progress import ASSESSING, CHECKING_ANSWER, CHECKING_WEATHER, emit, reading_notams
+class S(TypedDict):
+    done: bool
+def node(state: S) -> S:
+    for line in (CHECKING_WEATHER, reading_notams(1, 2), reading_notams(2, 2), ASSESSING, CHECKING_ANSWER):
+        emit(line)
+    return {"done": True}
+graph = StateGraph(S)
+graph.add_node("work", node)
+graph.add_edge(START, "work")
+graph.add_edge("work", END)
+for line in graph.compile().stream({"done": False}, stream_mode="custom"):
+    print(line)
+emit("outside a graph run")
+print("emit outside a graph run: no error, nothing written")
+'
+Checking weather…
+Reading 2 NOTAMs (1/2)…
+Reading 2 NOTAMs (2/2)…
+Assessing…
+Checking the answer…
+emit outside a graph run: no error, nothing written
+
