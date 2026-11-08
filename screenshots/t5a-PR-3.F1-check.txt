@@ -1,0 +1,3 @@
+$ uv run python -m evals.agent.loader --check
+dev 29 · held_out 15 · sheet 24 · fixtures 25/25 present · sheet finalised
+exit 0
