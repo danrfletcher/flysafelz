@@ -1,0 +1,41 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+network: --disable-socket in effect
+rootdir: /Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-9
+configfile: pyproject.toml
+plugins: langsmith-0.14.17, cov-7.1.0, socket-0.8.1, anyio-4.16.0
+collected 897 items
+
+tests/unit/test_eval_checksums.py ...................................... [  4%]
+...............                                                          [  5%]
+tests/unit/test_eval_form.py ........................................... [ 10%]
+........................................................................ [ 18%]
+.........                                                                [ 19%]
+tests/unit/test_eval_form_demo.py ....                                   [ 20%]
+tests/unit/test_eval_import_fence.py ................................... [ 24%]
+........................................................................ [ 32%]
+................................................                         [ 37%]
+tests/unit/test_eval_loader_cli.py ..........                            [ 38%]
+tests/unit/test_eval_loader_counts.py ........................           [ 41%]
+tests/unit/test_eval_loader_examples.py ................................ [ 44%]
+.............                                                            [ 46%]
+tests/unit/test_eval_loader_fixtures.py ........                         [ 47%]
+tests/unit/test_eval_loader_upload.py ........................           [ 49%]
+tests/unit/test_eval_mentions.py ....................................... [ 54%]
+....                                                                     [ 54%]
+tests/unit/test_eval_noise.py ..................                         [ 56%]
+tests/unit/test_eval_nulls.py .......................................... [ 61%]
+........................................................................ [ 69%]
+.............................................                            [ 74%]
+tests/unit/test_eval_run_v1_cli.py .....................                 [ 76%]
+tests/unit/test_eval_runner_context.py ...................               [ 78%]
+tests/unit/test_eval_runner_errors.py .................................. [ 82%]
+..................................                                       [ 86%]
+tests/unit/test_eval_runner_fence.py ...................                 [ 88%]
+tests/unit/test_eval_runner_order.py ............                        [ 89%]
+tests/unit/test_eval_runner_usage.py ....................                [ 92%]
+tests/unit/test_eval_splits.py ......................................... [ 96%]
+...                                                                      [ 96%]
+tests/unit/test_eval_trajectory.py ...........................           [100%]
+
+============================= 897 passed in 31.47s =============================

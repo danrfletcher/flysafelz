@@ -62,7 +62,7 @@ def test_both_builders_give_the_same_scored_answer_for_the_same_segments(recorde
 def test_both_give_identical_scores_for_every_evaluator_and_the_correct_answer_is_all_ones(recorded):
     rows, actions = labels_from(recorded)
     ex = example(rows, actions=actions, window=(t(7), t(18)), now=t(7, 30))
-    a, b = ScoredAnswer.from_assessment(recorded, path="assess"), ScoredAnswer.from_dict(v0_dict(recorded))
+    a, b = ScoredAnswer.from_assessment(recorded, path="assess", text=TEXT), ScoredAnswer.from_dict(v0_dict(recorded))  # same text: the form scores read it
     scores_a, scores_b = score_run(ScoredRun(ex, a)), score_run(ScoredRun(ex, b))
     assert scores_a == scores_b
     got = {key: f["score"] for key, f in scores_a.feedback.items() if f}
