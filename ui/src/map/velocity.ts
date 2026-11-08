@@ -18,7 +18,8 @@ interface VelocityOptions {
   particleMultiplier: number
 }
 
-// The parts of leaflet-velocity this file reaches into. They are private to the library, so each use is on one line below.
+// The parts of leaflet-velocity this file reaches into. They are private to the library, so each use is on one line below, and package.json pins
+// the library to the exact version these were read from (src/fence.test.ts checks there is no range), so an upgrade is a deliberate step: read this file against the new code first.
 interface CanvasLayerPrototype {
   drawLayer: (this: { _map: L.Map | null; _frame: number | null }) => void
   _onLayerDidMove: (this: { _map: L.Map | null }) => void

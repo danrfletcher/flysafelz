@@ -127,6 +127,7 @@ describe('chat from the What’s-here card', () => {
     pick(LONDON)
     await waitFor(() => expect(screen.queryByRole('dialog', { name: /\d/ })).toBeNull())
     await waitFor(() => expect(fake.runs[0].aborted).toBe(true))
+    expect(fake.runs[0].body.on_disconnect).toBe('cancel') // the server is told to cancel the run when the client goes, not to carry on
     fake.runs[0].release()
 
     const second = await chatAbout()

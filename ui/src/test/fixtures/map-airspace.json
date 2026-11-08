@@ -166,7 +166,7 @@
         "lower_ft": 0,
         "upper_ft": 3500,
         "hours": null,
-        "action": "NO_FLY"
+        "action": null
       }
     },
     {
