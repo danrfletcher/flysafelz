@@ -1,7 +1,7 @@
 import type { AirspaceProps, NotamProps } from '@/map/types'
 
 // The hover tooltips' words. Built as DOM nodes with textContent, never as HTML, so a name or an id from the server cannot inject markup.
-// The NOTAM's raw `text` is never used here: it belongs to the What's-here card and the chat.
+// The NOTAM's raw `text` is never used here: the What's-here card shows it.
 
 function line(label: string, value: string): HTMLElement {
   const row = document.createElement('div')

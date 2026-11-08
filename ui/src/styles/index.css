@@ -126,3 +126,41 @@
   color: var(--type-notam);
   text-shadow: 0 0 3px var(--background), 0 0 3px var(--background);
 }
+
+/* The pin dropped by a click on land: the accent colour with a dark edge. The svg's point is the icon's anchor. */
+.pick-pin {
+  background: none;
+  border: 0;
+}
+
+.pick-pin svg {
+  display: block;
+  fill: var(--primary);
+  stroke: var(--background);
+  stroke-width: 1.5;
+  filter: drop-shadow(0 2px 3px color-mix(in srgb, var(--background) 60%, black));
+}
+
+.pick-pin svg circle {
+  fill: var(--background);
+  stroke: none;
+}
+
+/* The What's-here card is a Leaflet popup (no close button) wearing the theme's surface, border and shadow. */
+.pick-card .leaflet-popup-content-wrapper,
+.pick-card .leaflet-popup-tip {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: var(--border-width) solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.pick-card .leaflet-popup-content-wrapper {
+  border-radius: var(--radius);
+}
+
+.pick-card .leaflet-popup-content {
+  margin: 0.75rem 0.875rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}

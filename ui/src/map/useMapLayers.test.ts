@@ -3,6 +3,7 @@ import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { REFETCH_MS, formatUpdated, nextState, readPayload, useMapLayers, type LayerState } from '@/map/useMapLayers'
+import { resetSkipped } from '@/pick/skipped'
 import { server } from '@/test/setup'
 import {
   AIRSPACE_FIXTURE,
@@ -273,5 +274,41 @@ describe('formatUpdated: HH:MM in the browser’s time zone', () => {
 
   it('gives an empty string for a value that is not a time', () => {
     expect(formatUpdated('not a time')).toBe('')
+  })
+})
+
+describe('features with no usable shape (the What’s-here card never sees them)', () => {
+  it('leaves them out of the layer and names each once, by layer and id only, across refetches', async () => {
+    resetSkipped()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const good = NOTAMS_FIXTURE.features[0]
+    const secret = 'SECRET NOTAM WORDS'
+    const bad = [
+      { ...good, geometry: null, properties: { ...good.properties, id: 'H1/26', text: secret } },
+      { ...good, geometry: { type: 'Point', coordinates: [0, 53] }, properties: { ...good.properties, id: 'H2/26', text: secret } },
+      { ...good, geometry: { type: 'Polygon', coordinates: [] }, properties: { ...good.properties, id: 'H3/26', text: secret } },
+    ]
+    const body = { ...NOTAMS_FIXTURE, features: [...bad, good] }
+    expect(readPayload(body, () => true, 'notams')?.features).toHaveLength(1)
+    expect(readPayload(body, () => true, 'notams')?.features).toHaveLength(1) // a refetch of the same payload
+    expect(warn.mock.calls.map((call) => call[0])).toEqual([
+      'Skipped notams feature H1/26: no usable shape',
+      'Skipped notams feature H2/26: no usable shape',
+      'Skipped notams feature H3/26: no usable shape',
+    ])
+    expect(JSON.stringify(warn.mock.calls)).not.toContain(secret)
+    warn.mockRestore()
+  })
+
+  it('goes through the hook too: the good NOTAM stays on the layer', async () => {
+    resetSkipped()
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const good = NOTAMS_FIXTURE.features[0]
+    server.use(notamsRoute({ ...NOTAMS_FIXTURE, features: [{ ...good, geometry: null }, good] }), airspaceRoute())
+    const { result } = renderHook(() => useMapLayers())
+    await waitFor(() => expect(result.current.notams.status).toBe('ok'))
+    expect(result.current.notams.features).toHaveLength(1)
+    expect(warn).toHaveBeenCalledWith(`Skipped notams feature ${good.properties.id}: no usable shape`)
+    warn.mockRestore()
   })
 })

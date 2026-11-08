@@ -4,6 +4,8 @@ import { apiUrl } from '@/config'
 import type { AirspaceProps, LayerPayload, NotamProps } from '@/map/types'
 import airspaceFixture from '@/test/fixtures/map-airspace.json'
 import notamsFixture from '@/test/fixtures/map-notams.json'
+import blueMillAirspace from '@/test/fixtures/map-airspace.blue-mill.json'
+import blueMillNotams from '@/test/fixtures/map-notams.blue-mill.json'
 
 export const AIRSPACE_FIXTURE = airspaceFixture as unknown as LayerPayload<AirspaceProps>
 export const NOTAMS_FIXTURE = notamsFixture as unknown as LayerPayload<NotamProps>
@@ -25,4 +27,13 @@ export const unavailable = (url: string) => http.get(url, () => HttpResponse.jso
 
 export function mapRoutes() {
   return [airspaceRoute(), notamsRoute()]
+}
+
+/** The Blue Mill payloads (53.802797, -0.086644): an ATZ and a CTA over it, a CTA floored at FL100 and a TMA at FL105, a NOTAM with a hole, an approx Q-circle NOTAM, a NOTAM with no Q-line lower limit, an FL105 NOTAM, and one far away. */
+export const BLUE_MILL_AIRSPACE = blueMillAirspace as unknown as LayerPayload<AirspaceProps>
+export const BLUE_MILL_NOTAMS = blueMillNotams as unknown as LayerPayload<NotamProps>
+export const BLUE_MILL = { lat: 53.802797, lon: -0.086644 }
+
+export function blueMillRoutes() {
+  return [airspaceRoute(BLUE_MILL_AIRSPACE), notamsRoute(BLUE_MILL_NOTAMS)]
 }

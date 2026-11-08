@@ -27,7 +27,7 @@ export interface AirspaceProps {
   action: string | null
 }
 
-/** One NOTAM in the PIB's wording. `text` (item E, as published) is carried for later PRs and is never shown or logged here. */
+/** One NOTAM in the PIB's wording. `text` (item E, as published) is shown as plain text in the What's-here card when a row is opened (src/pick), and is never logged. */
 export interface NotamProps {
   id: string
   q_code: string
