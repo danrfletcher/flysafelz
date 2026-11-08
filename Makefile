@@ -8,9 +8,9 @@ setup:
 	uv run python -m flysafelz.guidance.embedding_model
 
 # Runs the whole suite with sockets disabled (see addopts in pyproject.toml).
-# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, agent graph, system-prompt, middleware, guard, guard flow, tracing (anonymiser, client, feedback), answer (re-check line, limit lines, rehydration), `make run`, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess, search_guidance and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model, embedder, search index, eval), time-text and eval-harness (evals.agent: checksums, dataset and fixture import) modules must stay at 90% line coverage or better (the modules together).
+# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, agent graph, system-prompt, middleware, guard, guard flow, tracing (anonymiser, client, feedback), answer (re-check line, limit lines, rehydration), `make run`, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess, search_guidance and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model, embedder, search index, eval), time-text, eval-harness (evals.agent: checksums, dataset and fixture import) and verdict-sheet finalise (flysafelz.verdict_sheet_finalise) modules must stay at 90% line coverage or better (the modules together).
 test:
-	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.graph --cov=flysafelz.agent.prompts --cov=flysafelz.agent.middleware --cov=flysafelz.agent.run --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.guard --cov=flysafelz.agent.guard_flow --cov=flysafelz.agent.tracing --cov=flysafelz.agent.answer --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov=evals.agent --cov-report=term-missing --cov-fail-under=90
+	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.graph --cov=flysafelz.agent.prompts --cov=flysafelz.agent.middleware --cov=flysafelz.agent.run --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.guard --cov=flysafelz.agent.guard_flow --cov=flysafelz.agent.tracing --cov=flysafelz.agent.answer --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov=evals.agent --cov=flysafelz.verdict_sheet_finalise --cov-report=term-missing --cov-fail-under=90
 
 # Capture a NEW case: make fixtures CASE=blue_mill_2026-10-31_3day
 # case.yaml takes an optional `days: N` (1 to 8, Europe/London days from the day of `now`) for a multi-day window.
@@ -23,14 +23,20 @@ fixtures:
 
 # Copies Dan's dataset into evals/agent/data/ (examples.yaml, verdict_sheet.yaml, guidance_questions.yaml) after checking every file against
 # dataset.sha256, which sits beside the folder (<DATASET_SRC>/../dataset.sha256). One wrong byte stops it, naming the file, and nothing is
-# copied. The source is only read; code never writes it or the vault. A second run with an unchanged source changes nothing.
+# copied. The source is only read; code never writes it or the vault. It then finalises the copied sheet (build_verdict_sheet.py --finalise:
+# for each entry with actions_done: true, assess is rerun on the committed case with Dan's NOTAM actions in place of code's, and only the rows'
+# verdict and approaching_limits and the entry's `finalised` stamp are written) and prints counts by verdict and every row that moved; the
+# rows moved are against the copy, so the draft pre-fill being overwritten is listed. `--check` last refuses a stale or unfinalised sheet.
+# The finalised sheet is what is committed; a run with an unchanged source and unchanged code ends with the same bytes.
 # DATASET_SRC defaults to Dan's folder. Build workers point it at the verified mirror instead:
 #   make dataset DATASET_SRC=~/.local/share/vector/inputs/flysafelz/dataset
-# PR-2.F1 appends the finalise step to this target. DATASET_SRC is exported, so it reaches the program through the environment and the
+# DATASET_SRC is exported, so it reaches the program through the environment and the
 # shell never parses a path with spaces or a quote (as for CASE in `make fixtures`). It never calls `make fixtures`: no case is captured.
 export DATASET_SRC ?= $(HOME)/.local/share/flysafelz/dataset
 dataset:
 	@uv run python -m evals.agent.import_dataset
+	@uv run python scripts/build_verdict_sheet.py --finalise
+	@uv run python scripts/build_verdict_sheet.py --check
 
 # The reader eval, and the only target that calls the model: it needs the four READER_* settings (environment or .env) and
 # stops, naming the missing ones, when any is absent. It reads every fully labelled item in evals/reader/labels.yaml `runs`

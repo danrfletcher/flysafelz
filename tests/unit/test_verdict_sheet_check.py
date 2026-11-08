@@ -210,7 +210,9 @@ def test_gp5_check_prints_one_line_per_example_with_the_columns_and_exits_0(buil
     assert code == 0 and err == ""
     lines = out.splitlines()
     assert lines[0] == "e1 (blind): rows 3, labelled 0, unlabelled 3, unread left 0, actions done no (NOTAM actions not done), stale no"
-    assert lines[-1] == "1 entries checked: 0 errors, 0 stale, 0 orphans" and len(lines) == 2
+    # 5a PR-2.F1: an `actions_done: false` entry is also reported as not finalised (a note, not an error), before the summary line
+    assert lines[1] == "note: example e1 is not finalised (NOTAM actions not done)"
+    assert lines[-1] == "1 entries checked: 0 errors, 0 stale, 0 orphans" and len(lines) == 3
 
 
 def test_gp5_the_counts_follow_the_labels_dan_types_and_actions_done(built, capsys):
@@ -220,8 +222,10 @@ def test_gp5_the_counts_follow_the_labels_dan_types_and_actions_done(built, caps
     text = text.replace("X1/26: null", "X1/26: UNREAD_OVER_LZ")
     sheet.write_text(text, encoding="utf-8")
     code, out, _err = run_check(built, capsys)
-    assert code == 0
+    # 5a PR-2.F1: the counts line is as before, but an `actions_done: true` entry that was never finalised is now an error (exit 1)
+    assert code == 1
     assert out.splitlines()[0] == "e1 (blind): rows 3, labelled 1, unlabelled 2, unread left 1, actions done yes, stale no"
+    assert "error: example e1: verdict sheet is stale (finalised stamp missing): run make dataset" in out.splitlines()
 
 
 def test_gp5_a_bad_verdict_prints_the_error_with_example_and_row_and_exits_1(built, capsys):

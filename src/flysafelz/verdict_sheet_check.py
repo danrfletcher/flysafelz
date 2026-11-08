@@ -127,6 +127,7 @@ class EntryReport:
     unread_left: int = 0
     actions_done: bool = False
     errors: list[str] = field(default_factory=list)
+    edge_errors: list[str] = field(default_factory=list)  # the errors in `errors` about where rows start and end: a gap, an overlap, a row not after its start, rows not covering the window
 
 
 def _time(value: object) -> datetime | None:
@@ -222,12 +223,14 @@ def _check_row(row: object, number: int, label: str, report: EntryReport, previo
         bounds = None
     elif start >= end:
         report.errors.append(f"{where}: ends at {utc_text(end)}, which is not after its start")
+        report.edge_errors.append(report.errors[-1])
         bounds = (start, end)
     else:
         bounds = (start, end)
     if start is not None and previous_end is not None and start != previous_end:
         kind = "gap" if start > previous_end else "overlap"
         report.errors.append(f"{where}: {kind}: the row before ends at {utc_text(previous_end)} but this one starts at {utc_text(start)}")
+        report.edge_errors.append(report.errors[-1])
     if "tier" in row:
         if row["tier"] not in TIER_ONLY:
             report.errors.append(f"{where}: tier {row['tier']!r} is not one of {', '.join(TIER_ONLY)}")
@@ -258,8 +261,10 @@ def _check_coverage(rows: list, bounds: list, span: tuple[datetime, datetime], l
     first, last = bounds[0], bounds[-1]
     if first is not None and first[0] != span[0]:
         report.errors.append(f"{label}, row 1 ({utc_text(first[0])}): the window starts in the hour {utc_text(span[0])}, so the first row must start there")
+        report.edge_errors.append(report.errors[-1])
     if last is not None and last[1] != span[1]:
         report.errors.append(f"{label}, row {len(rows)} ({utc_text(last[0])}): the last row ends at {utc_text(last[1])}; the window needs the rows to end at {utc_text(span[1])}")
+        report.edge_errors.append(report.errors[-1])
 
 
 def report_line(report: EntryReport, stale: str = "no", *, orphan: bool = False) -> str:

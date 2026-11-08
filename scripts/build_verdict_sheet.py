@@ -10,8 +10,16 @@ file's own location, never from the working directory.
 
 A rerun on an existing `--out` only appends the entries of new examples (text appended; nothing already in the file
 changes) and reports any entry whose example has changed as stale, leaving it alone. `--check` validates the sheet and
-prints the counts per example; it exits 1 when it finds an error. `flysafelz.verdict_sheet.load_sheet(path)` reads a
-labelled sheet into data for scoring.
+prints the counts per example; it exits 1 when it finds an error, and for an `actions_done: true` entry that is unfinalised or
+finalised before something it depends on changed ("verdict sheet is stale (<part> changed): run make dataset").
+`flysafelz.verdict_sheet.load_sheet(path)` reads a labelled sheet into data for scoring.
+
+    uv run python scripts/build_verdict_sheet.py --finalise      (make dataset runs it, then --check)
+
+`--finalise` (5a): for each entry with `actions_done: true` it reruns assess over the committed case with Dan's NOTAM actions in place
+of code's, and writes only each labelable row's `verdict` and `approaching_limits` plus a sealed `finalised` stamp. `--examples` and
+`--out` default, for `--finalise` and `--check`, to evals/agent/data/examples.yaml and verdict_sheet.yaml under the root. It prints counts
+by verdict and each row that moved, never every row. See flysafelz.verdict_sheet_finalise.
 """
 
 import sys
