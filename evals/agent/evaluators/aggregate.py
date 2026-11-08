@@ -24,9 +24,13 @@ from typing import Any
 
 from evals.agent.evaluators.answer import ScoredAnswer
 from evals.agent.evaluators.blocker import MISSED_BLOCKER_KEY, RECALL_KEY, hard_restriction_recall, harmful_missed_blocker
+from evals.agent.evaluators.form import CITED_KEY, DECISION_KEY, GUARD_KEY, RECHECK_KEY, WINDOW_KEY, cited, decision_first, guard_pass, recheck_stated, window_stated
 from evals.agent.evaluators.labels import Evaluator, Feedback, example_id
+from evals.agent.evaluators.mentions import MUST_MENTION_KEY, MUST_NOT_MENTION_KEY, must_mention, must_not_mention
+from evals.agent.evaluators.noise import NOISE_KEY, noise_rate
 from evals.agent.evaluators.paths import ACTION_KEY, PATH_KEY, action_confusion, action_pairs, notam_action_match, path_accuracy, path_confusion, path_pair
 from evals.agent.evaluators.safety import DROPPED_KEY, HORIZON_KEY, no_verdict_beyond_day3, unverified_on_dropped_source
+from evals.agent.evaluators.trajectory import FORBIDDEN_KEY, REQUIRED_KEY, STEP_KEY, forbidden_tools, required_tools, step_cap_ok
 from evals.agent.evaluators.verdict import IOU_KEY, LIMITS_KEY, VERDICT_KEY, approaching_limits_match, verdict_match, window_iou
 
 EVALUATORS: dict[str, Evaluator] = {
@@ -39,6 +43,17 @@ EVALUATORS: dict[str, Evaluator] = {
     ACTION_KEY: notam_action_match,
     HORIZON_KEY: no_verdict_beyond_day3,
     DROPPED_KEY: unverified_on_dropped_source,
+    NOISE_KEY: noise_rate,
+    REQUIRED_KEY: required_tools,
+    FORBIDDEN_KEY: forbidden_tools,
+    STEP_KEY: step_cap_ok,
+    GUARD_KEY: guard_pass,
+    DECISION_KEY: decision_first,
+    CITED_KEY: cited,
+    WINDOW_KEY: window_stated,
+    RECHECK_KEY: recheck_stated,
+    MUST_MENTION_KEY: must_mention,
+    MUST_NOT_MENTION_KEY: must_not_mention,
 }
 
 

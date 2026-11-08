@@ -1,8 +1,9 @@
 """The one shape every answer is scored in (5a PR-5.F1): `ScoredAnswer`, and the two ways to build it.
 
-    ScoredAnswer(path, segments, notam_actions, text)
-    ScoredAnswer.from_assessment(assessment, *, path, text)   from a recorded `flysafelz.contracts.Assessment` (v1: the assess tool's result)
+    ScoredAnswer(path, segments, notam_actions, text, tool_calls, guard, kind)
+    ScoredAnswer.from_assessment(assessment, *, path, text, tool_calls, guard, kind)   from a recorded `flysafelz.contracts.Assessment` (v1: the assess tool's result)
     ScoredAnswer.from_dict(data)                              from a plain v0-style dict: {"path", "segments": [...], "notam_actions": {...}, "text"}
+    ToolCall(name, guides)                                    one tool call of the run (PR-6.F1)
     path_from_metadata(metadata)                              the predicted path of a run: its root run's metadata `path`, else "unknown" (I5)
 
     path            one of PATHS, or "unknown". Never read from the answer text: it is the guard's tag, which ticket 4 puts in the root run's metadata (I5); a
@@ -11,6 +12,11 @@
     notam_actions   {NOTAM id: NotamAction} for the NOTAMs the answer surfaced. A NOTAM the answer does not list counts as IGNORE, as in the sheet. Ids have
                     their whitespace removed and keep their `/26` year
     text            the final answer text
+    tool_calls      the run's tool calls in order, one ToolCall each: a tool called twice is two entries (PR-6.F1: trajectory and form read them). A bare name is
+                    taken as ToolCall(name). `guides` is only for `search_guidance`: the guidance sources it returned, as the artifact names them ("CAP 1535")
+    guard           ticket 4's guard result for the run: "passed", "retried" or "fallback"; None when the run has none (a turn that never reached the guard)
+    kind            "v1" (the agent) or "v0" (the single-call baseline). v0 has no tool calls, no guard and no tool-call-based prose, which is why the trajectory and
+                    the form scores that need them return None for it (E5)
 
 The v0 baseline's structured output (start, end, verdict, approaching_limits, conditions per segment, and an action per NOTAM) goes through `from_dict`; `conditions`
 and any other key are ignored. A segment time with no timezone, a verdict that is not a `Verdict` and an action that is not a `NotamAction` each raise ValueError.
@@ -30,6 +36,8 @@ from flysafelz.contracts import Assessment, NotamAction, Verdict
 
 PATHS = ("assess", "explain", "act", "clarify", "decline")
 UNKNOWN_PATH = "unknown"
+V1, V0 = "v1", "v0"
+KINDS = (V1, V0)
 _WHITESPACE = re.compile(r"\s+")
 
 
@@ -78,13 +86,43 @@ class ScoredSegment:
 
 
 @dataclass(frozen=True)
+class ToolCall:
+    name: str
+    guides: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "guides", tuple(self.guides))
+
+
+def _tool_calls_of(items: Iterable[object]) -> tuple[ToolCall, ...]:
+    """Tool calls from ToolCalls, bare names or {"name", "guides"} mappings. Anything else raises ValueError."""
+    found = []
+    for item in items:
+        if isinstance(item, ToolCall):
+            found.append(item)
+        elif isinstance(item, str):
+            found.append(ToolCall(item))
+        elif isinstance(item, Mapping) and isinstance(item.get("name"), str):
+            found.append(ToolCall(item["name"], tuple(item.get("guides") or ())))
+        else:
+            raise ValueError(f"tool call {item!r} must be a tool name or a mapping with a `name`")  # noqa: TRY004  # every bad input to a builder is a ValueError, as in _actions_of
+    return tuple(found)
+
+
+@dataclass(frozen=True)
 class ScoredAnswer:
     path: str = UNKNOWN_PATH
     segments: tuple[ScoredSegment, ...] = ()
     notam_actions: Mapping[str, NotamAction] = field(default_factory=dict)
     text: str = ""
+    tool_calls: tuple[ToolCall, ...] = ()
+    guard: str | None = None
+    kind: str = V1
 
     def __post_init__(self) -> None:
+        if self.kind not in KINDS:
+            raise ValueError(f"run kind {self.kind!r} is not one of {', '.join(KINDS)}")
+        object.__setattr__(self, "tool_calls", _tool_calls_of(self.tool_calls))
         object.__setattr__(self, "path", normalise_path(self.path))
         object.__setattr__(self, "segments", tuple(self.segments))
         actions: dict[str, NotamAction] = {}
@@ -95,7 +133,7 @@ class ScoredAnswer:
         object.__setattr__(self, "notam_actions", actions)
 
     @classmethod
-    def from_assessment(cls, assessment: Assessment, *, path: object, text: str = "") -> "ScoredAnswer":
+    def from_assessment(cls, assessment: Assessment, *, path: object, text: str = "", tool_calls: Iterable[object] = (), guard: str | None = None, kind: str = V1) -> "ScoredAnswer":
         """The answer an `Assessment` gives: its segments, and each NOTAM's most restrictive action. `path` is the run's metadata path (see path_from_metadata)."""
         segments = [ScoredSegment(s.start, s.end, s.verdict, s.approaching_limits) for hour in assessment.hours for s in hour.segments]
         actions: dict[str, NotamAction] = {}
@@ -103,16 +141,25 @@ class ScoredAnswer:
             for segment in hour.segments:
                 for result in segment.notam_actions:
                     actions[result.notam_id] = _stricter(actions.get(result.notam_id), result.action)
-        return cls(normalise_path(path), tuple(segments), actions, text)
+        return cls(normalise_path(path), tuple(segments), actions, text, tuple(tool_calls), guard, kind)  # type: ignore[arg-type]  # _tool_calls_of checks each entry
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "ScoredAnswer":
-        """A v0-style dict. `notam_actions` is {id: action} or a list of {"id": ..., "action": ...}; `segments` is a list of {start, end, verdict, approaching_limits}."""
+        """A v0-style dict. `notam_actions` is {id: action} or a list of {"id": ..., "action": ...}; `segments` is a list of {start, end, verdict, approaching_limits}.
+        Optional: `tool_calls` (names or {name, guides}), `guard` and `kind` (default "v1"; a v0 run says "v0")."""
         segments = tuple(
             ScoredSegment(item.get("start"), item.get("end"), item.get("verdict"), bool(item.get("approaching_limits", False)))  # type: ignore[arg-type]
             for item in data.get("segments") or []
         )
-        return cls(normalise_path(data.get("path")), segments, _actions_of(data.get("notam_actions")), str(data.get("text") or ""))
+        return cls(
+            normalise_path(data.get("path")),
+            segments,
+            _actions_of(data.get("notam_actions")),
+            str(data.get("text") or ""),
+            tuple(data.get("tool_calls") or ()),
+            data.get("guard"),
+            data.get("kind", V1),
+        )
 
 
 def _stricter(held: NotamAction | None, found: NotamAction) -> NotamAction:
