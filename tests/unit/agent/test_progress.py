@@ -9,7 +9,7 @@ from langchain_core.tools import tool
 from langgraph.graph import END, START, StateGraph
 
 from flysafelz.agent import progress
-from flysafelz.agent.progress import ASSESSING, CHECKING_ANSWER, CHECKING_WEATHER, emit, reading_notams
+from flysafelz.agent.progress import ASSESSING, CHECKING_AIRSPACE, CHECKING_ANSWER, CHECKING_WEATHER, emit, reading_notams
 
 VERDICT_WORDS = re.compile(r"NO-GO|NO GO|UNVERIFIED|PILOT DISCRETION|\bGO\b|\bsafe\b", re.IGNORECASE)
 
@@ -123,7 +123,7 @@ def test_only_whole_numbers_go_into_a_line(i, n):
 
 
 def test_f3_no_progress_line_holds_a_verdict_word_or_a_number_but_the_notam_counts():
-    constants = [CHECKING_WEATHER, ASSESSING, CHECKING_ANSWER]
+    constants = [CHECKING_WEATHER, CHECKING_AIRSPACE, ASSESSING, CHECKING_ANSWER]
     builders = [reading_notams(i, n) for n in (1, 2, 3) for i in range(1, n + 1)]
     for line in constants:
         assert not VERDICT_WORDS.search(line), line
@@ -137,4 +137,4 @@ def test_f3_no_progress_line_holds_a_verdict_word_or_a_number_but_the_notam_coun
 
 def test_the_progress_constants_are_the_whole_public_list_of_fixed_lines():
     fixed = {name: value for name, value in vars(progress).items() if name.isupper() and isinstance(value, str)}
-    assert fixed == {"CHECKING_WEATHER": "Checking weather…", "ASSESSING": "Assessing…", "CHECKING_ANSWER": "Checking the answer…"}
+    assert fixed == {"CHECKING_WEATHER": "Checking weather…", "CHECKING_AIRSPACE": "Checking airspace…", "ASSESSING": "Assessing…", "CHECKING_ANSWER": "Checking the answer…"}

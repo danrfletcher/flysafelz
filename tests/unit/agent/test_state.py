@@ -121,7 +121,7 @@ def test_a_notam_overlay_round_trips_to_geojson():
     assert geojson == {
         "type": "Feature",
         "geometry": {"type": "Polygon", "coordinates": [[[-0.10, 53.80], [-0.05, 53.80], [-0.05, 53.84], [-0.10, 53.84], [-0.10, 53.80]]]},
-        "properties": {"id": "J3857/26", "kind": "notam", "action": "CONTACT_FIRST", "bearing": 157.5, "text": "E) COOPERATIVE UAS BVLOS OPS"},
+        "properties": {"id": "J3857/26", "kind": "notam", "action": "CONTACT_FIRST", "bearing": 157.5, "text": "E) COOPERATIVE UAS BVLOS OPS", "approx": None},
     }
     assert OverlayFeature.model_validate(json.loads(json.dumps(geojson))) == feature
     assert shape(geojson["geometry"]).is_valid
@@ -178,7 +178,7 @@ def test_only_a_feature_is_an_overlay():
 def test_the_lz_circle_is_centred_on_the_lz_with_the_local_area_radius(lat, lon):
     feature = lz_radius_feature(lat, lon)
     geojson = feature.model_dump(mode="json")
-    assert geojson["properties"] == {"id": "lz_radius", "kind": "lz_radius", "action": None, "bearing": None, "text": None}
+    assert geojson["properties"] == {"id": "lz_radius", "kind": "lz_radius", "action": None, "bearing": None, "text": None, "approx": None}
     ring = geojson["geometry"]["coordinates"][0]
     assert ring[0] == ring[-1]
     radius_nm = float(cast(float, RULES.local_area.value))

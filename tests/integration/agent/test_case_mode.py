@@ -13,12 +13,14 @@ import cases
 import pytest
 from reader_replies import fixture_readings, model_reply
 from reader_set_helpers import ScriptedChat
+from tool_helpers import BLUE_MILL_WINDOW, ToolRun, calls, run_tools
 from unit.reader_helpers import blue_mill_notams
 
+from flysafelz.agent import input_check
 from flysafelz.agent.redaction import redact_artifact
 from flysafelz.agent.sources import SourceCache, Sources, SourcesError
 from flysafelz.agent.state import RunContext
-from flysafelz.assess import assess, fetch_horizon
+from flysafelz.assess import assess
 from flysafelz.contracts import Assessment, SourceName, SourceState, Verdict
 from flysafelz.reader import config as reader_config
 from flysafelz.reader.reader_set import reader_set
@@ -51,7 +53,18 @@ def sources_of(cache: SourceCache, case: str, **context) -> Sources:
 
 def assessed(case: str, sources: Sources) -> Assessment:
     c = load_case_sources(case).case
-    return assess(c.lat, c.lon, now=c.now, forecast=sources.forecast, airspace=sources.airspace, pib=sources.pib, readings=sources.readings, reader_status=sources.unread, window=(c.window.start, c.window.end), live=False)
+    return assess(
+        c.lat,
+        c.lon,
+        now=c.now,
+        forecast=sources.forecast,
+        airspace=sources.airspace,
+        pib=sources.pib,
+        readings=sources.readings,
+        reader_status=sources.unread,
+        window=(c.window.start, c.window.end),
+        live=False,
+    )
 
 
 def blue_mill_model() -> ScriptedChat:
@@ -138,24 +151,47 @@ def test_the_assessment_of_a_cached_case_is_the_assessment_of_the_loaded_one():
 # --- reader: live ---------------------------------------------------------------------------------------------
 
 
-def horizon_ids() -> set[str]:
-    """The NOTAM ids `read_for_lz` selects for Blue Mill over the whole horizon, found with the reader-set rule itself."""
+def window_ids() -> set[str]:
+    """The NOTAM ids the reader set holds for Blue Mill over the 10:00-16:00 window the tests ask about, found with the reader-set rule itself."""
     c = load_case_sources(BLUE_MILL, with_readings=False)
-    chosen = reader_set(c.pib.notams, (c.case.lat, c.case.lon), (c.case.now.replace(minute=0), fetch_horizon(c.case.now)))
+    chosen = reader_set(c.pib.notams, (c.case.lat, c.case.lon), (datetime(2026, 10, 31, 10, tzinfo=UTC), datetime(2026, 10, 31, 16, tzinfo=UTC)))
     return {notam.id for notam in chosen}
+
+
+def live_notams(source_cache: SourceCache, **context) -> ToolRun:
+    """One turn in which the model asks `get_notams` for the window, in a case run with the live reader. Reading happens in the tool (G11), not in the source cache."""
+    return run_tools(source_cache, [calls("get_notams", **BLUE_MILL_WINDOW)], ctx=RunContext(now=NOW, case=BLUE_MILL, reader="live", **context))
+
+
+def read_ids(run: ToolRun) -> set[str]:
+    return {item.id for item in run.artifact("get_notams").notams if item.reading is not None}
+
+
+def test_a_live_reader_case_run_leaves_the_readings_to_the_tool():
+    got = sources_of(SourceCache(fetch=NoFetch(), reader_model=blue_mill_model), BLUE_MILL, reader="live")
+    assert got.readings == {} and got.unread == {}
+    whole = load_case_sources(BLUE_MILL)
+    assert (got.forecast, got.airspace, got.pib) == (whole.forecast, whole.airspace, whole.pib)
 
 
 def test_a_live_reader_run_reads_the_selected_notams_and_nothing_else(tmp_path):
     llm = blue_mill_model()
-    store = tmp_path / "readings.sqlite"
-    got = sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), BLUE_MILL, reader="live", reader_cache=store)
-    assert horizon_ids() >= {"H7171/26", "J3857/26"}
-    assert set(llm.calls) == horizon_ids()
-    assert {"H7171/26", "J3857/26"} <= set(got.readings)
-    assert set(got.readings) | set(got.unread) == horizon_ids()
-    assert set(got.readings).isdisjoint(got.unread)
-    whole = load_case_sources(BLUE_MILL)
-    assert (got.forecast, got.airspace, got.pib) == (whole.forecast, whole.airspace, whole.pib)
+    run = live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), reader_cache=tmp_path / "readings.sqlite")
+    assert window_ids() >= {"H7171/26", "J3857/26"}
+    assert set(llm.calls) == window_ids()
+    assert {"H7171/26", "J3857/26"} <= read_ids(run)
+    assert run.progress == ["Reading 2 NOTAMs (1/2)…", "Reading 2 NOTAMs (2/2)…"]
+
+
+def test_a_live_reader_run_takes_its_readings_from_the_fake_model_not_from_readings_yaml(tmp_path):
+    by_id, readings = blue_mill_notams(), fixture_readings()
+    changed = readings["H7171/26"].model_copy(update={"activity": "the fake model's own wording"})
+    llm = ScriptedChat(list(by_id.values()), H7171_26=[model_reply(by_id["H7171/26"], changed)], J3857_26=[model_reply(by_id["J3857/26"], readings["J3857/26"])])
+    run = live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), reader_cache=tmp_path / "readings.sqlite")
+    items = {item.id: item for item in run.artifact("get_notams").notams}
+    assert items["H7171/26"].reading is not None and items["H7171/26"].reading.activity == "the fake model's own wording"
+    assert readings["H7171/26"].activity != "the fake model's own wording"
+    assert "the fake model's own wording" in items["H7171/26"].reason  # the action text is made from the fake's reading
 
 
 def test_a_live_reader_run_never_opens_readings_yaml(tmp_path, monkeypatch):
@@ -189,7 +225,9 @@ def test_a_live_reader_run_never_opens_readings_yaml(tmp_path, monkeypatch):
         raise AssertionError("the fixture reader ran in a live reader run")
 
     monkeypatch.setattr(case_sources, "_readings", fixture_reader_must_not_run)
-    sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), BLUE_MILL, reader="live", reader_cache=tmp_path / "readings.sqlite")
+    # The input check opens the case to see that it exists (it reads readings.yaml when there is one): that is not the reader path under test.
+    monkeypatch.setattr(input_check, "load_case_sources", lambda *args, **kwargs: None)
+    live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), reader_cache=tmp_path / "readings.sqlite")
     assert opened, "the spy saw no file at all: it is not watching"
     assert any(path.endswith("pib.xml") for path in opened)  # the spy works: the case's other files were read
     assert not [path for path in opened if path.endswith("readings.yaml")]
@@ -200,7 +238,7 @@ def test_a_live_reader_run_writes_only_the_given_store_and_leaves_the_real_one_a
     store = tmp_path / "somewhere" / "mine.sqlite"
     store.parent.mkdir()
     llm = blue_mill_model()
-    sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), BLUE_MILL, reader="live", reader_cache=store)
+    live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), reader_cache=store)
     assert sqlite_files(tmp_path) == [store]
     assert stamp(REAL_STORE) == before
     with sqlite3.connect(store) as db:
@@ -208,14 +246,15 @@ def test_a_live_reader_run_writes_only_the_given_store_and_leaves_the_real_one_a
     assert stored >= 1
 
 
-def test_a_second_run_with_the_same_store_is_all_cache_hits_and_reads_nothing(tmp_path):
+def test_a_second_run_with_the_same_store_is_all_hits_reads_nothing_and_writes_no_reader_line(tmp_path):
     store = tmp_path / "readings.sqlite"
     first_model, second_model = blue_mill_model(), blue_mill_model()
-    first = sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: first_model), BLUE_MILL, reader="live", reader_cache=store)
+    first = live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: first_model), reader_cache=store)
     assert first_model.calls
-    second = sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: second_model), BLUE_MILL, reader="live", reader_cache=store)
+    second = live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: second_model), reader_cache=store)
     assert second_model.calls == []
-    assert second.readings == first.readings and second.unread == first.unread
+    assert second.progress == []  # a hit costs no reader call, so there is no reader line (G11)
+    assert second.artifact("get_notams").notams == first.artifact("get_notams").notams
 
 
 def test_a_live_reader_run_without_a_store_uses_the_default_one(tmp_path, monkeypatch):
@@ -224,7 +263,7 @@ def test_a_live_reader_run_without_a_store_uses_the_default_one(tmp_path, monkey
     monkeypatch.setattr(reader_config, "reading_store", lambda: default)
     before = stamp(REAL_STORE)
     llm = blue_mill_model()
-    sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), BLUE_MILL, reader="live")
+    live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: llm))
     assert sqlite_files(tmp_path) == [default]
     assert stamp(REAL_STORE) == before
 
@@ -236,30 +275,32 @@ def test_the_reader_model_is_built_only_in_a_live_run_and_only_when_there_are_no
         built.append(1)
         return blue_mill_model()
 
-    cache = SourceCache(fetch=NoFetch(), reader_model=model)
-    sources_of(cache, BLUE_MILL, reader="fixture")
-    sources_of(cache, BLUE_MILL, reader="live", reader_cache=tmp_path / "a.sqlite", drop=("pib",))
+    source_cache = SourceCache(fetch=NoFetch(), reader_model=model)
+    run_tools(source_cache, [calls("get_notams", **BLUE_MILL_WINDOW)], ctx=RunContext(now=NOW, case=BLUE_MILL, reader="fixture"))
+    live_notams(source_cache, reader_cache=tmp_path / "a.sqlite", drop=("pib",))
     assert built == []
-    sources_of(cache, BLUE_MILL, reader="live", reader_cache=tmp_path / "b.sqlite")
+    live_notams(source_cache, reader_cache=tmp_path / "b.sqlite")
     assert built == [1]
 
 
-def test_a_live_run_with_the_reader_not_configured_gives_the_readers_line_not_an_exception(tmp_path):
-    """No READER_* settings (the suite clears them): the reader's own one line, naming each missing one, reaches the model as the tool text."""
-    got = get(SourceCache(fetch=NoFetch()), BLUE_MILL, reader="live", reader_cache=tmp_path / "readings.sqlite")
-    assert isinstance(got, SourcesError)
-    assert "READER_" in got.text and "\n" not in got.text
+def test_a_live_run_with_the_reader_not_configured_gives_an_unread_answer_not_an_exception(tmp_path):
+    """No READER_* settings (the suite clears them): the tool still answers, every NOTAM it had to read is unread and says why, and no store is made."""
+    run = live_notams(SourceCache(fetch=NoFetch()), reader_cache=tmp_path / "readings.sqlite")
+    notams = run.artifact("get_notams").notams
+    assert {item.id for item in notams} >= {"H7171/26", "J3857/26"}
+    assert all(item.reading is None and item.unread_reason == "reader unavailable" for item in notams)
+    assert "READER_" not in run.text("get_notams")
     assert sqlite_files(tmp_path) == []
 
 
 def test_fixture_and_live_runs_in_one_thread_never_share_readings(tmp_path):
     llm = blue_mill_model()
-    cache = SourceCache(fetch=NoFetch(), reader_model=lambda: llm)
-    from_file = sources_of(cache, BLUE_MILL, reader="fixture")
-    from_reader = sources_of(cache, BLUE_MILL, reader="live", reader_cache=tmp_path / "readings.sqlite")
-    again = sources_of(cache, BLUE_MILL, reader="fixture")
+    source_cache = SourceCache(fetch=NoFetch(), reader_model=lambda: llm)
+    from_file = sources_of(source_cache, BLUE_MILL, reader="fixture")
+    from_reader = sources_of(source_cache, BLUE_MILL, reader="live", reader_cache=tmp_path / "readings.sqlite")
+    again = sources_of(source_cache, BLUE_MILL, reader="fixture")
     assert from_file is not from_reader
-    assert llm.calls and again.readings == from_file.readings
+    assert from_reader.readings == {} and again.readings == from_file.readings
     assert again is not from_file  # the thread keeps one entry: the live run replaced the fixture one
 
 
@@ -299,19 +340,20 @@ def test_nothing_is_dropped_from_the_cached_case_sources_themselves():
 def test_drop_composes_with_the_live_reader_and_a_dropped_pib_means_no_reader_call(tmp_path):
     llm = blue_mill_model()
     store = tmp_path / "readings.sqlite"
-    got = sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), BLUE_MILL, reader="live", reader_cache=store, drop=("pib",))
+    run = live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), reader_cache=store, drop=("pib",))
     assert llm.calls == []
     assert not store.exists()
-    assert got.readings == {} and got.unread == {}
-    assert got.pib.status.reason == DROPPED_REASON
+    assert run.progress == []
+    assert run.artifact("get_notams").source.state == SourceState.FAILED
+    assert run.artifact("get_notams").source.reason == DROPPED_REASON
 
 
 @pytest.mark.parametrize("dropped", ["weather", "airspace"])
 def test_drop_of_another_source_with_the_live_reader_still_reads(tmp_path, dropped):
     llm = blue_mill_model()
-    got = sources_of(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), BLUE_MILL, reader="live", reader_cache=tmp_path / "readings.sqlite", drop=(dropped,))
-    assert set(llm.calls) == horizon_ids()
-    assert got.readings
+    run = live_notams(SourceCache(fetch=NoFetch(), reader_model=lambda: llm), reader_cache=tmp_path / "readings.sqlite", drop=(dropped,))
+    assert set(llm.calls) == window_ids()
+    assert read_ids(run)
 
 
 # --- phone numbers --------------------------------------------------------------------------------------------

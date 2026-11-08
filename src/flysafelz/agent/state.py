@@ -31,8 +31,9 @@ from langgraph.channels.ephemeral_value import EphemeralValue
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from flysafelz.contracts import Tier, Verdict, display_verdict
-from flysafelz.geo import FULL_CIRCLE, HALF_TURN, METRES_PER_NM, MIN_POLYGON_POINTS, QUARTER_TURN, WGS84_A, WGS84_E2
+from flysafelz.geo import FULL_CIRCLE, HALF_TURN, MIN_POLYGON_POINTS, QUARTER_TURN
 from flysafelz.rules import RULES
+from flysafelz.shapes import CIRCLE_VERTICES, circle_ring  # noqa: F401 - CIRCLE_VERTICES is re-exported: it is the vertex count of every circle
 
 # --- run context -----------------------------------------------------------------------------------------------------
 
@@ -97,7 +98,6 @@ def run_now(ctx: RunContext | None) -> datetime:
 
 OverlayKind = Literal["notam", "airspace", "lz_radius"]
 LAT_LIMIT = QUARTER_TURN  # degrees: the pole. A longitude's limit is geo.HALF_TURN. GeoJSON positions are [lon, lat]
-CIRCLE_VERTICES = 72  # the LZ circle is drawn as a polygon of this many points (one every 5 degrees)
 MIN_RING_POSITIONS = MIN_POLYGON_POINTS + 1  # a closed GeoJSON ring: the fewest points of an area, and the first repeated
 
 
@@ -146,6 +146,24 @@ class PolygonGeometry(BaseModel):
         return rings
 
 
+class MultiPolygonGeometry(BaseModel):
+    """A GeoJSON MultiPolygon (an airspace made of several parts): a list of polygons, each a list of closed rings."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    type: Literal["MultiPolygon"] = "MultiPolygon"
+    coordinates: list[list[list[list[float]]]]
+
+    @field_validator("coordinates")
+    @classmethod
+    def _each_part_is_a_polygon(cls, parts: list[list[list[list[float]]]]) -> list[list[list[list[float]]]]:
+        if not parts:
+            raise ValueError("a multipolygon needs at least one polygon")
+        for rings in parts:
+            PolygonGeometry(coordinates=rings)  # the same checks as a Polygon: closed rings, valid positions
+        return parts
+
+
 class OverlayProperties(BaseModel):
     """What the map needs to draw one feature and say what it is.
 
@@ -154,6 +172,7 @@ class OverlayProperties(BaseModel):
     action   code's action for a NOTAM or airspace area (None for the circle)
     bearing  degrees clockwise from true north, from the LZ to the feature (None when it is over the LZ, and for the circle)
     text     a NOTAM's raw E text as published (None for airspace and the circle)
+    approx   a NOTAM only: True when the shape is its Q-circle because no area could be built from its E text (None for airspace and the circle)
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -163,11 +182,14 @@ class OverlayProperties(BaseModel):
     action: str | None = None
     bearing: float | None = Field(default=None, ge=0, lt=FULL_CIRCLE)
     text: str | None = None
+    approx: bool | None = None
 
     @model_validator(mode="after")
-    def _only_a_notam_has_text(self) -> Self:
+    def _only_a_notam_has_text_and_approx(self) -> Self:
         if self.text is not None and self.kind != "notam":
             raise ValueError("only a notam feature carries text")
+        if self.approx is not None and self.kind != "notam":
+            raise ValueError("only a notam feature carries approx")
         return self
 
 
@@ -177,26 +199,16 @@ class OverlayFeature(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     type: Literal["Feature"] = "Feature"
-    geometry: PointGeometry | PolygonGeometry = Field(discriminator="type")
+    geometry: PointGeometry | PolygonGeometry | MultiPolygonGeometry = Field(discriminator="type")
     properties: OverlayProperties
 
 
 def lz_radius_feature(lat: float, lon: float) -> OverlayFeature:
     """The LZ's local-area circle: a polygon centred on the LZ, its radius the `local_area` rule (read from rules.yaml, in NM).
 
-    Points are placed on the same local flat map geo.py measures with (the WGS84 radii of curvature at the LZ), one every 5 degrees,
-    starting due north, and the ring is closed.
+    The ring is `shapes.circle_ring`, the one circle-to-polygon the NOTAM overlays use too.
     """
-    radius_m = float(RULES.local_area.value) * METRES_PER_NM  # type: ignore[arg-type]  # a number rule
-    sin_lat = math.sin(math.radians(lat))
-    w = math.sqrt(1 - WGS84_E2 * sin_lat * sin_lat)
-    north_radius = WGS84_A * (1 - WGS84_E2) / (w * w * w)
-    east_radius = WGS84_A / w * math.cos(math.radians(lat))
-    ring = []
-    for step in range(CIRCLE_VERTICES):
-        angle = math.tau * step / CIRCLE_VERTICES
-        ring.append([lon + math.degrees(radius_m * math.sin(angle) / east_radius), lat + math.degrees(radius_m * math.cos(angle) / north_radius)])
-    ring.append(list(ring[0]))
+    ring = circle_ring(lat, lon, float(RULES.local_area.value))  # type: ignore[arg-type]  # a number rule
     return OverlayFeature(geometry=PolygonGeometry(coordinates=[ring]), properties=OverlayProperties(id="lz_radius", kind="lz_radius"))
 
 
@@ -286,6 +298,26 @@ class ThreadLZ(TypedDict):
     tz: str
 
 
+def _number_key(written: str) -> str:
+    """A phone number as its digits, with a leading + kept: `01632 960003` and `01632960003` are one number."""
+    return ("+" if written.startswith("+") else "") + "".join(char for char in written if char.isdigit())
+
+
+def merge_phone_maps(current: dict[str, str] | None, update: dict[str, str] | None) -> dict[str, str]:
+    """The reducer of `phone_map`: the two maps joined, so tools that run in one step can each add their numbers.
+
+    A placeholder that stands for one number in both is kept once. One that stands for two different numbers (two tools numbered new
+    numbers from the same starting map) raises ValueError rather than let `<PHONE_n>` be put back as the wrong number in the answer.
+    The message names the placeholder only, never a number.
+    """
+    merged = dict(current or {})
+    for placeholder, number in (update or {}).items():
+        kept = merged.setdefault(placeholder, number)
+        if _number_key(kept) != _number_key(number):
+            raise ValueError(f"{placeholder} was given to two different numbers in one step: call the data tools one at a time")
+    return merged
+
+
 class RequestState(AgentState):
     """The thread state. Add a field here only when the plan changes: tests/unit/agent/test_state.py pins the key set."""
 
@@ -296,5 +328,7 @@ class RequestState(AgentState):
     guard: NotRequired[Annotated[GuardResult | None, OmitFromInput]]
     overlays: NotRequired[Annotated[list[OverlayFeature], OmitFromInput]]
     assessment: NotRequired[Annotated[Assessment | None, OmitFromInput]]
-    phone_map: NotRequired[Annotated[dict[str, str], PrivateStateAttr]]
+    # The reducer is the last annotation (LangGraph takes the last one). `| None` keeps LangGraph from starting the channel at {}: a request that
+    # never numbered a phone leaves no phone_map in the state, as before.
+    phone_map: NotRequired[Annotated[dict[str, str] | None, PrivateStateAttr, merge_phone_maps]]
     thread_lz: NotRequired[Annotated[ThreadLZ | None, PrivateStateAttr]]

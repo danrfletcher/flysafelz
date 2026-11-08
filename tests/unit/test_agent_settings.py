@@ -42,6 +42,7 @@ def test_the_shipped_file_loads_with_the_values_the_plan_names():
         "guard_retries": 1,
         "model_max_retries": 1,
         "source_reuse_minutes": 15,
+        "notam_reader_calls": 3,
         "embedding_model": "BAAI/bge-small-en-v1.5",
         "embedding_cache_dir": ".cache/fastembed",
         "chunker_version": 1,
@@ -74,7 +75,7 @@ def test_an_unknown_key_is_named(tmp_path):
         load_settings(write(tmp_path, set_key("top_n", 4)))
 
 
-INTEGER_KEYS = ["top_k", "chunk_tokens_min", "chunk_tokens_max", "guard_retries", "model_max_retries", "source_reuse_minutes", "chunker_version"]
+INTEGER_KEYS = ["top_k", "chunk_tokens_min", "chunk_tokens_max", "guard_retries", "model_max_retries", "source_reuse_minutes", "notam_reader_calls", "chunker_version"]
 TEXT_KEYS = ["embedding_model", "embedding_cache_dir", "langsmith_project"]
 WRONG_TYPES = [("a string", "4"), ("a float", 1.5), ("a whole-number float", 4.0), ("a boolean", True), ("a list", [4]), ("null", None)]
 
@@ -102,6 +103,7 @@ REFUSED_VALUES = [
     ("guard_retries is negative", "guard_retries", -1),
     ("model_max_retries is negative", "model_max_retries", -1),
     ("source_reuse_minutes is zero", "source_reuse_minutes", 0),
+    ("notam_reader_calls is zero", "notam_reader_calls", 0),
     ("chunker_version is zero", "chunker_version", 0),
     ("guard_retries is not an integer", "guard_retries", 0.5),
     ("model_max_retries is not an integer", "model_max_retries", "one"),
