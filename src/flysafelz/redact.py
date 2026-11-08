@@ -48,6 +48,29 @@ _PHONE = re.compile(
     rf"|0\d{{2}}(?:{_GAP}?\d){{7,9}}?)"  # UK: 10 to 12 digits in all (a twelfth digit is a typo seen in real NOTAMs), the first group at least 3 digits
     r"(?!\d)"
 )
+
+# Numbers written with a hyphen or a bracket, which `_PHONE` leaves alone (a hyphen ends a number there: `0800-1800` is a time range). Only the LangSmith
+# anonymiser uses this one; `redact_phones` does not, so what the model and the stores see is exactly what it was. Every form needs a UK number of 10 to 12 digits
+# in groups of the usual sizes (`07700-900123`, `01632-960-001`, `020-7946-0000`, or with spaces round the hyphen: `07700 - 900123`), a bracketed area code (`(01632) 960001`,
+# `[01632] 960 001`) or `+CC` with hyphen- or space-split groups (`+44-7700-900123`), a bracketed country code (`(+44) 7700 900123`) or a bracketed
+# area code after it (`+44 (7700) 900123`). A time range, a day list, a date, a zone offset (`+01:00`) or an id after a hyphen has none of these shapes.
+_SEP = r"(?:[^\S\r\n]?-[^\S\r\n]?|[^\S\r\n])"  # between groups: a space, a hyphen, or a hyphen with a space either side (`07700 - 900123`)
+_PUNCTUATED_PHONE = re.compile(
+    r"(?<![\w.\-])"
+    rf"(?:[(\[]0\d{{2,4}}[)\]]{_SEP}?\d{{3,4}}{_SEP}?\d{{3,4}}"  # (01632) 960001, [01632] 960 001, (020) 7946 0000
+    rf"|0\d{{4}}{_SEP}\d{{6}}"  # 07700-900123, 07700 - 900123
+    rf"|0\d{{4}}{_SEP}\d{{3}}{_SEP}\d{{3}}"  # 07700-900-123
+    rf"|0\d{{3}}{_SEP}\d{{3}}{_SEP}\d{{4}}"  # 0117-496-0123
+    rf"|0\d{{2}}{_SEP}\d{{4}}{_SEP}\d{{4}}"  # 020-7946-0000
+    rf"|\(\+\d{{1,3}}\){_SEP}?(?:\(0\){_SEP}?)?\d{{2,6}}(?:{_SEP}\d{{2,6}}){{1,3}}"  # (+44) 7700 900123, (+44) (0)7700 900123
+    rf"|\+\d{{1,3}}{_SEP}?\((?:0|\d{{2,6}})\){_SEP}?\d{{2,6}}(?:{_SEP}\d{{2,6}}){{0,2}}"  # +44 (7700) 900123, +44 (0)7700-900-123, +44 (0) 1632 960001
+    rf"|\+\d{{1,3}}{_SEP}\d{{2,6}}(?:{_SEP}\d{{2,6}}){{1,3}})"  # +44-7700-900123
+    r"(?!\d)"
+)
+
+# The patterns the LangSmith anonymiser (agent/tracing.py) masks phone numbers with: `_PHONE`, the one `redact_phones` finds numbers with (the same object, not a
+# copy, so a change to the pattern changes both), then the punctuated shapes above.
+PHONE_PATTERNS: tuple[re.Pattern[str], ...] = (_PHONE, _PUNCTUATED_PHONE)
 _NOT_DIGIT = re.compile(r"\D")
 
 
