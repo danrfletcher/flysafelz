@@ -101,7 +101,7 @@ REVIEWED_FLOATS = {
     "notam_action.py": {0.5: "half of pi: the latitude bound of the circle sanity check (arithmetic)"},
     "clients/openaip.py": {3.280839895: "feet per metre (unit conversion, FEET_PER_METRE)"},
 }
-REVIEWED_NAMED_CONSTANTS = {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3}
+REVIEWED_NAMED_CONSTANTS = {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3, "QUARTER_TURN": 90}
 GEO = "geo.py"
 
 
