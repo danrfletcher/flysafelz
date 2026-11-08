@@ -1,25 +1,29 @@
 import { useState } from 'react'
 
 import { ChatPanel } from '@/chat/ChatPanel'
-import { createSessions } from '@/chat/turns'
+import { createSessions, pinKey } from '@/chat/turns'
 import { Footer } from '@/components/Footer'
 import { LayerPanel, type LayerSwitches } from '@/components/LayerPanel'
 import { NavBar } from '@/components/NavBar'
 import { UkMap } from '@/components/UkMap'
 import { useIsDesktop } from '@/lib/useIsDesktop'
+import { AnswerOverlays } from '@/map/answerOverlays'
 import { BaseLayers } from '@/map/BaseLayers'
 import { FitToLz } from '@/map/FitToLz'
 import { PickHandler } from '@/map/PickHandler'
+import { selectTurn, useAnswerHighlight, type Selection } from '@/map/useAnswerHighlight'
 import { useMapLayers } from '@/map/useMapLayers'
 import type { LatLon } from '@/pick/whatsHere'
 
-// Airspace and NOTAMs below FL100 are on at first load. The choice is kept in memory only: a reload puts both back on.
-const DEFAULT_SWITCHES: LayerSwitches = { airspace: true, notams: true }
+// Airspace and NOTAMs below FL100 and the answer's highlights are on at first load. The choices are kept in memory only: a reload puts them back on.
+const DEFAULT_SWITCHES: LayerSwitches = { airspace: true, notams: true, answer: true }
 
 /**
  * Nav bar, the map in the space between (with the base layers, the click-to-pick pin and card, the layer panel and the chat), and the
  * footer. The page itself never scrolls. The chat's conversations live here, one per pin for as long as the page stays loaded.
  * Putting down a new pin closes the chat, which ends any run still going for the old pin; its turns stay with it in `sessions`.
+ * The map shows the highlights of one turn of the open chat: the latest answer's, unless the pilot picked another turn's badges or a NOTAM id.
+ * Closing the chat or putting down a new pin clears them.
  */
 export default function App() {
   const layers = useMapLayers()
@@ -27,7 +31,20 @@ export default function App() {
   const [sessions] = useState(createSessions)
   const [chatPoint, setChatPoint] = useState<LatLon | null>(null)
   const [mapArea, setMapArea] = useState<HTMLElement | null>(null)
+  const [selection, setSelection] = useState<Selection | null>(null)
+  const highlight = useAnswerHighlight(sessions, chatPoint, selection)
   const desktop = useIsDesktop()
+
+  const closeChat = () => {
+    setChatPoint(null)
+    setSelection(null)
+  }
+  // A click on a turn's badges or on a NOTAM id in it draws that turn's highlights, and turns the Answer overlays switch back on.
+  const showTurn = (turnId: string, notamId: string | null = null) => {
+    if (!chatPoint) return
+    setSelection(selectTurn(sessions.get(pinKey(chatPoint)), chatPoint, turnId, notamId))
+    setShown((current) => ({ ...current, answer: true }))
+  }
 
   return (
     <div className="flex h-dvh flex-col">
@@ -40,8 +57,9 @@ export default function App() {
             showAirspace={shown.airspace}
             showNotams={shown.notams}
           />
-          <PickHandler airspace={layers.airspace} notams={layers.notams} onChat={setChatPoint} onPick={() => setChatPoint(null)} />
+          <PickHandler airspace={layers.airspace} notams={layers.notams} onChat={setChatPoint} onPick={closeChat} />
           <FitToLz point={chatPoint} layout={desktop ? 'sheet' : 'drawer'} />
+          <AnswerOverlays point={chatPoint} highlight={highlight} visible={shown.answer} layout={desktop ? 'sheet' : 'drawer'} />
         </UkMap>
         <LayerPanel
           states={layers}
@@ -49,7 +67,14 @@ export default function App() {
           chatOpen={chatPoint !== null}
           onShownChange={(id, on) => setShown((current) => ({ ...current, [id]: on }))}
         />
-        <ChatPanel point={chatPoint} sessions={sessions} onClose={() => setChatPoint(null)} container={mapArea} />
+        <ChatPanel
+          point={chatPoint}
+          sessions={sessions}
+          onClose={closeChat}
+          container={mapArea}
+          onShowTurn={(turnId) => showTurn(turnId)}
+          onShowNotam={showTurn}
+        />
       </main>
       <Footer />
     </div>

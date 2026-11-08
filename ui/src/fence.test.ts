@@ -53,12 +53,12 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(filesMatching(word('VITE_', 'CARTO_KEY'))).toEqual([])
   })
 
-  it('has the two layer switches and no others: no wind, rain, all-heights, answer-overlay or basemap-status switch', () => {
+  it('has the base layers’ two switches and the Answer overlays switch, and no other: no wind, rain, all-heights or basemap-status switch', () => {
     const panel = readUi('src/components/LayerPanel.tsx')
-    expect(panel.match(/<Switch\b/g)).toHaveLength(1) // one in the list the two layers map over
+    expect(panel.match(/<Switch\b/g)).toHaveLength(1) // one in the list the layers map over
     const layers = [...panel.matchAll(/id: '(\w+)', name: '([^']+)'/g)].map((match) => [match[1], match[2]])
-    expect(layers).toEqual([['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100']])
-    const switchLabels = /wind|rain|radar|all heights|answer overlays|basemap/i
+    expect(layers).toEqual([['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100'], ['answer', 'Answer overlays']])
+    const switchLabels = /wind|rain|radar|all heights|basemap/i
     expect(switchLabels.test(panel)).toBe(false)
   })
 
@@ -78,14 +78,23 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(outside.sort()).toEqual(['components/ui/drawer.tsx', 'components/ui/sheet.tsx', 'map/fitLz.test.ts', 'map/fitLz.ts'])
   })
 
-  it('has no pin bounce and no answer-highlight code (PR-12.F1 and PR-6.F1 own them), and `overlays` and `assessment` are only kept by the chat, never drawn or rendered', () => {
+  it('has no pin bounce (PR-12.F1 owns it); `overlays` and `assessment` are read by the chat store, the badge and link readers and the answer-overlay map code, and by nothing else', () => {
     const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
     const found = (pattern: RegExp) => sources.filter((path) => pattern.test(readUi(path)))
     expect(found(word('bou', 'nce|@key', 'frames|prefers-reduced-', 'motion'))).toEqual([])
-    expect(found(word('high', 'light'))).toEqual([])
-    expect(found(word('overl', 'ays'))).toEqual(['src/chat/turns.ts', 'src/chat/useLzThread.ts']) // the store and the code that fills it; no map file
-    expect(found(word('assess', 'ment'))).toEqual(['src/chat/turns.ts', 'src/chat/useLzThread.ts'])
-    expect(readUi('src/chat/ChatPanel.tsx')).not.toMatch(/\.(assess|overl)/) // the panel never reads them off a turn to draw them
+    expect(found(word('overl', 'ays'))).toEqual([
+      'src/App.tsx', // hands the open pin's turn to the map
+      'src/chat/Answer.tsx', // says in a comment which ids are buttons
+      'src/chat/ChatPanel.tsx', // hands a turn's overlays to its NOTAM links
+      'src/chat/notamLinks.ts', // says in a comment which ids are linked
+      'src/chat/turns.ts', // the store
+      'src/chat/useLzThread.ts', // fills it
+      'src/components/LayerPanel.tsx', // the label of the Answer overlays switch
+      'src/map/answerFeatures.ts', // reads a turn's overlays
+      'src/map/answerOverlays.tsx', // draws them
+      'src/map/useAnswerHighlight.ts', // picks the turn
+    ])
+    expect(found(word('assess', 'ment'))).toEqual(['src/chat/Badges.tsx', 'src/chat/ChatPanel.tsx', 'src/chat/readBadges.ts', 'src/chat/turns.ts', 'src/chat/useLzThread.ts'])
   })
 
   it('has no verdict or action colour function: the legend swatches are theme tokens', () => {
@@ -98,8 +107,9 @@ describe('F2/F7: NOTAM text and colour', () => {
   it('reads a NOTAM’s `text` only in the type, the What’s-here row builder and the card that shows it, and never passes it to a console call', () => {
     const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
     const readers = sources.filter((path) => /properties\.text\b|\.text\b\s*[,)}]|\btext:/.test(readUi(path)))
-    expect(readers).toEqual(['src/map/types.ts', 'src/pick/WhatsHereCard.tsx', 'src/pick/whatsHere.ts']) // the declaration, the card, the row builder
-    const logging = sources.filter((path) => /console\.\w+\([^)]*\btext\b/.test(readUi(path)))
+    // the declaration, the overlay reader, the card, the row builder
+    expect(readers).toEqual(['src/map/answerFeatures.ts', 'src/map/types.ts', 'src/pick/WhatsHereCard.tsx', 'src/pick/whatsHere.ts'])
+    const logging = sources.filter((path) => /console\.\w+\([^)]*\b(text|conditions|answer)\b/.test(readUi(path)))
     expect(logging).toEqual([])
   })
 
@@ -111,18 +121,52 @@ describe('F2/F7: NOTAM text and colour', () => {
   })
 })
 
+describe('F7: one function chooses a badge colour', () => {
+  const sources = () => uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path) && /\.tsx?$/.test(path))
+  const VERDICT_WORDS = /NO-GO|NO_GO|UNVERIFIED|DISCRETION|APPROACHING|CONDITIONS/
+
+  it('names a verdict word only in badgeColour.ts and in the places that show or map those words, never in the badge files', () => {
+    const naming = sources().filter((path) => VERDICT_WORDS.test(readUi(path)))
+    expect(naming).toEqual([
+      'src/chat/badgeColour.ts', // the one colour function
+      'src/components/Legend.tsx', // the legend's labels
+      'src/content/howItWorks.ts', // the How-it-works words
+      'src/map/actionStyle.ts', // the server's action names on an overlay, not a verdict
+    ])
+  })
+
+  it('has a single caller of badgeColour, and the badge view picks classes by the colour name it returns, not by any word', () => {
+    expect(sources().filter((path) => /\bbadgeColour\(/.test(readUi(path)))).toEqual(['src/chat/badgeColour.ts', 'src/chat/readBadges.ts'])
+    const reader = readUi('src/chat/readBadges.ts')
+    const call = reader.slice(reader.indexOf('badgeColour({'), reader.indexOf('})', reader.indexOf('badgeColour({')))
+    expect(call).not.toMatch(/display|answer|label/)
+    const view = readUi('src/chat/Badges.tsx')
+    expect(view).toMatch(/PAINT\[badge\.colour\]/)
+    expect(view).not.toMatch(/\.display\b|\.verdict\b|\.label\.(?:includes|startsWith|match|test)|label\)\.test/)
+  })
+})
+
 describe('F5: the recorded chat payloads', () => {
   const recorded = readdirSync(resolve(UI_ROOT, 'src/test/fixtures/chat')).filter((name) => name.endsWith('.json'))
 
-  it('has the five recordings the chat tests use', () => {
-    expect(recorded.sort()).toEqual(['blue-mill-assess.json', 'guard-fallback.json', 'network-error.json', 'progress-sequence.json', 'uk-only-decline.json'])
+  it('has the recordings the chat tests use', () => {
+    expect(recorded.sort()).toEqual([
+      'blue-mill-assess.json',
+      'blue-mill-follow-up.json',
+      'blue-mill-highlights.json',
+      'guard-fallback.json',
+      'network-error.json',
+      'outlook-too-far.json',
+      'progress-sequence.json',
+      'uk-only-decline.json',
+    ])
   })
 
-  it('has only fiction-range phone numbers: 01632 960xxx, the number range Ofcom keeps for drama', () => {
+  it('has only fiction-range phone numbers: 01632 960xxx and 07700 900xxx, the number ranges Ofcom keeps for drama', () => {
     for (const name of recorded) {
       const text = readUi(`src/test/fixtures/chat/${name}`)
       const numbers = text.match(/\b0[\d ]{9,12}\d\b/g) ?? []
-      for (const number of numbers) expect(number.replace(/ /g, ''), `${name}: ${number}`).toMatch(/^01632960\d{3}$/)
+      for (const number of numbers) expect(number.replace(/ /g, ''), `${name}: ${number}`).toMatch(/^(01632960|07700900)\d{3}$/)
     }
     expect(readUi('src/test/fixtures/chat/blue-mill-assess.json')).toContain('01632 960003')
   })

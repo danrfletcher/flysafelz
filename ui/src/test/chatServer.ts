@@ -2,8 +2,11 @@ import { http, HttpResponse } from 'msw'
 
 import { apiUrl } from '@/config'
 import blueMill from '@/test/fixtures/chat/blue-mill-assess.json'
+import followUp from '@/test/fixtures/chat/blue-mill-follow-up.json'
+import highlights from '@/test/fixtures/chat/blue-mill-highlights.json'
 import fallback from '@/test/fixtures/chat/guard-fallback.json'
 import networkError from '@/test/fixtures/chat/network-error.json'
+import outlook from '@/test/fixtures/chat/outlook-too-far.json'
 import progressSequence from '@/test/fixtures/chat/progress-sequence.json'
 import decline from '@/test/fixtures/chat/uk-only-decline.json'
 
@@ -23,6 +26,12 @@ export interface Recording {
 }
 
 export const BLUE_MILL_RUN = blueMill as Recording
+/** The Blue Mill answer with an approximate NOTAM, a NOTAM with an action the UI does not know, and ids in code, in a link and not in the overlays. */
+export const HIGHLIGHTS_RUN = highlights as Recording
+/** The follow-up on the same thread: `assessment` null and no overlays, its answer naming H7171/26. */
+export const FOLLOW_UP_RUN = followUp as Recording
+/** An answer whose `assessment` has only OUTLOOK and TOO_FAR segments, and whose overlays are the 2 NM circle alone. */
+export const OUTLOOK_RUN = outlook as Recording
 export const DECLINE_RUN = decline as Recording
 export const FALLBACK_RUN = fallback as Recording
 export const NETWORK_ERROR_RUN = networkError as Recording
