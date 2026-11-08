@@ -10,11 +10,14 @@ import { formatUpdated, type LayerState } from '@/map/useMapLayers'
 export type ServerLayerId = 'airspace' | 'notams'
 export type LayerId = ServerLayerId | 'answer'
 
-/** The switches, in panel order: the two base layers, then the latest answer's highlights (drawn from the chat, not from a route). */
-export const LAYERS: readonly { id: LayerId; name: string }[] = [
-  { id: 'airspace', name: 'Airspace below FL100' },
-  { id: 'notams', name: 'NOTAMs below FL100' },
-  { id: 'answer', name: 'Answer overlays' },
+/**
+ * The switches, in panel order: the two base layers, then the latest answer's highlights (drawn from the chat, not from a route).
+ * This is also the registry of saved choices (src/lib/layerPrefs.ts): `defaultOn` is a layer's state when nothing is stored.
+ */
+export const LAYERS: readonly { id: LayerId; name: string; defaultOn: boolean }[] = [
+  { id: 'airspace', name: 'Airspace below FL100', defaultOn: true },
+  { id: 'notams', name: 'NOTAMs below FL100', defaultOn: true },
+  { id: 'answer', name: 'Answer overlays', defaultOn: true },
 ]
 
 export type LayerSwitches = Record<LayerId, boolean>

@@ -180,4 +180,7 @@ def test_readme_data_and_licences_has_one_line_per_source_and_ends_with_the_demo
 def test_readme_has_no_placeholder_for_the_pieces_later_prs_add():
     text = section("Running the UI")
     assert "CARTO key" not in text and "VITE_CARTO_KEY" not in text
-    assert "reload" not in text.lower() and "TODO" not in text and "coming soon" not in text.lower()
+    assert "TODO" not in text and "coming soon" not in text.lower()
+    # Layer choices are saved since the persistence PR: the old "not saved" note is gone, and the line that replaced it says what is kept and what is lost.
+    assert "not saved" not in text and "reset on reload" not in text
+    assert "kept in this browser's local storage" in text and "conversations are still lost on reload" in text

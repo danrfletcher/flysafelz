@@ -139,9 +139,9 @@ describe('GP2 (this PR’s part): airspace and NOTAMs below FL100, and the layer
     expect(within(panel).getByText('amber = near your limits, check the conditions too')).toBeInTheDocument()
   })
 
-  it('switches NOTAMs off and on without touching the airspace, and a remount puts both back on (no saved choice)', async () => {
+  it('switches NOTAMs off and on without touching the airspace', async () => {
     const fit = vi.spyOn(L.Map.prototype, 'fitBounds')
-    const first = render(<App />)
+    render(<App />)
     const map = mapOf(fit)
     await waitFor(() => expect(polygons(map, 'notams')).toBe(5))
     const { user } = await openPanel()
@@ -153,13 +153,6 @@ describe('GP2 (this PR’s part): airspace and NOTAMs below FL100, and the layer
 
     await user.click(screen.getByRole('switch', { name: 'Airspace below FL100' }))
     expect([polygons(map, 'airspace'), polygons(map, 'notams')]).toEqual([0, 5])
-
-    first.unmount() // a reload: the choice was only in memory
-    const again = vi.spyOn(L.Map.prototype, 'fitBounds')
-    again.mockClear()
-    render(<App />)
-    const reloaded = again.mock.contexts.at(-1) as L.Map
-    await waitFor(() => expect([polygons(reloaded, 'airspace'), polygons(reloaded, 'notams')]).toEqual([15, 5]))
   })
 })
 
