@@ -14,10 +14,11 @@ const SHADCN = [
   'destructive-foreground', 'border', 'input', 'ring', 'radius', 'border-width', 'shadow',
 ]
 const TYPE = ['type-restricted', 'type-danger', 'type-controlled', 'type-other', 'type-notam']
+const ACTION = ['action-no-fly', 'action-contact-first', 'action-check-sup', 'action-avoid-sector', 'action-awareness']
 const VERDICT = ['verdict-no-go', 'verdict-unverified', 'verdict-amber', 'verdict-conditions', 'verdict-discretion']
 
 describe('theme.css', () => {
-  it.each([...SHADCN, ...TYPE, ...VERDICT])('defines --%s', (name) => {
+  it.each([...SHADCN, ...TYPE, ...VERDICT, ...ACTION])('defines --%s', (name) => {
     expect(declared(name), `--${name}`).toBeTruthy()
   })
 

@@ -39,6 +39,12 @@
   --color-verdict-conditions: var(--verdict-conditions);
   --color-verdict-discretion: var(--verdict-discretion);
 
+  --color-action-no-fly: var(--action-no-fly);
+  --color-action-contact-first: var(--action-contact-first);
+  --color-action-check-sup: var(--action-check-sup);
+  --color-action-avoid-sector: var(--action-avoid-sector);
+  --color-action-awareness: var(--action-awareness);
+
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
@@ -80,4 +86,43 @@
 .leaflet-control-attribution {
   background: color-mix(in srgb, var(--background) 80%, transparent) !important;
   color: var(--muted-foreground) !important;
+}
+
+/* Hover tooltips on the base layers. */
+.leaflet-tooltip.leaflet-tooltip {
+  background: var(--popover);
+  color: var(--popover-foreground);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  white-space: normal;
+  max-width: 18rem;
+}
+
+.map-tip__title {
+  display: block;
+  margin-bottom: 0.125rem;
+}
+
+.map-tip__label {
+  color: var(--muted-foreground);
+}
+
+/* The "approx" word on an approximate NOTAM shape: a zero-size marker with the text centred on its point. */
+.approx-label {
+  background: none;
+  border: 0;
+}
+
+.approx-label__text {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--type-notam);
+  text-shadow: 0 0 3px var(--background), 0 0 3px var(--background);
 }

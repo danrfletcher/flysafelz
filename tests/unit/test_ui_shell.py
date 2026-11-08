@@ -63,7 +63,9 @@ def test_a_dry_run_of_make_dev_shows_the_server_and_the_ui_and_starts_neither():
 def test_make_test_ui_runs_the_four_checks_in_order():
     lines = dry_run("test-ui").strip().splitlines()
     assert lines[0] == "if [ ! -d ui/node_modules ]; then npm --prefix ui ci; fi"
-    assert lines[1] == ("npm --prefix ui run lint && npm --prefix ui test -- --run && npm --prefix ui run build && node ui/scripts/check-external-urls.mjs")
+    assert lines[1] == (
+        "npm --prefix ui run lint && npm --prefix ui test -- --run --coverage && npm --prefix ui run build && node ui/scripts/check-external-urls.mjs && node ui/scripts/check-no-keys.mjs"
+    )
 
 
 def test_make_test_still_runs_only_python():

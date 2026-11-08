@@ -33,6 +33,7 @@ describe('urlProblems', () => {
       'https://a.basemaps.cartocdn.com/x.png',
       'https://www.openstreetmap.org/copyright',
       'https://carto.com/attributions',
+      'https://www.openaip.net',
       'http://localhost:2024',
     ]
       .map((url) => `fetch("${url}")`)

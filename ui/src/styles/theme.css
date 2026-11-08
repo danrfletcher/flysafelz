@@ -48,4 +48,11 @@
   --verdict-amber: #f59e0b;
   --verdict-conditions: #3b82f6;
   --verdict-discretion: #22c55e;
+
+  /* What an answer says about a shape for one field: the legend's second set. The colour function that uses them is a later PR's. */
+  --action-no-fly: var(--verdict-no-go);
+  --action-contact-first: var(--verdict-amber);
+  --action-check-sup: var(--verdict-conditions);
+  --action-avoid-sector: var(--type-danger);
+  --action-awareness: var(--verdict-unverified);
 }
