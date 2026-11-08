@@ -50,7 +50,7 @@ def test_make_run_loads_dotenv_only_when_there_is_one():
 
 
 def test_the_coverage_list_has_the_modules_this_pr_adds_and_the_floor_is_unchanged():
-    for module in ("graph", "prompts", "middleware", "run"):
+    for module in ("graph", "prompts", "middleware", "run", "guard"):
         assert f"--cov=flysafelz.agent.{module} " in MAKEFILE
     assert "--cov-fail-under=90" in MAKEFILE
 

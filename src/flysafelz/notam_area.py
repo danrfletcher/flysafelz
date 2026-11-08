@@ -81,16 +81,22 @@ def _degrees(degrees: str, minutes: str, seconds: str | None, hemisphere: str) -
     return -value if hemisphere in "SW" else value
 
 
-def _points(text: str) -> list[Point] | None:
-    """Every coordinate pair in the text in order written; None when one of them is not a possible place."""
-    points = []
-    for lat_deg, lat_min, lat_sec, ns, lon_deg, lon_min, lon_sec, ew in _COORDINATE.findall(text):
+def _read_each(text: str) -> list[tuple[str, Point | None]]:
+    """Every coordinate pair in the text in order written, with the text it was written as; the point is None when that pair is not a possible place."""
+    pairs: list[tuple[str, Point | None]] = []
+    for found in _COORDINATE.finditer(text):
+        lat_deg, lat_min, lat_sec, ns, lon_deg, lon_min, lon_sec, ew = found.groups()
         lat = _degrees(lat_deg, lat_min, lat_sec or None, ns)
         lon = _degrees(lon_deg, lon_min, lon_sec or None, ew)
-        if lat is None or lon is None or abs(lat) > HALF_TURN - abs(lat):  # the last test is "latitude past 90"
-            return None
-        points.append((lat, lon))
-    return points
+        possible = lat is not None and lon is not None and abs(lat) <= HALF_TURN - abs(lat)  # the last test is "latitude not past 90"
+        pairs.append((found.group(), (lat, lon) if possible and lat is not None and lon is not None else None))
+    return pairs
+
+
+def _points(text: str) -> list[Point] | None:
+    """Every coordinate pair in the text in order written; None when one of them is not a possible place."""
+    points = [point for _, point in _read_each(text)]
+    return None if None in points else [point for point in points if point is not None]
 
 
 def _radii_nm(text: str) -> list[float]:
@@ -155,6 +161,22 @@ def build_area(notam: ParsedNotam) -> tuple[Area, str]:
         _REMEMBERED[key] = _build_area(notam)
     area, note = _REMEMBERED[key]
     return (area.model_copy(deep=True) if area is not None else None), note  # a copy: callers never share a mutable model
+
+
+def coordinates_in(text: str) -> list[Point]:
+    """Every coordinate pair the text writes as degrees, minutes and seconds (`534732N 0000459W`), in order, as decimal (lat, lon).
+
+    [] when there is none. A pair that is not a possible place is left out and the others stay (the NOTAM reader treats such a text as unreadable, but the
+    agent's guard only asks which places a tool printed). The guard uses it to compare an answer with a NOTAM's raw text.
+    """
+    return [point for _, point in _read_each(text) if point is not None]
+
+
+def coordinates_each(text: str) -> list[tuple[str, Point | None]]:
+    """Like `coordinates_in`, with the text each pair was written as ([("534732N 0000459W", (53.7922, -0.0831)), ...]), and a pair that is not a possible place
+    does not hide the others: its point is None (`995959N 0001000W`). The agent's guard uses it on an answer, where one invented pair must not switch off the
+    check of the rest."""
+    return _read_each(text)
 
 
 def forget_areas() -> None:
