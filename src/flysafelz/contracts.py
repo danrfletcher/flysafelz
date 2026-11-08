@@ -5,6 +5,7 @@ The verdict has three values and no bare "go" verdict exists
 """
 
 import re
+from decimal import Decimal
 from enum import StrEnum
 from typing import Annotated, Literal, Self
 
@@ -14,6 +15,9 @@ from flysafelz.designators import find_designators
 from flysafelz.sup_refs import find_sup_references
 
 STRICT = ConfigDict(extra="forbid")
+# The one NOTAM-id pattern in src/: a series letter, one to four digits, a slash, a two-digit year (H7171/26, Q172/26, V32/26). Real ids have one to four
+# digits, so a four-digit-only pattern would let an invented short id through unchecked. The guard and every later reader of an id import this constant.
+NOTAM_ID_RE = re.compile(r"\b[A-Z]\d{1,4}/\d{2}\b")
 _Q_CODE = re.compile(r"Q?(?P<subject>..)(?P<condition>..)")
 
 
@@ -57,6 +61,28 @@ def display_verdict(verdict: Verdict, approaching_limits: bool, has_conditions: 
     if not qualifiers:
         return _PILOT_DISCRETION_TEXT
     return f"{_PILOT_DISCRETION_TEXT} \u2013 " + " \u00b7 ".join(qualifiers)
+
+
+type Position = Literal["over", "at", "under"]
+_ABOVE_IS_PAST = frozenset({">", ">="})
+_BELOW_IS_PAST = frozenset({"<", "<="})
+
+
+def position_word(value: float | Decimal, limit: float | Decimal, comparison: str) -> Position:
+    """Where a value sits against its limit, as one word. The only place this is decided: the guard and the tool phrase and limit line (PR-11) all call it.
+
+    over   past the limit, the way its comparison looks (6.04 against `> 6`; 9.3 against `>= 9`; 4.0 against `< 5`). "above" says the same.
+    at     exactly the limit's number (9.0 against `>= 9`; 6.0 against `> 6`, which is not yet over). Exactness is the caller's: both numbers in the one unit.
+    under  has not reached the limit (5.9 against `> 6`; 8.7 against `>= 9`). "below" says the same.
+
+    Only the four ordering comparisons are limits; any other (`in`, `=`) has no position and raises ValueError.
+    """
+    if comparison not in _ABOVE_IS_PAST | _BELOW_IS_PAST:
+        raise ValueError(f"comparison {comparison!r} is not a limit, so a value has no position against it")
+    if value == limit:
+        return "at"
+    past = value > limit if comparison in _ABOVE_IS_PAST else value < limit
+    return "over" if past else "under"
 
 
 # --- source status --------------------------------------------------------
