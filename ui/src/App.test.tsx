@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import App from '@/App'
 import { UK_BOUNDS } from '@/lib/ukBounds'
+import { RAINVIEWER_INDEX_URL } from '@/map/rainIndex'
 import { WIND_URL } from '@/mocks/wind'
 import { server } from '@/test/setup'
 import {
@@ -75,19 +76,19 @@ describe('App', () => {
 
   it('asks for CARTO Dark Matter tiles and no other host', async () => {
     const { container } = render(<App />)
-    await waitFor(() => expect(container.querySelectorAll('img.leaflet-tile').length).toBeGreaterThan(0))
-    const hosts = [...container.querySelectorAll('img.leaflet-tile')].map((tile) => new URL((tile as HTMLImageElement).src).host)
+    await waitFor(() => expect(container.querySelectorAll('.leaflet-tile-pane img.leaflet-tile').length).toBeGreaterThan(0))
+    const hosts = [...container.querySelectorAll('.leaflet-tile-pane img.leaflet-tile')].map((tile) => new URL((tile as HTMLImageElement).src).host)
     expect(hosts.every((host) => /^[a-d]\.basemaps\.cartocdn\.com$/.test(host))).toBe(true)
   })
 
-  it('F2: calls only the three map routes on VITE_API_URL, and the basemap tiles', async () => {
+  it('F2: calls only the three map routes on VITE_API_URL, RainViewer’s index (the rain-grid route only if it fails), and the basemap tiles', async () => {
     const fetched = vi.spyOn(globalThis, 'fetch')
     const opened = vi.spyOn(XMLHttpRequest.prototype, 'open')
     const { container } = render(<App />)
-    await waitFor(() => expect(fetched).toHaveBeenCalledTimes(3))
+    await waitFor(() => expect(fetched).toHaveBeenCalledTimes(4))
     const urls = fetched.mock.calls.map(([input]) => String(input)).sort()
-    expect(urls).toEqual([AIRSPACE_URL(), NOTAMS_URL(), WIND_URL()].sort())
-    expect(urls.some((url) => /rain|radar|analytics|open-meteo/.test(url))).toBe(false)
+    expect(urls).toEqual([AIRSPACE_URL(), NOTAMS_URL(), WIND_URL(), RAINVIEWER_INDEX_URL].sort())
+    expect(urls.some((url) => /analytics|open-meteo|rain-grid/.test(url))).toBe(false)
     expect(opened).not.toHaveBeenCalled()
     await waitFor(() => expect(container.querySelectorAll('img.leaflet-tile').length).toBeGreaterThan(0))
   })

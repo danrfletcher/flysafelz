@@ -17,6 +17,7 @@ export type ThemeToken =
   | '--wind-moderate'
   | '--wind-strong'
   | '--wind-severe'
+  | '--rain'
 
 /** Every name in openAIP's CODES["type"] list (src/flysafelz/clients/openaip.py), in code order. tests/unit/test_ui_map_layers.py keeps the two equal. */
 export const AIRSPACE_TYPES = [

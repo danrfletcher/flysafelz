@@ -13,8 +13,12 @@ import { BaseLayers } from '@/map/BaseLayers'
 import type { BasemapStatus } from '@/map/basemap'
 import { FitToLz } from '@/map/FitToLz'
 import { PickHandler } from '@/map/PickHandler'
+import { RainGridLayer } from '@/map/RainGridLayer'
+import { RainLayer } from '@/map/RainLayer'
+import { RainStamp } from '@/map/RainStamp'
 import { selectTurn, useAnswerHighlight, type Selection } from '@/map/useAnswerHighlight'
 import { useMapLayers } from '@/map/useMapLayers'
+import { useRain } from '@/map/useRain'
 import { useWind } from '@/map/useWind'
 import { WindLayer } from '@/map/WindLayer'
 import type { LatLon } from '@/pick/whatsHere'
@@ -29,7 +33,8 @@ import type { LatLon } from '@/pick/whatsHere'
 export default function App() {
   const layers = useMapLayers()
   const wind = useWind()
-  // Wind, airspace and NOTAMs below FL100 and the answer's highlights are on at first load; a choice is kept in this browser's local storage and read back on load.
+  const rain = useRain()
+  // Wind, rain, airspace and NOTAMs below FL100 and the answer's highlights are on at first load; a choice is kept in this browser's local storage and read back on load.
   const [shown, setShown] = useLayerPrefs(LAYERS)
   // Whether the basemap tiles are loading: only the layer panel's note and the map's background read it, so nothing else waits on it.
   const [basemap, setBasemap] = useState<BasemapStatus>('loading')
@@ -57,6 +62,10 @@ export default function App() {
       <main ref={setMapArea} className="relative min-h-0 flex-1 overflow-hidden">
         <UkMap basemap={basemap} onBasemapStatus={setBasemap}>
           {shown.wind && wind.grid && <WindLayer grid={wind.grid} />}
+          {shown.rain && rain.state.mode === 'radar' && (
+            <RainLayer host={rain.state.host} frames={rain.state.frames} fetchedAt={rain.state.fetchedAt} gate={rain.gate} view={rain.view} />
+          )}
+          {shown.rain && rain.state.mode === 'fallback' && <RainGridLayer cells={rain.state.cells} view={rain.view} />}
           <BaseLayers
             airspace={layers.airspace.features}
             notams={layers.notams.features}
@@ -67,8 +76,10 @@ export default function App() {
           <FitToLz point={chatPoint} layout={desktop ? 'sheet' : 'drawer'} />
           <AnswerOverlays point={chatPoint} highlight={highlight} visible={shown.answer} layout={desktop ? 'sheet' : 'drawer'} />
         </UkMap>
+        {shown.rain && rain.state.mode === 'radar' && <RainStamp view={rain.view} />}
         <LayerPanel
           states={{ wind, ...layers }}
+          rain={{ state: rain.state, view: rain.view }}
           basemap={basemap}
           shown={shown}
           chatOpen={chatPoint !== null}

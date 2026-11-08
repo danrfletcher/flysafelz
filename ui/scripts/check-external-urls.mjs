@@ -4,7 +4,8 @@
 //
 // 1. Every absolute URL in a text file under dist must be on an allowlist, by host:
 //      basemaps.cartocdn.com         the tile host (the {s} subdomain placeholder is allowed)
-//      openstreetmap.org, carto.com, openaip.net, open-meteo.com  the attribution link hosts (the browser never calls open-meteo.com: wind comes from /map/wind)
+//      rainviewer.com                the Rain layer's index (api.) and radar tiles (tilecache.), and the attribution link (www.)
+//      openstreetmap.org, carto.com, openaip.net, open-meteo.com  the attribution link hosts (the browser never calls open-meteo.com: wind and the rain grid come from /map)
 //      localhost
 //    fonts.googleapis.com and fonts.gstatic.com fail with their own message, wherever they appear.
 // 2. Every @font-face `src` in the built CSS is a bundled file that exists in dist.
@@ -23,7 +24,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const ALLOWED_HOSTS = ['basemaps.cartocdn.com', 'openstreetmap.org', 'carto.com', 'openaip.net', 'open-meteo.com', 'localhost']
+export const ALLOWED_HOSTS = ['basemaps.cartocdn.com', 'openstreetmap.org', 'carto.com', 'openaip.net', 'open-meteo.com', 'rainviewer.com', 'localhost']
 export const FORBIDDEN_FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com']
 export const NOT_REQUESTS = [
   'http://www.w3.org/',

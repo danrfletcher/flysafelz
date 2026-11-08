@@ -51,6 +51,7 @@ describe('parseArgs', () => {
     expect(parseArgs(['--port', '4999'])).toMatchObject({ port: 4999, delayAirspace: 0, failNotams: false })
     expect(parseArgs(['--port', '4999', '--delay-notams', '500', '--fail-airspace'])).toMatchObject({ delayNotams: 500, failAirspace: true })
     expect(parseArgs(['--port', '4999', '--delay-wind', '300', '--fail-wind', '--stale-wind'])).toMatchObject({ delayWind: 300, failWind: true, staleWind: true })
+    expect(parseArgs(['--port', '4999', '--delay-rain-grid', '200', '--fail-rain-grid', '--stale-rain-grid'])).toMatchObject({ delayRainGrid: 200, failRainGrid: true, staleRainGrid: true })
   })
 
   it.each([[[]], [['--port', 'x']], [['--port', '80']], [['--port', '4999', '--delay-notams', '-1']], [['--port', '4999', '--nope']]])('rejects %j', (argv) => {
@@ -79,6 +80,20 @@ describe('the stand-in server', () => {
     const stale = JSON.parse((await get(await serve('--stale-wind'), '/map/wind')).body)
     expect([stale.stale, stale.updated_at]).toEqual([true, body.updated_at])
     const failed = await get(await serve('--fail-wind'), '/map/wind')
+    expect(failed.status).toBe(503)
+    expect(JSON.parse(failed.body)).toHaveProperty('reason')
+  })
+
+  it('serves the synthetic rain grid, stale when told to, 503 when told to fail', async () => {
+    const fresh = await get(await serve(), '/map/rain-grid')
+    expect(fresh.status).toBe(200)
+    expect(fresh.head).toContain('access-control-allow-origin: *')
+    const body = JSON.parse(fresh.body)
+    expect([body.stale, body.grid.length]).toEqual([false, 143])
+    expect(Object.keys(body.grid[0]).sort()).toEqual(['lat', 'lon', 'precipitation'])
+    const stale = JSON.parse((await get(await serve('--stale-rain-grid'), '/map/rain-grid')).body)
+    expect([stale.stale, stale.updated_at]).toEqual([true, body.updated_at])
+    const failed = await get(await serve('--fail-rain-grid'), '/map/rain-grid')
     expect(failed.status).toBe(503)
     expect(JSON.parse(failed.body)).toHaveProperty('reason')
   })

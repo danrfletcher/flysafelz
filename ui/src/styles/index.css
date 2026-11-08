@@ -38,6 +38,8 @@
   --color-wind-strong: var(--wind-strong);
   --color-wind-severe: var(--wind-severe);
 
+  --color-rain: var(--rain);
+
   --color-verdict-no-go: var(--verdict-no-go);
   --color-verdict-unverified: var(--verdict-unverified);
   --color-verdict-amber: var(--verdict-amber);
@@ -206,4 +208,10 @@
 
 .wind-arrow--severe {
   color: var(--wind-severe);
+}
+
+/* The rain layer sits in its own pane just over the basemap (tile pane 200) and under every vector layer (overlay pane 400), so rain never covers
+   an airspace outline or an answer's shape. The pane's opacity is the zoom fade (src/map/rainFade.ts), set from code. It takes no pointer events. */
+.rain-pane--model {
+  filter: blur(10px);
 }

@@ -42,7 +42,7 @@ function drawn(map: L.Map, kind: 'airspace' | 'notams'): number {
   return count
 }
 
-const NAMES = { wind: 'Wind', airspace: 'Airspace below FL100', notams: 'NOTAMs below FL100', answer: 'Answer overlays' } as const
+const NAMES = { wind: 'Wind', rain: 'Rain', airspace: 'Airspace below FL100', notams: 'NOTAMs below FL100', answer: 'Answer overlays' } as const
 
 async function openPanel(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Map layers' }))
@@ -58,7 +58,7 @@ describe('G1: choices survive a reload', () => {
     const { map, user } = load()
     await waitFor(() => expect(drawn(map, 'notams')).toBe(NOTAMS))
     await openPanel(user)
-    expect([checked('wind'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([true, true, true, true])
+    expect([checked('wind'), checked('rain'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([true, true, true, true, true])
     expect(drawn(map, 'airspace')).toBe(AIRSPACE)
     expect(set).not.toHaveBeenCalled()
     expect(window.localStorage.getItem(LAYER_PREFS_KEY)).toBeNull()
@@ -70,16 +70,16 @@ describe('G1: choices survive a reload', () => {
     await openPanel(first.user)
 
     await first.user.click(screen.getByRole('switch', { name: NAMES.airspace }))
-    expect(stored()).toEqual({ wind: true, airspace: false, notams: true, answer: true })
+    expect(stored()).toEqual({ wind: true, rain: true, airspace: false, notams: true, answer: true })
     expect([drawn(first.map, 'airspace'), drawn(first.map, 'notams')]).toEqual([0, NOTAMS])
 
     await first.user.click(screen.getByRole('switch', { name: NAMES.answer }))
-    expect(stored()).toEqual({ wind: true, airspace: false, notams: true, answer: false })
+    expect(stored()).toEqual({ wind: true, rain: true, airspace: false, notams: true, answer: false })
 
     await first.user.click(screen.getByRole('switch', { name: NAMES.notams }))
-    expect(stored()).toEqual({ wind: true, airspace: false, notams: false, answer: false })
+    expect(stored()).toEqual({ wind: true, rain: true, airspace: false, notams: false, answer: false })
     await first.user.click(screen.getByRole('switch', { name: NAMES.notams }))
-    expect(stored()).toEqual({ wind: true, airspace: false, notams: true, answer: false })
+    expect(stored()).toEqual({ wind: true, rain: true, airspace: false, notams: true, answer: false })
 
     first.view.unmount() // the reload
     const again = load()
@@ -102,16 +102,16 @@ describe('G1: choices survive a reload', () => {
     expect(drawn(map, 'notams')).toBe(0)
   })
 
-  it('applies a stored Wind choice, ignores a stored choice for a layer that is not registered (rain), and keeps it on the next write', async () => {
-    window.localStorage.setItem(LAYER_PREFS_KEY, '{"wind":false,"rain":true,"airspace":false}')
+  it('applies a stored Wind and Rain choice and keeps it on the next write (Rain joins the one layers.v1 key)', async () => {
+    window.localStorage.setItem(LAYER_PREFS_KEY, '{"wind":false,"rain":false,"airspace":false}')
     const { map, user } = load()
     await waitFor(() => expect(drawn(map, 'notams')).toBe(NOTAMS))
     const panel = await openPanel(user)
-    expect(within(panel).getAllByRole('switch')).toHaveLength(4) // no Rain switch
-    expect([checked('wind'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([false, false, true, true])
+    expect(within(panel).getAllByRole('switch')).toHaveLength(5)
+    expect([checked('wind'), checked('rain'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([false, false, false, true, true])
 
     await user.click(screen.getByRole('switch', { name: NAMES.notams }))
-    expect(stored()).toEqual({ wind: false, rain: true, airspace: false, notams: false, answer: true })
+    expect(stored()).toEqual({ wind: false, rain: false, airspace: false, notams: false, answer: true })
   })
 
   it('never reads a later layers.v2 key', async () => {
@@ -119,7 +119,7 @@ describe('G1: choices survive a reload', () => {
     const { map, user } = load()
     await waitFor(() => expect(drawn(map, 'notams')).toBe(NOTAMS))
     await openPanel(user)
-    expect([checked('wind'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([true, true, true, true])
+    expect([checked('wind'), checked('rain'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([true, true, true, true, true])
   })
 
   it('G10/C2: What’s-here still lists switched-off layers after a reload with them off', async () => {
@@ -150,12 +150,12 @@ describe('E13: storage that is missing, corrupt or failing', () => {
     await waitFor(() => expect(drawn(map, 'notams')).toBe(NOTAMS))
     expect(drawn(map, 'airspace')).toBe(AIRSPACE)
     await openPanel(user)
-    expect([checked('wind'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([true, true, true, true])
+    expect([checked('wind'), checked('rain'), checked('airspace'), checked('notams'), checked('answer')]).toEqual([true, true, true, true, true])
     expect(view.container.querySelector('.leaflet-container')).not.toBeNull()
     expect(screen.queryByText(/something went wrong/i)).toBeNull()
 
     await user.click(screen.getByRole('switch', { name: NAMES.airspace }))
-    expect(stored()).toEqual({ wind: true, airspace: false, notams: true, answer: true })
+    expect(stored()).toEqual({ wind: true, rain: true, airspace: false, notams: true, answer: true })
     window.removeEventListener('error', onError)
     expect(errors).toEqual([])
   })

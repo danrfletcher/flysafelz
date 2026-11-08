@@ -9,6 +9,7 @@ import { DRAWER_HEIGHT_FRACTION, SHEET_WIDTH_PX, lzBounds } from '@/map/fitLz'
 import { BLUE_MILL_RUN, chatServer, scriptOf } from '@/test/chatServer'
 import { BLUE_MILL, blueMillRoutes } from '@/test/handlers'
 import { server } from '@/test/setup'
+import { RAINVIEWER_INDEX_URL } from '@/map/rainIndex'
 import { apiUrl } from '@/config'
 
 const LONDON = { lat: 51.5074, lon: -0.1278 }
@@ -87,7 +88,7 @@ describe('chat from the What’s-here card', () => {
     expect(screen.getByRole('button', { name: 'Chat about this LZ' })).toBeEnabled()
   })
 
-  it('runs a whole conversation against the server, and the only network target is VITE_API_URL (F2, F4)', async () => {
+  it('runs a whole conversation against the server, and the only network targets are VITE_API_URL and RainViewer’s index (F2, F4)', async () => {
     const fetched = vi.spyOn(globalThis, 'fetch')
     const { pick, user, fake } = open(scriptOf(BLUE_MILL_RUN))
     pick(BLUE_MILL)
@@ -97,7 +98,7 @@ describe('chat from the What’s-here card', () => {
 
     expect(fake.threads).toHaveLength(1)
     const targets = fetched.mock.calls.map(([input]) => new URL(input instanceof Request ? input.url : String(input)).origin)
-    expect([...new Set(targets)]).toEqual([new URL(apiUrl()).origin])
+    expect([...new Set(targets)].sort()).toEqual([new URL(apiUrl()).origin, new URL(RAINVIEWER_INDEX_URL).origin].sort())
   })
 
   it('warns before the page is left while a conversation has turns, and not before (G24)', async () => {

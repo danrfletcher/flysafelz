@@ -60,25 +60,29 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(naming).toEqual(['src/map/basemap.ts', 'src/vite-env.d.ts'])
   })
 
-  it('has the wind switch, the base layers’ two switches and the Answer overlays switch, and no other: no rain or all-heights switch, and the basemap entry has none', () => {
+  it('has the wind and rain switches, the base layers’ two switches and the Answer overlays switch, and no other: no all-heights switch, and the basemap entry has none', () => {
     const panel = readUi('src/components/LayerPanel.tsx')
     expect(panel.match(/<Switch\b/g)).toHaveLength(1) // one in the list the layers map over
     const layers = [...panel.matchAll(/id: '(\w+)', name: '([^']+)'/g)].map((match) => [match[1], match[2]])
-    expect(layers).toEqual([['wind', 'Wind'], ['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100'], ['answer', 'Answer overlays']])
-    const switchLabels = /rain|radar|all heights/i
+    expect(layers).toEqual([['wind', 'Wind'], ['rain', 'Rain'], ['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100'], ['answer', 'Answer overlays']])
+    const switchLabels = /all heights/i
     expect(switchLabels.test(panel)).toBe(false)
   })
 
-  it('fetches the three map routes (airspace, NOTAMs, wind) and no other route, and never Open-Meteo', () => {
+  it('fetches the four map routes (airspace, NOTAMs, wind, rain-grid) and no other route, RainViewer’s index and tiles are the only other call, and never Open-Meteo', () => {
     expect(filesMatching(word('api\\.open-', 'meteo'))).toEqual([]) // the browser never calls the forecast API; wind arrives from /map/wind
     const credit = filesMatching(word('open-', 'meteo\\.com')).filter((path) => !/\.test\.|\/test\//.test(path))
     expect(credit).toEqual(['scripts/check-external-urls.mjs', 'src/map/basemap.ts']) // the attribution link and the allowlist that lets it through
-    expect(filesMatching(word('rain', '-grid'))).toEqual([])
-    expect(filesMatching(word('rainviewer', 'api'))).toEqual([])
+    const sources = (paths: string[]) => paths.filter((path) => path.startsWith('src/') && !/\.test\.|\/test\/|\/mocks\//.test(path)) // the app's own code, not the scripts, tests or mocks
+    // the rain-grid route is read in the rain grid's reader and called from the one hook that falls back to it
+    expect(sources(filesMatching(word("'/map/rain", "-grid'")))).toEqual(['src/map/rainGrid.ts'])
+    expect(sources(filesMatching(word('RAIN_GRID', '_PATH')))).toEqual(['src/map/rainGrid.ts', 'src/map/useRain.ts'])
+    // RainViewer: the index URL is named in one file (the allowlist script names the bare host); tiles are built from the index's own host and paths
+    expect(sources(filesMatching(word('api\\.rainviewer', '\\.com')))).toEqual(['src/map/rainIndex.ts'])
     const routes = uiTextFiles()
       .filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
       .flatMap((path) => [...readUi(path).matchAll(/['"`](\/map\/[a-z-]+)['"`]/g)].map((match) => match[1]))
-    expect([...new Set(routes)].sort()).toEqual(['/map/airspace', '/map/notams', '/map/wind'])
+    expect([...new Set(routes)].sort()).toEqual(['/map/airspace', '/map/notams', '/map/rain-grid', '/map/wind'])
   })
 
   it('keeps the chat inside src/chat, with the Sheet and Drawer as the two components/ui shells and the 2 NM fit in src/map', () => {

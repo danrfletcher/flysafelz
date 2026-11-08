@@ -1,4 +1,5 @@
 import { HOW_IT_WORKS } from '@/content/howItWorks'
+import type { RainState } from '@/map/useRain'
 import { WIND_BANDS, type WindBand } from '@/map/wind'
 
 // The legend's colours are theme variables, named through Tailwind tokens (src/styles/index.css): no colour is chosen here by a function.
@@ -35,6 +36,14 @@ export const WIND_SPEEDS: readonly Row[] = WIND_BANDS.map(({ name, label }) => (
   swatch: `inline-block h-1 w-6 shrink-0 rounded-full ${WIND_SWATCH[name]}`,
 }))
 
+/** The Rain layer's legend line: radar, or (when RainViewer's index failed) Open-Meteo's model, said as it is. None while the layer has no data at all. */
+export function rainRow(mode: RainState['mode']): Row | null {
+  const swatch = 'inline-block h-3.5 w-6 shrink-0 rounded-sm bg-rain/60'
+  if (mode === 'fallback') return { label: 'rain (model, not radar)', swatch }
+  if (mode === 'unavailable') return null
+  return { label: 'Rain radar, past 2 h', swatch }
+}
+
 /** What an answer says about a shape for the field you picked. */
 export const ACTIONS: readonly Row[] = [
   { label: 'No fly', swatch: `${OUTLINE} border-action-no-fly bg-action-no-fly/20` },
@@ -69,7 +78,8 @@ function Rows({ rows }: { rows: readonly Row[] }) {
 }
 
 /** The two legend sets of the layer panel. */
-export function Legend() {
+export function Legend({ rain = 'loading' }: { rain?: RainState['mode'] }) {
+  const rainLine = rainRow(rain)
   return (
     <div className="space-y-4 text-sm">
       <section aria-labelledby="legend-map">
@@ -80,6 +90,11 @@ export function Legend() {
         <div className="mt-2">
           <Rows rows={WIND_SPEEDS} />
         </div>
+        {rainLine && (
+          <div className="mt-2">
+            <Rows rows={[rainLine]} />
+          </div>
+        )}
       </section>
       <section aria-labelledby="legend-field">
         <h3 id="legend-field" className="mb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">

@@ -35,6 +35,9 @@ describe('urlProblems', () => {
       'https://carto.com/attributions',
       'https://www.openaip.net',
       'https://open-meteo.com',
+      'https://api.rainviewer.com/public/weather-maps.json',
+      'https://tilecache.rainviewer.com/v2/radar/1/256/{z}/{x}/{y}/2/1_0.png',
+      'https://www.rainviewer.com',
       'http://localhost:2024',
     ]
       .map((url) => `fetch("${url}")`)
@@ -73,7 +76,9 @@ describe('urlProblems', () => {
     'https://carto.com.evil.example/x',
     'https://evil-carto.com/x',
     'https://carto.com@evil.example/x',
-    'https://api.rainviewer.com/public/weather-maps.json',
+    'https://rainviewer.com.evil.example/x',
+    'https://evil-rainviewer.com/x',
+    'http://api.rainviewer.com.evil.example/x',
   ])('fails on %s', (url) => {
     const problems = urlProblems(dist({ 'index.js': `fetch("${url}")` }))
     expect(problems).toHaveLength(1)
