@@ -19,6 +19,7 @@ from flysafelz.agent.input_check import check_input
 from flysafelz.agent.sources import SourceCache
 from flysafelz.agent.state import RequestState, RunContext
 from flysafelz.agent.tools.airspace_tool import build_get_airspace
+from flysafelz.agent.tools.assess_tool import build_assess
 from flysafelz.agent.tools.notams_tool import build_get_notams
 from flysafelz.agent.tools.weather_tool import build_get_weather
 
@@ -26,6 +27,7 @@ BLUE_MILL_NOW = datetime(2026, 10, 31, 7, 30, tzinfo=UTC)
 BLUE_MILL_LZ = {"lat": 53.802797, "lon": -0.086644}
 BLUE_MILL_WINDOW = {"start": "2026-10-31 10:00", "end": "2026-10-31 16:00"}
 ALL_THREE = ("get_weather", "get_airspace", "get_notams")
+ASSESS = "assess"
 
 
 @dataclass
@@ -62,7 +64,7 @@ def run_tools(
 ) -> ToolRun:
     """Send one turn through a graph whose model asks for `steps` in turn and then says "done."; return what the tools did."""
     ctx = ctx or RunContext(now=BLUE_MILL_NOW, case="blue_mill_2026-10-31")
-    tools = {"get_weather": build_get_weather(source_cache), "get_airspace": build_get_airspace(source_cache), "get_notams": build_get_notams(source_cache)}
+    tools = {"get_weather": build_get_weather(source_cache), "get_airspace": build_get_airspace(source_cache), "get_notams": build_get_notams(source_cache), "assess": build_assess(source_cache)}
     script = [AIMessage("", tool_calls=[{"name": name, "args": args, "id": f"call-{n}-{i}"} for i, (name, args) in enumerate(step)]) for n, step in enumerate(steps)]
     model = FakeToolChatModel(script=[*script, AIMessage("done.")])
     graph: Any = create_agent(model=model, tools=list(tools.values()), middleware=[check_input], state_schema=RequestState, context_schema=RunContext, checkpointer=InMemorySaver())

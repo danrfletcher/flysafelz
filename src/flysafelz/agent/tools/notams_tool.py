@@ -91,7 +91,7 @@ def _to_read(prepared: Prepared, chosen: list[ParsedNotam]) -> list[ParsedNotam]
     return [parsed for parsed in chosen if parsed.id not in sources.readings and parsed.id not in sources.unread and parsed.id not in sources.limited]
 
 
-def _read(source_cache: SourceCache, prepared: Prepared, span: Window, chosen: list[ParsedNotam]) -> None:
+def read_chosen(source_cache: SourceCache, prepared: Prepared, span: Window, chosen: list[ParsedNotam]) -> None:
     """Read what the thread has not, within the reader's call limit, and keep the answers on the thread's Sources.
 
     The reading store is asked first: a NOTAM it holds is read for no model call, writes no progress line and does not count against the limit.
@@ -139,7 +139,7 @@ def _read(source_cache: SourceCache, prepared: Prepared, span: Window, chosen: l
     sources.record_reads(readings, unread, limited=[parsed.id for parsed in over])
 
 
-def _why_unread(prepared: Prepared, notam_id: str) -> str | None:
+def why_unread(prepared: Prepared, notam_id: str) -> str | None:
     """Why this NOTAM has no reading, or None when it has one."""
     sources = prepared.sources
     if notam_id in sources.readings:
@@ -206,7 +206,7 @@ def notams_answer(prepared: Prepared, source_cache: SourceCache, redactor: Redac
         lz = (prepared.lat, prepared.lon)
         kept, dropped = prefilter(sources.pib.notams, lz, span, tz=prepared.tz)
         chosen = reader_set(sources.pib.notams, lz, span)
-        _read(source_cache, prepared, span, chosen)
+        read_chosen(source_cache, prepared, span, chosen)
         height, known = elevation_ft(sources.forecast)
         if not known:
             assumptions.append("Site elevation unknown (the forecast gave none): taken as 0 ft.")
@@ -227,7 +227,7 @@ def notams_answer(prepared: Prepared, source_cache: SourceCache, redactor: Redac
                 reading, why = None, None
             else:
                 reading = sources.readings.get(parsed.id)
-                why = _why_unread(prepared, parsed.id)
+                why = why_unread(prepared, parsed.id)
                 result = notam_action(parsed, reading, landing_zone, segment)
                 if result.action is NotamAction.IGNORE:
                     ignored += 1
@@ -281,7 +281,7 @@ def _assumption_lines(unread_ids: list[str], prepared: Prepared, assumptions: li
     """Add the lines that say why a NOTAM is unread, to `assumptions`, and return them (with the others) as text."""
     by_reason: dict[str, list[str]] = {}
     for notam_id in unread_ids:
-        by_reason.setdefault(_why_unread(prepared, notam_id) or "", []).append(notam_id)
+        by_reason.setdefault(why_unread(prepared, notam_id) or "", []).append(notam_id)
     for reason, ids in by_reason.items():
         names = ", ".join(ids)
         if reason == UNAVAILABLE_REASON:

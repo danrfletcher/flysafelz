@@ -1,0 +1,16 @@
+$ uv run python -c <driver: assess tool through the agent graph, case blue_mill_2026-10-31, now 2026-10-31T07:30Z, reader fixture> 2026-11-05 10:00 2026-11-05 13:00
+Window: Thursday 5 Nov 10:00 – 13:00 GMT.
+Data as of 07:30 GMT.
+Overall: No verdict: OUTLOOK only
+0 NOTAMs within 2 NM. 0 h assessed, 3 OUTLOOK, 0 too far.
+Flyable windows: no flyable window in this window.
+Sources:
+- weather source: ok
+- airspace source: ok
+- notams source: ok (PIB issued 2026-10-31 07:00 GMT)
+OUTLOOK hours (no verdict):
+- Thursday 5 Nov 10:00–13:00 GMT: OUTLOOK (no verdict). Trend: wind not forecast, gust not forecast, rain chance not forecast. Ask again on Monday 2 Nov.
+Assumptions:
+- rain chance not available
+- total cloud not available
+- wind direction not available

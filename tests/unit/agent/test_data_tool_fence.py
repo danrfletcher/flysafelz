@@ -34,7 +34,7 @@ def rule_numbers() -> set[float]:
 
 
 def test_the_tool_modules_are_found():
-    assert {p.name for p in TOOLS} >= {"weather_tool.py", "airspace_tool.py", "notams_tool.py", "common.py", "artifacts.py"}
+    assert {p.name for p in TOOLS} >= {"weather_tool.py", "airspace_tool.py", "notams_tool.py", "assess_tool.py", "common.py", "artifacts.py"}
 
 
 @pytest.mark.parametrize("path", NEW_MODULES, ids=lambda p: p.name)
@@ -60,3 +60,16 @@ def test_the_tool_modules_hold_no_number_but_0_and_1(path):
 def test_the_scan_sees_a_planted_literal():
     planted = ast.parse("limit = 17.5\n")
     assert unreviewed_literals(Path("weather_tool.py"), planted) == [(1, 17.5)]
+
+
+def test_the_assess_tool_never_builds_a_chat_model_or_reads_the_environment():
+    """F2/F6 for G12: the verdict tool takes the reader's model from the source cache like get_notams, and builds none of its own."""
+    path = SRC / "agent" / "tools" / "assess_tool.py"
+    names = {node.id for node in ast.walk(tree_of(path)) if isinstance(node, ast.Name)} | {node.attr for node in ast.walk(tree_of(path)) if isinstance(node, ast.Attribute)}
+    assert not names & {"ChatOpenAI", "init_chat_model", "reader_llm", "environ", "getenv"}
+    assert "read_chosen" in names  # the NOTAMs are read through the one shared reading step
+
+
+@pytest.mark.parametrize("module", ["assess.py", "notam_action.py"])
+def test_ticket_2s_modules_import_nothing_from_the_agent(module):
+    assert not [name for name in imported(SRC / module) if name == "flysafelz.agent" or name.startswith("flysafelz.agent.")]
