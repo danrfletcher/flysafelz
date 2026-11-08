@@ -92,7 +92,20 @@ def test_with_no_settings_it_names_every_missing_variable_and_builds_nothing(tmp
     assert code == 1 and out.getvalue() == ""
     message = err.getvalue()
     assert message.count("\n") == 1
-    for name in ("AGENT_BASE_URL", "AGENT_MODEL", "AGENT_API_KEY", "READER_PROVIDER", "READER_BASE_URL", "READER_API_KEY", "READER_MODEL", "LANGSMITH_API_KEY"):
+    for name in (
+        "AGENT_BASE_URL",
+        "AGENT_MODEL",
+        "AGENT_API_KEY",
+        "READER_PROVIDER",
+        "READER_BASE_URL",
+        "READER_API_KEY",
+        "READER_MODEL",
+        "JUDGE_PROVIDER",
+        "JUDGE_BASE_URL",
+        "JUDGE_API_KEY",
+        "JUDGE_MODEL",
+        "LANGSMITH_API_KEY",
+    ):
         assert name in message
     assert "nothing was built, sent or written" in message
     assert "uv run --env-file .env python -m evals.agent.run_v1" in message and "or in .env" not in message  # the agent reads AGENT_* from the environment only
@@ -106,7 +119,18 @@ def test_only_the_variables_that_are_missing_are_named(tmp_path):
     code = run_v1.main([], environ=environ, stderr=err, graph_factory=never, client_factory=never, data_dir=built.data_dir, root=built.root, cache_dir=tmp_path / "c")
     assert code == 1
     assert "AGENT_MODEL" in err.getvalue() and "LANGSMITH_API_KEY" in err.getvalue()
-    assert "AGENT_API_KEY" not in err.getvalue() and "READER_" not in err.getvalue()
+    assert "AGENT_API_KEY" not in err.getvalue() and "READER_" not in err.getvalue() and "JUDGE_" not in err.getvalue()
+
+
+def test_missing_judge_settings_are_named_when_the_experiment_starts_before_anything_is_built(tmp_path):
+    """5a PR-7.F1: the judge's JUDGE_* settings are checked with the others, so a run never starts and then finds the judge cannot be built."""
+    built = write_dataset(tmp_path)
+    environ = {k: v for k, v in FAKE_ENV.items() if k not in ("JUDGE_MODEL", "JUDGE_API_" + "KEY")}
+    err = io.StringIO()
+    code = run_v1.main([], environ=environ, stderr=err, graph_factory=never, client_factory=never, data_dir=built.data_dir, root=built.root, cache_dir=tmp_path / "c")
+    assert code == 1 and "JUDGE_MODEL" in err.getvalue() and "JUDGE_API_" + "KEY" in err.getvalue()
+    assert "JUDGE_PROVIDER" not in err.getvalue() and "AGENT_" not in err.getvalue().split("(")[0]
+    assert not (tmp_path / "c").exists()
 
 
 def test_an_agent_url_that_is_not_a_url_is_named(tmp_path):
