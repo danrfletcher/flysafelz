@@ -8,9 +8,11 @@ datums, every NOTAM with its action, and the GeoJSON Features the map draws. Bot
     AirspaceArtifact  get_airspace: findings, the lowest ceiling over the LZ, the notes
     NotamsArtifact    get_notams: the counts and one entry per NOTAM
     AssessArtifact    assess: every segment with its display string, conditions, cautions and NOTAM actions, the overall verdict, the flyable spans and the counts
+    GuidanceArtifact  search_guidance: the query and the chunks that came back, each with its document, edition, section number, title and text
 
 The first three carry `source` (its state, reason, fetch time and the manual check), the window in UTC, and `overlays` (the LZ's local-area circle
-and, for the two that have shapes, the features to draw). `assess` carries all three sources in `sources` instead, since it judges them together.
+and, for the two that have shapes, the features to draw). `assess` carries all three sources in `sources` instead, since it judges them together. The guidance artifact has no source, window or overlays: it is
+published text, not a reading of the landing zone.
 """
 
 from datetime import datetime
@@ -305,3 +307,24 @@ class AssessArtifact(_Model):
     assumptions: list[str]
     fetched_at: AwareDatetime | None
     data_as_of: str | None
+
+
+# --- search_guidance ------------------------------------------------------------------------------------------------
+
+
+class GuidanceChunk(_Model):
+    """One chunk of published guidance as the tool printed it. The guard treats `section` as a section number a tool printed (FR6)."""
+
+    document: str
+    edition: str
+    section: str
+    title: str
+    text: str
+
+
+class GuidanceArtifact(_Model):
+    """What `search_guidance` returns beside its text: the query and the chunks that came back, best first. `chunks` is empty when nothing was found or the search could not run."""
+
+    tool: Literal["search_guidance"] = "search_guidance"
+    query: str
+    chunks: list[GuidanceChunk]

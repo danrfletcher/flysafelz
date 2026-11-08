@@ -108,7 +108,7 @@ def test_a_missing_embedding_model_is_an_error_not_a_download(tmp_path, capsys):
 
 
 def test_the_model_loader_never_asks_fastembed_to_download():
-    source = (SRC / "guidance" / "ingest.py").read_text(encoding="utf-8")
+    source = (SRC / "guidance" / "embedder.py").read_text(encoding="utf-8")  # the one place the model is built; ingest.py and index.py call it
     calls = [n for n in ast.walk(ast.parse(source)) if isinstance(n, ast.Call) and getattr(n.func, "id", "") == "TextEmbedding"]
     assert len(calls) == 1
     assert {k.arg: ast.literal_eval(k.value) for k in calls[0].keywords if k.arg == "local_files_only"} == {"local_files_only": True}
@@ -167,7 +167,10 @@ def test_the_settings_file_holds_the_band_and_top_k():
     assert SETTINGS.chunk_tokens_min < SETTINGS.chunk_tokens_max
 
 
-@pytest.mark.parametrize("path", sorted((SRC / "guidance").glob("*.py")), ids=lambda p: p.name)
+SEARCH_CODE = [*sorted((SRC / "guidance").glob("*.py")), SRC / "agent" / "tools" / "guidance_tool.py"]
+
+
+@pytest.mark.parametrize("path", SEARCH_CODE, ids=lambda p: p.name)
 def test_f7_no_literal_token_band_or_top_k_in_guidance(path):
     assert band_literals(path.read_text(encoding="utf-8"), settings_values()) == []
 
@@ -182,6 +185,90 @@ def test_f7_the_scan_catches_a_planted_literal(planted):
 
 def test_f7_the_ingest_reads_the_band_and_top_k_from_the_settings():
     source = (SRC / "guidance" / "ingest.py").read_text(encoding="utf-8")
-    for name in ("SETTINGS.chunk_tokens_min", "SETTINGS.chunk_tokens_max", "SETTINGS.top_k"):
+    for name in ("SETTINGS.chunk_tokens_min", "SETTINGS.chunk_tokens_max"):
         assert name in source
+    assert "SETTINGS.top_k" in (SRC / "guidance" / "eval.py").read_text(encoding="utf-8")  # the gate scores through eval.hit4_of_index, which reads top_k
     assert ingest.SETTINGS is SETTINGS and ingest.CHUNKER_VERSION == SETTINGS.chunker_version
+
+
+# --- PR-8: the search side (G13, G18, G19) ---------------------------------------------------------------------------
+
+
+def sqlite_connections(source: str) -> list[ast.Call]:
+    return [n for n in ast.walk(ast.parse(source)) if isinstance(n, ast.Call) and ast.unparse(n.func) in ("sqlite3.connect", "connect")]
+
+
+def writers_of_sqlite(src: Path) -> dict[str, int]:
+    """Calls of sqlite3.connect in guidance/ and agent/ that do not open the file read-only (`mode=ro` in the URI), by file."""
+    found: dict[str, int] = {}
+    for folder in ("guidance", "agent"):
+        for path in sorted((src / folder).rglob("*.py")):
+            bad = [c for c in sqlite_connections(path.read_text(encoding="utf-8")) if "mode=ro" not in ast.unparse(c)]
+            if bad:
+                found[path.relative_to(src).as_posix()] = len(bad)
+    return found
+
+
+def test_g18_only_the_ingest_writer_opens_a_sqlite_file_for_writing():
+    """`corpus.write_embeddings` is the one write-mode connect; `make guidance` (ingest.py) is its only caller. The index, the eval, the embedder and the agent open nothing for writing."""
+    assert writers_of_sqlite(SRC) == {"guidance/corpus.py": 1}
+    callers = [p.relative_to(SRC).as_posix() for p in sorted(SRC.rglob("*.py")) if "write_embeddings(" in p.read_text(encoding="utf-8") and p.name != "corpus.py"]
+    assert callers == ["guidance/ingest.py"]
+
+
+@pytest.mark.parametrize("where", ["guidance/index.py", "agent/tools/guidance_tool.py"])
+def test_g18_a_planted_write_mode_connect_is_caught(tmp_path, where):
+    (tmp_path / where).parent.mkdir(parents=True)
+    (tmp_path / where).write_text("import sqlite3\nconnection = sqlite3.connect('embeddings.sqlite')\n", encoding="utf-8")
+    assert writers_of_sqlite(tmp_path) == {where: 1}
+
+
+def test_g18_a_read_only_connect_is_not_a_writer(tmp_path):
+    (tmp_path / "guidance").mkdir()
+    (tmp_path / "guidance" / "index.py").write_text("import sqlite3\nconnection = sqlite3.connect(f'{uri}?mode=ro', uri=True)\n", encoding="utf-8")
+    assert writers_of_sqlite(tmp_path) == {}
+
+
+def test_f1_search_guidance_is_the_one_tool_this_pr_adds():
+    names = []
+    for path in sorted((SRC / "agent" / "tools").glob("*.py")):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Call) and ast.unparse(node.func) == "tool" and node.args and isinstance(node.args[0], ast.Constant):
+                names.append(node.args[0].value)
+    assert sorted(names) == ["assess", "get_airspace", "get_notams", "get_weather", "search_guidance"]
+
+
+def test_f5_load_search_and_eval_never_ask_fastembed_to_download(tmp_path, monkeypatch, capsys):
+    """The embedder factory is replaced by one that fails on any call that is not `local_files_only=True` with a cache folder; load, search and the eval command all go through it."""
+    from factories import guidance_chunk, write_questions, write_snapshot
+    from guidance_helpers import FakeEmbedder
+
+    from flysafelz.guidance import embedder
+    from flysafelz.guidance import eval as guidance_eval
+    from flysafelz.guidance.index import load_index
+
+    built = []
+
+    def refuses_to_download(model, *, cache_dir=None, local_files_only=False, **rest):
+        assert local_files_only is True and cache_dir and not rest, "this call could download"
+        built.append(model)
+        return FakeEmbedder()
+
+    monkeypatch.setattr(embedder, "TextEmbedding", refuses_to_download)
+    write_snapshot(tmp_path / "data", [guidance_chunk("a", "1", "alpha beta"), guidance_chunk("a", "2", "gamma delta")])
+    loaded = load_index(tmp_path / "data")
+    assert built == [] and [c.section for c in loaded.search("alpha beta", 4)] == ["1", "2"] and built == [SETTINGS.embedding_model]
+    questions = write_questions(tmp_path / "q.yaml", ("alpha beta", [("a", "1")]))
+    assert guidance_eval.main(["--data-dir", str(tmp_path / "data"), "--questions", str(questions)]) == 0
+    assert "hit@4: 1/1 (100%)" in capsys.readouterr().out and built == [SETTINGS.embedding_model] * 2
+
+
+def test_f5_an_empty_model_folder_raises_the_make_setup_message_for_the_settings_factory(tmp_path, monkeypatch):
+    from flysafelz.guidance import embedder
+
+    empty = tmp_path / "model-cache"
+    empty.mkdir()
+    monkeypatch.setattr(embedder, "embedding_folder", lambda: empty)
+    with pytest.raises(EmbeddingModelMissing, match="embedding model missing: run make setup"):
+        embedder.load_settings_embedder()
+    assert list(empty.iterdir()) == []

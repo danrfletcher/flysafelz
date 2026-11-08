@@ -16,6 +16,7 @@ Python 3.12 with `uv` · LangGraph + LangChain v1 · LangSmith (traces, datasets
 make setup   # uv sync; needs no API key
 make test    # uv run pytest, with sockets disabled
 make eval-reader   # the reader eval: the only target that calls the model, so it needs the READER_* settings
+make eval-guidance # hit@4 of guidance search on evals/guidance/questions.yaml; needs the embedding model `make setup` stored, no key, no network
 ```
 
 Copy `.env.example` to `.env` for the openAIP key when fixtures are captured later. `.env` is gitignored. The NOTAM reader's model endpoint is four more lines in the same file (or in the environment, which wins): `READER_PROVIDER`, `READER_BASE_URL`, `READER_API_KEY` and `READER_MODEL`, any OpenAI-compatible endpoint. All four are required and nothing falls back to a default; only `src/flysafelz/reader/config.py` reads them, and only when the reader is first used. `make test` never needs them.
@@ -84,6 +85,23 @@ Every threshold lives in `src/flysafelz/rules.yaml` with its source and confiden
 | reader_area_slack_nm | 1 | NM | > | Ticket 3 Q4 (Dan); 4 archived PIBs (4 Jul, 22 Aug, 19 Sep, 31 Oct 2026): the area in the E text is never more than 1 NM outside the Q-circle | educated guess | A NOTAM area built from the E text that reaches further than this outside the Q-circle is treated as a parser miss and replaced by the Q-circle. Exactly this far out is kept. |
 
 Confidence is `sourced` (a citable document), `best practice` (common practice, not one citation) or `educated guess` (our own call). Limits cannot be changed by the user.
+
+## Guidance search and its eval
+
+`search_guidance` returns the four passages of the published guidance (`data/guidance/embeddings.sqlite`, written only by `make guidance`) most like a question, each as `<document> <edition> §<section> <title>` and its text. The embedding model is loaded from the folder `make setup` filled, with local files only; it is built at the first search, not at start-up, and nothing is ever downloaded. If the stored corpus key differs from the one computed from `manifest.yaml`, the model name and the chunker version, the passages are embedded again in memory with a warning that names both keys, and the file is left as it is.
+
+`make eval-guidance` scores that search against `evals/guidance/questions.yaml`. It prints `hit@4: <hits>/<n> (<percent>)`, one line per miss (the question, every place it expected, and the four places that came back) and the corpus key. It exits 0 whatever the score: whether to promote a new snapshot is decided by `make guidance`, which uses the same scorer. With no questions it prints `hit@4 not run: no labels`. A malformed file, or an expected document that `data/guidance/sources.yaml` does not list, exits non-zero and names the question or document.
+
+The format of `questions.yaml`: a list of questions, each with `question` and `expected`, a list of `{document, section}` with the section as printed in the document:
+
+```
+- question: What is a danger area?
+  expected:
+    - {document: cap1535, section: "3.2"}
+    - {document: cap2562, section: "4.1"}
+```
+
+A question is a hit when any of the four passages returned is in the same document as any `expected` entry and in that section or a subsection of it (`3.2` matches `3.2` and `3.2.1`, not `3.20` or `13.2`). The questions may be drafted by a model that has not seen the corpus, but Dan writes every expected section; no model ever drafts one.
 
 ## Limitations
 

@@ -1,4 +1,4 @@
-.PHONY: setup test fixtures eval-reader guidance
+.PHONY: setup test fixtures eval-reader guidance eval-guidance
 
 # Needs no API key: installs the project and its dependencies, then stores the embedding model (name and folder from
 # src/flysafelz/agent/settings.yaml, the folder git-ignored) so the app never downloads at runtime. A second run downloads
@@ -8,7 +8,7 @@ setup:
 	uv run python -m flysafelz.guidance.embedding_model
 
 # Runs the whole suite with sockets disabled (see addopts in pyproject.toml).
-# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model) and time-text modules must stay at 90% line coverage or better (the modules together).
+# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess, search_guidance and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model, embedder, search index, eval) and time-text modules must stay at 90% line coverage or better (the modules together).
 test:
 	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov-report=term-missing --cov-fail-under=90
 
@@ -35,3 +35,10 @@ eval-reader:
 # the model). GUIDANCE_SOURCES=<file> reads a different register. `make test` never runs it.
 guidance:
 	@uv run python -m flysafelz.guidance.ingest
+
+# Scores guidance search against Dan's labelled questions in evals/guidance/questions.yaml: prints hit@4, one line per miss (the question, every place it
+# expected, the four places that came back) and the corpus key. It always exits 0 on a score, whatever it is (`make guidance` owns the promote decision); it
+# exits non-zero for a questions file that is malformed, an expected document that sources.yaml does not list, a missing index or an embedding model that
+# `make setup` has not stored. With no questions it prints "hit@4 not run: no labels". It reads the embedding model from the folder `make setup` filled and never downloads.
+eval-guidance:
+	@uv run python -m flysafelz.guidance.eval

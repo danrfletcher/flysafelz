@@ -6,6 +6,7 @@
 weather, airspace and NOTAMs at once). Nothing is faked but the model and what the caller puts in the SourceCache (its fetcher and its reader model).
 """
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -13,6 +14,7 @@ from typing import Any
 from fakes import FakeToolChatModel
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.tools import BaseTool
 from langgraph.checkpoint.memory import InMemorySaver
 
 from flysafelz.agent.input_check import check_input
@@ -61,10 +63,11 @@ def run_tools(
     lz: dict[str, float] | None = None,
     tz: str | None = "Europe/London",
     thread_id: str = "thread-1",
+    extra_tools: Sequence[BaseTool] = (),
 ) -> ToolRun:
     """Send one turn through a graph whose model asks for `steps` in turn and then says "done."; return what the tools did."""
     ctx = ctx or RunContext(now=BLUE_MILL_NOW, case="blue_mill_2026-10-31")
-    tools = {"get_weather": build_get_weather(source_cache), "get_airspace": build_get_airspace(source_cache), "get_notams": build_get_notams(source_cache), "assess": build_assess(source_cache)}
+    tools = {"get_weather": build_get_weather(source_cache), "get_airspace": build_get_airspace(source_cache), "get_notams": build_get_notams(source_cache), "assess": build_assess(source_cache), **{t.name: t for t in extra_tools}}
     script = [AIMessage("", tool_calls=[{"name": name, "args": args, "id": f"call-{n}-{i}"} for i, (name, args) in enumerate(step)]) for n, step in enumerate(steps)]
     model = FakeToolChatModel(script=[*script, AIMessage("done.")])
     graph: Any = create_agent(model=model, tools=list(tools.values()), middleware=[check_input], state_schema=RequestState, context_schema=RunContext, checkpointer=InMemorySaver())
