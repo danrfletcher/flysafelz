@@ -2,15 +2,26 @@
 
 Parsed NOTAMs come from PR-4's `parsed()` (tests/unit/pib_helpers.py); readings are written by
 hand. No fixture file, no network, no .env.
+
+Guidance search tests (index, search_guidance, eval, gate) build their snapshots here too:
+    FakeEmbedder                  bag-of-words hashing into a fixed-dimension vector (tests/guidance_helpers.py), so cosine ranking can be predicted; records its calls
+    EmbedderSpy                   an embedder factory that counts how many times it was asked to build the embedder
+    guidance_chunk(...)           one chunk of a document
+    write_snapshot(folder, ...)   a data folder as `make guidance` leaves it (manifest.yaml + embeddings.sqlite, and optionally sources.yaml), built by PR-7's own writers
 """
 
+import hashlib
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 
+import yaml
+from guidance_helpers import FakeEmbedder
 from pib_helpers import parsed as pib_parsed
 from weather_helpers import calm
 
+from flysafelz.agent.settings import SETTINGS
 from flysafelz.assess import assess, default_window
 from flysafelz.clients.open_meteo import Forecast
 from flysafelz.clients.openaip import Airspace, AirspaceFetch
@@ -35,6 +46,8 @@ from flysafelz.contracts import (
     SourceStatus,
 )
 from flysafelz.geo import distance_nm
+from flysafelz.guidance import corpus
+from flysafelz.guidance.chunker import Chunk
 from flysafelz.notam_action import ActionSegment, LandingZone, notam_action
 from flysafelz.notam_area import NoArea, Shape, area_from_item_e
 from flysafelz.pib import PibResult
@@ -313,4 +326,71 @@ def run_assess(
 def wind(mph: float) -> dict[str, float]:
     """Calm weather with the 10 m wind at mph and a gust 2 mph above it (spread 2), and 80 m / 120 m wind kept near it."""
     return {"wind_10m": mph, "gust_10m": mph + 2, "wind_80m": mph + 1, "wind_120m": mph + 2}
+
+
+
+# --- guidance snapshots ---------------------------------------------------------------------------------------------------
+
+
+class EmbedderSpy:
+    """An embedder factory (what `load_index(embedder_factory=...)` takes) that counts the times it is called and hands out the same embedder every time."""
+
+    def __init__(self, embedder: object | None = None, error: Exception | None = None) -> None:
+        self.embedder = FakeEmbedder() if embedder is None else embedder
+        self.error = error
+        self.constructed = 0
+
+    def __call__(self) -> object:
+        self.constructed += 1
+        if self.error is not None:
+            raise self.error
+        return self.embedder
+
+
+def guidance_chunk(doc: str, section: str, text: str, *, title: str = "", edition: str = "1") -> Chunk:
+    """One chunk. The title defaults to one derived from the section so every chunk has one."""
+    return Chunk(doc, edition, section, title or f"Part {section}", text, hashlib.sha256(text.encode("utf-8")).hexdigest())
+
+
+def write_snapshot(
+    folder: Path,
+    chunks: Sequence[Chunk],
+    *,
+    embedder: object | None = None,
+    model: str = SETTINGS.embedding_model,
+    chunker_version: int = SETTINGS.chunker_version,
+    stored_key: str | None = None,
+    link_only: Sequence[str] = (),
+    register: bool = True,
+) -> str:
+    """Write `manifest.yaml` and `embeddings.sqlite` (and `sources.yaml` when `register`) into `folder` with PR-7's writers; return the corpus key computed from the manifest.
+
+    `stored_key` is what the embeddings file says its key is (default: the computed one). The model and chunker version default to settings.yaml's, so a snapshot's key matches what `load_index` computes. `link_only` are document ids the register marks `indexed: false`;
+    they get no chunks of their own here unless `chunks` has some (a test of the read-side filter puts them there on purpose).
+    """
+    folder.mkdir(parents=True, exist_ok=True)
+    embedder = FakeEmbedder() if embedder is None else embedder
+    docs = sorted({c.doc for c in chunks})
+    editions = {c.doc: c.edition for c in chunks}
+    documents = [{"id": d, "edition": editions[d], "sha256": hashlib.sha256(d.encode()).hexdigest()} for d in docs]
+    manifest = {"corpus_key": "", "model": model, "chunker_version": chunker_version, "documents": documents}
+    key = corpus.corpus_key(manifest, model, chunker_version)
+    manifest["corpus_key"] = key
+    corpus.write_manifest(folder / corpus.MANIFEST_NAME, manifest)
+    vectors = [list(v) for v in embedder.embed([c.text for c in chunks])] if chunks else []  # type: ignore[attr-defined]
+    corpus.write_embeddings(folder / corpus.EMBEDDINGS_NAME, chunks, vectors, {"corpus_key": key if stored_key is None else stored_key, "model": model, "chunker_version": str(chunker_version)})
+    if register:
+        entries = [
+            {"id": d, "title": d.title(), "url": f"https://docs.test/{d}.pdf", "edition": editions.get(d, "1"), "licence": "test", "review_date": "2026-11-07", "indexed": d not in link_only}
+            for d in sorted({*docs, *link_only})
+        ]
+        (folder / "sources.yaml").write_text(yaml.safe_dump({"documents": entries}, sort_keys=False), encoding="utf-8")
+    return key
+
+
+def write_questions(path: Path, *questions: tuple[str, Sequence[tuple[str, str]]]) -> Path:
+    """Write labelled questions: (question, [(document, section), ...])."""
+    entries = [{"question": q, "expected": [{"document": d, "section": s} for d, s in expected]} for q, expected in questions]
+    path.write_text(yaml.safe_dump(entries, sort_keys=False), encoding="utf-8")
+    return path
 

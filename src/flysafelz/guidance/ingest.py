@@ -11,7 +11,8 @@ One run, in order:
      Otherwise read the PDF, split it into chunks and keep them in memory. A download or PDF that fails never stops the run (the current snapshot is kept, or the
      document is named as missing on a first run). A PDF with no section headings does stop it.
   3. If nothing changed, stop. Otherwise write the changed documents' section files, the new manifest and the embeddings of every chunk into `staging/`.
-  4. Run hit@4 on staging and on the current snapshot with the same questions. Staging fewer hits than current: exit 1, naming each question that went from hit to miss.
+  4. Run hit@4 on staging and on the current snapshot with the same questions, through index.py's search and eval.py's `hit4_of_index`: the code the app and
+     `make eval-guidance` use, so the gate and the eval cannot disagree. Staging fewer hits than current: exit 1, naming each question that went from hit to miss.
      No questions: promote and say "hit@4 not run: no labels". No current snapshot (a first run): current counts as 0.
   5. Promote by rename, the manifest last, so a crash leaves the old manifest and key consistent with the old embeddings; an error rolls the renames back.
 This is the only module in `guidance/` and `agent/` that imports httpx, and it runs only from the command: importing it does nothing.
@@ -22,19 +23,21 @@ import os
 import shutil
 import sqlite3
 import sys
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 import httpx
-from fastembed import TextEmbedding
 
 from flysafelz.agent.settings import SETTINGS, embedding_folder, repository_root
 from flysafelz.guidance import corpus
 from flysafelz.guidance.chunker import Chunk, NoHeadingsError, PdfUnreadable, chunk_pages, read_pdf_pages
 from flysafelz.guidance.corpus import EMBEDDINGS_NAME, MANIFEST_NAME, CorpusError
-from flysafelz.guidance.hit4 import Hit4Result, Question, QuestionsError, describe_misses, load_questions, rank, regressions, run_hit4
+from flysafelz.guidance.embedder import Embedder, EmbeddingModelMissing, load_embedder
+from flysafelz.guidance.eval import hit4_of_index
+from flysafelz.guidance.hit4 import Question, QuestionsError, describe_misses, load_questions, regressions
+from flysafelz.guidance.index import GuidanceIndex, load_index
 from flysafelz.guidance.sources import Source, SourcesError, indexed, load_sources, url_is_allowed
 
 # Bump this when the chunker's rules change (chunker.py's docstring lists them); the value lives in settings.yaml with the other knobs.
@@ -50,11 +53,6 @@ DOWNLOAD_LIMIT_BYTES = 200_000_000  # a document larger than this is treated as 
 PDF_END_MARKER = b"%%EOF"
 PDF_END_WINDOW_BYTES = 1024  # a complete PDF ends with the marker within this many bytes of its end
 USER_AGENT = "FlySafeLZ guidance ingest"
-MISSING_MESSAGE = "embedding model missing: run make setup"
-
-
-class EmbeddingModelMissing(RuntimeError):
-    """The embedding model is not stored in the model folder; `make setup` stores it. It is never downloaded here (F5)."""
 
 
 class DownloadFailed(Exception):
@@ -69,26 +67,10 @@ class IngestStop(Exception):
     """The run cannot go on and nothing is promoted. The message has already been printed."""
 
 
-class Embedder(Protocol):
-    """The two methods of fastembed's TextEmbedding that are used. Vectors are sequences of numbers."""
-
-    def embed(self, documents: Iterable[str], **kwargs: Any) -> Iterable[Any]: ...
-
-    def query_embed(self, query: Iterable[str], **kwargs: Any) -> Iterable[Any]: ...
-
-
 @dataclass(frozen=True)
 class PromotePlan:
     replaced: list[str]  # documents whose section folder staging brings
     dropped: list[str]  # documents that are in the old manifest and no longer indexed
-
-
-def load_embedder(model_name: str, folder: Path) -> Embedder:
-    """The embedding model from the folder `make setup` filled. Raises EmbeddingModelMissing if it is not there; never downloads."""
-    try:
-        return TextEmbedding(model_name, cache_dir=str(folder), local_files_only=True)
-    except ValueError as error:  # fastembed's "could not load model from any source" for a model that is not stored here
-        raise EmbeddingModelMissing(MISSING_MESSAGE) from error
 
 
 def fetch(client: httpx.Client, source: Source) -> bytes:
@@ -119,10 +101,9 @@ def fetch(client: httpx.Client, source: Source) -> bytes:
     return data
 
 
-def _vectors(embedder: Embedder, texts: list[str], *, query: bool) -> list[tuple[float, ...]]:
-    """One vector per text, passed through float32 so it equals what is stored and read back."""
-    raw = embedder.query_embed(texts) if query else embedder.embed(texts)
-    return [corpus.unpack_vector(corpus.pack_vector([float(x) for x in vector])) for vector in raw]
+def _vectors(embedder: Embedder, texts: list[str]) -> list[tuple[float, ...]]:
+    """One document vector per text, passed through float32 so it equals what is stored and read back."""
+    return [corpus.unpack_vector(corpus.pack_vector([float(x) for x in vector])) for vector in embedder.embed(texts)]
 
 
 def _snapshot_is_whole(data_dir: Path, entry: dict[str, Any]) -> bool:
@@ -130,18 +111,9 @@ def _snapshot_is_whole(data_dir: Path, entry: dict[str, Any]) -> bool:
     return folder.is_dir() and len(list(folder.glob("*.md"))) == entry["sections"]
 
 
-def _hit4(path: Path, questions: list[Question], embedder: Embedder, model: str) -> Hit4Result:
-    """hit@4 over the embeddings file at `path`. Its stored vectors are used when they come from this model; otherwise its texts are embedded again here."""
-    meta, rows = corpus.read_embeddings(path)
-    query_vectors = dict(zip((q.question for q in questions), _vectors(embedder, [q.question for q in questions], query=True), strict=True))
-    vectors = [row.vector for row in rows]
-    if meta.get("model") != model or (rows and len(rows[0].vector) != len(next(iter(query_vectors.values())))):
-        vectors = _vectors(embedder, [row.text for row in rows], query=False)
-
-    def search(question: str) -> list[tuple[str, str]]:
-        return [(rows[position].doc, rows[position].section) for position in rank(query_vectors[question], vectors, SETTINGS.top_k)]
-
-    return run_hit4(questions, search, SETTINGS.top_k)
+def _index_in(folder: Path, embedder: Embedder, model: str) -> GuidanceIndex:
+    """The search index over `folder`'s embeddings.sqlite and manifest.yaml: the same index and ranking the app searches with (index.py)."""
+    return load_index(folder, embedder_factory=lambda: embedder, model=model, chunker_version=CHUNKER_VERSION, apply_register=False)
 
 
 def promote(data_dir: Path, staging: Path, plan: PromotePlan, rename: Callable[[Path, Path], object] = os.replace) -> None:
@@ -321,7 +293,7 @@ def run_ingest(
     for doc, doc_chunks in fresh.items():
         corpus.write_section_files(staging / doc, doc_chunks)
     corpus.write_embeddings(
-        staging / EMBEDDINGS_NAME, chunks, _vectors(embedder, [chunk.text for chunk in chunks], query=False), {"corpus_key": key, "model": model, "chunker_version": str(CHUNKER_VERSION)}
+        staging / EMBEDDINGS_NAME, chunks, _vectors(embedder, [chunk.text for chunk in chunks]), {"corpus_key": key, "model": model, "chunker_version": str(CHUNKER_VERSION)}
     )
     corpus.write_manifest(staging / MANIFEST_NAME, new_manifest)
 
@@ -344,15 +316,16 @@ def _gate(data_dir: Path, staging: Path, questions: list[Question], embedder: Em
     if not questions:
         print("hit@4 not run: no labels")
         return True
-    candidate = _hit4(staging / EMBEDDINGS_NAME, questions, embedder, model)
+    candidate = hit4_of_index(_index_in(staging, embedder, model), questions)
     current_path = data_dir / EMBEDDINGS_NAME
     current = None
     baseline = "current none yet, counted as 0"
     if current_path.is_file():
-        try:
-            current = _hit4(current_path, questions, embedder, model)
+        current_index = _index_in(data_dir, embedder, model)
+        if current_index.available:
+            current = hit4_of_index(current_index, questions)
             baseline = f"current {current.hits}/{current.total}"
-        except sqlite3.Error:  # the same file _needs_rebuild treats as "rebuild": it holds no usable snapshot, so it counts as 0
+        else:  # the same file _needs_rebuild treats as "rebuild": it holds no usable snapshot, so it counts as 0
             baseline = "current snapshot unreadable, counted as 0"
     print(f"hit@4: staging {candidate.hits}/{candidate.total}, {baseline}")
     for line in describe_misses(candidate):
