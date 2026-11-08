@@ -119,13 +119,38 @@ describe('answer badges, NOTAM links and highlights through the app', () => {
     expect(await screen.findByRole('switch', { name: 'Answer overlays' })).toBeChecked()
   })
 
+  it('G14/G17: a NOTAM id clicked 50 ms after the answer lands, while the badges are still entering, highlights its shape and opens its text', async () => {
+    const { pick, user, map } = open(scriptOf(HIGHLIGHTS_RUN))
+    pick(BLUE_MILL)
+    const sheet = await chatAbout()
+    await user.click(within(sheet).getByRole('button', { name: FIRST_CHIP }))
+    await within(sheet).findByText(/Pilot's call this afternoon/, undefined, SLOW)
+    const badge = within(sheet).getByRole('list', { name: 'Verdict by time' }).querySelector('li')!
+    const shapesBefore = shapes(map).map((layer) => layer.options.weight)
+
+    // From here the clock is the test's: the 50 ms are advanced, and the badges, which began a moment ago, have not finished.
+    vi.useFakeTimers()
+    try {
+      act(() => void vi.advanceTimersByTime(50))
+      expect(badge.style.opacity).not.toBe('1')
+      const id = within(sheet).getAllByRole('button', { name: /^[A-Z]\d+\/\d+$/ })[0]
+      act(() => id.click())
+      expect(screen.getByRole('dialog', { name: `NOTAM ${id.textContent}` })).toHaveTextContent('01632 960003')
+      const weights = shapes(map).map((layer) => layer.options.weight!)
+      expect(weights).toHaveLength(shapesBefore.length)
+      expect(weights.filter((weight) => weight === Math.max(...weights))).toHaveLength(1) // the picked shape is drawn heavier
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('GP8: the follow-up has no badges and shows only the circle; turn 1 keeps its badges, and clicking them redraws turn 1’s highlights', async () => {
     const { pick, user, map } = open(scriptOf(HIGHLIGHTS_RUN), scriptOf(FOLLOW_UP_RUN))
     pick(BLUE_MILL)
     const sheet = await chatAbout()
     await user.click(within(sheet).getByRole('button', { name: FIRST_CHIP }))
     await within(sheet).findByText(/Pilot's call this afternoon/, undefined, SLOW)
-    const before = within(sheet).getByRole('list', { name: 'Verdict by time' }).innerHTML
+    const before = within(sheet).getByRole('list', { name: 'Verdict by time' }).textContent // the text, not the markup: the badges' enter animation is still settling
 
     await ask(user, sheet, 'What does that NOTAM mean?')
     await within(sheet).findByText(/parachutists land inside/, undefined, SLOW)
@@ -133,7 +158,7 @@ describe('answer badges, NOTAM links and highlights through the app', () => {
     const turns = within(sheet).getAllByRole('region', { name: 'Question and answer' })
     expect(turns).toHaveLength(2)
     expect(within(turns[1]).queryByRole('list', { name: 'Verdict by time' })).toBeNull()
-    expect(within(turns[0]).getByRole('list', { name: 'Verdict by time' }).innerHTML).toBe(before)
+    expect(within(turns[0]).getByRole('list', { name: 'Verdict by time' }).textContent).toBe(before)
     expect(circles(map)).toHaveLength(1)
     expect(shapes(map)).toHaveLength(0) // the latest turn has no overlays: only the circle
 

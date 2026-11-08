@@ -4,17 +4,27 @@ import { useSyncExternalStore } from 'react'
 export const DESKTOP_MIN_WIDTH = 768
 const QUERY = `(min-width: ${DESKTOP_MIN_WIDTH}px)`
 
+/** The media query, or null where there is none: no matchMedia (jsdom, an old browser) or one that throws. */
+function query(): MediaQueryList | null {
+  try {
+    return window.matchMedia?.(QUERY) ?? null
+  } catch {
+    return null
+  }
+}
+
 function subscribe(onChange: () => void): () => void {
-  const query = window.matchMedia?.(QUERY)
-  query?.addEventListener('change', onChange)
+  const list = query()
+  list?.addEventListener?.('change', onChange)
   window.addEventListener('resize', onChange)
   return () => {
-    query?.removeEventListener('change', onChange)
+    list?.removeEventListener?.('change', onChange)
     window.removeEventListener('resize', onChange)
   }
 }
 
-const isDesktop = () => (window.matchMedia ? window.matchMedia(QUERY).matches : window.innerWidth >= DESKTOP_MIN_WIDTH)
+// where the query cannot be read, the window width gives the same answer
+const isDesktop = () => query()?.matches ?? window.innerWidth >= DESKTOP_MIN_WIDTH
 
 /** True at 768 px and wider. */
 export function useIsDesktop(): boolean {

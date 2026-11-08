@@ -38,9 +38,10 @@ describe('F2: no analytics, no logging of answer text', () => {
 })
 
 describe('no half-wiring: nothing here belongs to a later PR', () => {
-  it('has no motion or extra chat dependency (leaflet-velocity is the wind layer’s, PR-9.F1): the LangGraph SDK and react-markdown are the chat PR’s, and the one Turf package is the point-in-polygon test', () => {
-    const later = /^(motion|framer-motion|vaul|rehype-raw|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
+  it('has `motion` as the one animation library (PR-12.F1) and no extra chat dependency (leaflet-velocity is the wind layer’s, PR-9.F1): the LangGraph SDK and react-markdown are the chat PR’s, and the one Turf package is the point-in-polygon test', () => {
+    const later = /^(framer-motion|vaul|rehype-raw|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
     expect(installed.filter((name) => later.test(name))).toEqual([])
+    expect(installed.filter((name) => /motion/.test(name))).toEqual(['motion'])
     expect(installed.filter((name) => name.startsWith('@langchain/'))).toEqual(['@langchain/langgraph-sdk'])
     expect(installed).toContain('react-markdown')
     expect(installed).toContain('leaflet-velocity') // the wind layer's particles, and the only wind dependency
@@ -97,12 +98,16 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(outside.sort()).toEqual(['components/ui/drawer.tsx', 'components/ui/sheet.tsx', 'map/fitLz.test.ts', 'map/fitLz.ts'])
   })
 
-  it('has no pin bounce (PR-12.F1 owns it); `overlays` and `assessment` are read by the chat store, the badge and link readers and the answer-overlay map code, and by nothing else', () => {
+  it('keeps every enter animation’s timing in src/lib/motion.ts and reads reduced motion in one hook; `overlays` and `assessment` are read by the chat store, the badge and link readers and the answer-overlay map code, and by nothing else', () => {
     const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
     const found = (pattern: RegExp) => sources.filter((path) => pattern.test(readUi(path)))
-    expect(found(word('bou', 'nce|@key', 'frames'))).toEqual([])
-    // reduced motion is read in one hook, for the wind layer's arrows (PR-9.F1); the pin and the rest have no motion to polish yet
-    expect(found(word('prefers-reduced-', 'motion'))).toEqual(['src/lib/usePrefersReducedMotion.ts'])
+    expect(found(word('visual', 'Duration|bou', 'nce:'))).toEqual(['src/lib/motion.ts'])
+    // the system setting is read in one hook (the wind layer, the rain layer and every enter animation use it), never by a component on its own
+    expect(found(word('prefers-reduced-', 'motion'))).toEqual(['src/hooks/useReducedMotion.ts'])
+    // the one setting feeds MotionConfig at the top of the app, so there is no second source for it
+    expect(readUi('src/App.tsx')).toMatch(/<MotionConfig reducedMotion=\{reducedMotion \? 'always' : 'never'\}>/)
+    expect(found(word('import\\s*\\{[^}]*useReduced', "Motion[^}]*\\}\\s*from 'motion/react'"))).toEqual([]) // not motion's own hook
+    expect(found(word('match', 'Media')).sort()).toEqual(['src/hooks/useReducedMotion.ts', 'src/lib/useIsDesktop.ts'])
     expect(found(word('overl', 'ays'))).toEqual([
       'src/App.tsx', // hands the open pin's turn to the map
       'src/chat/Answer.tsx', // says in a comment which ids are buttons
