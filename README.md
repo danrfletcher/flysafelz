@@ -103,6 +103,44 @@ The format of `questions.yaml`: a list of questions, each with `question` and `e
 
 A question is a hit when any of the four passages returned is in the same document as any `expected` entry and in that section or a subsection of it (`3.2` matches `3.2` and `3.2.1`, not `3.20` or `13.2`). The questions may be drafted by a model that has not seen the corpus, but Dan writes every expected section; no model ever drafts one.
 
+## Running the UI
+
+The UI is a React + Vite + TypeScript app in `ui/` (shadcn/ui, Tailwind, Leaflet), dark theme only. It needs Node 22 or newer and npm.
+
+```
+make dev       # the LangGraph server and the UI together; Ctrl-C stops both, and if either one exits the other is stopped
+make ui        # the UI alone; runs npm --prefix ui ci first when ui/node_modules is missing
+make test-ui   # lint, Vitest with coverage (no keys, no network), the production build, then scans of ui/dist for outside URLs, unbundled fonts and keys
+```
+
+Ports: the LangGraph server is on 2024 and the UI's dev server on 5173. `vite preview` (the built app) is on 4173. The server's CORS list names exactly 5173 and 4173, so Vite is set to `strictPort`: with 5173 taken, `make ui` stops with Vite's port error instead of moving to 5174. Free the port, or add the new origin with `FLYSAFELZ_UI_ORIGIN`.
+
+The one setting the browser reads is `VITE_API_URL`, where the LangGraph server is (default `http://localhost:2024`), plus an optional public basemap key (next section). Set `VITE_API_URL` in the environment when you start the UI, for example `VITE_API_URL=http://localhost:2025 make ui`. No key or model setting ever reaches the browser. The map opens on the whole UK over CARTO Dark Matter tiles, which work without a key (see "Basemap key (optional)", the next section).
+
+The map draws two layers from the server's read-only routes, each coloured by type: airspace below FL100 (`GET /map/airspace`; restricted and prohibited red with a light fill, danger orange, CTR, CTA and ATZ sky blue, every other type slate) and NOTAMs below FL100 (`GET /map/notams`; violet dashed, an "approx" label where the shape is the NOTAM's Q-line circle). "Below FL100" means the lower limit is under FL100: airspace by its openAIP lower limit (a floor exactly at FL100, 10,000 ft, is not below; ground, surface and above-ground floors count as below), NOTAMs by the Q-line lower flight level. Both routes are fetched on load and every 15 minutes while the page is open; there is no refresh button. The Layers button at the top right opens the switches, the legend and each layer's "updated HH:MM" (browser time zone), "stale" and "unavailable" notes. The switches' choices (airspace, NOTAMs, Answer overlays) are kept in this browser's local storage (key `flysafelz.layers.v1`), so a reload keeps them; conversations are still lost on reload. If the browser blocks or fills its storage, or the stored value is unreadable, the switches start on and still work for that visit.
+
+## Basemap key (optional)
+
+The app works with no key: the map uses CARTO Dark Matter tiles without one. CARTO's terms ask for a free key for the non-commercial tier, and its raster-tile docs say a request without a key may come back with an "API key required" watermark, so for regular use get one:
+
+1. Request the free key from CARTO at https://carto.com/basemaps/apikey/.
+2. Copy `ui/.env.example` to `ui/.env` (or `ui/.env.local`; both are git-ignored) and set `VITE_CARTO_KEY=<your key>`.
+3. Restart `make ui` or `make dev`. Vite reads the file only at start. The key goes into the tile URL as `?key=<your key>`.
+
+The key is public: it is built into the page and sent to the CARTO tile host only (never anywhere else, and the app never logs or stores it), so it is not a secret like the server's keys. The tests never need it; they run keyless whatever `ui/.env` holds.
+
+If the basemap tiles fail to load (no network, or CARTO refuses the key), the map shows its plain dark background, the Layers panel says "basemap unavailable" next to the basemap entry, and everything else (airspace, NOTAMs, clicking, the chat) keeps working. The note goes when a tile loads again, for example after you pan or zoom with the network back.
+
+## Data and licences
+
+- Open-Meteo: free API, non-commercial, CC BY 4.0. The map's wind layer is Open-Meteo's current 10 m wind on a 1 degree grid over the UK, fetched by the server (`GET /map/wind`, cached 3 h) and credited in the map's attribution. Its rain grid is the Rain layer's fallback: when RainViewer's index cannot be read, the layer shows Open-Meteo's current precipitation on the same 1 degree grid (a model, not radar; `GET /map/rain-grid`, cached 3 h). The browser never calls Open-Meteo.
+- RainViewer: free API, personal and educational use, the past 2 hours of radar frames, tiles to zoom 7 at most, and 100 requests a minute per IP. The map's Rain layer loops those frames from the browser (the index and tiles are the only calls the browser makes to RainViewer) and credits RainViewer, with a link, in the map's attribution.
+- openAIP: CC BY-NC 4.0, attribution required (openaip.net/legal).
+- NATS PIB: NATS (Services) Ltd terms for UK Aeronautical Information Products; no guarantee of accuracy or completeness, no liability accepted; the XML has no declared schema and may change at short notice.
+- CARTO basemap: CARTO Basemaps Terms (version 29 Sep 2026), free non-commercial tier up to 5M tile requests a month, CARTO and OpenStreetMap (ODbL) credit kept visible.
+
+This is a non-commercial demo; a production deployment would move to commercial plans (Open-Meteo API subscription, a licensed radar feed such as the Met Office's).
+
 ## Limitations
 
 - Airspace comes from openAIP only. It is not cross-checked against the official UK AIP, so a difference between the two will not be caught.

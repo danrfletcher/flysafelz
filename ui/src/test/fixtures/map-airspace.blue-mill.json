@@ -1,0 +1,217 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.12,
+              53.78
+            ],
+            [
+              -0.05,
+              53.78
+            ],
+            [
+              -0.05,
+              53.83
+            ],
+            [
+              -0.12,
+              53.83
+            ],
+            [
+              -0.12,
+              53.78
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff100000000000000000001",
+        "name": "BLUE MILL TEST ATZ",
+        "type": "atz",
+        "class": "D",
+        "lower": "SFC",
+        "upper": "2000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 2000,
+        "hours": "MON-FRI 0800-1700",
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.15,
+              53.76
+            ],
+            [
+              -0.02,
+              53.76
+            ],
+            [
+              -0.02,
+              53.85
+            ],
+            [
+              -0.15,
+              53.85
+            ],
+            [
+              -0.15,
+              53.76
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff100000000000000000002",
+        "name": "BLUE MILL TEST CTA",
+        "type": "cta",
+        "class": "D",
+        "lower": "1500 ft AMSL",
+        "upper": "4500 ft AMSL",
+        "lower_ft": 1500,
+        "upper_ft": 4500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.2,
+              53.7
+            ],
+            [
+              0.1,
+              53.7
+            ],
+            [
+              0.1,
+              53.9
+            ],
+            [
+              -0.2,
+              53.9
+            ],
+            [
+              -0.2,
+              53.7
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff100000000000000000003",
+        "name": "BLUE MILL FL100 FLOOR CTA",
+        "type": "cta",
+        "class": "C",
+        "lower": "FL100",
+        "upper": "FL245",
+        "lower_ft": 10000,
+        "upper_ft": 24500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.25,
+              53.65
+            ],
+            [
+              0.2,
+              53.65
+            ],
+            [
+              0.2,
+              53.95
+            ],
+            [
+              -0.25,
+              53.95
+            ],
+            [
+              -0.25,
+              53.65
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff100000000000000000004",
+        "name": "BLUE MILL TEST TMA ABOVE FL100",
+        "type": "tma",
+        "class": "A",
+        "lower": "FL105",
+        "upper": "FL195",
+        "lower_ft": 10500,
+        "upper_ft": 19500,
+        "hours": "H24",
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -4.2,
+              51.4
+            ],
+            [
+              -3.7,
+              51.4
+            ],
+            [
+              -3.7,
+              51.75
+            ],
+            [
+              -4.2,
+              51.75
+            ],
+            [
+              -4.2,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff100000000000000000005",
+        "name": "TESTVILLE RESTRICTED AREA",
+        "type": "restricted",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "5000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 5000,
+        "hours": null,
+        "action": null
+      }
+    }
+  ],
+  "updated_at": "2026-11-08T12:00:00Z",
+  "stale": false
+}

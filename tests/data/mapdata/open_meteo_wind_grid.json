@@ -1,0 +1,3005 @@
+[
+ {
+  "latitude": 61.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 45
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 82
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 119
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 156
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 193
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 230
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 267
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 304
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 341
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 18
+  }
+ },
+ {
+  "latitude": 61.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 55
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 74
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 111
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 148
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 185
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 222
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 259
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 296
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 333
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 10
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 47
+  }
+ },
+ {
+  "latitude": 60.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 84
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 103
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 140
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 177
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 214
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 251
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 288
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 325
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 2
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 39
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 76
+  }
+ },
+ {
+  "latitude": 59.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 113
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 132
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 169
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 206
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 243
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 280
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 317
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 354
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 31
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 68
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 105
+  }
+ },
+ {
+  "latitude": 58.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 142
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 161
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 198
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 235
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 272
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 309
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 346
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 23
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 60
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 97
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 134
+  }
+ },
+ {
+  "latitude": 57.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 171
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 190
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 227
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 264
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 301
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 338
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 15
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 52
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 89
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 126
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 163
+  }
+ },
+ {
+  "latitude": 56.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 200
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 219
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 256
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 293
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 330
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 7
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 0.0,
+   "wind_direction_10m": 0
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 81
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 118
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 155
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 192
+  }
+ },
+ {
+  "latitude": 55.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 229
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 248
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 285
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 322
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 359
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 36
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 73
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 110
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 147
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 184
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 221
+  }
+ },
+ {
+  "latitude": 54.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 258
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 277
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 314
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 351
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 28
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 65
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 102
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 139
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 176
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 213
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 250
+  }
+ },
+ {
+  "latitude": 53.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 287
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 306
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 343
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 20
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 57
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 94
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 131
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 168
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 205
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 242
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 279
+  }
+ },
+ {
+  "latitude": 52.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 316
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 335
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 12
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 49
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 86
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 123
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 160
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 197
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 234
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 271
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 308
+  }
+ },
+ {
+  "latitude": 51.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 345
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 4
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 41
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 78
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 115
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 152
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 189
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 226
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 263
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 300
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 337
+  }
+ },
+ {
+  "latitude": 50.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 14
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -8.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.0,
+   "wind_direction_10m": 33
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -7.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 8.7,
+   "wind_direction_10m": 70
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -6.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 1.5,
+   "wind_direction_10m": 107
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -5.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 4.2,
+   "wind_direction_10m": 144
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -4.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 6.9,
+   "wind_direction_10m": 181
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -3.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 9.6,
+   "wind_direction_10m": 218
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 2.4,
+   "wind_direction_10m": 255
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": -1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 5.1,
+   "wind_direction_10m": 292
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": 0.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 7.8,
+   "wind_direction_10m": 329
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": 1.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 10.5,
+   "wind_direction_10m": 6
+  }
+ },
+ {
+  "latitude": 49.0,
+  "longitude": 2.0,
+  "generationtime_ms": 0.05,
+  "utc_offset_seconds": 0,
+  "timezone": "GMT",
+  "timezone_abbreviation": "GMT",
+  "elevation": 0.0,
+  "current_units": {
+   "time": "iso8601",
+   "interval": "seconds",
+   "wind_speed_10m": "m/s",
+   "wind_direction_10m": "\u00b0"
+  },
+  "current": {
+   "time": "2026-11-08T12:00",
+   "interval": 900,
+   "wind_speed_10m": 3.3,
+   "wind_direction_10m": 43
+  }
+ }
+]

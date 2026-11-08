@@ -1,0 +1,769 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -4.2,
+              51.4
+            ],
+            [
+              -3.7,
+              51.4
+            ],
+            [
+              -3.7,
+              51.75
+            ],
+            [
+              -4.2,
+              51.75
+            ],
+            [
+              -4.2,
+              51.4
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000001",
+        "name": "TESTVILLE RESTRICTED AREA",
+        "type": "restricted",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "5000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 5000,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -1.5,
+              52.4
+            ],
+            [
+              -1.2,
+              52.4
+            ],
+            [
+              -1.2,
+              52.65
+            ],
+            [
+              -1.5,
+              52.65
+            ],
+            [
+              -1.5,
+              52.4
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000002",
+        "name": "EXAMPLEBY PROHIBITED AREA",
+        "type": "prohibited",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "2000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 2000,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -2.2,
+              54.6
+            ],
+            [
+              -1.5000000000000002,
+              54.6
+            ],
+            [
+              -1.5000000000000002,
+              55.0
+            ],
+            [
+              -2.2,
+              55.0
+            ],
+            [
+              -2.2,
+              54.6
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000003",
+        "name": "SAMPLE MOOR DANGER AREA",
+        "type": "danger",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "12000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 12000,
+        "hours": "by NOTAM",
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.4,
+              53.3
+            ],
+            [
+              0.09999999999999998,
+              53.3
+            ],
+            [
+              0.09999999999999998,
+              53.599999999999994
+            ],
+            [
+              -0.4,
+              53.599999999999994
+            ],
+            [
+              -0.4,
+              53.3
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000004",
+        "name": "TESTVILLE CTR",
+        "type": "ctr",
+        "class": "D",
+        "lower": "SFC",
+        "upper": "3500 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 3500,
+        "hours": null,
+        "action": "NO_FLY"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -0.9,
+              53.1
+            ],
+            [
+              0.4,
+              53.1
+            ],
+            [
+              0.4,
+              53.800000000000004
+            ],
+            [
+              -0.9,
+              53.800000000000004
+            ],
+            [
+              -0.9,
+              53.1
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000005",
+        "name": "TESTVILLE CTA 1",
+        "type": "cta",
+        "class": "D",
+        "lower": "1500 ft AMSL",
+        "upper": "4500 ft AMSL",
+        "lower_ft": 1500,
+        "upper_ft": 4500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -3.6,
+              55.0
+            ],
+            [
+              -3.35,
+              55.0
+            ],
+            [
+              -3.35,
+              55.2
+            ],
+            [
+              -3.6,
+              55.2
+            ],
+            [
+              -3.6,
+              55.0
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000006",
+        "name": "EXAMPLEBY ATZ",
+        "type": "atz",
+        "class": "D",
+        "lower": "SFC",
+        "upper": "2000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 2000,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -6.0,
+              56.6
+            ],
+            [
+              -4.8,
+              56.6
+            ],
+            [
+              -4.8,
+              57.4
+            ],
+            [
+              -6.0,
+              57.4
+            ],
+            [
+              -6.0,
+              56.6
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000007",
+        "name": "SAMPLE TMA 1",
+        "type": "tma",
+        "class": "D",
+        "lower": "FL65",
+        "upper": "FL95",
+        "lower_ft": 6500,
+        "upper_ft": 9500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              0.4,
+              52.7
+            ],
+            [
+              0.9,
+              52.7
+            ],
+            [
+              0.9,
+              53.1
+            ],
+            [
+              0.4,
+              53.1
+            ],
+            [
+              0.4,
+              52.7
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000008",
+        "name": "SAMPLE MATZ",
+        "type": "matz",
+        "class": "D",
+        "lower": "SFC",
+        "upper": "5000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 5000,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -2.9,
+              51.9
+            ],
+            [
+              -2.6,
+              51.9
+            ],
+            [
+              -2.6,
+              52.15
+            ],
+            [
+              -2.9,
+              52.15
+            ],
+            [
+              -2.9,
+              51.9
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000009",
+        "name": "SAMPLE RMZ",
+        "type": "rmz",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "2500 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 2500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -1.9,
+              50.9
+            ],
+            [
+              -1.5999999999999999,
+              50.9
+            ],
+            [
+              -1.5999999999999999,
+              51.199999999999996
+            ],
+            [
+              -1.9,
+              51.199999999999996
+            ],
+            [
+              -1.9,
+              50.9
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000010",
+        "name": "SAMPLE TMZ",
+        "type": "tmz",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "3000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 3000,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -5.2,
+              57.4
+            ],
+            [
+              -4.7,
+              57.4
+            ],
+            [
+              -4.7,
+              57.75
+            ],
+            [
+              -5.2,
+              57.75
+            ],
+            [
+              -5.2,
+              57.4
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000011",
+        "name": "SAMPLE OTHER AREA",
+        "type": "other",
+        "class": null,
+        "lower": "SFC",
+        "upper": "1500 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 1500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -3.9,
+              58.6
+            ],
+            [
+              -2.5,
+              58.6
+            ],
+            [
+              -2.5,
+              59.2
+            ],
+            [
+              -3.9,
+              59.2
+            ],
+            [
+              -3.9,
+              58.6
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000012",
+        "name": "SAMPLE CTA FL100 FLOOR",
+        "type": "cta",
+        "class": "D",
+        "lower": "FL100",
+        "upper": "FL245",
+        "lower_ft": 10000,
+        "upper_ft": 24500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -1.4,
+              56.9
+            ],
+            [
+              -0.19999999999999996,
+              56.9
+            ],
+            [
+              -0.19999999999999996,
+              57.5
+            ],
+            [
+              -1.4,
+              57.5
+            ],
+            [
+              -1.4,
+              56.9
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000013",
+        "name": "SAMPLE TMA ABOVE FL100",
+        "type": "tma",
+        "class": "D",
+        "lower": "FL105",
+        "upper": "FL195",
+        "lower_ft": 10500,
+        "upper_ft": 19500,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              1.0,
+              51.0
+            ],
+            [
+              1.6,
+              51.0
+            ],
+            [
+              1.6,
+              51.4
+            ],
+            [
+              1.0,
+              51.4
+            ],
+            [
+              1.0,
+              51.0
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000014",
+        "name": "SAMPLE TMA 300 M AGL",
+        "type": "tma",
+        "class": "D",
+        "lower": "984 ft AGL",
+        "upper": "4921 ft AMSL",
+        "lower_ft": 984,
+        "upper_ft": 4921,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -3.3,
+              52.7
+            ],
+            [
+              -2.3,
+              52.7
+            ],
+            [
+              -2.3,
+              53.5
+            ],
+            [
+              -3.3,
+              53.5
+            ],
+            [
+              -3.3,
+              52.7
+            ]
+          ],
+          [
+            [
+              -3.0,
+              52.9
+            ],
+            [
+              -3.0,
+              53.3
+            ],
+            [
+              -2.6,
+              53.3
+            ],
+            [
+              -2.6,
+              52.9
+            ],
+            [
+              -3.0,
+              52.9
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000015",
+        "name": "SAMPLE CTR WITH HOLE",
+        "type": "ctr",
+        "class": "D",
+        "lower": "SFC",
+        "upper": "4000 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 4000,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                -5.8,
+                54.3
+              ],
+              [
+                -5.5,
+                54.3
+              ],
+              [
+                -5.5,
+                54.5
+              ],
+              [
+                -5.8,
+                54.5
+              ],
+              [
+                -5.8,
+                54.3
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                -5.2,
+                54.5
+              ],
+              [
+                -4.95,
+                54.5
+              ],
+              [
+                -4.95,
+                54.7
+              ],
+              [
+                -5.2,
+                54.7
+              ],
+              [
+                -5.2,
+                54.5
+              ]
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000016",
+        "name": "SAMPLE DANGER TWO PARTS",
+        "type": "danger",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "2300 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 2300,
+        "hours": null,
+        "action": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -7.2,
+              52.6
+            ],
+            [
+              -6.8,
+              52.6
+            ],
+            [
+              -6.8,
+              52.9
+            ],
+            [
+              -7.2,
+              52.9
+            ],
+            [
+              -7.2,
+              52.6
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id": "fff000000000000000000099",
+        "name": "SAMPLE UNKNOWN KIND",
+        "type": "balloon_zone",
+        "class": "SUA",
+        "lower": "SFC",
+        "upper": "2300 ft AMSL",
+        "lower_ft": 0,
+        "upper_ft": 2300,
+        "hours": null,
+        "action": null
+      }
+    }
+  ],
+  "updated_at": "2026-11-08T12:00:00Z",
+  "stale": false
+}
