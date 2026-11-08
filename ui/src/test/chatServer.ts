@@ -64,8 +64,6 @@ export interface ChatServer {
   threads: string[]
   /** Every run request, in order. */
   runs: RunCall[]
-  /** The ids of the runs the browser asked the server to cancel. */
-  cancelled: string[]
   /** What `GET /threads/:id/state` says for a thread (the retry check). Absent: the thread has no stored answer. */
   stored: Map<string, Record<string, unknown>>
   /** The scripts the next run requests will use, first to last. The last one repeats. */
@@ -87,7 +85,7 @@ export function scriptOf(recording: Recording, options: Partial<RunScript> = {})
  */
 export function chatServer(...script: RunScript[]): ChatServer {
   const base = () => apiUrl()
-  const state: ChatServer = { threads: [], runs: [], cancelled: [], stored: new Map(), script, handlers: [] }
+  const state: ChatServer = { threads: [], runs: [], stored: new Map(), script, handlers: [] }
 
   state.handlers = [
     http.post(`${base()}/threads`, () => {
@@ -101,10 +99,9 @@ export function chatServer(...script: RunScript[]): ChatServer {
     }),
     http.post(`${base()}/threads/:threadId/history`, () => HttpResponse.json([])),
     http.get(`${base()}/threads/:threadId/history`, () => HttpResponse.json([])),
-    http.post(`${base()}/threads/:threadId/runs/:runId/cancel`, ({ params }) => {
-      state.cancelled.push(String(params.runId))
-      return new HttpResponse(null, { status: 202 })
-    }),
+    // The browser does not call this one: a run is cancelled by the stream's `on_disconnect: 'cancel'` (the tests read that from each run's body). Answered
+    // anyway, so a change in the SDK that did call it would not fail as an unmocked request.
+    http.post(`${base()}/threads/:threadId/runs/:runId/cancel`, () => new HttpResponse(null, { status: 202 })),
     http.post(`${base()}/threads/:threadId/runs/stream`, async ({ request, params }) => {
       const body = (await request.json()) as RunCall['body']
       const runId = `run-${state.runs.length + 1}`

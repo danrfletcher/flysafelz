@@ -1,4 +1,5 @@
 import { HOW_IT_WORKS } from '@/content/howItWorks'
+import { notamStyle } from '@/map/airspaceStyle'
 import type { RainState } from '@/map/useRain'
 import { WIND_BANDS, type WindBand } from '@/map/wind'
 
@@ -10,6 +11,8 @@ interface Row {
   label: string
   /** The swatch's classes. */
   swatch: string
+  /** An SVG dash pattern, for a swatch that must show the map line's own dashes: the swatch is then an outlined rectangle drawn with it. */
+  dash?: string
 }
 
 /** What the base layers look like (Q10). */
@@ -19,7 +22,8 @@ export const ON_THE_MAP: readonly Row[] = [
   { label: 'CTR, CTA or ATZ', swatch: `${OUTLINE} border-type-controlled` },
   { label: 'Other airspace', swatch: `${OUTLINE} border-type-other` },
   { label: 'NOTAM', swatch: `${OUTLINE} border-dashed border-type-notam` },
-  { label: 'NOTAM, approx (Q-line circle)', swatch: `${OUTLINE} border-dotted border-type-notam` },
+  // The map draws an approximate NOTAM with a short dash pattern (notamStyle), which a CSS border cannot copy, so this swatch draws that pattern itself.
+  { label: 'NOTAM, approx (Q-line circle)', swatch: 'h-3.5 w-6 shrink-0 stroke-type-notam', dash: notamStyle(true).dashArray },
 ]
 
 // Written out so Tailwind sees each class name.
@@ -69,7 +73,13 @@ function Rows({ rows }: { rows: readonly Row[] }) {
     <ul className="space-y-1">
       {rows.map((row) => (
         <li key={row.label} className="flex items-center gap-2">
-          <span className={row.swatch} aria-hidden="true" />
+          {row.dash ? (
+            <svg className={row.swatch} viewBox="0 0 24 14" aria-hidden="true">
+              <rect x="1" y="1" width="22" height="12" rx="2" fill="none" strokeWidth="2" strokeDasharray={row.dash} />
+            </svg>
+          ) : (
+            <span className={row.swatch} aria-hidden="true" />
+          )}
           <span>{row.label}</span>
         </li>
       ))}

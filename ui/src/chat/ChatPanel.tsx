@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 
 import { Answer } from '@/chat/Answer'
 import { Badges } from '@/chat/Badges'
-import { ERROR_TEXT, STARTER_CHIPS } from '@/chat/copy'
+import { ERROR_TEXT, STARTER_CHIPS, STOPPED_TEXT } from '@/chat/copy'
 import { ProgressLine } from '@/chat/ProgressLine'
 import { pinKey, type Sessions, type Turn } from '@/chat/turns'
 import { useLeaveWarning } from '@/chat/useLeaveWarning'
@@ -117,9 +117,9 @@ function Conversation({ point, sessions, onClose, onShowTurn, onShowNotam }: Con
           {last?.status === 'running' && <ProgressLine key={line ?? WORKING_TEXT} line={line ?? WORKING_TEXT} />}
         </div>
 
-        {last?.status === 'error' && (
-          <div role="alert" className="flex flex-wrap items-center gap-3 text-sm">
-            <p className="text-destructive">{ERROR_TEXT}</p>
+        {(last?.status === 'error' || last?.status === 'stopped') && (
+          <div role={last.status === 'error' ? 'alert' : undefined} className="flex flex-wrap items-center gap-3 text-sm">
+            <p className={last.status === 'error' ? 'text-destructive' : 'text-muted-foreground'}>{last.status === 'error' ? ERROR_TEXT : STOPPED_TEXT}</p>
             <button
               type="button"
               onClick={retry}

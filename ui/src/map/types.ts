@@ -1,5 +1,5 @@
 // The shapes of GET /map/airspace and GET /map/notams, read from the routes' own code (src/flysafelz/mapdata/airspace.py and
-// notams.py) and their recorded output (src/test/fixtures/map-airspace.json, map-notams.json). Both routes answer with one
+// notams.py) and made-up payloads shaped like their output (src/test/fixtures/map-airspace.json, map-notams.json; tests/unit/test_ui_map_layers.py checks them against the route code). Both routes answer with one
 // envelope: a GeoJSON FeatureCollection plus `updated_at` (ISO UTC) and `stale`.
 
 export type Position = [number, number] // [lon, lat], GeoJSON order

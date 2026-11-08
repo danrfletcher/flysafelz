@@ -3,7 +3,8 @@ import type { LatLon } from '@/pick/whatsHere'
 /** A turn's `assessment` or one overlay feature, exactly as the server sent it. This PR only keeps them; PR-6.F1 reads them. */
 export type Payload = Record<string, unknown>
 
-export type TurnStatus = 'running' | 'done' | 'error'
+/** `stopped` is a run the pilot ended by leaving (Change LZ, another pin): not a failure of the server, so it is not `error`. */
+export type TurnStatus = 'running' | 'done' | 'error' | 'stopped'
 
 /** One question and what came back for it. `assessment` and `overlays` stay with the turn they arrived with, and no later turn touches them. */
 export interface Turn {
@@ -56,6 +57,17 @@ export function readResult(values: unknown): TurnResult | null {
 }
 
 /**
+ * Like readResult, but only for the final state of a turn's run: the thread's last message must be the model's reply (an `ai` message), which code
+ * writes after the turn's input check. The first states of a later turn hold the new question and the PREVIOUS turn's `answer`, `guard` and
+ * `assessment` (input_check clears them only when it runs); their last message is the new question, so they read as no result.
+ */
+export function readFinalResult(values: unknown): TurnResult | null {
+  const messages = isRecord(values) ? values.messages : null
+  if (!Array.isArray(messages) || messages.at(-1)?.type !== 'ai') return null
+  return readResult(values)
+}
+
+/**
  * The conversations of this page load, one per pin, kept in memory only: a reload starts empty (Q8). It works with
  * `useSyncExternalStore`: `get(key)` returns the same object until that pin changes.
  */
@@ -68,6 +80,8 @@ export interface Sessions {
   resume(key: string, id: string): void
   complete(key: string, id: string, result: TurnResult): void
   fail(key: string, id: string): void
+  /** Marks a running turn as stopped: the pilot left before it finished. */
+  stop(key: string, id: string): void
   subscribe(listener: () => void): () => void
 }
 
@@ -93,6 +107,7 @@ export function createSessions(): Sessions {
     resume: (key, id) => changeTurn(key, id, (turn) => ({ ...turn, status: 'running' })),
     complete: (key, id, result) => changeTurn(key, id, (turn) => ({ ...turn, ...result, status: 'done' })),
     fail: (key, id) => changeTurn(key, id, (turn) => ({ ...turn, status: 'error' })),
+    stop: (key, id) => changeTurn(key, id, (turn) => ({ ...turn, status: 'stopped' })),
     subscribe: (listener) => {
       listeners.add(listener)
       return () => listeners.delete(listener)

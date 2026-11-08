@@ -23,7 +23,7 @@ import {
 import { rainIndexRoute } from '@/mocks/rain'
 import { server } from '@/test/setup'
 
-// The whole path for the "all heights" layers (PR-11.F1): the real App, the recorded stacked payloads served by MSW (any other request fails the
+// The whole path for the "all heights" layers (PR-11.F1): the real App, the synthetic stacked payloads served by MSW (any other request fails the
 // test), jsdom's storage, and "a reload" is unmount + render.
 
 const LOW_AIRSPACE = ALL_HEIGHTS_AIRSPACE.features.filter((f) => airspaceBelowFl100(f.properties)).length

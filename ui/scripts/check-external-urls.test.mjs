@@ -45,6 +45,11 @@ describe('urlProblems', () => {
     expect(urlProblems(dist({ 'index.js': js }))).toEqual([])
   })
 
+  it('skips the Leaflet attribution link with or without a path, and only that host', () => {
+    const js = '\'<a href="https://leafletjs.com">\' "https://leafletjs.com/" "https://leafletjs.com/reference.html"'
+    expect(urlProblems(dist({ 'index.js': js }))).toEqual([])
+  })
+
   it('skips the namespace, React error and Leaflet link strings that are never requested', () => {
     const js = '"http://www.w3.org/2000/svg" "https://react.dev/errors/31" \'<a href="https://leafletjs.com">\''
     expect(urlProblems(dist({ 'index.js': js }))).toEqual([])
@@ -79,6 +84,13 @@ describe('urlProblems', () => {
     'https://rainviewer.com.evil.example/x',
     'https://evil-rainviewer.com/x',
     'http://api.rainviewer.com.evil.example/x',
+    'https://leafletjs.com.evil.example/x',
+    'https://leafletjs.com.evil.example',
+    'https://leafletjs.comx/x',
+    `https://${['api', 'open-meteo.com'].join('.')}/v1/forecast`, // built from pieces: src/fence.test.ts forbids that host name written out in any file
+    `https://${['customer-api', 'open-meteo.com'].join('.')}/v1/forecast`,
+    'https://evil-open-meteo.com/x',
+    'https://open-meteo.com.evil.example/x',
   ])('fails on %s', (url) => {
     const problems = urlProblems(dist({ 'index.js': `fetch("${url}")` }))
     expect(problems).toHaveLength(1)

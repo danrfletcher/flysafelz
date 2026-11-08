@@ -135,7 +135,12 @@ describe('which features are drawn', () => {
 
 describe('colour comes from the type alone (E11)', () => {
   it('colours each airspace by type, and ignores an action on the feature', () => {
-    renderLayers()
+    // The real route sends `action: null` for every base-layer airspace (the fixture does too), so this one feature is given an action here:
+    // a made-up case, to show that if the server ever did send one the colour would still come from the type.
+    const withAction = AIRSPACE_FIXTURE.features.map((feature) =>
+      feature.properties.name === 'TESTVILLE CTR' ? { ...feature, properties: { ...feature.properties, action: 'NO_FLY' } } : feature,
+    )
+    renderLayers({ airspace: withAction })
     const byName = Object.fromEntries(airspaceShapes().map((layer) => [featureOf<AirspaceProps>(layer).properties.name, layer.options]))
     expect(byName['TESTVILLE RESTRICTED AREA']).toMatchObject({ color: RED, fillOpacity: 0.15 })
     expect(byName['EXAMPLEBY PROHIBITED AREA']).toMatchObject({ color: RED, fillOpacity: 0.15 })
@@ -144,7 +149,7 @@ describe('colour comes from the type alone (E11)', () => {
     expect(byName['SAMPLE TMA 1']).toMatchObject({ color: SLATE })
     expect(byName['SAMPLE MATZ']).toMatchObject({ color: SLATE })
     expect(byName['SAMPLE OTHER AREA']).toMatchObject({ color: SLATE })
-    // TESTVILLE CTR carries action NO_FLY in the fixture; it is still sky blue, the colour of a CTR.
+    // TESTVILLE CTR carries action NO_FLY in this test; it is still sky blue, the colour of a CTR.
     const ctr = airspaceShapes().find((layer) => featureOf<AirspaceProps>(layer).properties.name === 'TESTVILLE CTR')!
     expect(featureOf<AirspaceProps>(ctr).properties.action).toBe('NO_FLY')
     expect(ctr.options).toMatchObject({ color: SKY, fillOpacity: 0 })
