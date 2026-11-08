@@ -1,0 +1,6 @@
+$ env -i PATH HOME READER_DOTENV_PATH=<no such file> uv run python -m evals.agent.run_v1   (empty settings; the repo .env is not read)
+evals.agent.run_v1: missing settings: AGENT_BASE_URL, AGENT_MODEL, AGENT_API_KEY, READER_PROVIDER, READER_BASE_URL, READER_API_KEY, READER_MODEL, LANGSMITH_API_KEY (AGENT_* and LANGSMITH_API_KEY come from the environment only, this command does not read .env; to use one, run `uv run --env-file .env python -m evals.agent.run_v1`, as `make run` does); nothing was built, sent or written
+exit code: 1
+
+$ ls data/eval-cache   (no cache file made)
+ls: data/eval-cache: No such file or directory
