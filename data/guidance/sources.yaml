@@ -1,0 +1,42 @@
+# The guidance register (G16): the documents `make guidance` may fetch, split by section heading and embed.
+# Per document: id (also its folder under data/guidance/), title, url (https), edition, licence, review_date (YYYY-MM-DD) and indexed.
+# `indexed: false` is link-only: the document is named here and never downloaded, parsed or embedded.
+#
+# BEFORE THE FIRST REAL `make guidance` RUN (Vector, after merge): confirm the licence of each indexed document (the notes in `licence` say what was found),
+# and the BHPA licence before turning its `indexed` on. A url that stops working is not silent: the run names the document ("download failed (404)")
+# and leaves it out of the index, and hit@4 shows the gap. The CAA's /media/<hash>/ links change when a new version is uploaded; each page below
+# links to the current file.
+documents:
+  # Version 4 of the Skyway Code, page https://www.caa.co.uk/cap1535 (the print file "cap1535p.pdf"; the on-screen file is /media/b5jd2xk3/cap1535s.pdf).
+  - id: cap1535
+    title: "CAP 1535: The Skyway Code (airspace, NOTAM and danger-area sections)"
+    url: https://www.caa.co.uk/media/3lxhzwko/cap1535p.pdf
+    edition: "Version 4, 28 November 2023"
+    licence: "CAA copyright. Page 2 of the PDF allows copying and use of the text if the latest version is used, in context, crediting the CAA; the publication page reserves all rights. Vector to confirm before the chunks are committed"
+    review_date: 2026-11-08
+    indexed: true
+  # Version 2 of the Paramotor Code, page https://www.caa.co.uk/cap2562 (the download link /publication/download/20600 serves the PDF directly).
+  - id: cap2562
+    title: "CAP 2562: The Paramotor Code"
+    url: https://www.caa.co.uk/publication/download/20600
+    edition: "Version 2, 24 September 2024"
+    licence: "CAA publication. No reuse terms were found in the PDF or on its page. Vector to confirm before the chunks are committed"
+    review_date: 2026-11-08
+    indexed: true
+  # Link-only: the CAA's guidance on RA(T) and NOTAMs is a web page, https://www.caa.co.uk/commercial-industry/airspace/event-and-obstacle-notification/airspace-restrictions/,
+  # and no PDF of it was found. `make guidance` reads PDFs only. The nearby PDF (SARG Policy 133, special use airspace) is a different document and is not in this corpus.
+  # To index it, save or find a PDF of that guidance, put its direct link here and set `indexed: true`.
+  - id: caa-rat-notam
+    title: "CAA guidance on Restricted Areas (Temporary), RA(T), and NOTAMs"
+    url: https://www.caa.co.uk/commercial-industry/airspace/event-and-obstacle-notification/airspace-restrictions/
+    edition: "web page, read 2026-11-08"
+    licence: "CAA web page, not downloaded: link-only because no PDF of it was found (see the note above this entry)"
+    review_date: 2026-11-08
+    indexed: false
+  - id: bhpa-safety
+    title: "BHPA public safety guidance"
+    url: https://www.bhpa.co.uk/
+    edition: "to confirm"
+    licence: "Not confirmed: link-only until Vector confirms the BHPA licence allows the text in the repository"
+    review_date: 2026-11-07
+    indexed: false
