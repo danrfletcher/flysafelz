@@ -234,7 +234,7 @@ describe('G1: the Wind switch', () => {
     await waitFor(() => expect(canvases(first.container)).toBe(1))
     await openPanel(first.user)
     await first.user.click(windSwitch())
-    expect(stored()).toEqual({ wind: false, rain: true, airspace: true, notams: true, answer: true })
+    expect(stored()).toEqual({ wind: false, rain: true, airspace: true, airspaceAll: false, notamsAll: false, notams: true, answer: true })
     first.view.unmount() // the reload
     const again = load()
     await openPanel(again.user)
@@ -454,7 +454,7 @@ describe('G6 and E1: stale and unavailable', () => {
     )
     const { container, map, user } = load()
     const panel = await openPanel(user)
-    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(2)) // airspace and NOTAMs
+    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(4)) // airspace and NOTAMs, each with its all-heights partner
     expect(within(panel).getAllByRole('listitem')[0]).toHaveTextContent(/Loading/)
     expect(map.getZoom()).toBeGreaterThan(0)
     expect(canvases(container)).toBe(0)

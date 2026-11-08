@@ -1,11 +1,8 @@
-import { FL100_FEET } from '@/map/belowFl100'
 import type { AirspaceProps, NotamProps } from '@/map/types'
 
-// The What's-here card's floor rule (C2). A floor is a number of feet; the card sorts by it, lowest first, and puts a floor at or
-// above FL100 (10,000 ft) in a collapsed group. This is its own rule, not the base layers' "below FL100" filter (belowFl100.ts):
-// that filter keeps every above-ground limit on the map, while here an above-ground limit counts for the feet it states.
-
-export { FL100_FEET }
+// The What's-here card's floor order (C2). A floor is a number of feet; the card sorts by it, lowest first. Which rows go in the
+// collapsed "Above FL100" group is not decided here: it is the map layers' own rule (belowFl100.ts), read into `aboveFl100` by the
+// card's rows, so the card and the "below FL100" and "all heights" layers always agree for the same feature.
 
 const FLIGHT_LEVEL = /^FL\s*(\d+)\b/i
 const GROUND = /^(SFC|GND)\b/i
@@ -29,13 +26,10 @@ export function notamFloorFt(props: Pick<NotamProps, 'lower_fl'>): number {
   return Math.max(0, props.lower_fl * 100)
 }
 
-/** A floor of exactly FL100 is in the group above; 9,999 ft is not. */
-export function isAboveFl100(floorFt: number): boolean {
-  return floorFt >= FL100_FEET
-}
-
 export interface Sortable {
   floorFt: number
+  /** Whether the row sits in the "Above FL100" group: `!airspaceBelowFl100(...)` or `!notamBelowFl100(...)` of belowFl100.ts, the map layers' rule. */
+  aboveFl100: boolean
   /** The name or NOTAM id: the tie-break. */
   name: string
   /** The last tie-break, so that two items with one floor and one name keep a fixed order. */
@@ -49,8 +43,8 @@ export function sortByFloor<T extends Sortable>(rows: readonly T[]): T[] {
   return [...rows].sort((a, b) => a.floorFt - b.floorFt || compareText(a.name, b.name) || compareText(a.key, b.key))
 }
 
-/** Sorted rows split into those below FL100 (shown) and those at or above it (the collapsed group), each keeping its order. */
+/** Sorted rows split into those below FL100 (shown) and those at or above it (the collapsed group, by `aboveFl100`), each keeping its order. */
 export function splitAtFl100<T extends Sortable>(rows: readonly T[]): { below: T[]; above: T[] } {
   const sorted = sortByFloor(rows)
-  return { below: sorted.filter((row) => !isAboveFl100(row.floorFt)), above: sorted.filter((row) => isAboveFl100(row.floorFt)) }
+  return { below: sorted.filter((row) => !row.aboveFl100), above: sorted.filter((row) => row.aboveFl100) }
 }

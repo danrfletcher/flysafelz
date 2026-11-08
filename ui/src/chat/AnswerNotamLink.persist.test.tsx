@@ -43,7 +43,7 @@ describe('G1: a NOTAM-id click that turns Answer overlays on is saved', () => {
 
     await user.click(within(sheet).getAllByRole('button', { name: /^[A-Z]\d+\/\d+$/ })[0])
     await screen.findByRole('dialog', { name: 'NOTAM H7171/26' })
-    expect(JSON.parse(window.localStorage.getItem(LAYER_PREFS_KEY) as string)).toEqual({ wind: true, rain: true, airspace: true, notams: true, answer: true })
+    expect(JSON.parse(window.localStorage.getItem(LAYER_PREFS_KEY) as string)).toEqual({ wind: true, rain: true, airspace: true, airspaceAll: false, notamsAll: false, notams: true, answer: true })
 
     view.unmount() // the reload
     server.use(...blueMillRoutes())

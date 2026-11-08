@@ -1,5 +1,6 @@
 import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon'
 
+import { airspaceBelowFl100, notamBelowFl100 } from '@/map/belowFl100'
 import { airspaceStyle, type ThemeToken } from '@/map/airspaceStyle'
 import { notamLimits, notamTimes } from '@/map/tooltips'
 import type { AirspaceProps, MapGeometry, NotamProps } from '@/map/types'
@@ -54,6 +55,7 @@ function airspaceRow(props: AirspaceProps, position: number): HereRow {
     key: `airspace:${props.id}:${position}`,
     name: props.name,
     floorFt: airspaceFloorFt(props),
+    aboveFl100: !airspaceBelowFl100(props),
     chip: props.type.replace(/_/g, ' ').toUpperCase(),
     token: airspaceStyle(props.type).token,
     limits: `${props.lower} to ${props.upper}`,
@@ -69,6 +71,7 @@ function notamRow(props: NotamProps, position: number): HereRow {
     key: `notam:${props.id}:${position}`,
     name: props.id,
     floorFt: notamFloorFt(props),
+    aboveFl100: !notamBelowFl100(props),
     chip: 'NOTAM',
     token: NOTAM_TOKEN,
     limits: notamLimits(props),

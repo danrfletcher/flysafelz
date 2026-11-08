@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AIRSPACE_FIXTURE, BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS, NOTAMS_FIXTURE } from '@/test/handlers'
+import { ALL_HEIGHTS_AIRSPACE, ALL_HEIGHTS_NOTAMS, AIRSPACE_FIXTURE, BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS, NOTAMS_FIXTURE } from '@/test/handlers'
 
 // The airspace ids are 24-character openAIP ids made of digits, so the id is left out of the scan.
 // F5: a phone number in a UI fixture is in a range Ofcom keeps for drama, never a real one. The numbers are found by a blunt rule
@@ -81,5 +81,42 @@ describe('the Blue Mill fixtures (PR-4.F1)', () => {
     expect(BLUE_MILL_NOTAMS.features.some((f) => f.geometry.type === 'Polygon' && f.geometry.coordinates.length === 2 && !f.properties.approx)).toBe(true)
     expect(BLUE_MILL_NOTAMS.features.some((f) => f.properties.approx)).toBe(true)
     expect(BLUE_MILL_NOTAMS.features.map((f) => f.properties.lower_fl)).toEqual(expect.arrayContaining([null, 105]))
+  })
+})
+
+describe('the all-heights fixtures (PR-11.F1)', () => {
+  it('F5: every phone number in them is in the fiction range, and there are some', () => {
+    const found = [ALL_HEIGHTS_AIRSPACE, ALL_HEIGHTS_NOTAMS].flatMap((payload) =>
+      payload.features.flatMap((feature) => strings({ ...feature.properties, id: '' }).flatMap(runs)),
+    )
+    expect(found.length).toBeGreaterThanOrEqual(3)
+    for (const number of found) expect(FICTION.some((prefix) => number.startsWith(prefix)), number).toBe(true)
+  })
+
+  it('hold at least 200 airspaces, an unknown type, every limit form, and NOTAMs with Q-line floors on both sides of FL100, in the route’s envelope', () => {
+    for (const payload of [ALL_HEIGHTS_AIRSPACE, ALL_HEIGHTS_NOTAMS]) {
+      expect(Object.keys(payload).sort()).toEqual(['features', 'stale', 'type', 'updated_at'])
+      expect(payload.stale).toBe(false)
+    }
+    expect(ALL_HEIGHTS_AIRSPACE.features.length).toBeGreaterThanOrEqual(200)
+    const lowers = new Set(ALL_HEIGHTS_AIRSPACE.features.map((f) => f.properties.lower))
+    for (const form of ['SFC', 'GND', '', 'FL65', 'FL100', 'FL105', 'FL195', '9999 ft AMSL', '10000 ft AMSL', '12000 ft AMSL', '984 ft AGL']) expect(lowers, form).toContain(form)
+    expect(ALL_HEIGHTS_AIRSPACE.features.map((f) => f.properties.type)).toContain('balloon_zone')
+    const floors = ALL_HEIGHTS_NOTAMS.features.map((f) => f.properties.lower_fl)
+    expect(floors).toEqual(expect.arrayContaining([0, 99, 100, 150, 195, 245, null]))
+    expect(ALL_HEIGHTS_NOTAMS.features.some((f) => f.properties.approx)).toBe(true)
+  })
+
+  it('F5: nothing is at the old West Sleekburn point (55.17 N, 1.58 W) or at Blue Mill', () => {
+    const near = (lat: number, lon: number, point: [number, number]) => Math.abs(lat - point[0]) < 0.5 && Math.abs(lon - point[1]) < 0.5
+    for (const payload of [ALL_HEIGHTS_AIRSPACE, ALL_HEIGHTS_NOTAMS]) {
+      for (const feature of payload.features) {
+        const ring = (feature.geometry.type === 'Polygon' ? feature.geometry.coordinates[0] : feature.geometry.coordinates[0][0]) as [number, number][]
+        for (const [lon, lat] of ring) {
+          expect(near(lat, lon, [55.17, -1.58])).toBe(false)
+          expect(near(lat, lon, [53.8028, -0.0866])).toBe(false)
+        }
+      }
+    }
   })
 })

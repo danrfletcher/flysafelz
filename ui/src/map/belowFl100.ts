@@ -1,5 +1,8 @@
 import type { AirspaceProps, NotamProps } from '@/map/types'
 
+// The one "below FL100" rule. The "below FL100" and "all heights" map layers (layers.ts) and the What's-here card's "Above FL100" group
+// (pick/whatsHere.ts) all ask these two functions, so for one feature the map and the card always agree.
+
 /** FL100 in feet. "Below FL100" means the lower limit is under this; a floor exactly at it is not below. */
 export const FL100_FEET = 10_000
 export const FL100 = 100

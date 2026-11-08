@@ -60,13 +60,19 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(naming).toEqual(['src/map/basemap.ts', 'src/vite-env.d.ts'])
   })
 
-  it('has the wind and rain switches, the base layers’ two switches and the Answer overlays switch, and no other: no all-heights switch, and the basemap entry has none', () => {
+  it('has the wind and rain switches, each base layer’s switch with its all-heights partner (PR-11.F1), and the Answer overlays switch, and no other: the basemap entry has none', () => {
     const panel = readUi('src/components/LayerPanel.tsx')
     expect(panel.match(/<Switch\b/g)).toHaveLength(1) // one in the list the layers map over
     const layers = [...panel.matchAll(/id: '(\w+)', name: '([^']+)'/g)].map((match) => [match[1], match[2]])
-    expect(layers).toEqual([['wind', 'Wind'], ['rain', 'Rain'], ['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100'], ['answer', 'Answer overlays']])
-    const switchLabels = /all heights/i
-    expect(switchLabels.test(panel)).toBe(false)
+    expect(layers).toEqual([
+      ['wind', 'Wind'],
+      ['rain', 'Rain'],
+      ['airspace', 'Airspace below FL100'],
+      ['airspaceAll', 'Airspace all heights'],
+      ['notams', 'NOTAMs below FL100'],
+      ['notamsAll', 'NOTAMs all heights'],
+      ['answer', 'Answer overlays'],
+    ])
   })
 
   it('fetches the four map routes (airspace, NOTAMs, wind, rain-grid) and no other route, RainViewer’s index and tiles are the only other call, and never Open-Meteo', () => {

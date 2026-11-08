@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { AirspaceProps, MapFeature, NotamProps } from '@/map/types'
 import { resetSkipped } from '@/pick/skipped'
+import { airspaceBelowFl100, notamBelowFl100 } from '@/map/belowFl100'
 import { whatsHere, type LoadedFeature } from '@/pick/whatsHere'
 import { BLUE_MILL, BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS } from '@/test/handlers'
 
@@ -85,6 +86,39 @@ describe('whatsHere at Blue Mill (GP3)', () => {
 
   it('finds above-FL100 items too (any height)', () => {
     expect(rows.filter((row) => row.floorFt >= 10000)).toHaveLength(3)
+  })
+})
+
+describe('PR-11.F1: the card’s "Above FL100" membership is the map layers’ rule (belowFl100.ts), not a second one', () => {
+  const everywhere = { type: 'Polygon', coordinates: square(-1, 50, 1, 52) }
+  const point = { lat: 51, lon: 0 }
+  const cases: [string, Partial<AirspaceProps>][] = [
+    ['FL65', { lower: 'FL65', lower_ft: 6500 }],
+    ['FL100', { lower: 'FL100', lower_ft: 10000 }],
+    ['9999 ft AMSL', { lower: '9999 ft AMSL', lower_ft: 9999 }],
+    ['10000 ft AMSL', { lower: '10000 ft AMSL', lower_ft: 10000 }],
+    ['an above-ground floor of 15000 ft: below on the map, so below in the card too', { lower: '15000 ft AGL', lower_ft: 15000 }],
+    ['GND', { lower: 'GND', lower_ft: null }],
+    ['a missing lower', { lower: '', lower_ft: null }],
+  ]
+
+  it.each(cases)('airspace with a lower limit of %s', (_label, over) => {
+    const feature = airspace('A1', everywhere, over)
+    const [row] = whatsHere(point, { airspace: [feature], notams: [] })
+    expect(row.aboveFl100).toBe(!airspaceBelowFl100(feature.properties))
+  })
+
+  it.each([0, 99, 100, 195, 245, null])('a NOTAM with a Q-line lower of %s', (lowerFl) => {
+    const feature = notam('H1/26', everywhere, { lower_fl: lowerFl })
+    const [row] = whatsHere(point, { airspace: [], notams: [feature] })
+    expect(row.aboveFl100).toBe(!notamBelowFl100(feature.properties))
+  })
+
+  it('puts an above-ground floor of 15000 ft in the lower list although its floor in feet sorts last', () => {
+    const feature = airspace('A2', everywhere, { lower: '15000 ft AGL', lower_ft: 15000 })
+    const [row] = whatsHere(point, { airspace: [feature], notams: [] })
+    expect(row.floorFt).toBe(15000)
+    expect(row.aboveFl100).toBe(false)
   })
 })
 

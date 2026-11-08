@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { LAYERS } from '@/components/LayerPanel'
 import { LAYER_PREFS_KEY, loadLayerPrefs, resetLayerPrefsWarning, saveLayerPrefs, type LayerRegistry } from '@/lib/layerPrefs'
 
 // The three real layers (all on by default) and one made-up id, standing in for a layer whose PR has not landed.
@@ -187,5 +188,44 @@ describe('storage that fails (E13)', () => {
     saveLayerPrefs(DEFAULTS)
     loadLayerPrefs(REGISTRY)
     expect(warn).not.toHaveBeenCalled()
+  })
+})
+
+// PR-11.F1 (G1, E13): the real registry, with the two "all heights" layers off by default.
+describe('the real layer registry with the all-heights layers', () => {
+  const real = LAYERS.map(({ id, defaultOn }) => ({ id, defaultOn }))
+  const DEFAULT_CHOICES = { wind: true, rain: true, airspace: true, airspaceAll: false, notams: true, notamsAll: false, answer: true }
+
+  it('G1: has Wind, Rain, Airspace below FL100 and NOTAMs below FL100 on, and both all-heights layers off, with nothing stored', () => {
+    expect(loadLayerPrefs(real)).toEqual(DEFAULT_CHOICES)
+  })
+
+  it('round-trips each all-heights choice through flysafelz.layers.v1, and keeps the others as they were', () => {
+    saveLayerPrefs({ ...DEFAULT_CHOICES, airspaceAll: true })
+    expect(stored()).toEqual({ ...DEFAULT_CHOICES, airspaceAll: true })
+    expect(loadLayerPrefs(real)).toEqual({ ...DEFAULT_CHOICES, airspaceAll: true })
+    saveLayerPrefs({ ...DEFAULT_CHOICES, airspaceAll: true, notamsAll: true, notams: false })
+    expect(loadLayerPrefs(real)).toEqual({ ...DEFAULT_CHOICES, airspaceAll: true, notamsAll: true, notams: false })
+    expect(LAYER_PREFS_KEY).toBe('flysafelz.layers.v1')
+  })
+
+  it('E13: an object stored before this PR (no keys for the new layers) keeps its choices, and the new layers are off', () => {
+    seed('{"wind":false,"rain":true,"airspace":false,"notams":true,"answer":false}')
+    expect(loadLayerPrefs(real)).toEqual({ wind: false, rain: true, airspace: false, airspaceAll: false, notams: true, notamsAll: false, answer: false })
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('E13: corrupt JSON, or storage that throws, gives every default with no crash', () => {
+    seed('{"airspaceAll":tru')
+    expect(loadLayerPrefs(real)).toEqual(DEFAULT_CHOICES)
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked')
+    })
+    expect(loadLayerPrefs(real)).toEqual(DEFAULT_CHOICES)
+  })
+
+  it('E13: a non-boolean stored under a new layer’s id is ignored', () => {
+    seed('{"airspaceAll":"yes","notamsAll":1,"airspace":false}')
+    expect(loadLayerPrefs(real)).toEqual({ ...DEFAULT_CHOICES, airspace: false })
   })
 })

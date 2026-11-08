@@ -1,10 +1,12 @@
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon'
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
+import { drawnAirspace, drawnNotams } from '@/map/layers'
 import type { AirspaceProps, NotamProps } from '@/map/types'
 import { CARD_EMPTY, CARD_FOOTNOTE, CARD_TITLE, WhatsHereCard } from '@/pick/WhatsHereCard'
-import { BLUE_MILL, BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS } from '@/test/handlers'
+import { ALL_HEIGHTS_AIRSPACE, ALL_HEIGHTS_NOTAMS, BLUE_MILL, BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS } from '@/test/handlers'
 import { loaded, loading } from '@/test/layers'
 
 const AIRSPACE = loaded<AirspaceProps>(BLUE_MILL_AIRSPACE.features)
@@ -129,6 +131,45 @@ describe('the "Above FL100 (n)" group', () => {
     await user.click(screen.getByRole('button', { name: 'Above FL100 (3)' }))
     await user.click(screen.getByRole('button', { name: /H2003\/26/ }))
     expect(screen.getByText(/AIR DISPLAY/)).toBeInTheDocument()
+  })
+})
+
+describe('PR-11.F1: the card and the map agree on "Above FL100" for the same feature', () => {
+  // Points over the stacked all-heights payloads. For each, the features the card puts in its \"Above FL100\" group must be exactly the ones
+  // over the point that the map's "below FL100" layers leave out (the "all heights" layers add them).
+  const POINTS = [
+    { lat: 52.5, lon: -1.5 },
+    { lat: 51.2, lon: -3.1 },
+    { lat: 53.4, lon: -2.2 },
+    { lat: 51.9, lon: -0.9 },
+  ]
+  const over = (point: { lat: number; lon: number }, features: readonly { geometry: unknown }[]) =>
+    features.filter((feature) => booleanPointInPolygon([point.lon, point.lat], feature.geometry as never))
+
+  it.each(POINTS)('at %o', async (point) => {
+    const user = userEvent.setup()
+    render(<WhatsHereCard point={point} airspace={loaded<AirspaceProps>(ALL_HEIGHTS_AIRSPACE.features)} notams={loaded<NotamProps>(ALL_HEIGHTS_NOTAMS.features)} />)
+    const everyAirspace = over(point, ALL_HEIGHTS_AIRSPACE.features) as typeof ALL_HEIGHTS_AIRSPACE.features
+    const everyNotam = over(point, ALL_HEIGHTS_NOTAMS.features) as typeof ALL_HEIGHTS_NOTAMS.features
+    const drawnLowIds = new Set([
+      ...drawnAirspace(everyAirspace, { below: true, all: false }).map((f) => f.properties.id),
+      ...drawnNotams(everyNotam, { below: true, all: false }).map((f) => f.properties.id),
+    ])
+    const expectedAbove = [...everyAirspace, ...everyNotam].map((f) => f.properties.id).filter((id) => !drawnLowIds.has(id)).sort()
+    expect(expectedAbove.length).toBeGreaterThan(0) // the point is covered by something above FL100, or the test proves nothing
+
+    const group = screen.getByRole('button', { name: `Above FL100 (${expectedAbove.length})` })
+    await user.click(group)
+    const shownAbove = screen.getAllByRole('listitem').slice(-expectedAbove.length)
+    const idOf = (row: HTMLElement) => {
+      const label = row.querySelector('button')?.textContent ?? ''
+      const featureIds = [...everyAirspace, ...everyNotam].map((f) => f.properties)
+      return featureIds.find((p) => ('name' in p ? label.includes(p.name) : label.includes(p.id)))?.id ?? label
+    }
+    expect(shownAbove.map(idOf).sort()).toEqual(expectedAbove)
+    // and the rows above the group are the ones the map's "below FL100" layers draw
+    const total = everyAirspace.length + everyNotam.length
+    expect(screen.getAllByRole('listitem')).toHaveLength(total)
   })
 })
 
