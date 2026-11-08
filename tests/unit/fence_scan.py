@@ -108,6 +108,11 @@ REVIEWED_FLOATS = {
 }
 REVIEWED_NAMED_CONSTANTS = {"METRES_PER_KM": 1000, "MIN_POLYGON_POINTS": 3, "QUARTER_TURN": 90}
 GEO = "geo.py"
+# mapdata/wind.py: the UK wind grid's bounds and leaflet-velocity's record codes happen to equal rules.yaml numbers (the UK coverage's north edge,
+# 2, 3); they are the grid's own and name no flight threshold. Reviewed as named constants in that file only.
+WIND_NAMED_CONSTANTS = {"NORTH": 61, "EAST": 2, "PARAMETER_CATEGORY": 2, "U_NUMBER": 2, "V_NUMBER": 3, "DECIMALS": 3}
+WIND = "wind.py"
+REVIEWED_CONSTANTS_BY_FILE = {GEO: REVIEWED_NAMED_CONSTANTS, WIND: WIND_NAMED_CONSTANTS}
 
 
 def number(node: ast.AST) -> float | None:
@@ -118,8 +123,9 @@ def number(node: ast.AST) -> float | None:
 
 
 def _reviewed_constant_nodes(path: Path, tree: ast.Module) -> set[int]:
-    """The ids of the literal nodes of a reviewed named constant, when the file is geo.py."""
-    if path.name != GEO:
+    """The ids of the literal nodes of a reviewed named constant, when the file is geo.py or wind.py (each with its own list)."""
+    reviewed = REVIEWED_CONSTANTS_BY_FILE.get(path.name)
+    if reviewed is None:
         return set()
     skipped = set()
     for stmt in tree.body:
@@ -129,7 +135,7 @@ def _reviewed_constant_nodes(path: Path, tree: ast.Module) -> set[int]:
             name, value = stmt.target.id, stmt.value
         else:
             continue
-        if name in REVIEWED_NAMED_CONSTANTS and number(value) == REVIEWED_NAMED_CONSTANTS[name]:
+        if name in reviewed and number(value) == reviewed[name]:
             skipped.add(id(value))
     return skipped
 

@@ -88,7 +88,7 @@ def test_an_empty_airspace_page_is_a_200_with_no_features(tmp_path):
 
 
 def test_an_unknown_map_path_is_a_404(setup):
-    assert setup.get("/map/wind").status_code == 404 and setup.upstream.calls == 0
+    assert setup.get("/map/nothing").status_code == 404 and setup.upstream.calls == 0
 
 
 # --- the cache through the routes ---------------------------------------------------------------------------------------------

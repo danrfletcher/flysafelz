@@ -13,6 +13,10 @@ export type ThemeToken =
   | '--action-avoid-sector'
   | '--action-awareness'
   | '--primary'
+  | '--wind-light'
+  | '--wind-moderate'
+  | '--wind-strong'
+  | '--wind-severe'
 
 /** Every name in openAIP's CODES["type"] list (src/flysafelz/clients/openaip.py), in code order. tests/unit/test_ui_map_layers.py keeps the two equal. */
 export const AIRSPACE_TYPES = [

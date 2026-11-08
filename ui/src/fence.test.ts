@@ -38,11 +38,13 @@ describe('F2: no analytics, no logging of answer text', () => {
 })
 
 describe('no half-wiring: nothing here belongs to a later PR', () => {
-  it('has no motion, wind or extra chat dependency: the LangGraph SDK and react-markdown are the chat PR’s, and the one Turf package is the point-in-polygon test', () => {
-    const later = /^(motion|framer-motion|leaflet-velocity|vaul|rehype-raw|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
+  it('has no motion or extra chat dependency (leaflet-velocity is the wind layer’s, PR-9.F1): the LangGraph SDK and react-markdown are the chat PR’s, and the one Turf package is the point-in-polygon test', () => {
+    const later = /^(motion|framer-motion|vaul|rehype-raw|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
     expect(installed.filter((name) => later.test(name))).toEqual([])
     expect(installed.filter((name) => name.startsWith('@langchain/'))).toEqual(['@langchain/langgraph-sdk'])
     expect(installed).toContain('react-markdown')
+    expect(installed).toContain('leaflet-velocity') // the wind layer's particles, and the only wind dependency
+    expect(installed.filter((name) => /^(windy|.*particle.*|@deck\.gl\/.*|d3-.*|.*velocity.*)$/.test(name))).toEqual(['leaflet-velocity'])
     expect(installed.filter((name) => name.startsWith('@turf/'))).toEqual(['@turf/boolean-point-in-polygon'])
     expect(installed).toContain('@radix-ui/react-popover')
     expect(installed).toContain('@radix-ui/react-switch')
@@ -58,23 +60,25 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(naming).toEqual(['src/map/basemap.ts', 'src/vite-env.d.ts'])
   })
 
-  it('has the base layers’ two switches and the Answer overlays switch, and no other: no wind, rain or all-heights switch, and the basemap entry has none', () => {
+  it('has the wind switch, the base layers’ two switches and the Answer overlays switch, and no other: no rain or all-heights switch, and the basemap entry has none', () => {
     const panel = readUi('src/components/LayerPanel.tsx')
     expect(panel.match(/<Switch\b/g)).toHaveLength(1) // one in the list the layers map over
     const layers = [...panel.matchAll(/id: '(\w+)', name: '([^']+)'/g)].map((match) => [match[1], match[2]])
-    expect(layers).toEqual([['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100'], ['answer', 'Answer overlays']])
-    const switchLabels = /wind|rain|radar|all heights/i
+    expect(layers).toEqual([['wind', 'Wind'], ['airspace', 'Airspace below FL100'], ['notams', 'NOTAMs below FL100'], ['answer', 'Answer overlays']])
+    const switchLabels = /rain|radar|all heights/i
     expect(switchLabels.test(panel)).toBe(false)
   })
 
-  it('fetches the two map routes and no other route', () => {
-    expect(filesMatching(word('/map/', 'wind'))).toEqual([])
+  it('fetches the three map routes (airspace, NOTAMs, wind) and no other route, and never Open-Meteo', () => {
+    expect(filesMatching(word('api\\.open-', 'meteo'))).toEqual([]) // the browser never calls the forecast API; wind arrives from /map/wind
+    const credit = filesMatching(word('open-', 'meteo\\.com')).filter((path) => !/\.test\.|\/test\//.test(path))
+    expect(credit).toEqual(['scripts/check-external-urls.mjs', 'src/map/basemap.ts']) // the attribution link and the allowlist that lets it through
     expect(filesMatching(word('rain', '-grid'))).toEqual([])
     expect(filesMatching(word('rainviewer', 'api'))).toEqual([])
     const routes = uiTextFiles()
       .filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
       .flatMap((path) => [...readUi(path).matchAll(/['"`](\/map\/[a-z-]+)['"`]/g)].map((match) => match[1]))
-    expect([...new Set(routes)].sort()).toEqual(['/map/airspace', '/map/notams'])
+    expect([...new Set(routes)].sort()).toEqual(['/map/airspace', '/map/notams', '/map/wind'])
   })
 
   it('keeps the chat inside src/chat, with the Sheet and Drawer as the two components/ui shells and the 2 NM fit in src/map', () => {
@@ -86,7 +90,9 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
   it('has no pin bounce (PR-12.F1 owns it); `overlays` and `assessment` are read by the chat store, the badge and link readers and the answer-overlay map code, and by nothing else', () => {
     const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
     const found = (pattern: RegExp) => sources.filter((path) => pattern.test(readUi(path)))
-    expect(found(word('bou', 'nce|@key', 'frames|prefers-reduced-', 'motion'))).toEqual([])
+    expect(found(word('bou', 'nce|@key', 'frames'))).toEqual([])
+    // reduced motion is read in one hook, for the wind layer's arrows (PR-9.F1); the pin and the rest have no motion to polish yet
+    expect(found(word('prefers-reduced-', 'motion'))).toEqual(['src/lib/usePrefersReducedMotion.ts'])
     expect(found(word('overl', 'ays'))).toEqual([
       'src/App.tsx', // hands the open pin's turn to the map
       'src/chat/Answer.tsx', // says in a comment which ids are buttons

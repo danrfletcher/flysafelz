@@ -34,6 +34,7 @@ describe('urlProblems', () => {
       'https://www.openstreetmap.org/copyright',
       'https://carto.com/attributions',
       'https://www.openaip.net',
+      'https://open-meteo.com',
       'http://localhost:2024',
     ]
       .map((url) => `fetch("${url}")`)
