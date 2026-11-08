@@ -1,0 +1,1486 @@
+{
+  "items": [
+    {
+      "__v": 0,
+      "_id": "6a95ddb62c3eecd59e67bafe",
+      "activity": 0,
+      "byNotam": false,
+      "country": "GB",
+      "createdAt": "2026-08-31T20:01:58.964Z",
+      "createdBy": "openaip-system",
+      "dataIngestion": true,
+      "deletable": true,
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -1.69861,
+              56.22861
+            ],
+            [
+              -1.99083,
+              56.19528
+            ],
+            [
+              -1.71389,
+              55.44639
+            ],
+            [
+              -1.81611,
+              55.13083
+            ],
+            [
+              -1.53083,
+              55.10028
+            ],
+            [
+              -1.41583,
+              55.44806
+            ],
+            [
+              -1.69861,
+              56.22861
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "hoursOfOperation": {
+        "operatingHours": [
+          {
+            "byNotam": false,
+            "dayOfWeek": 0,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 1,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 2,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 3,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 4,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 5,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 6,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          }
+        ]
+      },
+      "icaoClass": 3,
+      "lowerLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 155
+      },
+      "name": "BORDERS CTA 12",
+      "onDemand": false,
+      "onRequest": false,
+      "requestCompliance": false,
+      "specialAgreement": false,
+      "type": 26,
+      "updatedAt": "2026-08-31T20:01:58.964Z",
+      "updatedBy": "openaip-system",
+      "upperLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 195
+      }
+    },
+    {
+      "__v": 0,
+      "_id": "6942bfb6cc42205201dbca84",
+      "activity": 0,
+      "byNotam": false,
+      "country": "GB",
+      "createdAt": "2025-12-17T14:35:34.943Z",
+      "createdBy": "eBT9qSrxquPVguazo7MwJzzaf2p1",
+      "dataIngestion": false,
+      "deletable": false,
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -2.51639,
+              56.82889
+            ],
+            [
+              -2.76694,
+              56.63167
+            ],
+            [
+              -2.87389,
+              56.22139
+            ],
+            [
+              -2.6625,
+              56.02278
+            ],
+            [
+              -2.70333,
+              55.65778
+            ],
+            [
+              -2.51306,
+              55.49778
+            ],
+            [
+              -1.70806,
+              55.23417
+            ],
+            [
+              -1.68333,
+              55.24056
+            ],
+            [
+              -1.57583,
+              55.26944
+            ],
+            [
+              -1.33528,
+              55.32222
+            ],
+            [
+              -1.333158,
+              55.321351
+            ],
+            [
+              -1.331044,
+              55.320476
+            ],
+            [
+              -1.328937,
+              55.319596
+            ],
+            [
+              -1.326838,
+              55.318709
+            ],
+            [
+              -1.324746,
+              55.317817
+            ],
+            [
+              -1.322661,
+              55.31692
+            ],
+            [
+              -1.320585,
+              55.316016
+            ],
+            [
+              -1.318516,
+              55.315108
+            ],
+            [
+              -1.316454,
+              55.314193
+            ],
+            [
+              -1.3144,
+              55.313274
+            ],
+            [
+              -1.312354,
+              55.312348
+            ],
+            [
+              -1.310315,
+              55.311418
+            ],
+            [
+              -1.308284,
+              55.310482
+            ],
+            [
+              -1.306261,
+              55.309541
+            ],
+            [
+              -1.304245,
+              55.308595
+            ],
+            [
+              -1.302237,
+              55.307643
+            ],
+            [
+              -1.300236,
+              55.306687
+            ],
+            [
+              -1.298243,
+              55.305725
+            ],
+            [
+              -1.296258,
+              55.304759
+            ],
+            [
+              -1.294281,
+              55.303787
+            ],
+            [
+              -1.292311,
+              55.302811
+            ],
+            [
+              -1.290349,
+              55.301829
+            ],
+            [
+              -1.288394,
+              55.300843
+            ],
+            [
+              -1.286447,
+              55.299852
+            ],
+            [
+              -1.284508,
+              55.298856
+            ],
+            [
+              -1.282576,
+              55.297856
+            ],
+            [
+              -1.280652,
+              55.296851
+            ],
+            [
+              -1.278735,
+              55.295841
+            ],
+            [
+              -1.276827,
+              55.294827
+            ],
+            [
+              -1.274925,
+              55.293808
+            ],
+            [
+              -1.273032,
+              55.292784
+            ],
+            [
+              -1.271146,
+              55.291757
+            ],
+            [
+              -1.269267,
+              55.290725
+            ],
+            [
+              -1.267396,
+              55.289688
+            ],
+            [
+              -1.265533,
+              55.288647
+            ],
+            [
+              -1.263677,
+              55.287602
+            ],
+            [
+              -1.261829,
+              55.286553
+            ],
+            [
+              -1.259988,
+              55.2855
+            ],
+            [
+              -1.258154,
+              55.284442
+            ],
+            [
+              -1.256329,
+              55.28338
+            ],
+            [
+              -1.25451,
+              55.282315
+            ],
+            [
+              -1.252699,
+              55.281245
+            ],
+            [
+              -1.250895,
+              55.280171
+            ],
+            [
+              -1.249099,
+              55.279093
+            ],
+            [
+              -1.24731,
+              55.278012
+            ],
+            [
+              -1.245529,
+              55.276926
+            ],
+            [
+              -1.243755,
+              55.275837
+            ],
+            [
+              -1.241988,
+              55.274744
+            ],
+            [
+              -1.240228,
+              55.273647
+            ],
+            [
+              -1.238476,
+              55.272546
+            ],
+            [
+              -1.236731,
+              55.271441
+            ],
+            [
+              -1.234995,
+              55.270332
+            ],
+            [
+              -1.233267,
+              55.269219
+            ],
+            [
+              -1.231548,
+              55.268102
+            ],
+            [
+              -1.229837,
+              55.26698
+            ],
+            [
+              -1.228135,
+              55.265855
+            ],
+            [
+              -1.226441,
+              55.264725
+            ],
+            [
+              -1.224756,
+              55.263591
+            ],
+            [
+              -1.223079,
+              55.262453
+            ],
+            [
+              -1.221411,
+              55.261311
+            ],
+            [
+              -1.219751,
+              55.260165
+            ],
+            [
+              -1.218101,
+              55.259014
+            ],
+            [
+              -1.216459,
+              55.25786
+            ],
+            [
+              -1.214826,
+              55.256702
+            ],
+            [
+              -1.213201,
+              55.255539
+            ],
+            [
+              -1.211585,
+              55.254373
+            ],
+            [
+              -1.209979,
+              55.253203
+            ],
+            [
+              -1.208381,
+              55.252029
+            ],
+            [
+              -1.206792,
+              55.250851
+            ],
+            [
+              -1.205211,
+              55.249669
+            ],
+            [
+              -1.20364,
+              55.248483
+            ],
+            [
+              -1.202078,
+              55.247294
+            ],
+            [
+              -1.200525,
+              55.246101
+            ],
+            [
+              -1.198981,
+              55.244903
+            ],
+            [
+              -1.197446,
+              55.243703
+            ],
+            [
+              -1.19592,
+              55.242498
+            ],
+            [
+              -1.194403,
+              55.24129
+            ],
+            [
+              -1.192895,
+              55.240078
+            ],
+            [
+              -1.191396,
+              55.238862
+            ],
+            [
+              -1.189907,
+              55.237643
+            ],
+            [
+              -1.188427,
+              55.23642
+            ],
+            [
+              -1.186956,
+              55.235193
+            ],
+            [
+              -1.185494,
+              55.233963
+            ],
+            [
+              -1.184042,
+              55.232729
+            ],
+            [
+              -1.182599,
+              55.231492
+            ],
+            [
+              -1.181165,
+              55.230251
+            ],
+            [
+              -1.179741,
+              55.229007
+            ],
+            [
+              -1.178326,
+              55.227759
+            ],
+            [
+              -1.17692,
+              55.226508
+            ],
+            [
+              -1.175524,
+              55.225253
+            ],
+            [
+              -1.174138,
+              55.223995
+            ],
+            [
+              -1.172761,
+              55.222734
+            ],
+            [
+              -1.171393,
+              55.221469
+            ],
+            [
+              -1.170035,
+              55.220201
+            ],
+            [
+              -1.168687,
+              55.21893
+            ],
+            [
+              -1.167348,
+              55.217655
+            ],
+            [
+              -1.166019,
+              55.216377
+            ],
+            [
+              -1.164699,
+              55.215096
+            ],
+            [
+              -1.16339,
+              55.213812
+            ],
+            [
+              -1.16209,
+              55.212524
+            ],
+            [
+              -1.160799,
+              55.211234
+            ],
+            [
+              -1.159518,
+              55.20994
+            ],
+            [
+              -1.158248,
+              55.208643
+            ],
+            [
+              -1.156986,
+              55.207343
+            ],
+            [
+              -1.155735,
+              55.20604
+            ],
+            [
+              -1.154494,
+              55.204733
+            ],
+            [
+              -1.153262,
+              55.203424
+            ],
+            [
+              -1.15204,
+              55.202112
+            ],
+            [
+              -1.150828,
+              55.200797
+            ],
+            [
+              -1.149626,
+              55.199479
+            ],
+            [
+              -1.148434,
+              55.198158
+            ],
+            [
+              -1.147252,
+              55.196834
+            ],
+            [
+              -1.14608,
+              55.195507
+            ],
+            [
+              -1.144918,
+              55.194177
+            ],
+            [
+              -1.143766,
+              55.192845
+            ],
+            [
+              -1.142624,
+              55.191509
+            ],
+            [
+              -1.141492,
+              55.190171
+            ],
+            [
+              -1.14037,
+              55.188831
+            ],
+            [
+              -1.139259,
+              55.187487
+            ],
+            [
+              -1.138157,
+              55.186141
+            ],
+            [
+              -1.137065,
+              55.184792
+            ],
+            [
+              -1.135984,
+              55.18344
+            ],
+            [
+              -1.134913,
+              55.182086
+            ],
+            [
+              -1.133852,
+              55.180729
+            ],
+            [
+              -1.132801,
+              55.17937
+            ],
+            [
+              -1.131761,
+              55.178008
+            ],
+            [
+              -1.13073,
+              55.176643
+            ],
+            [
+              -1.12971,
+              55.175276
+            ],
+            [
+              -1.1287,
+              55.173907
+            ],
+            [
+              -1.127701,
+              55.172535
+            ],
+            [
+              -1.126712,
+              55.171161
+            ],
+            [
+              -1.125733,
+              55.169784
+            ],
+            [
+              -1.124765,
+              55.168405
+            ],
+            [
+              -1.123807,
+              55.167023
+            ],
+            [
+              -1.122859,
+              55.165639
+            ],
+            [
+              -1.121922,
+              55.164253
+            ],
+            [
+              -1.120995,
+              55.162865
+            ],
+            [
+              -1.120078,
+              55.161474
+            ],
+            [
+              -1.119173,
+              55.160081
+            ],
+            [
+              -1.118277,
+              55.158686
+            ],
+            [
+              -1.117392,
+              55.157289
+            ],
+            [
+              -1.116517,
+              55.15589
+            ],
+            [
+              -1.115653,
+              55.154488
+            ],
+            [
+              -1.1148,
+              55.153084
+            ],
+            [
+              -1.113957,
+              55.151679
+            ],
+            [
+              -1.113125,
+              55.150271
+            ],
+            [
+              -1.112303,
+              55.148861
+            ],
+            [
+              -1.111492,
+              55.14745
+            ],
+            [
+              -1.110691,
+              55.146036
+            ],
+            [
+              -1.109901,
+              55.14462
+            ],
+            [
+              -1.109122,
+              55.143203
+            ],
+            [
+              -1.108353,
+              55.141783
+            ],
+            [
+              -1.107595,
+              55.140362
+            ],
+            [
+              -1.106847,
+              55.138939
+            ],
+            [
+              -1.106111,
+              55.137514
+            ],
+            [
+              -1.105385,
+              55.136087
+            ],
+            [
+              -1.104669,
+              55.134658
+            ],
+            [
+              -1.103964,
+              55.133228
+            ],
+            [
+              -1.103271,
+              55.131796
+            ],
+            [
+              -1.102587,
+              55.130362
+            ],
+            [
+              -1.101915,
+              55.128927
+            ],
+            [
+              -1.101253,
+              55.12749
+            ],
+            [
+              -1.100602,
+              55.126051
+            ],
+            [
+              -1.099962,
+              55.124611
+            ],
+            [
+              -1.099333,
+              55.12317
+            ],
+            [
+              -1.098714,
+              55.121726
+            ],
+            [
+              -1.098106,
+              55.120282
+            ],
+            [
+              -1.097509,
+              55.118836
+            ],
+            [
+              -1.096923,
+              55.117388
+            ],
+            [
+              -1.096348,
+              55.115939
+            ],
+            [
+              -1.095784,
+              55.114488
+            ],
+            [
+              -1.09523,
+              55.113037
+            ],
+            [
+              -1.094687,
+              55.111583
+            ],
+            [
+              -1.094156,
+              55.110129
+            ],
+            [
+              -1.093635,
+              55.108673
+            ],
+            [
+              -1.093125,
+              55.107216
+            ],
+            [
+              -1.092626,
+              55.105758
+            ],
+            [
+              -1.092137,
+              55.104299
+            ],
+            [
+              -1.09166,
+              55.102838
+            ],
+            [
+              -1.091194,
+              55.101376
+            ],
+            [
+              -1.090738,
+              55.099913
+            ],
+            [
+              -1.090294,
+              55.098449
+            ],
+            [
+              -1.08986,
+              55.096984
+            ],
+            [
+              -1.089438,
+              55.095518
+            ],
+            [
+              -1.089026,
+              55.094051
+            ],
+            [
+              -1.088625,
+              55.092583
+            ],
+            [
+              -1.088236,
+              55.091114
+            ],
+            [
+              -1.087857,
+              55.089644
+            ],
+            [
+              -1.087489,
+              55.088173
+            ],
+            [
+              -1.087132,
+              55.086701
+            ],
+            [
+              -1.086786,
+              55.085228
+            ],
+            [
+              -1.086452,
+              55.083755
+            ],
+            [
+              -1.086128,
+              55.082281
+            ],
+            [
+              -1.085815,
+              55.080805
+            ],
+            [
+              -1.085513,
+              55.07933
+            ],
+            [
+              -1.085223,
+              55.077853
+            ],
+            [
+              -1.084943,
+              55.076376
+            ],
+            [
+              -1.084674,
+              55.074898
+            ],
+            [
+              -1.084417,
+              55.073419
+            ],
+            [
+              -1.08417,
+              55.07194
+            ],
+            [
+              -1.04139,
+              55.05278
+            ],
+            [
+              1.37361,
+              54.39361
+            ],
+            [
+              2.03,
+              55.80778
+            ],
+            [
+              0.65222,
+              56.25611
+            ],
+            [
+              -2.51639,
+              56.82889
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "hoursOfOperation": {
+        "operatingHours": [
+          {
+            "byNotam": false,
+            "dayOfWeek": 0,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 1,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 2,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 3,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 4,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 5,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 6,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          }
+        ]
+      },
+      "icaoClass": 8,
+      "lowerLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 85
+      },
+      "name": "EGD514 COMBAT AIRSPACE",
+      "onDemand": false,
+      "onRequest": false,
+      "requestCompliance": false,
+      "specialAgreement": false,
+      "type": 2,
+      "updatedAt": "2025-12-17T14:41:39.407Z",
+      "updatedBy": "eBT9qSrxquPVguazo7MwJzzaf2p1",
+      "upperLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 660
+      }
+    },
+    {
+      "__v": 0,
+      "_id": "6a95e5cd2c3eecd59e67caec",
+      "activity": 0,
+      "byNotam": false,
+      "country": "GB",
+      "createdAt": "2026-08-31T20:36:29.474Z",
+      "createdBy": "openaip-system",
+      "dataIngestion": true,
+      "deletable": true,
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -3,
+              55
+            ],
+            [
+              -1.5,
+              55
+            ],
+            [
+              -2,
+              56
+            ],
+            [
+              -3,
+              56
+            ],
+            [
+              -3,
+              55
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "hoursOfOperation": {
+        "operatingHours": [
+          {
+            "byNotam": false,
+            "dayOfWeek": 0,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 1,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 2,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 3,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 4,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 5,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 6,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          }
+        ]
+      },
+      "icaoClass": 8,
+      "lowerLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 100
+      },
+      "name": "NSGA BORDERS",
+      "onDemand": false,
+      "onRequest": false,
+      "remarks": "NOSSR",
+      "requestCompliance": false,
+      "specialAgreement": false,
+      "type": 21,
+      "updatedAt": "2026-08-31T20:36:29.474Z",
+      "updatedBy": "openaip-system",
+      "upperLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 195
+      }
+    },
+    {
+      "__v": 0,
+      "_id": "6a95e5f22c3eecd59e67cb36",
+      "activity": 0,
+      "byNotam": false,
+      "country": "GB",
+      "createdAt": "2026-08-31T20:37:06.850Z",
+      "createdBy": "openaip-system",
+      "dataIngestion": true,
+      "deletable": true,
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -2.65389,
+              56.1
+            ],
+            [
+              -2.69111,
+              55.76667
+            ],
+            [
+              -1.98167,
+              55.76667
+            ],
+            [
+              -2.03778,
+              55.91667
+            ],
+            [
+              -2.65389,
+              56.1
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "hoursOfOperation": {
+        "operatingHours": [
+          {
+            "byNotam": false,
+            "dayOfWeek": 0,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 1,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 2,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 3,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 4,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 5,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 6,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          }
+        ]
+      },
+      "icaoClass": 8,
+      "lowerLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 195
+      },
+      "name": "TRAG NORTHUMBRIA",
+      "onDemand": false,
+      "onRequest": false,
+      "remarks": "TRA",
+      "requestCompliance": false,
+      "specialAgreement": false,
+      "type": 21,
+      "updatedAt": "2026-08-31T20:37:06.850Z",
+      "updatedBy": "openaip-system",
+      "upperLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 240
+      }
+    },
+    {
+      "__v": 0,
+      "_id": "6a95e5f52c3eecd59e67cb3e",
+      "activity": 0,
+      "byNotam": false,
+      "country": "GB",
+      "createdAt": "2026-08-31T20:37:09.675Z",
+      "createdBy": "openaip-system",
+      "dataIngestion": true,
+      "deletable": true,
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -2.69111,
+              55.76667
+            ],
+            [
+              -2.70306,
+              55.65778
+            ],
+            [
+              -2.51278,
+              55.4975
+            ],
+            [
+              -1.90944,
+              55.30083
+            ],
+            [
+              -1.86306,
+              55.44556
+            ],
+            [
+              -1.98167,
+              55.76667
+            ],
+            [
+              -2.69111,
+              55.76667
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "hoursOfOperation": {
+        "operatingHours": [
+          {
+            "byNotam": false,
+            "dayOfWeek": 0,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 1,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 2,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 3,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 4,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 5,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          },
+          {
+            "byNotam": false,
+            "dayOfWeek": 6,
+            "endTime": "00:00",
+            "publicHolidaysExcluded": false,
+            "startTime": "00:00",
+            "sunrise": false,
+            "sunset": false
+          }
+        ]
+      },
+      "icaoClass": 8,
+      "lowerLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 195
+      },
+      "name": "TRAG NORTHUMBRIA",
+      "onDemand": false,
+      "onRequest": false,
+      "remarks": "TRA",
+      "requestCompliance": false,
+      "specialAgreement": false,
+      "type": 21,
+      "updatedAt": "2026-08-31T20:37:09.675Z",
+      "updatedBy": "openaip-system",
+      "upperLimit": {
+        "referenceDatum": 2,
+        "unit": 6,
+        "value": 240
+      }
+    }
+  ],
+  "page": 1,
+  "totalCount": 5,
+  "totalPages": 1
+}

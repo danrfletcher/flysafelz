@@ -1,0 +1,29 @@
+$ cp -R ~/.local/share/vector/inputs/flysafelz/dataset $TMP/dataset; cp .../dataset.sha256 $TMP/   # a tmp copy, not the mirror
+$ # change one byte of verdict_sheet.yaml in the tmp copy (the first "-" becomes "+")
+$ shasum -a 256 -c ../dataset.sha256   # in the tmp copy
+examples.yaml: OK
+guidance_questions.yaml: OK
+verdict_sheet.yaml: FAILED
+shasum: WARNING: 1 computed checksum did NOT match
+$ DATASET_SRC=$TMP/dataset make dataset
+make dataset: verdict_sheet.yaml does not match its checksum in dataset.sha256
+make: *** [dataset] Error 1
+exit 2
+$ git status --short evals/agent/data   # empty: nothing was copied or changed
+$ ls -A evals/agent/data   # no temporary file left
+examples.yaml
+guidance_questions.yaml
+verdict_sheet.yaml
+
+# make reports any failed recipe as exit 2; the program's own exit status is 1:
+$ DATASET_SRC=$TMP/dataset uv run python -m evals.agent.import_dataset; echo "exit $?"
+make dataset: verdict_sheet.yaml does not match its checksum in dataset.sha256
+exit 1
+
+# a source path with spaces and both kinds of quote reaches the program intact (the same tmp copy, verdict_sheet.yaml repaired):
+$ DATASET_SRC="$TMP/in put's \"x\"/dataset" make dataset
+verified examples.yaml, verdict_sheet.yaml, guidance_questions.yaml against dataset.sha256
+unchanged: examples.yaml -> data/examples.yaml
+unchanged: verdict_sheet.yaml -> data/verdict_sheet.yaml
+unchanged: guidance_questions.yaml -> data/guidance_questions.yaml
+exit 0

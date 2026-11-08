@@ -1,0 +1,12 @@
+# dev_16 (explain, compound: helicopter loads NOTAM + "the wind later"). Archive SHA pinned: the last
+# PIB commit at or before `now` (2026-09-24T05:48:52Z), looked up with an authenticated call.
+lat: 54.52960562792453
+lon: -3.2566887588684965
+now: '2026-09-24T06:30:00Z'
+window:
+  start: '2026-09-24T08:00:00Z'
+  end: '2026-09-24T18:00:00Z'
+archive_sha: 55bc107a15650fe4f5569e9fc27833b340d4b99b
+capture:
+  pib_issued: '2026-09-24T05:00:09Z'
+  sha: 55bc107a15650fe4f5569e9fc27833b340d4b99b

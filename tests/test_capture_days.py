@@ -432,7 +432,10 @@ def test_days_adds_no_environment_read():
 
 
 def test_no_committed_case_yaml_has_a_days_key():
-    case_files = sorted((REPO / "fixtures").glob("*/case.yaml"))
+    """The cases committed before `days` existed are untouched. Dan's labelled cases (5a PR-1.S1) are the exception: some were captured with
+    `days` and are committed byte for byte, so the folders in labelled-fixtures.sha256 are left out."""
+    labelled = {line.split("  ", 1)[1].removeprefix("./").split("/")[0] for line in (REPO / "fixtures" / "labelled-fixtures.sha256").read_text(encoding="utf-8").splitlines() if line.strip()}
+    case_files = sorted(p for p in (REPO / "fixtures").glob("*/case.yaml") if p.parent.name not in labelled)
     assert case_files
     for path in case_files:
         assert "days" not in yaml.safe_load(path.read_text(encoding="utf-8")), path

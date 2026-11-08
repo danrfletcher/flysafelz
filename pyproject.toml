@@ -5,6 +5,7 @@ description = "Deterministic go/no-go core for UK paramotor landing zones"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "agentevals>=0.0.9",
     "astral>=3.2",
     "fastembed>=0.9.1",
     "httpx>=0.28.1",
@@ -15,6 +16,7 @@ dependencies = [
     "pydantic>=2",
     "pypdf>=7.0.0",
     "pyyaml",
+    "scikit-learn>=1.9.1",
     "shapely>=2.2.0",
     "tzdata>=2026.6",
 ]
