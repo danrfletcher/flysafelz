@@ -1,0 +1,14 @@
+# git diff --stat 81d14878718c29ff284bc956d6edb1f5850fb012 -- src tests/golden src/flysafelz/rules.yaml   (slice 5/10 base; includes uncommitted work)
+(exit 0; empty above means no change)
+
+# git diff --stat dev -- src tests/golden src/flysafelz/rules.yaml   (the spec's F1 command; dev lacks slices 2-4, which changed src, so this is not empty)
+ src/flysafelz/verdict_sheet.py          |  47 ++-
+ src/flysafelz/verdict_sheet_check.py    |   5 +
+ src/flysafelz/verdict_sheet_finalise.py | 639 ++++++++++++++++++++++++++++++++
+ 3 files changed, 685 insertions(+), 6 deletions(-)
+
+# git diff --stat dev..81d14878718c29ff284bc956d6edb1f5850fb012 -- src tests/golden src/flysafelz/rules.yaml   (what earlier slices changed: the same lines)
+ src/flysafelz/verdict_sheet.py          |  47 ++-
+ src/flysafelz/verdict_sheet_check.py    |   5 +
+ src/flysafelz/verdict_sheet_finalise.py | 639 ++++++++++++++++++++++++++++++++
+ 3 files changed, 685 insertions(+), 6 deletions(-)
