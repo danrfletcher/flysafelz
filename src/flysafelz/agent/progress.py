@@ -2,6 +2,7 @@
 
     emit(line)                 write one line to the stream; nothing at all outside a graph run
     CHECKING_WEATHER           "Checking weather…"
+    CHECKING_AIRSPACE          "Checking airspace…"
     reading_notams(i, n)       "Reading 2 NOTAMs (1/2)…"
     ASSESSING                  "Assessing…"
     CHECKING_ANSWER            "Checking the answer…"
@@ -13,6 +14,7 @@ the guard would have to check. The tools call `emit` with these; so does the gua
 from langgraph.config import get_stream_writer
 
 CHECKING_WEATHER = "Checking weather…"
+CHECKING_AIRSPACE = "Checking airspace…"
 ASSESSING = "Assessing…"
 CHECKING_ANSWER = "Checking the answer…"
 

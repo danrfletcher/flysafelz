@@ -25,6 +25,7 @@ class AgentSettings(BaseModel):
     guard_retries: extra model calls after a failed answer.
     model_max_retries: the chat model client's own retries.
     source_reuse_minutes: how long a fetched source is reused within a thread.
+    notam_reader_calls: model calls `get_notams` may make to read NOTAMs in one request.
     embedding_model: the fastembed model name.
     embedding_cache_dir: where that model is stored, relative to the repository root (see embedding_folder).
     chunker_version: part of the corpus key.
@@ -39,6 +40,7 @@ class AgentSettings(BaseModel):
     guard_retries: int = Field(strict=True, ge=0)
     model_max_retries: int = Field(strict=True, ge=0)
     source_reuse_minutes: int = Field(strict=True, gt=0)
+    notam_reader_calls: int = Field(strict=True, gt=0)
     embedding_model: str = Field(strict=True, min_length=1)
     embedding_cache_dir: str = Field(strict=True, min_length=1)
     chunker_version: int = Field(strict=True, gt=0)

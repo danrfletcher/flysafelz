@@ -17,6 +17,9 @@ model_max_retries: 1
 # Minutes a fetched source is reused within a thread before it is fetched again (FR12).
 source_reuse_minutes: 15
 
+# Model calls get_notams may make to read NOTAMs in one request; the NOTAMs beyond them are shown unread, with the reason "reader limit" (G11).
+notam_reader_calls: 3
+
 # The fastembed model for guidance search, downloaded by `make setup` (F5), and the folder it is stored in.
 # The folder is relative to the repository root and git-ignored; fastembed's own default is a temp folder that gets wiped.
 embedding_model: BAAI/bge-small-en-v1.5
