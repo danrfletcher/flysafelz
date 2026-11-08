@@ -12,3 +12,5 @@ data/guidance/staging/
 .coverage
 evals/reader/runs/
 .cache/
+# the map routes' disk cache (/map/notams holds NOTAM text as published); never committed
+data/map/
