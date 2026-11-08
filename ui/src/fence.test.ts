@@ -51,11 +51,19 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect(installed).toContain('@radix-ui/react-switch')
   })
 
+  it('pins leaflet-velocity to one exact version: velocity.ts patches and reaches into its private members, which a minor upgrade could change', () => {
+    expect(pkg.dependencies['leaflet-velocity']).toMatch(/^\d+\.\d+\.\d+$/)
+  })
+
   it('keeps browser storage to the one layer-choices module (F2: its key and no other store), and the CARTO key named in the one file that reads it, its type declaration and nothing else under src/', () => {
     const sources = (paths: string[]) => paths.filter((path) => !/\.test\.|\/test\//.test(path))
     expect(sources(filesMatching(word('local', 'Storage')))).toEqual(['src/lib/layerPrefs.ts'])
     expect(filesMatching(word('session', 'Storage'))).toEqual([])
-    expect(filesMatching(word('addEventListener\\(.', 'storage'))).toEqual([]) // no cross-tab sync in v1
+    // no cross-tab sync in v1: no listener for the browser's cross-tab event however it is written (addEventListener with the name inline or held in a variable, the on-handler property, an event object of that kind)
+    expect(filesMatching(word('addEventListener\\(.', 'stor', 'age'))).toEqual([])
+    expect(filesMatching(word('\\bon', 'stor', 'age\\b'))).toEqual([])
+    expect(filesMatching(word('Stor', 'ageEvent\\b'))).toEqual([])
+    expect(filesMatching(word('[\'"`]', 'stor', 'age[\'"`]'))).toEqual([])
     expect(sources(filesMatching(word('flysafelz\\.layers\\.', 'v\\d')))).toEqual(['src/lib/layerPrefs.ts']) // the one key, v1
     const naming = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path) && word('VITE_', 'CARTO_KEY').test(readUi(path)))
     expect(naming).toEqual(['src/map/basemap.ts', 'src/vite-env.d.ts'])
@@ -151,14 +159,30 @@ describe('F7: one function chooses a badge colour', () => {
   const sources = () => uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path) && /\.tsx?$/.test(path))
   const VERDICT_WORDS = /NO-GO|NO_GO|UNVERIFIED|DISCRETION|APPROACHING|CONDITIONS/
 
+  // actionStyle.ts as the scan sees it: without comments and without the BY_ACTION table, whose keys are the server's action names on an overlay, not verdicts
+  const actionStyleOutsideTable = () => {
+    const text = readUi('src/map/actionStyle.ts')
+    const start = text.indexOf('const BY_ACTION')
+    const end = text.indexOf('\n}\n', start)
+    expect(start).toBeGreaterThan(-1)
+    expect(end).toBeGreaterThan(start)
+    return (text.slice(0, start) + text.slice(end + 3)).replace(/^\s*\/\/.*$/gm, '')
+  }
+
   it('names a verdict word only in badgeColour.ts and in the places that show or map those words, never in the badge files', () => {
     const naming = sources().filter((path) => VERDICT_WORDS.test(readUi(path)))
     expect(naming).toEqual([
       'src/chat/badgeColour.ts', // the one colour function
       'src/components/Legend.tsx', // the legend's labels
       'src/content/howItWorks.ts', // the How-it-works words
-      'src/map/actionStyle.ts', // the server's action names on an overlay, not a verdict
+      'src/map/actionStyle.ts', // the server's action names on an overlay, not a verdict: only inside the BY_ACTION table (next test)
     ])
+  })
+
+  it('lets actionStyle.ts name those words in its BY_ACTION table only: any colour decision beside the table is a badge-colour decision and fails here', () => {
+    expect(actionStyleOutsideTable()).not.toMatch(VERDICT_WORDS)
+    expect(readUi('src/map/actionStyle.ts')).toMatch(VERDICT_WORDS) // the table does name them, so this scan is looking at something
+    expect(`${actionStyleOutsideTable()}\nif (action === 'NO_GO') paint = NO_FLY`).toMatch(VERDICT_WORDS) // and a decision beside the table would be caught
   })
 
   it('has a single caller of badgeColour, and the badge view picks classes by the colour name it returns, not by any word', () => {

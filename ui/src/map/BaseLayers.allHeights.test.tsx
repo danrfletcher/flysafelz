@@ -15,7 +15,7 @@ import type { AirspaceProps, MapFeature, NotamProps } from '@/map/types'
 import { HIGHLIGHTS_RUN } from '@/test/chatServer'
 import { ALL_HEIGHTS_AIRSPACE, ALL_HEIGHTS_NOTAMS } from '@/test/handlers'
 
-// The "all heights" layers drawn on a real Leaflet map in jsdom, from the recorded payloads (240 airspaces, 60 NOTAMs).
+// The "all heights" layers drawn on a real Leaflet map in jsdom, from the synthetic payloads (240 airspaces, 60 NOTAMs).
 
 beforeEach(() => {
   vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(1200)
@@ -252,7 +252,6 @@ describe('many overlapping high polygons: 240 airspaces and 60 NOTAMs', () => {
     for (let toggle = 1; toggle <= 10; toggle += 1) set({ showAirspaceAll: toggle % 2 === 1, showNotamsAll: toggle % 4 === 1 })
     // the 10th toggle: airspace all off, NOTAMs all off
     expect(shapes()).toHaveLength(0)
-    mapNow().eachLayer((l) => process.stdout.write('LEFT ' + JSON.stringify([l.constructor.name, Object.keys(l.options ?? {}), (l as L.Layer & {_url?:string})._url]) + '\n'))
     expect(everyLayer()).toBe(0)
     for (let toggle = 1; toggle <= 9; toggle += 1) set({ showAirspaceAll: toggle % 2 === 1, showAirspace: toggle % 2 === 0 })
     // the 9th: all on, below off

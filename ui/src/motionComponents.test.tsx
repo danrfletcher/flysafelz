@@ -106,6 +106,19 @@ describe.each([
     await waitFor(() => expect(atRest(bubble.style.transform)).toBe(true))
   })
 
+  it('springs the card’s tip in with the bubble, so the tip never shows at full opacity beside a fading bubble', async () => {
+    const { container } = renderMap()
+    clickAt(BLUE_MILL.lat, BLUE_MILL.lon)
+    const tip = container.querySelector<HTMLElement>('.leaflet-popup-tip-container')!
+    const calls = played('.leaflet-popup-tip-container')
+    expect(calls).toHaveLength(1)
+    expect(calls[0][0]).toBe(tip)
+    expect(calls[0][1]).toEqual(played('.leaflet-popup-content-wrapper')[0][1]) // the same values as the bubble
+    expect(calls[0][2]).toEqual(ENTER.card[variant].transition)
+    await waitFor(() => expect(tip.style.opacity).toBe('1'))
+    await waitFor(() => expect(atRest(tip.style.transform)).toBe(true))
+  })
+
   it.each([
     [1024, 'sheet'],
     [375, 'drawer'],

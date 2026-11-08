@@ -12,6 +12,11 @@ this app's middleware as its own for every endpoint, the agent's included (the c
 the middleware answers a preflight for every method and header; the routes themselves are GET only. langgraph.json (`http.cors`) lists the two
 dev origins for the server's own layer, so the agent endpoints are not left on the server's default (any origin).
 
+FLYSAFELZ_UI_ORIGIN reaches the real server only because langgraph-api (0.17.1, uv.lock) puts this app's middleware outside the server's own CORS layer
+(langgraph_api/server.py: `app.user_middleware = custom_middleware + global_middleware + ...`). langgraph.json's `http.cors` lists only the dev
+origins, so if a langgraph-api upgrade changed that order the extra origin would be dropped without a failure. tests/unit/agent/test_langgraph_json.py
+pins the method, header and expose lists below to langgraph.json's and reads that line of the installed server, so such an upgrade fails a test.
+
 `root`, `clock`, `settings` and `client_factory` are for tests: the repository root, the time, the settings and the HTTP client that reaches
 openAIP and the PIB. Left out, they are the real ones.
 """

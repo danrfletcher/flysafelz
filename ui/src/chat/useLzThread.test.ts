@@ -153,11 +153,12 @@ describe('useLzThread', () => {
       old.unmount() // the sheet is closed or another pin is picked: Conversation is unmounted
 
       await waitFor(() => expect(fake.runs[0].aborted).toBe(true))
+      expect(fake.runs[0].body.on_disconnect).toBe('cancel') // not left to the SDK's default: the server cancels the run when the client goes
       fake.runs[0].release()
       await new Promise((resolve) => setTimeout(resolve, 50))
 
       // Nothing from the old run reached the old pin as an answer, and the new pin has nothing at all.
-      expect(sessions.get(pinKey(BLUE_MILL)).turns[0]).toMatchObject({ status: 'error', answer: null, assessment: null, overlays: [] })
+      expect(sessions.get(pinKey(BLUE_MILL)).turns[0]).toMatchObject({ status: 'stopped', answer: null, assessment: null, overlays: [] })
       expect(sessions.get(pinKey(OTHER)).turns).toEqual([])
       expect(sessions.get(pinKey(BLUE_MILL)).threadId).toBe('thread-1')
 
@@ -249,6 +250,22 @@ describe('useLzThread', () => {
       expect(hook.result.current.turns[0].answer).toContain("Pilot's call")
     })
 
+    it('retries a stopped turn: the pilot came back to the pin, and the question goes out again on the same thread', async () => {
+      const { fake, sessions } = setup(scriptOf(BLUE_MILL_RUN, { holdAt: 3 }), scriptOf(BLUE_MILL_RUN))
+      const old = mount(BLUE_MILL, sessions)
+      act(() => old.result.current.send(QUESTION))
+      await waitFor(() => expect(old.result.current.line).toBe('Checking airspace…'))
+      old.unmount()
+      await waitFor(() => expect(fake.runs[0].aborted).toBe(true))
+      expect(sessions.get(pinKey(BLUE_MILL)).turns[0].status).toBe('stopped')
+
+      const back = mount(BLUE_MILL, sessions)
+      act(() => back.result.current.retry())
+      await waitFor(() => expect(back.result.current.turns[0].status).toBe('done'), { timeout: 5000 })
+      expect(fake.threads).toEqual(['thread-1'])
+      expect(fake.runs).toHaveLength(2)
+    })
+
     it('has nothing to retry when the latest turn did not fail', async () => {
       const { fake, sessions } = setup(scriptOf(BLUE_MILL_RUN))
       const hook = mount(BLUE_MILL, sessions)
@@ -260,8 +277,43 @@ describe('useLzThread', () => {
   })
 })
 
+describe('a turn after the first, before the server has cleared the last turn’s output', () => {
+  // The first state of turn 2 holds the new question and turn 1's answer, guard and assessment: input_check clears them only when it runs.
+  const first = BLUE_MILL_RUN.events.at(-1)!.data as { answer: string; guard: string; assessment: object; overlays: object[] }
+  const beforeInputCheck = (question: string) => ({
+    event: 'values',
+    data: {
+      ...first,
+      messages: [
+        { type: 'human', id: 'turn-1', content: QUESTION },
+        { type: 'ai', id: 'ai-1', content: first.answer },
+        { type: 'human', id: 'turn-2', content: question },
+      ],
+    },
+  })
+
+  it('does not store the previous turn’s answer and verdict when the stream closes cleanly in that window', async () => {
+    const { sessions } = setup(scriptOf(BLUE_MILL_RUN), { events: [beforeInputCheck('And tomorrow?')] })
+    const hook = mount(BLUE_MILL, sessions)
+    act(() => hook.result.current.send(QUESTION))
+    await settled(hook)
+    expect(hook.result.current.turns[0].status).toBe('done')
+
+    act(() => hook.result.current.send('And tomorrow?'))
+    await settled(hook, 1)
+    expect(hook.result.current.turns[1]).toMatchObject({ status: 'error', answer: null, guard: null, assessment: null, overlays: [] })
+    expect(hook.result.current.turns[0].answer).toBe(first.answer) // the first turn keeps its own
+  })
+
+  it('does not take them as the stored answer on a retry either', () => {
+    const state = beforeInputCheck('And tomorrow?').data
+    expect(storedResult(state, 'turn-2')).toBeNull()
+    expect(storedResult({ ...state, messages: [...state.messages, { type: 'ai', id: 'ai-2', content: 'x' }] }, 'turn-2')).toMatchObject({ answer: first.answer })
+  })
+})
+
 describe('storedResult', () => {
-  const answered = { messages: [{ type: 'human', id: 'q2' }], answer: 'Yes.', guard: 'passed', overlays: [], assessment: null }
+  const answered = { messages: [{ type: 'human', id: 'q2' }, { type: 'ai', id: 'a2' }], answer: 'Yes.', guard: 'passed', overlays: [], assessment: null }
 
   it('reads the answer when the turn is the thread latest question', () => {
     expect(storedResult(answered, 'q2')).toMatchObject({ answer: 'Yes.', guard: 'passed' })

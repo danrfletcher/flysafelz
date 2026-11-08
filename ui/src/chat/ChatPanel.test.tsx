@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ChatPanel, formatPoint } from '@/chat/ChatPanel'
-import { ERROR_TEXT, FALLBACK_HEADER, STARTER_CHIPS } from '@/chat/copy'
+import { ERROR_TEXT, FALLBACK_HEADER, STARTER_CHIPS, STOPPED_TEXT } from '@/chat/copy'
 import { createSessions, pinKey, type Sessions } from '@/chat/turns'
 import { BLUE_MILL_RUN, DECLINE_RUN, FALLBACK_RUN, NETWORK_ERROR_RUN, chatServer, scriptOf } from '@/test/chatServer'
 import { server } from '@/test/setup'
@@ -272,6 +272,7 @@ describe('ChatPanel conversation', () => {
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
     expect(screen.getAllByRole('button', { name: /fly here|airspace|NOTAMs/ })).toHaveLength(3) // the new pin starts empty, with chips
     await waitFor(() => expect(fake.runs[0].aborted).toBe(true))
+    expect(fake.runs[0].body.on_disconnect).toBe('cancel') // the server is told to cancel the run when the client goes, not to carry on
 
     fake.runs[0].release()
     await new Promise((resolve) => setTimeout(resolve, 50))
@@ -281,7 +282,11 @@ describe('ChatPanel conversation', () => {
     rerender(view(BLUE_MILL))
     expect(screen.getAllByRole('region', { name: 'Question and answer' })).toHaveLength(1) // the old pin kept its turn
     expect(screen.queryByText(/Pilot's call/)).toBeNull() // cancelled, so it has no answer; the pilot can retry
-    expect(screen.getByRole('alert')).toHaveTextContent(ERROR_TEXT)
+    // A run the pilot ended is "stopped", not a failed connection: no alert, no "Couldn't reach FlySafeLZ", and Retry is still there.
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.queryByText(ERROR_TEXT)).toBeNull()
+    expect(screen.getByText(STOPPED_TEXT)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
   })
 
   it('does not show the result of a run when the sheet is closed mid-run', async () => {
@@ -292,6 +297,7 @@ describe('ChatPanel conversation', () => {
     await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Checking airspace…'))
     rerender(view(null))
     await waitFor(() => expect(fake.runs[0].aborted).toBe(true))
+    expect(fake.runs[0].body.on_disconnect).toBe('cancel')
     fake.runs[0].release()
     rerender(view(OTHER))
     await new Promise((resolve) => setTimeout(resolve, 50))

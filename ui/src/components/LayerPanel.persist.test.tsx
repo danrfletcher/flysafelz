@@ -11,7 +11,7 @@ import { server } from '@/test/setup'
 // The whole path for saved layer choices: the real App reads jsdom's storage at load and writes it on every switch, the recorded
 // /map/airspace and /map/notams payloads are served by MSW (any other request fails the test), and "a reload" is unmount + render.
 
-const AIRSPACE = 15 // drawn polygons in the recorded payloads (src/test/fixtures/map-*.json)
+const AIRSPACE = 15 // drawn polygons in the made-up payloads (src/test/fixtures/map-*.json)
 const NOTAMS = 5
 
 beforeEach(() => {

@@ -55,10 +55,13 @@ function Pin({ point, airspace, notams, onChat }: PinProps) {
 
   useEffect(() => {
     marker.current?.openPopup()
-    // Leaflet owns the pin's and the card's elements, so they are animated through the DOM: the pin's inner element, and the card's bubble.
+    // Leaflet owns the pin's and the card's elements, so they are animated through the DOM: the pin's inner element, and the card's bubble and its tip
+    // (the tip gets the bubble's own animation, so it fades and moves with the bubble and never shows alone at full opacity).
+    const card = popup.current?.getElement()
     const played = [
       playEnter(marker.current?.getElement()?.querySelector('.pick-pin__drop'), drop),
-      playEnter(popup.current?.getElement()?.querySelector('.leaflet-popup-content-wrapper'), spring),
+      playEnter(card?.querySelector('.leaflet-popup-content-wrapper'), spring),
+      playEnter(card?.querySelector('.leaflet-popup-tip-container'), spring),
     ]
     return () => played.forEach((controls) => controls?.stop())
   }, [drop, spring])

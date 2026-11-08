@@ -5,12 +5,16 @@
 // 1. Every absolute URL in a text file under dist must be on an allowlist, by host:
 //      basemaps.cartocdn.com         the tile host (the {s} subdomain placeholder is allowed)
 //      rainviewer.com                the Rain layer's index (api.) and radar tiles (tilecache.), and the attribution link (www.)
-//      openstreetmap.org, carto.com, openaip.net, open-meteo.com  the attribution link hosts (the browser never calls open-meteo.com: wind and the rain grid come from /map)
+//      openstreetmap.org, carto.com, openaip.net  the attribution link hosts
 //      localhost
+//    open-meteo.com is allowed as that exact host only (the attribution link, https://open-meteo.com). The browser never calls Open-Meteo: wind and the
+//    rain grid come from /map. So the forecast API's host and any other subdomain
+//    are reported, as the source scan in src/fence.test.ts also does.
 //    fonts.googleapis.com and fonts.gstatic.com fail with their own message, wherever they appear.
 // 2. Every @font-face `src` in the built CSS is a bundled file that exists in dist.
 //
-// Some strings are in the bundle that are not requests, and are skipped by their full prefix, not by host:
+// Some strings are in the bundle that are not requests, and are skipped by their full prefix, not by host. A prefix without a closing slash
+// (https://leafletjs.com) matches that URL itself or that URL followed by a slash, so https://leafletjs.com.evil.example is still reported:
 //    http://www.w3.org/                 XML namespace names (svg, xlink, MathML); an identifier, never fetched
 //    https://react.dev/errors/          text inside React's production error messages
 //    https://leafletjs.com              the "Leaflet" link in the map's default attribution; shown, never fetched
@@ -24,7 +28,9 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-export const ALLOWED_HOSTS = ['basemaps.cartocdn.com', 'openstreetmap.org', 'carto.com', 'openaip.net', 'open-meteo.com', 'rainviewer.com', 'localhost']
+export const ALLOWED_HOSTS = ['basemaps.cartocdn.com', 'openstreetmap.org', 'carto.com', 'openaip.net', 'rainviewer.com', 'localhost']
+// Hosts allowed as themselves only, never with a subdomain.
+export const EXACT_HOSTS = ['open-meteo.com']
 export const FORBIDDEN_FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com']
 export const NOT_REQUESTS = [
   'http://www.w3.org/',
@@ -42,7 +48,12 @@ const URL_IN_TEXT = /https?:\/\/[^\s"'`<>()\\]+/g
 
 function hostAllowed(host) {
   const bare = host.replace(/^\{s\}\./, '').replace(/:\d+$/, '')
-  return ALLOWED_HOSTS.some((allowed) => bare === allowed || bare.endsWith(`.${allowed}`))
+  return EXACT_HOSTS.includes(bare) || ALLOWED_HOSTS.some((allowed) => bare === allowed || bare.endsWith(`.${allowed}`))
+}
+
+/** Whether `url` is one of the NOT_REQUESTS strings: the whole URL, or (for an entry without a closing slash) the URL followed by a slash. */
+function isNotRequest(url) {
+  return NOT_REQUESTS.some((entry) => (entry.endsWith('/') ? url.startsWith(entry) : url === entry || url.startsWith(`${entry}/`)))
 }
 
 function textFiles(folder) {
@@ -65,12 +76,12 @@ export function urlProblems(dist) {
       if (text.includes(host)) problems.push(`${name}: reaches ${host}; fonts must be bundled`)
     }
     for (const url of text.match(URL_IN_TEXT) ?? []) {
-      if (NOT_REQUESTS.some((prefix) => url.startsWith(prefix))) continue
+      if (isNotRequest(url)) continue
       if (FORBIDDEN_FONT_HOSTS.some((host) => url.includes(host))) continue // reported above
       const host = url.replace(/^https?:\/\//, '').split(/[/?#]/)[0]
       if (url.startsWith('https://') && INERT_LANGSMITH_HOSTS.includes(host)) continue
       if (!hostAllowed(host)) {
-        problems.push(`${name}: ${url} is on ${host}, which is not on the allowlist (${ALLOWED_HOSTS.join(', ')})`)
+        problems.push(`${name}: ${url} is on ${host}, which is not on the allowlist (${[...ALLOWED_HOSTS, ...EXACT_HOSTS].join(', ')})`)
       }
     }
   }
