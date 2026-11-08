@@ -52,6 +52,9 @@
   --wind-strong: #fde68a;
   --wind-severe: #fda4af;
 
+  /* Rain: the legend's swatch and the model-rain cells (the radar tiles carry RainViewer's own colours). Shown with its text. */
+  --rain: #60a5fa;
+
   /* Verdict colours: always shown with their text */
   --verdict-no-go: #ef4444;
   --verdict-unverified: #94a3b8;

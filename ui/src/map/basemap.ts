@@ -7,7 +7,7 @@ export const CARTO_TILE_URL = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x
 export const CARTO_KEY_PARAM = 'key'
 
 export const ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a> | airspace data <a href="https://www.openaip.net">openAIP</a> (CC BY-NC 4.0) | wind data <a href="https://open-meteo.com">Open-Meteo</a> (CC BY 4.0)'
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a> | airspace data <a href="https://www.openaip.net">openAIP</a> (CC BY-NC 4.0) | wind and model rain data <a href="https://open-meteo.com">Open-Meteo</a> (CC BY 4.0) | rain radar <a href="https://www.rainviewer.com">RainViewer</a>'
 
 /**
  * The tile URL template. No key, an empty key or a blank one gives CARTO_TILE_URL unchanged; otherwise the trimmed key is

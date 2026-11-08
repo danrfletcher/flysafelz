@@ -7,13 +7,17 @@ import { ACTIONS, ON_THE_MAP, VERDICTS } from '@/components/Legend'
 import { LAYERS, LayerPanel, type LayerId, type LayerSwitches } from '@/components/LayerPanel'
 import { HOW_IT_WORKS } from '@/content/howItWorks'
 import type { BasemapStatus } from '@/map/basemap'
+import { createRainView, type RainView } from '@/map/rainView'
 import type { LayerState, LayerStatus } from '@/map/useMapLayers'
+import type { RainState } from '@/map/useRain'
 
 const UPDATED = '2026-11-08T14:32:00Z'
 const ok = (over: Partial<LayerState<unknown>> = {}): LayerState<unknown> => ({ status: 'ok', features: [], updatedAt: UPDATED, stale: false, ...over })
 const loading: LayerState<unknown> = { status: 'loading', features: [], updatedAt: null, stale: false }
 const unavailable: LayerState<unknown> = { status: 'unavailable', features: [], updatedAt: null, stale: false }
 const windOk = (over: Partial<LayerStatus> = {}): LayerStatus => ({ status: 'ok', updatedAt: UPDATED, stale: false, ...over })
+
+const RADAR: RainState = { mode: 'radar', host: 'https://tilecache.rainviewer.com', frames: [{ time: 1_794_139_800, path: '/v2/radar/a' }], fetchedAt: 0 }
 
 /** The panel with its switches held in state, as App holds them. */
 function Panel({
@@ -22,17 +26,22 @@ function Panel({
   notams = ok(),
   basemap,
   onChange,
+  rain = RADAR,
+  rainView = createRainView(),
 }: {
   wind?: LayerStatus
   airspace?: LayerState<unknown>
   notams?: LayerState<unknown>
   basemap?: BasemapStatus
   onChange?: (id: LayerId, on: boolean) => void
+  rain?: RainState
+  rainView?: RainView
 }) {
-  const [shown, setShown] = useState<LayerSwitches>({ wind: true, airspace: true, notams: true, answer: true })
+  const [shown, setShown] = useState<LayerSwitches>({ wind: true, rain: true, airspace: true, notams: true, answer: true })
   return (
     <LayerPanel
       states={{ wind, airspace, notams }}
+      rain={{ state: rain, view: rainView }}
       basemap={basemap}
       shown={shown}
       onShownChange={(id, on) => {
@@ -55,15 +64,16 @@ afterEach(() => {
 })
 
 describe('the switches', () => {
-  it('has Wind, the two base layers and the Answer overlays switch, all on by default', async () => {
+  it('has Wind, Rain, the two base layers and the Answer overlays switch, all on by default', async () => {
     await open()
     const switches = screen.getAllByRole('switch')
-    expect(switches.map((s) => s.getAttribute('aria-checked'))).toEqual(['true', 'true', 'true', 'true'])
+    expect(switches.map((s) => s.getAttribute('aria-checked'))).toEqual(['true', 'true', 'true', 'true', 'true'])
     expect(screen.getByRole('switch', { name: 'Wind' })).toBeChecked()
+    expect(screen.getByRole('switch', { name: 'Rain' })).toBeChecked()
     expect(screen.getByRole('switch', { name: 'Airspace below FL100' })).toBeChecked()
     expect(screen.getByRole('switch', { name: 'NOTAMs below FL100' })).toBeChecked()
     expect(screen.getByRole('switch', { name: 'Answer overlays' })).toBeChecked()
-    expect(LAYERS.map((layer) => layer.id)).toEqual(['wind', 'airspace', 'notams', 'answer'])
+    expect(LAYERS.map((layer) => layer.id)).toEqual(['wind', 'rain', 'airspace', 'notams', 'answer'])
   })
 
   it('switches Answer overlays on its own, and gives it no update time (it is drawn from the chat, not a route)', async () => {
@@ -96,9 +106,9 @@ describe('the switches', () => {
     expect(screen.getByRole('switch', { name: 'Airspace below FL100' })).not.toBeChecked()
   })
 
-  it('has no switch for rain or all heights, and none for the basemap', async () => {
+  it('has no switch for all heights, and none for the basemap', async () => {
     const { dialog } = await open()
-    expect(within(dialog).queryByText(/rain|radar|all heights/i)).toBeNull()
+    expect(within(dialog).queryByText(/all heights/i)).toBeNull()
     expect(within(dialog).queryByRole('switch', { name: /basemap/i })).toBeNull()
   })
 })
@@ -154,10 +164,11 @@ describe('each layer’s line', () => {
 
   it('shows "stale" next to the time for a stale layer only', async () => {
     const { dialog } = await open(<Panel airspace={ok()} notams={ok({ stale: true })} />)
-    const rows = within(dialog).getAllByRole('listitem').slice(0, 3)
+    const rows = within(dialog).getAllByRole('listitem').slice(0, 4)
     expect(rows[0]).not.toHaveTextContent('stale') // wind
-    expect(rows[1]).not.toHaveTextContent('stale') // airspace
-    expect(rows[2]).toHaveTextContent(/updated \d\d:\d\d\s*stale/) // NOTAMs
+    expect(rows[1]).not.toHaveTextContent('stale') // rain
+    expect(rows[2]).not.toHaveTextContent('stale') // airspace
+    expect(rows[3]).toHaveTextContent(/updated \d\d:\d\d\s*stale/) // NOTAMs
   })
 
   it('says "<layer> unavailable" for a 503 layer, with no time, and leaves the other alone', async () => {
@@ -218,7 +229,7 @@ describe('the basemap entry', () => {
     const { dialog } = await open(<Panel basemap="unavailable" />)
     expect(within(entry(dialog)).queryByRole('switch')).toBeNull()
     expect(entry(dialog).textContent).not.toMatch(/updated|stale|loading/i)
-    expect(within(dialog).getAllByRole('switch')).toHaveLength(4)
+    expect(within(dialog).getAllByRole('switch')).toHaveLength(5)
     expect(within(dialog).getAllByText(/^updated /)).toHaveLength(3)
   })
 

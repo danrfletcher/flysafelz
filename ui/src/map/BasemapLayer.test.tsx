@@ -94,16 +94,17 @@ describe('the basemap tile layer', () => {
     expect(container).not.toHaveClass('basemap-unavailable')
   })
 
-  it('keeps the OpenStreetMap, CARTO, openAIP and Open-Meteo (wind) credits, with links, in both states', () => {
+  it('keeps the OpenStreetMap, CARTO, openAIP, Open-Meteo (wind and model rain) and RainViewer (radar) credits, with links, in both states', () => {
     const { map, tile, container } = mount()
     const credits = () => container.querySelector('.leaflet-control-attribution') as HTMLElement
     const check = () => {
       expect(credits()).toHaveTextContent('OpenStreetMap')
       expect(credits()).toHaveTextContent('CARTO')
       expect(credits()).toHaveTextContent('openAIP')
-      expect(credits()).toHaveTextContent('wind data Open-Meteo (CC BY 4.0)')
+      expect(credits()).toHaveTextContent('wind and model rain data Open-Meteo (CC BY 4.0)')
+      expect(credits()).toHaveTextContent('rain radar RainViewer')
       const links = [...credits().querySelectorAll('a')].map((a) => a.getAttribute('href'))
-      expect(links).toEqual(expect.arrayContaining(['https://www.openstreetmap.org/copyright', 'https://carto.com/attributions', 'https://www.openaip.net', 'https://open-meteo.com']))
+      expect(links).toEqual(expect.arrayContaining(['https://www.openstreetmap.org/copyright', 'https://carto.com/attributions', 'https://www.openaip.net', 'https://open-meteo.com', 'https://www.rainviewer.com']))
     }
     check()
     tile('tileerror')

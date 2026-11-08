@@ -172,9 +172,11 @@ def test_readme_running_the_ui_names_node_the_targets_the_ports_and_vite_api_url
 def test_readme_data_and_licences_has_one_line_per_source_and_ends_with_the_demo_sentence():
     text = section("Data and licences").strip()
     lines = [line for line in text.splitlines() if line.startswith("- ")]
-    assert [line.split(":")[0] for line in lines] == ["- Open-Meteo", "- openAIP", "- NATS PIB", "- CARTO basemap"]
+    assert [line.split(":")[0] for line in lines] == ["- Open-Meteo", "- RainViewer", "- openAIP", "- NATS PIB", "- CARTO basemap"]
     assert text.endswith("This is a non-commercial demo; a production deployment would move to commercial plans (Open-Meteo API subscription, a licensed radar feed such as the Met Office's).")
-    assert "RainViewer" not in text  # its line comes with the rain PR
+    rain = next(line for line in lines if line.startswith("- RainViewer"))
+    assert all(word in rain for word in ("free API", "personal and educational", "2 hours", "zoom 7", "100 requests"))
+    assert "GET /map/rain-grid" in lines[0] and "model, not radar" in lines[0]  # the Open-Meteo line carries the rain-grid fallback
 
 
 def test_readme_has_no_placeholder_for_the_pieces_later_prs_add():

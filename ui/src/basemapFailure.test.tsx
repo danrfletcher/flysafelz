@@ -23,6 +23,9 @@ beforeEach(() => {
 })
 afterEach(() => vi.restoreAllMocks())
 
+/** The CARTO layer: the radar's frame layers are tile layers too (PR-10.F1), in their own pane and with no credit of their own. */
+const isBasemap = (layer: L.Layer): layer is L.TileLayer => layer instanceof L.TileLayer && !!layer.options.attribution?.includes('CARTO')
+
 function open() {
   const fake = chatServer(scriptOf(HIGHLIGHTS_RUN))
   server.use(...blueMillRoutes(), ...fake.handlers)
@@ -31,7 +34,7 @@ function open() {
   const map = fit.mock.contexts[0] as L.Map
   let tiles!: L.TileLayer
   map.eachLayer((layer) => {
-    if (layer instanceof L.TileLayer) tiles = layer
+    if (isBasemap(layer)) tiles = layer
   })
   const fire = (name: 'tileload' | 'tileerror' | 'load') => act(() => void tiles.fire(name, { tile: document.createElement('img'), coords: { x: 1, y: 1, z: 5 } }))
   const click = (point: { lat: number; lon: number }) => act(() => void map.fire('click', { latlng: L.latLng(point.lat, point.lon) }))
@@ -111,6 +114,6 @@ describe('E2: the basemap is unavailable', () => {
     expect(tiles.options.opacity).toBe(1)
     expect(view.container.querySelector('.leaflet-container')).not.toHaveClass('basemap-unavailable')
 
-    expect(count(map, (layer) => layer instanceof L.TileLayer)).toBe(1) // the one CARTO layer, hidden and shown again: no second provider
+    expect(count(map, isBasemap)).toBe(1) // the one CARTO layer, hidden and shown again: no second provider
   })
 })

@@ -102,9 +102,9 @@ def test_the_route_makes_one_multi_location_request_to_open_meteo(setup):
     assert (params["current"], params["wind_speed_unit"]) == ("wind_speed_10m,wind_direction_10m", "ms")
 
 
-def test_only_the_wind_route_is_added_and_there_is_no_rain_grid_route(setup):
-    assert setup.client.get("/map/rain-grid").status_code == 404
-    assert setup.upstream.requests == []
+def test_the_wind_route_never_calls_upstream_for_the_rain_grid_route(setup):
+    setup.get()
+    assert len(setup.upstream.requests) == 1  # the rain grid is its own route and its own request (tests/unit/test_mapdata_rain_grid.py)
 
 
 # --- the 3 h cache ------------------------------------------------------------------------------------------------------

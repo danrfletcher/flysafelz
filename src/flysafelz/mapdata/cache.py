@@ -14,7 +14,7 @@ A file that cannot be read as a payload is treated as no cache and is overwritte
 
 The file is written to a temporary file in the same folder, then renamed over the old one, so a reader never sees half a file.
 Nothing is written anywhere else. The body is `updated_at` (ISO UTC), `stale` and the items under `key`. The default key "features" makes the body a
-GeoJSON FeatureCollection (the airspace and NOTAM routes); the wind route's key is "grid" (its two leaflet-velocity records).
+GeoJSON FeatureCollection (the airspace and NOTAM routes); the wind and rain-grid routes' key is "grid" (the wind route's two leaflet-velocity records; the rain grid's list of cells).
 """
 
 import asyncio

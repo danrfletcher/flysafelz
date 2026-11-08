@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 import { apiUrl } from '@/config'
+import { rainIndexRoute } from '@/mocks/rain'
 import { windRoute } from '@/mocks/wind'
 import type { AirspaceProps, LayerPayload, NotamProps } from '@/map/types'
 import airspaceFixture from '@/test/fixtures/map-airspace.json'
@@ -26,9 +27,9 @@ export function notamsRoute(body: object = NOTAMS_FIXTURE) {
 /** What the server says when a route has no cache and its refresh failed (src/flysafelz/mapdata/cache.py). */
 export const unavailable = (url: string) => http.get(url, () => HttpResponse.json({ reason: 'openAIP: not reachable' }, { status: 503 }))
 
-/** All three map routes with their recorded answers. */
+/** All the map routes with their recorded answers, and RainViewer's index with three current frames (a test of the fallback adds `rainGridRoute`). */
 export function mapRoutes() {
-  return [airspaceRoute(), notamsRoute(), windRoute()]
+  return [airspaceRoute(), notamsRoute(), windRoute(), rainIndexRoute()]
 }
 
 /** The Blue Mill payloads (53.802797, -0.086644): an ATZ and a CTA over it, a CTA floored at FL100 and a TMA at FL105, a NOTAM with a hole, an approx Q-circle NOTAM, a NOTAM with no Q-line lower limit, an FL105 NOTAM, and one far away. */
@@ -37,5 +38,5 @@ export const BLUE_MILL_NOTAMS = blueMillNotams as unknown as LayerPayload<NotamP
 export const BLUE_MILL = { lat: 53.802797, lon: -0.086644 }
 
 export function blueMillRoutes() {
-  return [airspaceRoute(BLUE_MILL_AIRSPACE), notamsRoute(BLUE_MILL_NOTAMS), windRoute()]
+  return [airspaceRoute(BLUE_MILL_AIRSPACE), notamsRoute(BLUE_MILL_NOTAMS), windRoute(), rainIndexRoute()]
 }

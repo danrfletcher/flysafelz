@@ -234,7 +234,7 @@ describe('G1: the Wind switch', () => {
     await waitFor(() => expect(canvases(first.container)).toBe(1))
     await openPanel(first.user)
     await first.user.click(windSwitch())
-    expect(stored()).toEqual({ wind: false, airspace: true, notams: true, answer: true })
+    expect(stored()).toEqual({ wind: false, rain: true, airspace: true, notams: true, answer: true })
     first.view.unmount() // the reload
     const again = load()
     await openPanel(again.user)

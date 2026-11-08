@@ -2,6 +2,7 @@
 
     wind_grid(client, now)   -> [U record, V record], or raises RefreshFailed
     grid_points()            the 143 (latitude, longitude) points, north to south and, in each row, west to east
+    location_params()        the multi-location `latitude` and `longitude` of those points (shared with rain_grid.py)
     request_params()         the query of the one multi-location request
     wind_uv(speed, direction) -> (u, v) in m/s
 
@@ -54,14 +55,17 @@ def grid_points() -> list[tuple[int, int]]:
     return [(latitude, longitude) for latitude in LATITUDES for longitude in LONGITUDES]
 
 
-def request_params() -> dict[str, str]:
+def location_params() -> dict[str, str]:
+    """The `latitude` and `longitude` of an Open-Meteo multi-location request for the whole grid, in grid_points() order. The rain grid asks for the same points."""
     points = grid_points()
     return {
         "latitude": ",".join(str(latitude) for latitude, _ in points),
         "longitude": ",".join(str(longitude) for _, longitude in points),
-        "current": ",".join(CURRENT),
-        "wind_speed_unit": SPEED_UNIT,
     }
+
+
+def request_params() -> dict[str, str]:
+    return {**location_params(), "current": ",".join(CURRENT), "wind_speed_unit": SPEED_UNIT}
 
 
 def _number(value: object) -> float | None:

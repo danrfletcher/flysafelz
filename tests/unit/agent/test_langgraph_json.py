@@ -84,13 +84,13 @@ def test_http_app_names_the_map_routes_app():
     assert config()["http"]["app"] == APP_ENTRY
 
 
-def test_the_http_app_entry_loads_as_the_server_loads_it_and_is_a_starlette_app_with_the_three_routes():
+def test_the_http_app_entry_loads_as_the_server_loads_it_and_is_a_starlette_app_with_the_four_routes():
     from starlette.applications import Starlette
     from starlette.routing import Route
 
     app = load_factory(config()["http"]["app"])  # the same file-path load: the server imports the file, then reads the name
     assert isinstance(app, Starlette)
-    assert {route.path for route in app.routes if isinstance(route, Route)} == {"/map/airspace", "/map/notams", "/map/wind"}
+    assert {route.path for route in app.routes if isinstance(route, Route)} == {"/map/airspace", "/map/notams", "/map/wind", "/map/rain-grid"}
 
 
 def test_the_servers_cors_lists_exactly_the_two_dev_origins_and_never_a_wildcard():
