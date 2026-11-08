@@ -1,3 +1,4 @@
+import { MotionConfig } from 'motion/react'
 import { useState } from 'react'
 
 import { ChatPanel } from '@/chat/ChatPanel'
@@ -6,6 +7,7 @@ import { Footer } from '@/components/Footer'
 import { LAYERS, LayerPanel } from '@/components/LayerPanel'
 import { NavBar } from '@/components/NavBar'
 import { UkMap } from '@/components/UkMap'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useIsDesktop } from '@/lib/useIsDesktop'
 import { useLayerPrefs } from '@/lib/useLayerPrefs'
 import { AnswerOverlays } from '@/map/answerOverlays'
@@ -29,6 +31,8 @@ import type { LatLon } from '@/pick/whatsHere'
  * Putting down a new pin closes the chat, which ends any run still going for the old pin; its turns stay with it in `sessions`.
  * The map shows the highlights of one turn of the open chat: the latest answer's, unless the pilot picked another turn's badges or a NOTAM id.
  * Closing the chat or putting down a new pin clears them.
+ * Every enter animation (pin, card, chat panel, progress line, badges) follows the one reduced-motion setting read by `useReducedMotion`; `MotionConfig`
+ * is given that same value, so a motion component outside the shared variants could not animate a transform under reduced motion either.
  */
 export default function App() {
   const layers = useMapLayers()
@@ -44,6 +48,7 @@ export default function App() {
   const [selection, setSelection] = useState<Selection | null>(null)
   const highlight = useAnswerHighlight(sessions, chatPoint, selection)
   const desktop = useIsDesktop()
+  const reducedMotion = useReducedMotion()
 
   const closeChat = () => {
     setChatPoint(null)
@@ -57,46 +62,48 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-dvh flex-col">
-      <NavBar />
-      <main ref={setMapArea} className="relative min-h-0 flex-1 overflow-hidden">
-        <UkMap basemap={basemap} onBasemapStatus={setBasemap}>
-          {shown.wind && wind.grid && <WindLayer grid={wind.grid} />}
-          {shown.rain && rain.state.mode === 'radar' && (
-            <RainLayer host={rain.state.host} frames={rain.state.frames} fetchedAt={rain.state.fetchedAt} gate={rain.gate} view={rain.view} />
-          )}
-          {shown.rain && rain.state.mode === 'fallback' && <RainGridLayer cells={rain.state.cells} view={rain.view} />}
-          <BaseLayers
-            airspace={layers.airspace.features}
-            notams={layers.notams.features}
-            showAirspace={shown.airspace}
-            showNotams={shown.notams}
-            showAirspaceAll={shown.airspaceAll}
-            showNotamsAll={shown.notamsAll}
+    <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
+      <div className="flex h-dvh flex-col">
+        <NavBar />
+        <main ref={setMapArea} className="relative min-h-0 flex-1 overflow-hidden">
+          <UkMap basemap={basemap} onBasemapStatus={setBasemap}>
+            {shown.wind && wind.grid && <WindLayer grid={wind.grid} />}
+            {shown.rain && rain.state.mode === 'radar' && (
+              <RainLayer host={rain.state.host} frames={rain.state.frames} fetchedAt={rain.state.fetchedAt} gate={rain.gate} view={rain.view} />
+            )}
+            {shown.rain && rain.state.mode === 'fallback' && <RainGridLayer cells={rain.state.cells} view={rain.view} />}
+            <BaseLayers
+              airspace={layers.airspace.features}
+              notams={layers.notams.features}
+              showAirspace={shown.airspace}
+              showNotams={shown.notams}
+              showAirspaceAll={shown.airspaceAll}
+              showNotamsAll={shown.notamsAll}
+            />
+            <PickHandler airspace={layers.airspace} notams={layers.notams} onChat={setChatPoint} onPick={closeChat} />
+            <FitToLz point={chatPoint} layout={desktop ? 'sheet' : 'drawer'} />
+            <AnswerOverlays point={chatPoint} highlight={highlight} visible={shown.answer} layout={desktop ? 'sheet' : 'drawer'} />
+          </UkMap>
+          {shown.rain && rain.state.mode === 'radar' && <RainStamp view={rain.view} />}
+          <LayerPanel
+            states={{ wind, ...layers }}
+            rain={{ state: rain.state, view: rain.view }}
+            basemap={basemap}
+            shown={shown}
+            chatOpen={chatPoint !== null}
+            onShownChange={setShown}
           />
-          <PickHandler airspace={layers.airspace} notams={layers.notams} onChat={setChatPoint} onPick={closeChat} />
-          <FitToLz point={chatPoint} layout={desktop ? 'sheet' : 'drawer'} />
-          <AnswerOverlays point={chatPoint} highlight={highlight} visible={shown.answer} layout={desktop ? 'sheet' : 'drawer'} />
-        </UkMap>
-        {shown.rain && rain.state.mode === 'radar' && <RainStamp view={rain.view} />}
-        <LayerPanel
-          states={{ wind, ...layers }}
-          rain={{ state: rain.state, view: rain.view }}
-          basemap={basemap}
-          shown={shown}
-          chatOpen={chatPoint !== null}
-          onShownChange={setShown}
-        />
-        <ChatPanel
-          point={chatPoint}
-          sessions={sessions}
-          onClose={closeChat}
-          container={mapArea}
-          onShowTurn={(turnId) => showTurn(turnId)}
-          onShowNotam={showTurn}
-        />
-      </main>
-      <Footer />
-    </div>
+          <ChatPanel
+            point={chatPoint}
+            sessions={sessions}
+            onClose={closeChat}
+            container={mapArea}
+            onShowTurn={(turnId) => showTurn(turnId)}
+            onShowNotam={showTurn}
+          />
+        </main>
+        <Footer />
+      </div>
+    </MotionConfig>
   )
 }

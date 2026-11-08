@@ -1,3 +1,6 @@
+import { motion } from 'motion/react'
+
+import { useEnter } from '@/hooks/useEnter'
 import { readBadges } from '@/chat/readBadges'
 import type { BadgeColour } from '@/chat/badgeColour'
 import type { Payload } from '@/chat/turns'
@@ -16,21 +19,25 @@ const PAINT: Record<BadgeColour, { badge: string; dot: string }> = {
 export interface BadgesProps {
   /** The turn's own `assessment`, as the server sent it. Null draws nothing at all. */
   assessment: Payload | null
+  /** True for the turn whose answer has just landed: its badges fade and scale in once, when they mount. Every other turn's badges are drawn at rest. */
+  enter?: boolean
   /** A click on a badge: draw this turn's highlights on the map. */
   onSelect?: () => void
 }
 
 /**
  * The verdict badges above one answer: one per segment of that turn's `assessment`, its time span, its labels as text and its
- * conditions beneath. No assessment (or no readable segment) renders nothing, not even an empty container.
+ * conditions beneath. No assessment (or no readable segment) renders nothing, not even an empty container. The enter animation is
+ * played by the element when it mounts, so a re-render of the turn (a highlight redraw, a later turn arriving) never replays it.
  */
-export function Badges({ assessment, onSelect }: BadgesProps) {
+export function Badges({ assessment, enter = false, onSelect }: BadgesProps) {
+  const appear = useEnter('badge')
   const badges = readBadges(assessment)
   if (!badges) return null
   return (
     <ul aria-label="Verdict by time" className="space-y-2">
       {badges.map((badge, index) => (
-        <li key={index} className="space-y-1">
+        <motion.li key={index} initial={enter ? appear.initial : false} animate={appear.animate} transition={appear.transition} className="space-y-1">
           <button
             type="button"
             onClick={onSelect}
@@ -49,7 +56,7 @@ export function Badges({ assessment, onSelect }: BadgesProps) {
               ))}
             </ul>
           )}
-        </li>
+        </motion.li>
       ))}
     </ul>
   )

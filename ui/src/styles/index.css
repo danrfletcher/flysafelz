@@ -136,10 +136,15 @@
   text-shadow: 0 0 3px var(--background), 0 0 3px var(--background);
 }
 
-/* The pin dropped by a click on land: the accent colour with a dark edge. The svg's point is the icon's anchor. */
+/* The pin dropped by a click on land: the accent colour with a dark edge. The svg's point is the icon's anchor. The drop animation moves
+   `.pick-pin__drop`, never the icon element, whose transform is Leaflet's position. */
 .pick-pin {
   background: none;
   border: 0;
+}
+
+.pick-pin__drop {
+  display: block;
 }
 
 .pick-pin svg {

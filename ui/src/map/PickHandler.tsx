@@ -4,17 +4,20 @@ import { createPortal } from 'react-dom'
 import { Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 
 import { NOT_LAND_MESSAGE, Toast } from '@/components/Toast'
+import { useEnter } from '@/hooks/useEnter'
+import { playEnter } from '@/lib/motion'
 import type { AirspaceProps, NotamProps } from '@/map/types'
 import type { LayerState } from '@/map/useMapLayers'
 import { isUkLand } from '@/pick/land'
 import { WhatsHereCard } from '@/pick/WhatsHereCard'
 import type { LatLon } from '@/pick/whatsHere'
 
-// The pin: an SVG teardrop in the theme's accent, its point on the picked coordinates. Static markup, nothing from the server in it.
+// The pin: an SVG teardrop in the theme's accent, its point on the picked coordinates. Static markup, nothing from the server in it. Leaflet moves the
+// icon element itself with a transform, so the drop animation plays on the `pick-pin__drop` element inside it.
 const PIN_ICON = L.divIcon({
   className: 'pick-pin',
   html:
-    '<svg viewBox="0 0 28 38" width="28" height="38" aria-hidden="true"><path d="M14 1C7 1 1.5 6.5 1.5 13.4 1.5 22.7 14 37 14 37S26.5 22.7 26.5 13.4C26.5 6.5 21 1 14 1Z"/><circle cx="14" cy="13.5" r="4.5"/></svg>',
+    '<span class="pick-pin__drop"><svg viewBox="0 0 28 38" width="28" height="38" aria-hidden="true"><path d="M14 1C7 1 1.5 6.5 1.5 13.4 1.5 22.7 14 37 14 37S26.5 22.7 26.5 13.4C26.5 6.5 21 1 14 1Z"/><circle cx="14" cy="13.5" r="4.5"/></svg></span>',
   iconSize: [28, 38],
   iconAnchor: [14, 37],
   popupAnchor: [0, -34],
@@ -40,14 +43,25 @@ interface PinProps {
   onChat?: (point: LatLon) => void
 }
 
-/** The pin and its open card. Mounted fresh (by its key) for each picked point, so a new point never shows an old card's open rows. */
+/**
+ * The pin and its open card. Mounted fresh (by its key) for each picked point, so a new point never shows an old card's open rows, and the pin's
+ * drop and the card's spring each play once, on that mount. Both follow the reduced-motion setting as it is when the pin is put down.
+ */
 function Pin({ point, airspace, notams, onChat }: PinProps) {
   const marker = useRef<L.Marker>(null)
   const popup = useRef<L.Popup>(null)
+  const [drop] = useState(useEnter('pin'))
+  const [spring] = useState(useEnter('card'))
 
   useEffect(() => {
     marker.current?.openPopup()
-  }, [])
+    // Leaflet owns the pin's and the card's elements, so they are animated through the DOM: the pin's inner element, and the card's bubble.
+    const played = [
+      playEnter(marker.current?.getElement()?.querySelector('.pick-pin__drop'), drop),
+      playEnter(popup.current?.getElement()?.querySelector('.leaflet-popup-content-wrapper'), spring),
+    ]
+    return () => played.forEach((controls) => controls?.stop())
+  }, [drop, spring])
 
   return (
     <Marker ref={marker} position={[point.lat, point.lon]} icon={PIN_ICON} title="Picked field" keyboard>

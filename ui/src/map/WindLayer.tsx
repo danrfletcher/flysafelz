@@ -2,7 +2,7 @@ import L from 'leaflet'
 import { useEffect } from 'react'
 import { useMap } from 'react-leaflet'
 
-import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { createVelocityLayer } from '@/map/velocity'
 import { arrowLength, CALM_MS, toArrows, windBand, type WindArrow, type WindGrid } from '@/map/wind'
 
@@ -68,6 +68,6 @@ function Arrows({ grid }: { grid: WindGrid }) {
  * switch is on and a grid is held: unmounting removes the layer, so switching on and off leaves one layer on the map, or none.
  */
 export function WindLayer({ grid }: { grid: WindGrid }) {
-  const reduced = usePrefersReducedMotion()
+  const reduced = useReducedMotion()
   return reduced ? <Arrows grid={grid} /> : <Particles grid={grid} />
 }

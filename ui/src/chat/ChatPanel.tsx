@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Answer } from '@/chat/Answer'
 import { Badges } from '@/chat/Badges'
 import { ERROR_TEXT, STARTER_CHIPS } from '@/chat/copy'
+import { ProgressLine } from '@/chat/ProgressLine'
 import { pinKey, type Sessions, type Turn } from '@/chat/turns'
 import { useLeaveWarning } from '@/chat/useLeaveWarning'
 import { useLzThread } from '@/chat/useLzThread'
@@ -35,15 +36,18 @@ interface ConversationProps extends HighlightRequests {
   onClose: () => void
 }
 
-/** One answered turn: its badges (from its own `assessment`) above its answer, whose NOTAM ids that are in its own `overlays` are buttons. */
-function TurnAnswer({ turn, onShowTurn, onShowNotam }: { turn: Turn } & HighlightRequests) {
+/**
+ * One answered turn: its badges (from its own `assessment`) above its answer, whose NOTAM ids that are in its own `overlays` are buttons.
+ * `arrived` is true for a turn whose answer landed while the chat was open: only its badges play the enter animation.
+ */
+function TurnAnswer({ turn, arrived, onShowTurn, onShowNotam }: { turn: Turn; arrived: boolean } & HighlightRequests) {
   const notams = useMemo(() => notamsById(turn.overlays), [turn.overlays])
   const links = useMemo(() => ({ notams, onShow: (id: string) => onShowNotam?.(turn.id, id) }), [notams, onShowNotam, turn.id])
   return (
     <Answer
       answer={turn.answer ?? ''}
       guard={turn.guard}
-      badges={<Badges assessment={turn.assessment} onSelect={() => onShowTurn?.(turn.id)} />}
+      badges={<Badges assessment={turn.assessment} enter={arrived} onSelect={() => onShowTurn?.(turn.id)} />}
       links={links}
     />
   )
@@ -52,6 +56,9 @@ function TurnAnswer({ turn, onShowTurn, onShowNotam }: { turn: Turn } & Highligh
 /** The chat for one LZ: header, turns, the live status line (or the error with its retry button), starter chips and the question box. */
 function Conversation({ point, sessions, onClose, onShowTurn, onShowNotam }: ConversationProps) {
   const { turns, line, running, send, retry } = useLzThread(point, sessions)
+  // Turns already answered when this chat opened (the pilot came back to a pin): their badges show at rest. A turn answered after that is the
+  // one that "just arrived" and its badges enter once; older turns never replay, as their elements stay mounted.
+  const [answeredAtOpen] = useState(() => new Set(turns.filter((turn) => turn.status === 'done').map((turn) => turn.id)))
   useLeaveWarning(turns.length > 0)
   const [text, setText] = useState('')
   const end = useRef<HTMLDivElement>(null)
@@ -102,16 +109,12 @@ function Conversation({ point, sessions, onClose, onShowTurn, onShowNotam }: Con
         {turns.map((turn) => (
           <section key={turn.id} className="space-y-2" aria-label="Question and answer">
             <p className="ml-auto w-fit max-w-[85%] rounded-lg bg-muted px-3 py-2 text-sm whitespace-pre-wrap [overflow-wrap:anywhere]">{turn.question}</p>
-            {turn.status === 'done' && turn.answer !== null && <TurnAnswer turn={turn} onShowTurn={onShowTurn} onShowNotam={onShowNotam} />}
+            {turn.status === 'done' && turn.answer !== null && <TurnAnswer turn={turn} arrived={!answeredAtOpen.has(turn.id)} onShowTurn={onShowTurn} onShowNotam={onShowNotam} />}
           </section>
         ))}
 
         <div role="status" aria-live="polite">
-          {last?.status === 'running' && (
-            <p key={line ?? WORKING_TEXT} className="text-sm text-muted-foreground transition-opacity duration-300 motion-reduce:transition-none starting:opacity-0">
-              {line ?? WORKING_TEXT}
-            </p>
-          )}
+          {last?.status === 'running' && <ProgressLine key={line ?? WORKING_TEXT} line={line ?? WORKING_TEXT} />}
         </div>
 
         {last?.status === 'error' && (

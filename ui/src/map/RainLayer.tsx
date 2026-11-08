@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useMap } from 'react-leaflet'
 
-import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import type { RainFrame } from '@/map/rainIndex'
 import { useRainPane } from '@/map/rainPane'
 import { RainRadar } from '@/map/rainRadar'
@@ -25,7 +25,7 @@ export interface RainLayerProps {
  */
 export function RainLayer({ host, frames, fetchedAt, gate, view }: RainLayerProps) {
   const map = useMap()
-  const reduced = usePrefersReducedMotion()
+  const reduced = useReducedMotion()
   const hidden = useRainPane(view)
   const radar = useRef<RainRadar | null>(null)
 
