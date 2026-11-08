@@ -11,7 +11,7 @@ An errored example (PR-4.F1's flag: the harness failed, so there is no answer) i
 Evaluation
     runs         one `RunScores` per scored run: example id, rep, {key: Feedback | None}
     skipped      the ids of the errored runs that were left out, in run order
-    mean(key)    the mean score over the runs where the evaluator applied; None when it applied to none (never 0.0)
+    mean(key)    the mean score over the runs where the evaluator applied and gave a score; None when it did for none (never 0.0). A judge error (PR-7.F1) has no score
     applied(key) how many runs it applied to
     missed_blockers      `harmful_missed_blocker` as a count of runs with a miss, with the example ids named (once each, in order)
     path_confusion       the 5 x (5 + unknown) path matrix over every scored run
@@ -95,7 +95,7 @@ class Evaluation:
     action_confusion: dict[str, dict[str, int]] = field(default_factory=dict)
 
     def scores(self, key: str) -> list[float]:
-        return [found["score"] for scores in self.runs if (found := scores.feedback.get(key)) is not None]
+        return [found["score"] for scores in self.runs if (found := scores.feedback.get(key)) is not None and found["score"] is not None]  # a judge error is a null, not a 0
 
     def applied(self, key: str) -> int:
         return len(self.scores(key))

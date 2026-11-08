@@ -7,7 +7,7 @@ ScriptedGraph(...)           a fake agent graph: per-(example, rep) or per-examp
 FakeClock, FakeSleeper       a clock that only the sleeper moves, and a sleeper that records the waits and never sleeps
 RecordingTimeout             the timeout function, recording the seconds it was given and calling straight through
 RunRecordingClient           tests' RecordingClient plus create_project and create_run (what the runner sends to LangSmith)
-FAKE_ENV                     every AGENT_*, READER_* and LANGSMITH_* variable set to an obviously fake value, for the command's settings check
+FAKE_ENV                     every AGENT_*, READER_*, JUDGE_* and LANGSMITH_* variable set to an obviously fake value, for the command's settings check
 """
 
 import threading
@@ -33,6 +33,10 @@ FAKE_ENV = {
     "READER_API_KEY": "fake-key",
     "READER_MODEL": "fake-reader-model",
     "LANGSMITH_API_KEY": "fake-key",
+    "JUDGE_PROVIDER": "fake",
+    "JUDGE_BASE_URL": "http://judge.invalid/v1",
+    "JUDGE_API_KEY": "fake-key",
+    "JUDGE_MODEL": "fake-judge-model",
 }
 FROZEN = "2026-01-02T03:04:00Z"
 ANSWER = "GO WITH CONDITIONS. Invented answer for a test."

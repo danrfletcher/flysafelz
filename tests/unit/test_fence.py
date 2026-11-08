@@ -645,6 +645,7 @@ def test_env_is_gitignored_and_example_is_empty():
     # Names split so this file never matches the F6 scan.
     listed = {"OPENAIP_API_" + "KEY=", "READER_PROVIDER=", "READER_BASE_URL=", "READER_API_" + "KEY=", "READER_MODEL="}
     listed |= {"AGENT_BASE_URL=", "AGENT_MODEL=", "AGENT_API_" + "KEY=", "LANGSMITH_API_" + "KEY=", "LANGSMITH_PROJECT="}
+    listed |= {"JUDGE_PROVIDER=", "JUDGE_BASE_URL=", "JUDGE_API_" + "KEY=", "JUDGE_MODEL="}
     assert set(lines) == listed and len(lines) == len(listed)
 
 

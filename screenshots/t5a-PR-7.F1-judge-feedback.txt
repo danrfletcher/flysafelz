@@ -1,0 +1,29 @@
+# t5a-PR-7.F1: judge feedback, one dev example per path, fake chat model (canned replies), nothing real called
+
+dev_01_blue_mill
+  judge.answers_the_question       score=1.0  comment='ok'
+  judge.prioritised                score=1.0  comment='ok'
+  judge.actionable                 score=1.0  comment='ok'
+  judge.good_decline               null (does not apply to this path; nothing sent)
+dev_05_druridge_bay
+  judge.answers_the_question       score=1.0  comment='ok'
+  judge.prioritised                score=0.0  comment='The decisive NOTAM is in the last line.'
+  judge.actionable                 score=1.0  comment='ok'
+  judge.good_decline               null (does not apply to this path; nothing sent)
+dev_07_buttermere
+  judge.answers_the_question       score=1.0  comment='ok'
+  judge.prioritised                null (does not apply to this path; nothing sent)
+  judge.actionable                 null (does not apply to this path; nothing sent)
+  judge.good_decline               null (does not apply to this path; nothing sent)
+dev_08_bamburgh
+  judge.answers_the_question       score=1.0  comment='ok'
+  judge.prioritised                null (does not apply to this path; nothing sent)
+  judge.actionable                 null (does not apply to this path; nothing sent)
+  judge.good_decline               score=0.0  comment='It gives launch advice anyway.'
+dev_act_probe
+  judge.answers_the_question       null (does not apply to this path; nothing sent)
+  judge.prioritised                null (does not apply to this path; nothing sent)
+  judge.actionable                 null (does not apply to this path; nothing sent)
+  judge.good_decline               null (does not apply to this path; nothing sent)
+
+model calls: 4 (the act example never reaches the model)

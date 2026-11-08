@@ -9,8 +9,8 @@ The split is dev unless `--split held_out` is typed; nothing else chooses it (no
 
 The order, each step before the next (the first two before any client is built, any graph call or any cache file):
   1. the loader (evals.agent.loader.load_dataset): a missing fixture folder, a stale or unfinalised sheet or a wrong count stops the run, its message as it is;
-  2. the settings: AGENT_* (the model), READER_* (the NOTAM reader) and LANGSMITH_API_KEY must be set. One message names every one that is not. Only READER_*
-     is also read from .env (reader/config.py); the agent reads AGENT_* from the process environment alone (agent/config.py), so a run that keeps its keys in .env is started as
+  2. the settings: AGENT_* (the model), READER_* (the NOTAM reader), JUDGE_* (the LLM judge, PR-7.F1) and LANGSMITH_API_KEY must be set. One message names every one that is not.
+     Only READER_* and JUDGE_* are also read from .env (reader/config.py, judge_config.py); the agent reads AGENT_* from the process environment alone (agent/config.py), so a run that keeps its keys in .env is started as
      `uv run --env-file .env python -m evals.agent.run_v1`, the way `make run` does. PR-10's `make eval` must do the same;
   3. the experiment's cache path: a file already there stops the run, naming it;
   4. the LangSmith client (tracing.build_client, with the phone anonymiser) and the split's dataset upload (loader.upload_dataset);
@@ -31,6 +31,7 @@ from typing import Any
 
 from evals.agent import runner
 from evals.agent.import_dataset import DATA_DIR, DatasetError
+from evals.agent.judge_config import missing_judge_settings
 from evals.agent.loader import DEFAULT_SPLIT, EXPECTED, REPO, SPLITS, load_dataset, upload_dataset
 from flysafelz.agent.config import LANGSMITH_KEY, AgentConfigError, agent_config
 from flysafelz.reader.config import ReaderConfigError, reader_config
@@ -41,7 +42,7 @@ INTERRUPTED_EXIT = 130  # the shell's number for a run ended by SIGINT
 
 
 def missing_settings(environ: Mapping[str, str]) -> list[str]:
-    """What is wrong with the settings, one entry per variable: every missing AGENT_*, READER_* and LANGSMITH_API_KEY, and an AGENT_BASE_URL that is not a URL. Builds nothing."""
+    """What is wrong with the settings, one entry per variable: every missing AGENT_*, READER_*, JUDGE_* and LANGSMITH_API_KEY, and an AGENT_BASE_URL that is not a URL. Builds nothing."""
     problems: list[str] = []
     try:
         agent_config(environ)
@@ -51,6 +52,7 @@ def missing_settings(environ: Mapping[str, str]) -> list[str]:
         reader_config(environ)
     except ReaderConfigError as error:
         problems += error.missing
+    problems += missing_judge_settings(environ)
     if not environ.get(LANGSMITH_KEY, "").strip():
         problems.append(LANGSMITH_KEY)
     return problems

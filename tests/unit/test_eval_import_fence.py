@@ -37,9 +37,16 @@ ADDED_TESTS = [
     REPO / "tests" / "unit" / "test_eval_runner_order.py",
     REPO / "tests" / "unit" / "test_eval_runner_usage.py",
     REPO / "tests" / "integration" / "test_eval_runner_dev.py",
+    # the judge (5a PR-7.F1): its fakes and tests hold fiction-range phones only. Two of them read the dataset's case names on purpose (see NAMES_REAL_CASES)
+    REPO / "tests" / "unit" / "judge_helpers.py",
+    REPO / "tests" / "unit" / "test_judge_config.py",
+    REPO / "tests" / "unit" / "test_judge_criteria.py",
+    REPO / "tests" / "unit" / "test_judge_examples.py",
+    REPO / "tests" / "unit" / "test_judge_message.py",
+    REPO / "tests" / "integration" / "test_judge_evaluator.py",
 ]
 # these two read the committed labelled cases by name on purpose; the rest of the added tests use invented names
-NAMES_REAL_CASES = {"test_labelled_fixtures_committed.py", "test_lz_allow_list.py"}
+NAMES_REAL_CASES = {"test_labelled_fixtures_committed.py", "test_lz_allow_list.py", "test_judge_message.py", "test_judge_examples.py"}  # the last two use real case names to test against them
 
 
 # --- F4: nothing captures ---------------------------------------------------------------------------------------------------------

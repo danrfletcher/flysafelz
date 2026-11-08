@@ -1,6 +1,6 @@
 """What the evaluators share: the feedback shape, and the sheet's labels of one example as minutes (5a PR-5.F1).
 
-    Feedback                   {"key", "score", "comment"}: LangSmith's feedback shape. An evaluator returns one, or None when it does not apply to the example
+    Feedback                   {"key", "score", "comment"}: LangSmith's feedback shape (score is None only for a judge error, PR-7.F1). An evaluator returns one, or None when it does not apply to the example
     Evaluator                  (example, answer) -> Feedback | None
     sheet_labels(example)      the example's labels as `Labels`, or None when it is not an assess example or has no finalised sheet entry
     answer_minutes(answer, window)   the answer's segments as {minute: (verdict, approaching_limits)} inside the window
@@ -31,7 +31,7 @@ SHEET_KEYS = ("verdict_by_segment", "tier", "notam_actions")
 
 class Feedback(TypedDict):
     key: str
-    score: float
+    score: float | None  # None only for a judge error (PR-7.F1): a null with a comment, never a fail. The code evaluators always give a number
     comment: str
 
 
