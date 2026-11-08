@@ -9,6 +9,7 @@ import { UkMap } from '@/components/UkMap'
 import { useIsDesktop } from '@/lib/useIsDesktop'
 import { AnswerOverlays } from '@/map/answerOverlays'
 import { BaseLayers } from '@/map/BaseLayers'
+import type { BasemapStatus } from '@/map/basemap'
 import { FitToLz } from '@/map/FitToLz'
 import { PickHandler } from '@/map/PickHandler'
 import { selectTurn, useAnswerHighlight, type Selection } from '@/map/useAnswerHighlight'
@@ -28,6 +29,8 @@ const DEFAULT_SWITCHES: LayerSwitches = { airspace: true, notams: true, answer: 
 export default function App() {
   const layers = useMapLayers()
   const [shown, setShown] = useState<LayerSwitches>(DEFAULT_SWITCHES)
+  // Whether the basemap tiles are loading: only the layer panel's note and the map's background read it, so nothing else waits on it.
+  const [basemap, setBasemap] = useState<BasemapStatus>('loading')
   const [sessions] = useState(createSessions)
   const [chatPoint, setChatPoint] = useState<LatLon | null>(null)
   const [mapArea, setMapArea] = useState<HTMLElement | null>(null)
@@ -50,7 +53,7 @@ export default function App() {
     <div className="flex h-dvh flex-col">
       <NavBar />
       <main ref={setMapArea} className="relative min-h-0 flex-1 overflow-hidden">
-        <UkMap>
+        <UkMap basemap={basemap} onBasemapStatus={setBasemap}>
           <BaseLayers
             airspace={layers.airspace.features}
             notams={layers.notams.features}
@@ -63,6 +66,7 @@ export default function App() {
         </UkMap>
         <LayerPanel
           states={layers}
+          basemap={basemap}
           shown={shown}
           chatOpen={chatPoint !== null}
           onShownChange={(id, on) => setShown((current) => ({ ...current, [id]: on }))}

@@ -3,7 +3,7 @@ import { cleanup } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { setupServer } from 'msw/node'
-import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, expect, vi } from 'vitest'
 
 // No handlers by default: a test that makes a request must say which (src/test/handlers.ts has the map routes). onUnhandledRequest
 // 'error' makes MSW refuse any other request, and the list below makes the test that caused it fail, even when the code swallows the refusal.
@@ -34,6 +34,8 @@ beforeAll(() => {
 })
 beforeEach(() => {
   unhandled = []
+  // F4: tests need no CARTO key. A key in a developer's ui/.env must not reach them either, so each test starts keyless (a test that wants a key stubs it).
+  vi.stubEnv('VITE_CARTO_KEY', '')
 })
 afterEach(() => {
   cleanup()

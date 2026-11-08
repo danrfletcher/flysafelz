@@ -29,12 +29,17 @@ const ENV_READ = new RegExp(['import', 'meta', 'env'].join('\\.') + '\\.(VITE_[A
 const SECRET_NAMES = [['OPEN', 'AIP'], ['READER', '_'], ['API', '_KEY']].map((pieces) => pieces.join(''))
 
 describe('what the browser may read (F3)', () => {
-  it('reads exactly one setting, VITE_API_URL', () => {
+  it('reads exactly two settings, VITE_API_URL and the optional VITE_CARTO_KEY, and the key in one file only', () => {
     const names = new Set<string>()
+    const keyReaders: string[] = []
     for (const path of uiTextFiles()) {
-      for (const match of readUi(path).matchAll(ENV_READ)) names.add(match[1])
+      for (const match of readUi(path).matchAll(ENV_READ)) {
+        names.add(match[1])
+        if (match[1] === 'VITE_CARTO_KEY') keyReaders.push(path)
+      }
     }
-    expect([...names]).toEqual(['VITE_API_URL'])
+    expect([...names].sort()).toEqual(['VITE_API_URL', 'VITE_CARTO_KEY'])
+    expect([...new Set(keyReaders)]).toEqual(['src/map/basemap.ts'])
   })
 
   it('has no key or server-setting name anywhere under ui/ outside node_modules', () => {

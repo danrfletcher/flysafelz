@@ -25,6 +25,9 @@
   --destructive: #ef4444;
   --destructive-foreground: #fff5f5;
 
+  /* The map's own colour: what shows behind the tiles, and on its own when the basemap tiles fail */
+  --map-background: var(--background);
+
   /* Lines and focus */
   --border: #2b3a55;
   --input: #2b3a55;

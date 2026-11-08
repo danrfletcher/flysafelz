@@ -115,9 +115,21 @@ make test-ui   # lint, Vitest with coverage (no keys, no network), the productio
 
 Ports: the LangGraph server is on 2024 and the UI's dev server on 5173. `vite preview` (the built app) is on 4173. The server's CORS list names exactly 5173 and 4173, so Vite is set to `strictPort`: with 5173 taken, `make ui` stops with Vite's port error instead of moving to 5174. Free the port, or add the new origin with `FLYSAFELZ_UI_ORIGIN`.
 
-The one setting the browser reads is `VITE_API_URL`, where the LangGraph server is (default `http://localhost:2024`). Set it in the environment when you start the UI, for example `VITE_API_URL=http://localhost:2025 make ui`. No key or model setting ever reaches the browser. The map opens on the whole UK over CARTO Dark Matter tiles, which need no key.
+The one setting the browser reads is `VITE_API_URL`, where the LangGraph server is (default `http://localhost:2024`), plus an optional public basemap key (next section). Set `VITE_API_URL` in the environment when you start the UI, for example `VITE_API_URL=http://localhost:2025 make ui`. No key or model setting ever reaches the browser. The map opens on the whole UK over CARTO Dark Matter tiles, which work without a key (see "Basemap key (optional)", the next section).
 
 The map draws two layers from the server's read-only routes, each coloured by type: airspace below FL100 (`GET /map/airspace`; restricted and prohibited red with a light fill, danger orange, CTR, CTA and ATZ sky blue, every other type slate) and NOTAMs below FL100 (`GET /map/notams`; violet dashed, an "approx" label where the shape is the NOTAM's Q-line circle). "Below FL100" means the lower limit is under FL100: airspace by its openAIP lower limit (a floor exactly at FL100, 10,000 ft, is not below; ground, surface and above-ground floors count as below), NOTAMs by the Q-line lower flight level. Both routes are fetched on load and every 15 minutes while the page is open; there is no refresh button. The Layers button at the top right opens the switches, the legend and each layer's "updated HH:MM" (browser time zone), "stale" and "unavailable" notes. The switches are not saved: both start on at every page load.
+
+## Basemap key (optional)
+
+The app works with no key: the map uses CARTO Dark Matter tiles without one. CARTO's terms ask for a free key for the non-commercial tier, and its raster-tile docs say a request without a key may come back with an "API key required" watermark, so for regular use get one:
+
+1. Request the free key from CARTO at https://carto.com/basemaps/apikey/.
+2. Copy `ui/.env.example` to `ui/.env` (or `ui/.env.local`; both are git-ignored) and set `VITE_CARTO_KEY=<your key>`.
+3. Restart `make ui` or `make dev`. Vite reads the file only at start. The key goes into the tile URL as `?key=<your key>`.
+
+The key is public: it is built into the page and sent to the CARTO tile host only (never anywhere else, and the app never logs or stores it), so it is not a secret like the server's keys. The tests never need it; they run keyless whatever `ui/.env` holds.
+
+If the basemap tiles fail to load (no network, or CARTO refuses the key), the map shows its plain dark background, the Layers panel says "basemap unavailable" next to the basemap entry, and everything else (airspace, NOTAMs, clicking, the chat) keeps working. The note goes when a tile loads again, for example after you pan or zoom with the network back.
 
 ## Data and licences
 
