@@ -1,27 +1,31 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { apiUrl } from '@/config'
 import { warnSkippedOnce } from '@/pick/skipped'
 import type { AirspaceProps, LayerPayload, MapFeature, MapGeometry, NotamProps, Position } from '@/map/types'
 
-/** Both routes are fetched on load and then this often while the page is open. There is no refresh button. */
+/** Every route (airspace, NOTAMs, wind) is fetched on load and then this often while the page is open. There is no refresh button. */
 export const REFETCH_MS = 15 * 60 * 1000
 
 export const AIRSPACE_PATH = '/map/airspace'
 export const NOTAMS_PATH = '/map/notams'
 
 /**
- * What the panel and the map know about one route.
+ * What the layer panel knows about one route.
  *   loading      nothing has come back yet
- *   ok           `features` are drawn; `stale` is the route's own flag, or true when a later refetch failed and the old data is kept
+ *   ok           the data is drawn; `stale` is the route's own flag, or true when a later refetch failed and the old data is kept
  *   unavailable  the route answered 503, the network failed, or the body was not a payload, and there is no earlier data to keep
  */
-export interface LayerState<P> {
+export interface LayerStatus {
   status: 'loading' | 'ok' | 'unavailable'
-  features: MapFeature<P>[]
   /** The route's `updated_at` (ISO UTC) of the data on the map, or null. */
   updatedAt: string | null
   stale: boolean
+}
+
+/** A feature route's status with the features it holds. */
+export interface LayerState<P> extends LayerStatus {
+  features: MapFeature<P>[]
 }
 
 const LOADING: LayerState<never> = { status: 'loading', features: [], updatedAt: null, stale: false }
@@ -83,13 +87,12 @@ export function readPayload<P>(
   return { features, updated_at: body.updated_at, stale: body.stale }
 }
 
-/** One fetch of one route: the payload, or null for a 503, any other bad status, a network error or a body that is not a payload. Never rejects. */
-async function fetchLayer<P>(path: string, hasProps: (p: Record<string, unknown>) => boolean, signal: AbortSignal) {
-  const layer = path.split('/').pop() ?? path
+/** One fetch of one route: what `read` makes of the body, or null for a 503, any other bad status, a network error or a body `read` refuses. Never rejects. */
+export async function fetchRoute<T>(path: string, read: (body: unknown) => T | null, signal: AbortSignal): Promise<T | null> {
   try {
     const response = await fetch(`${apiUrl()}${path}`, { signal })
     if (!response.ok) return null
-    return readPayload<P>(await response.json(), hasProps, layer)
+    return read(await response.json())
   } catch {
     return null
   }
@@ -104,8 +107,13 @@ export function nextState<P>(previous: LayerState<P>, payload: LayerPayload<P> |
   return UNAVAILABLE
 }
 
-function useRoute<P>(path: string, hasProps: (p: Record<string, unknown>) => boolean): LayerState<P> {
-  const [state, setState] = useState<LayerState<P>>(LOADING)
+/**
+ * Fetches a route on load and every REFETCH_MS while the component is mounted, and keeps the state `next` makes of each answer (a payload, or null
+ * when the fetch failed). A slow earlier request never overwrites a newer answer, and unmounting aborts the one in flight. `fetchOne`
+ * and `next` must be stable (module-level or memoised): a new one restarts the polling.
+ */
+export function useRoutePolling<T, S>(fetchOne: (signal: AbortSignal) => Promise<T | null>, next: (previous: S, payload: T | null) => S, initial: S): S {
+  const [state, setState] = useState<S>(initial)
 
   useEffect(() => {
     let latest = 0
@@ -116,8 +124,8 @@ function useRoute<P>(path: string, hasProps: (p: Record<string, unknown>) => boo
       const mine = new AbortController()
       controller = mine
       const run = ++latest
-      const payload = await fetchLayer<P>(path, hasProps, mine.signal)
-      if (run === latest && !mine.signal.aborted) setState((previous) => nextState(previous, payload))
+      const payload = await fetchOne(mine.signal)
+      if (run === latest && !mine.signal.aborted) setState((previous) => next(previous, payload))
     }
 
     void load()
@@ -127,9 +135,15 @@ function useRoute<P>(path: string, hasProps: (p: Record<string, unknown>) => boo
       controller?.abort()
       latest += 1
     }
-  }, [path, hasProps])
+  }, [fetchOne, next])
 
   return state
+}
+
+function useRoute<P>(path: string, hasProps: (p: Record<string, unknown>) => boolean): LayerState<P> {
+  const layer = path.split('/').pop() ?? path
+  const fetchOne = useCallback((signal: AbortSignal) => fetchRoute(path, (body) => readPayload<P>(body, hasProps, layer), signal), [path, hasProps, layer])
+  return useRoutePolling(fetchOne, nextState<P>, LOADING as LayerState<P>)
 }
 
 /** The two base layers' data: fetched on load and every 15 minutes. A failure of one never touches the other. */

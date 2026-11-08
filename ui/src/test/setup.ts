@@ -26,6 +26,21 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 }
 
+// jsdom has no canvas: getContext gives null, which leaflet-velocity's particle loop cannot draw on. This 2D context accepts every call and keeps every
+// property set on it, and draws nothing. (A test that wants to see the drawing replaces it.)
+if (typeof HTMLCanvasElement !== 'undefined') {
+  HTMLCanvasElement.prototype.getContext = function getContext() {
+    const kept: Record<string | symbol, unknown> = {}
+    return new Proxy(kept, {
+      get: (target, name) => (name in target ? target[name] : () => undefined),
+      set: (target, name, value) => {
+        target[name] = value
+        return true
+      },
+    })
+  } as unknown as HTMLCanvasElement['getContext']
+}
+
 beforeAll(() => {
   server.events.on('request:unhandled', ({ request }) => {
     unhandled.push(`${request.method} ${request.url}`)

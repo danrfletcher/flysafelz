@@ -94,15 +94,16 @@ describe('the basemap tile layer', () => {
     expect(container).not.toHaveClass('basemap-unavailable')
   })
 
-  it('keeps the OpenStreetMap, CARTO and openAIP credits, with links, in both states', () => {
+  it('keeps the OpenStreetMap, CARTO, openAIP and Open-Meteo (wind) credits, with links, in both states', () => {
     const { map, tile, container } = mount()
     const credits = () => container.querySelector('.leaflet-control-attribution') as HTMLElement
     const check = () => {
       expect(credits()).toHaveTextContent('OpenStreetMap')
       expect(credits()).toHaveTextContent('CARTO')
       expect(credits()).toHaveTextContent('openAIP')
+      expect(credits()).toHaveTextContent('wind data Open-Meteo (CC BY 4.0)')
       const links = [...credits().querySelectorAll('a')].map((a) => a.getAttribute('href'))
-      expect(links).toEqual(expect.arrayContaining(['https://www.openstreetmap.org/copyright', 'https://carto.com/attributions', 'https://www.openaip.net']))
+      expect(links).toEqual(expect.arrayContaining(['https://www.openstreetmap.org/copyright', 'https://carto.com/attributions', 'https://www.openaip.net', 'https://open-meteo.com']))
     }
     check()
     tile('tileerror')

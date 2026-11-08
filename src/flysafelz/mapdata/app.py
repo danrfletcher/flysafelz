@@ -1,11 +1,11 @@
-"""The map data app: GET /map/airspace and GET /map/notams, mounted on the LangGraph server as `http.app` in langgraph.json.
+"""The map data app: GET /map/airspace, GET /map/notams and GET /map/wind, mounted on the LangGraph server as `http.app` in langgraph.json.
 
-    create_app(root=, clock=, settings=, client_factory=)   a Starlette app with the two routes and their CORS
+    create_app(root=, clock=, settings=, client_factory=)   a Starlette app with the three routes and their CORS
     app                                                    create_app() with the real clock, settings and network
 
-Both routes answer with one envelope: a GeoJSON FeatureCollection (`features`) with `updated_at` (ISO UTC, the last good refresh) and `stale`.
-A failed refresh serves the last cache with `stale: true`; with no cache it is HTTP 503 and {"reason": one line}. One route failing does not
-touch the other. Only GET (and the HEAD that goes with it) is answered; any other method is 405 with `Allow`, and the only files written are under <root>/data/map/.
+The airspace and NOTAM routes answer with one envelope: a GeoJSON FeatureCollection (`features`) with `updated_at` (ISO UTC, the last good refresh)
+and `stale`. The wind route's envelope is the same with `grid` (leaflet-velocity's U and V records) in place of the features. A failed refresh serves
+the last cache with `stale: true`; with no cache it is HTTP 503 and {"reason": one line}. One route failing does not touch the others. Only GET (and the HEAD that goes with it) is answered; any other method is 405 with `Allow`, and the only files written are under <root>/data/map/.
 
 CORS allows the dev UI's two origins and FLYSAFELZ_UI_ORIGIN when it is set, and nothing else; there is no wildcard. The LangGraph server takes
 this app's middleware as its own for every endpoint, the agent's included (the chat stream is a POST with a JSON body from the same origins), so
@@ -34,9 +34,12 @@ from flysafelz.mapdata.airspace import airspace_features
 from flysafelz.mapdata.cache import Layer
 from flysafelz.mapdata.config import cache_dir, openaip_key, process_settings, project_root, ui_origins
 from flysafelz.mapdata.notams import notam_features
+from flysafelz.mapdata.wind import wind_grid
 
 AIRSPACE_TTL = timedelta(hours=24)
 NOTAM_TTL = timedelta(minutes=15)
+WIND_TTL = timedelta(minutes=180)  # 3 h
+GRID = "grid"  # the wind payload's key, where the other two routes have "features"
 READ_METHODS = ("GET", "HEAD")
 ANY_METHOD = [*READ_METHODS, "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 NOT_ALLOWED = HTTPStatus.METHOD_NOT_ALLOWED.value
@@ -75,8 +78,13 @@ def create_app(
         with make_client() as client:
             return notam_features(client, now)
 
+    def refresh_wind(now: datetime) -> list[dict]:
+        with make_client() as client:
+            return wind_grid(client, now)
+
     airspace = Layer("airspace", AIRSPACE_TTL, refresh_airspace)
     notams = Layer("notams", NOTAM_TTL, refresh_notams)
+    wind = Layer("wind", WIND_TTL, refresh_wind, key=GRID)
 
     def route(layer: Layer) -> Callable:
         async def respond(request: Request) -> Response:
@@ -89,7 +97,11 @@ def create_app(
 
     # The routes take every common method and answer all but GET and HEAD themselves. With methods=["GET"] Starlette would only partly
     # match a POST, and the LangGraph server's catch-all mount (added after this app's routes) would answer 404 instead of 405.
-    routes = [Route("/map/airspace", route(airspace), methods=ANY_METHOD), Route("/map/notams", route(notams), methods=ANY_METHOD)]
+    routes = [
+        Route("/map/airspace", route(airspace), methods=ANY_METHOD),
+        Route("/map/notams", route(notams), methods=ANY_METHOD),
+        Route("/map/wind", route(wind), methods=ANY_METHOD),
+    ]
     cors = Middleware(
         CORSMiddleware,
         allow_origins=ui_origins(values),

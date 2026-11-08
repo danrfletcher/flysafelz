@@ -33,6 +33,11 @@
   --color-type-other: var(--type-other);
   --color-type-notam: var(--type-notam);
 
+  --color-wind-light: var(--wind-light);
+  --color-wind-moderate: var(--wind-moderate);
+  --color-wind-strong: var(--wind-strong);
+  --color-wind-severe: var(--wind-severe);
+
   --color-verdict-no-go: var(--verdict-no-go);
   --color-verdict-unverified: var(--verdict-unverified);
   --color-verdict-amber: var(--verdict-amber);
@@ -165,4 +170,40 @@
   margin: 0.75rem 0.875rem;
   font-size: 0.875rem;
   line-height: 1.4;
+}
+
+/* The wind layer. The particle canvas takes no pointer events, so a click or a hover on the map goes through it to the shapes and the map under it
+   (a Leaflet marker without `interactive` already takes none). Each arrow is an inline svg turned to its bearing, in its speed band's colour. */
+.velocity-overlay {
+  pointer-events: none;
+}
+
+.wind-arrow {
+  background: none;
+  border: 0;
+}
+
+.wind-arrow svg {
+  display: block;
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: currentColor;
+  stroke: currentColor;
+  filter: drop-shadow(0 0 2px var(--background));
+}
+
+.wind-arrow--light {
+  color: var(--wind-light);
+}
+
+.wind-arrow--moderate {
+  color: var(--wind-moderate);
+}
+
+.wind-arrow--strong {
+  color: var(--wind-strong);
+}
+
+.wind-arrow--severe {
+  color: var(--wind-severe);
 }

@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import App from '@/App'
 import { UK_BOUNDS } from '@/lib/ukBounds'
+import { WIND_URL } from '@/mocks/wind'
 import { server } from '@/test/setup'
 import {
   AIRSPACE_FIXTURE,
@@ -79,14 +80,14 @@ describe('App', () => {
     expect(hosts.every((host) => /^[a-d]\.basemaps\.cartocdn\.com$/.test(host))).toBe(true)
   })
 
-  it('F2: calls only the two map routes on VITE_API_URL, and the basemap tiles', async () => {
+  it('F2: calls only the three map routes on VITE_API_URL, and the basemap tiles', async () => {
     const fetched = vi.spyOn(globalThis, 'fetch')
     const opened = vi.spyOn(XMLHttpRequest.prototype, 'open')
     const { container } = render(<App />)
-    await waitFor(() => expect(fetched).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(fetched).toHaveBeenCalledTimes(3))
     const urls = fetched.mock.calls.map(([input]) => String(input)).sort()
-    expect(urls).toEqual([AIRSPACE_URL(), NOTAMS_URL()])
-    expect(urls.some((url) => /wind|rain|radar|analytics/.test(url))).toBe(false)
+    expect(urls).toEqual([AIRSPACE_URL(), NOTAMS_URL(), WIND_URL()].sort())
+    expect(urls.some((url) => /rain|radar|analytics|open-meteo/.test(url))).toBe(false)
     expect(opened).not.toHaveBeenCalled()
     await waitFor(() => expect(container.querySelectorAll('img.leaflet-tile').length).toBeGreaterThan(0))
   })
@@ -125,7 +126,7 @@ async function openPanel() {
 }
 
 describe('GP2 (this PR’s part): airspace and NOTAMs below FL100, and the layer panel', () => {
-  it('draws both layers on first load and shows the legend and "updated HH:MM" for both', async () => {
+  it('draws both layers on first load and shows the legend and "updated HH:MM" for wind and both', async () => {
     const fit = vi.spyOn(L.Map.prototype, 'fitBounds')
     render(<App />)
     const map = mapOf(fit)
@@ -133,7 +134,7 @@ describe('GP2 (this PR’s part): airspace and NOTAMs below FL100, and the layer
     await waitFor(() => expect(polygons(map, 'notams')).toBe(5))
 
     const { panel } = await openPanel()
-    expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(2)
+    expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(3)
     expect(within(panel).getByText('On the map')).toBeInTheDocument()
     expect(within(panel).getByText('For this field')).toBeInTheDocument()
     expect(within(panel).getByText('amber = near your limits, check the conditions too')).toBeInTheDocument()
@@ -168,7 +169,7 @@ describe('E1: a route that fails does not break the rest', () => {
     const { panel } = await openPanel()
     expect(within(panel).getByText('Airspace below FL100 unavailable')).toBeInTheDocument()
     expect(within(panel).getByText('stale')).toBeInTheDocument()
-    expect(within(panel).getAllByText(/^updated/)).toHaveLength(1)
+    expect(within(panel).getAllByText(/^updated/)).toHaveLength(2) // wind and NOTAMs
 
     // the map still pans, and the shell is still there
     const before = map.getCenter()
@@ -199,7 +200,7 @@ describe('E1: a route that fails does not break the rest', () => {
     render(<App />)
     await waitFor(() => expect(polygons(mapOf(fit), 'airspace')).toBe(15))
     const { panel } = await openPanel()
-    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(2))
+    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(3))
     expect(polygons(mapOf(fit), 'notams')).toBe(0)
     expect(panel).not.toHaveTextContent('stale')
   })

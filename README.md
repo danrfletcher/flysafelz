@@ -133,7 +133,7 @@ If the basemap tiles fail to load (no network, or CARTO refuses the key), the ma
 
 ## Data and licences
 
-- Open-Meteo: free API, non-commercial, CC BY 4.0.
+- Open-Meteo: free API, non-commercial, CC BY 4.0. The map's wind layer is Open-Meteo's current 10 m wind on a 1 degree grid over the UK, fetched by the server (`GET /map/wind`, cached 3 h) and credited in the map's attribution; the browser never calls Open-Meteo.
 - openAIP: CC BY-NC 4.0, attribution required (openaip.net/legal).
 - NATS PIB: NATS (Services) Ltd terms for UK Aeronautical Information Products; no guarantee of accuracy or completeness, no liability accepted; the XML has no declared schema and may change at short notice.
 - CARTO basemap: CARTO Basemaps Terms (version 29 Sep 2026), free non-commercial tier up to 5M tile requests a month, CARTO and OpenStreetMap (ODbL) credit kept visible.

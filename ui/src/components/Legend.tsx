@@ -1,4 +1,5 @@
 import { HOW_IT_WORKS } from '@/content/howItWorks'
+import { WIND_BANDS, type WindBand } from '@/map/wind'
 
 // The legend's colours are theme variables, named through Tailwind tokens (src/styles/index.css): no colour is chosen here by a function.
 
@@ -19,6 +20,20 @@ export const ON_THE_MAP: readonly Row[] = [
   { label: 'NOTAM', swatch: `${OUTLINE} border-dashed border-type-notam` },
   { label: 'NOTAM, approx (Q-line circle)', swatch: `${OUTLINE} border-dotted border-type-notam` },
 ]
+
+// Written out so Tailwind sees each class name.
+const WIND_SWATCH: Record<WindBand, string> = {
+  light: 'bg-wind-light',
+  moderate: 'bg-wind-moderate',
+  strong: 'bg-wind-strong',
+  severe: 'bg-wind-severe',
+}
+
+/** The wind layer's speed bands: a short bar in the band's colour, with its speeds in words. */
+export const WIND_SPEEDS: readonly Row[] = WIND_BANDS.map(({ name, label }) => ({
+  label,
+  swatch: `inline-block h-1 w-6 shrink-0 rounded-full ${WIND_SWATCH[name]}`,
+}))
 
 /** What an answer says about a shape for the field you picked. */
 export const ACTIONS: readonly Row[] = [
@@ -62,6 +77,9 @@ export function Legend() {
           On the map
         </h3>
         <Rows rows={ON_THE_MAP} />
+        <div className="mt-2">
+          <Rows rows={WIND_SPEEDS} />
+        </div>
       </section>
       <section aria-labelledby="legend-field">
         <h3 id="legend-field" className="mb-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">

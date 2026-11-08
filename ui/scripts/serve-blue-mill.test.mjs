@@ -50,6 +50,7 @@ describe('parseArgs', () => {
   it('needs a port and takes the options', () => {
     expect(parseArgs(['--port', '4999'])).toMatchObject({ port: 4999, delayAirspace: 0, failNotams: false })
     expect(parseArgs(['--port', '4999', '--delay-notams', '500', '--fail-airspace'])).toMatchObject({ delayNotams: 500, failAirspace: true })
+    expect(parseArgs(['--port', '4999', '--delay-wind', '300', '--fail-wind', '--stale-wind'])).toMatchObject({ delayWind: 300, failWind: true, staleWind: true })
   })
 
   it.each([[[]], [['--port', 'x']], [['--port', '80']], [['--port', '4999', '--delay-notams', '-1']], [['--port', '4999', '--nope']]])('rejects %j', (argv) => {
@@ -67,6 +68,19 @@ describe('the stand-in server', () => {
     expect(JSON.parse(airspace.body).features.map((f) => f.properties.name)).toContain('BLUE MILL TEST ATZ')
     expect(JSON.parse(notams.body).features.map((f) => f.properties.id)).toContain('H2001/26')
     expect((await get(port, '/other')).status).toBe(404)
+  })
+
+  it('serves the synthetic wind grid, stale when told to, 503 when told to fail', async () => {
+    const fresh = await get(await serve(), '/map/wind')
+    expect(fresh.status).toBe(200)
+    expect(fresh.head).toContain('access-control-allow-origin: *')
+    const body = JSON.parse(fresh.body)
+    expect([body.stale, body.grid.length, body.grid[0].data.length]).toEqual([false, 2, 143])
+    const stale = JSON.parse((await get(await serve('--stale-wind'), '/map/wind')).body)
+    expect([stale.stale, stale.updated_at]).toEqual([true, body.updated_at])
+    const failed = await get(await serve('--fail-wind'), '/map/wind')
+    expect(failed.status).toBe(503)
+    expect(JSON.parse(failed.body)).toHaveProperty('reason')
   })
 
   it('answers 503 for a route told to fail, and holds a route told to wait', async () => {

@@ -15,6 +15,8 @@ import { FitToLz } from '@/map/FitToLz'
 import { PickHandler } from '@/map/PickHandler'
 import { selectTurn, useAnswerHighlight, type Selection } from '@/map/useAnswerHighlight'
 import { useMapLayers } from '@/map/useMapLayers'
+import { useWind } from '@/map/useWind'
+import { WindLayer } from '@/map/WindLayer'
 import type { LatLon } from '@/pick/whatsHere'
 
 /**
@@ -26,7 +28,8 @@ import type { LatLon } from '@/pick/whatsHere'
  */
 export default function App() {
   const layers = useMapLayers()
-  // Airspace and NOTAMs below FL100 and the answer's highlights are on at first load; a choice is kept in this browser's local storage and read back on load.
+  const wind = useWind()
+  // Wind, airspace and NOTAMs below FL100 and the answer's highlights are on at first load; a choice is kept in this browser's local storage and read back on load.
   const [shown, setShown] = useLayerPrefs(LAYERS)
   // Whether the basemap tiles are loading: only the layer panel's note and the map's background read it, so nothing else waits on it.
   const [basemap, setBasemap] = useState<BasemapStatus>('loading')
@@ -53,6 +56,7 @@ export default function App() {
       <NavBar />
       <main ref={setMapArea} className="relative min-h-0 flex-1 overflow-hidden">
         <UkMap basemap={basemap} onBasemapStatus={setBasemap}>
+          {shown.wind && wind.grid && <WindLayer grid={wind.grid} />}
           <BaseLayers
             airspace={layers.airspace.features}
             notams={layers.notams.features}
@@ -64,7 +68,7 @@ export default function App() {
           <AnswerOverlays point={chatPoint} highlight={highlight} visible={shown.answer} layout={desktop ? 'sheet' : 'drawer'} />
         </UkMap>
         <LayerPanel
-          states={layers}
+          states={{ wind, ...layers }}
           basemap={basemap}
           shown={shown}
           chatOpen={chatPoint !== null}

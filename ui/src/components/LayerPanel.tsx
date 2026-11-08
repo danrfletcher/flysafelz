@@ -4,17 +4,18 @@ import { Legend } from '@/components/Legend'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Switch } from '@/components/ui/switch'
 import type { BasemapStatus } from '@/map/basemap'
-import { formatUpdated, type LayerState } from '@/map/useMapLayers'
+import { formatUpdated, type LayerStatus } from '@/map/useMapLayers'
 
 /** The layers that come from a map route, and so have an update time and a state. */
-export type ServerLayerId = 'airspace' | 'notams'
+export type ServerLayerId = 'wind' | 'airspace' | 'notams'
 export type LayerId = ServerLayerId | 'answer'
 
 /**
- * The switches, in panel order: the two base layers, then the latest answer's highlights (drawn from the chat, not from a route).
+ * The switches, in panel order: wind, the two base layers, then the latest answer's highlights (drawn from the chat, not from a route).
  * This is also the registry of saved choices (src/lib/layerPrefs.ts): `defaultOn` is a layer's state when nothing is stored.
  */
 export const LAYERS: readonly { id: LayerId; name: string; defaultOn: boolean }[] = [
+  { id: 'wind', name: 'Wind', defaultOn: true },
   { id: 'airspace', name: 'Airspace below FL100', defaultOn: true },
   { id: 'notams', name: 'NOTAMs below FL100', defaultOn: true },
   { id: 'answer', name: 'Answer overlays', defaultOn: true },
@@ -23,7 +24,7 @@ export const LAYERS: readonly { id: LayerId; name: string; defaultOn: boolean }[
 export type LayerSwitches = Record<LayerId, boolean>
 
 export interface LayerPanelProps {
-  states: Record<ServerLayerId, LayerState<unknown>>
+  states: Record<ServerLayerId, LayerStatus>
   shown: LayerSwitches
   onShownChange: (id: LayerId, on: boolean) => void
   /** Whether the map's tiles are loading; the panel adds a note under the basemap entry only when they are unavailable. */
@@ -33,7 +34,7 @@ export interface LayerPanelProps {
 }
 
 /** The line under a switch: loading, "updated HH:MM" (with "stale" when the route says so or a refetch failed), or "<layer> unavailable". */
-function Status({ name, state }: { name: string; state: LayerState<unknown> }) {
+function Status({ name, state }: { name: string; state: LayerStatus }) {
   if (state.status === 'loading') return <p className="text-xs text-muted-foreground">Loading…</p>
   if (state.status === 'unavailable') return <p className="text-xs text-destructive">{name} unavailable</p>
   return (
