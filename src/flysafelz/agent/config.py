@@ -1,8 +1,9 @@
 """The agent's model configuration: the only place in src/ that reads `AGENT_*` (the agent's counterpart of reader/config.py).
 
-    agent_config()      -> AgentConfig   the three AGENT_* values, or AgentConfigError naming every missing or bad one
-    build_chat_model()  -> ChatOpenAI    a client for that endpoint; nothing is sent until it is invoked
-    LazyChatModel       a chat model that calls build_chat_model() the first time a model call needs it, not when the graph is built
+    agent_config()          -> AgentConfig        the three AGENT_* values, or AgentConfigError naming every missing or bad one
+    langsmith_settings()    -> LangSmithSettings  the LANGSMITH_* values tracing.py needs (PR-12.F1); a missing key is a value (`api_key` None), not an error
+    build_chat_model()      -> ChatOpenAI         a client for that endpoint; nothing is sent until it is invoked
+    LazyChatModel           a chat model that calls build_chat_model() the first time a model call needs it, not when the graph is built
 
 Nothing is read on import: the environment is read each time `agent_config()` is called, so importing this module has no
 side effect and a test can set the variables first. Only the process environment is read, never a `.env` file (the
@@ -31,6 +32,9 @@ BASE_URL = "AGENT_BASE_URL"
 MODEL = "AGENT_MODEL"
 KEY = "AGENT_API_KEY"
 AGENT_VARIABLES = (BASE_URL, MODEL, KEY)
+LANGSMITH_KEY = "LANGSMITH_API_KEY"
+LANGSMITH_PROJECT = "LANGSMITH_PROJECT"
+LANGSMITH_ENDPOINT = "LANGSMITH_ENDPOINT"
 _SCHEMES = ("http", "https")
 
 
@@ -56,6 +60,27 @@ class AgentConfig(BaseModel):
     base_url: str
     model: str
     api_key: SecretStr
+
+
+class LangSmithSettings(BaseModel):
+    """What tracing.py needs from the environment: the key (None when unset or blank, which means tracing is off), the project, and the endpoint (None for LangSmith's own)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    api_key: SecretStr | None
+    project: str
+    endpoint: str | None
+
+
+def langsmith_settings(environ: Mapping[str, str] | None = None) -> LangSmithSettings:
+    """The LANGSMITH_* settings, read now (never at import). The project is LANGSMITH_PROJECT, else `langsmith_project` in settings.yaml. `environ` is os.environ unless a test passes its own."""
+    environ = os.environ if environ is None else environ
+    key = environ.get(LANGSMITH_KEY, "").strip()
+    return LangSmithSettings(
+        api_key=SecretStr(key) if key else None,
+        project=environ.get(LANGSMITH_PROJECT, "").strip() or SETTINGS.langsmith_project,
+        endpoint=environ.get(LANGSMITH_ENDPOINT, "").strip() or None,
+    )
 
 
 def _has_scheme_and_host(url: str) -> bool:

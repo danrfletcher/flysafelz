@@ -8,8 +8,9 @@ The graph is `create_agent(model, tools=[the five], middleware=[FlySafeMiddlewar
 Nothing else: no custom node, no sub-agent, no second middleware. The five tools are get_weather, get_airspace, get_notams, assess and
 search_guidance. The thread state is state.py's `RequestState` and the run context is its `RunContext`. The one middleware (middleware.py) runs
 the input check, gives the model its system prompt (prompts.py), checks every final answer (the guard: one text-only retry, then a fallback built by
-code; guard_flow.py), adds the re-check and limit lines, puts the phone numbers back and answers for the model when it fails. Tracing (PR-12) is not
-here; `build_agent(on_outcome=...)` is where it will take each turn's guard outcome from.
+code; guard_flow.py), adds the re-check and limit lines, puts the phone numbers back and answers for the model when it fails. Tracing (tracing.py) is
+configuration, not a node: `build_graph` puts a tracer with the anonymising client on the graph's config when LANGSMITH_API_KEY is set, and `build_agent`
+passes each turn's guard outcome to tracing's `report_outcome`.
 
 The model. `build_graph()` with no model uses a `LazyChatModel` (config.py): the configured ChatOpenAI, built when the first model call needs it.
 So importing this module, building the graph, and a turn that never reaches the model all work with no AGENT_* setting; the first model call
@@ -42,6 +43,7 @@ from flysafelz.agent.tools.assess_tool import build_assess
 from flysafelz.agent.tools.guidance_tool import build_search_guidance
 from flysafelz.agent.tools.notams_tool import build_get_notams
 from flysafelz.agent.tools.weather_tool import build_get_weather
+from flysafelz.agent.tracing import report_outcome, traced
 from flysafelz.guidance.index import GuidanceIndex, load_index
 
 Agent = CompiledStateGraph[Any, RunContext, Any, Any]  # what `create_agent` returns
@@ -67,8 +69,16 @@ def shared_guidance_index() -> GuidanceIndex:
         return _shared["index"]
 
 
-def build_agent(model: BaseChatModel, *, source_cache: SourceCache, index: GuidanceIndex, checkpointer: Checkpointer | None = None, on_outcome: Callable[[GuardOutcome], None] | None = None) -> Agent:
-    """The agent over these parts: the one `create_agent` call in the code base. `on_outcome` gets each turn's `GuardOutcome` (PR-12.F1 sends it as feedback)."""
+def build_agent(
+    model: BaseChatModel,
+    *,
+    source_cache: SourceCache,
+    index: GuidanceIndex,
+    checkpointer: Checkpointer | None = None,
+    on_outcome: Callable[[GuardOutcome], None] | None = report_outcome,
+) -> Agent:
+    """The agent over these parts: the one `create_agent` call in the code base. `on_outcome` gets each turn's `GuardOutcome`: by default tracing.py's
+    `report_outcome`, which sends it to LangSmith as feedback when the run is traced and does nothing when it is not. The graph has no tracer here; `build_graph` adds it."""
     tools = [
         build_get_weather(source_cache),
         build_get_airspace(source_cache),
@@ -80,7 +90,10 @@ def build_agent(model: BaseChatModel, *, source_cache: SourceCache, index: Guida
 
 
 def build_graph(model: BaseChatModel | Mapping[str, Any] | None = None) -> Agent:
-    """The agent graph. `model` is a chat model to use (tests); left out, the configured one is built at the first model call."""
+    """The agent graph. `model` is a chat model to use (tests); left out, the configured one is built at the first model call.
+
+    With LANGSMITH_API_KEY set (read now, not at import) the graph carries a tracer whose client anonymises phones and emails (tracing.py); without it, none.
+    """
     if model is None or isinstance(model, Mapping):
         model = LazyChatModel()
-    return build_agent(model, source_cache=shared_source_cache(), index=shared_guidance_index())
+    return traced(build_agent(model, source_cache=shared_source_cache(), index=shared_guidance_index()))

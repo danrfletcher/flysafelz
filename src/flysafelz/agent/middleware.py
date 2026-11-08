@@ -14,7 +14,7 @@ Its hooks, in the order a turn meets them:
 
 The guard (PR-10, PR-11) goes into this same class: it checks the answer inside `wrap_model_call`, so a failed draft never reaches the thread's
 state. This file holds no guard check, no retry beyond the model client's own (`model_max_retries`, FR17), no fallback after a failed check and
-no re-check line.
+no re-check line. Tracing (PR-12.F1) adds two calls and no hook: `before_agent` tags the root run's source, and the guard's outcome goes to `on_outcome`.
 
 E17. When the model endpoint times out or fails (after the client's own retry), or returns tool calls that cannot be parsed, nothing escapes to
 the caller. The answer is built by code: if `assess` ran this turn, that tool's text exactly as it gave it (placeholders kept, for the rehydration
@@ -41,6 +41,7 @@ from flysafelz.agent.guard_flow import GuardFlow, GuardOutcome, output_update
 from flysafelz.agent.input_check import validate_request
 from flysafelz.agent.prompts import system_prompt
 from flysafelz.agent.state import DEFAULT_TZ, RequestState, RunContext, run_now
+from flysafelz.agent.tracing import tag_turn
 
 log = logging.getLogger(__name__)
 
@@ -119,7 +120,8 @@ def unavailable_response(messages: Sequence[BaseMessage], reason: str, state: Ma
 class FlySafeMiddleware(AgentMiddleware[RequestState, RunContext]):
     """The graph's one middleware. See the module doc for its hooks.
 
-    `on_outcome`, when given, is called once for each final message the guard has dealt with, with the turn's `GuardOutcome` (PR-12.F1 sends it as feedback).
+    `on_outcome`, when given, is called once for each final message the guard has dealt with, with the turn's `GuardOutcome` (graph.py passes
+    tracing.py's `report_outcome`, which sends it to LangSmith as feedback). `before_agent` also tells tracing.py the run context, for the root run's `source`.
     """
 
     state_schema = RequestState
@@ -130,6 +132,7 @@ class FlySafeMiddleware(AgentMiddleware[RequestState, RunContext]):
 
     @hook_config(can_jump_to=["end"])
     def before_agent(self, state: RequestState, runtime: Runtime[RunContext]) -> dict[str, Any] | None:
+        tag_turn(runtime.context)  # the root run's `source` (I6), before the check, so a rejected request carries it too
         return validate_request(state, runtime.context)
 
     def _with_prompt(self, request: ModelRequest[RunContext]) -> ModelRequest[RunContext]:
