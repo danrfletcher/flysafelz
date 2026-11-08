@@ -9,17 +9,32 @@
 //    fonts.googleapis.com and fonts.gstatic.com fail with their own message, wherever they appear.
 // 2. Every @font-face `src` in the built CSS is a bundled file that exists in dist.
 //
-// Three kinds of string are in the bundle that are not requests, and are skipped by their full prefix, not by host:
+// Some strings are in the bundle that are not requests, and are skipped by their full prefix, not by host:
 //    http://www.w3.org/                 XML namespace names (svg, xlink, MathML); an identifier, never fetched
 //    https://react.dev/errors/          text inside React's production error messages
 //    https://leafletjs.com              the "Leaflet" link in the map's default attribution; shown, never fetched
+//    https://github.com/syntax-tree/    a link in react-markdown's error text
+//    https://docs.langchain.com/, https://docs.expo.dev/    links in the LangGraph SDK's error and warning text
+//    https://[api.|dev.|eu.|aws.|apac.|beta.]smith.langchain.com    the default endpoints inside the langsmith client, which the LangGraph SDK's
+//                                       peer @langchain/core bundles. It reads its settings from process.env, and Vite builds that as {} (the
+//                                       built file holds `typeof process<"u"?{}[name]`), so tracing is off by construction and nothing is sent
+//                                       there; the chat test asserts that a whole run fetches from the API origin only.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export const ALLOWED_HOSTS = ['basemaps.cartocdn.com', 'openstreetmap.org', 'carto.com', 'openaip.net', 'localhost']
 export const FORBIDDEN_FONT_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com']
-export const NOT_REQUESTS = ['http://www.w3.org/', 'https://react.dev/errors/', 'https://leafletjs.com']
+export const NOT_REQUESTS = [
+  'http://www.w3.org/',
+  'https://react.dev/errors/',
+  'https://leafletjs.com',
+  'https://github.com/syntax-tree/',
+  'https://docs.langchain.com/',
+  'https://docs.expo.dev/',
+]
+// Those langsmith hosts, matched whole (so smith.langchain.com.evil.example is still reported), over https only.
+export const INERT_LANGSMITH_HOSTS = ['', 'api.', 'dev.', 'eu.', 'aws.', 'apac.', 'beta.'].map((prefix) => `${prefix}smith.langchain.com`)
 
 const BINARY = new Set(['.woff', '.woff2', '.ttf', '.otf', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.webp', '.map'])
 const URL_IN_TEXT = /https?:\/\/[^\s"'`<>()\\]+/g
@@ -52,6 +67,7 @@ export function urlProblems(dist) {
       if (NOT_REQUESTS.some((prefix) => url.startsWith(prefix))) continue
       if (FORBIDDEN_FONT_HOSTS.some((host) => url.includes(host))) continue // reported above
       const host = url.replace(/^https?:\/\//, '').split(/[/?#]/)[0]
+      if (url.startsWith('https://') && INERT_LANGSMITH_HOSTS.includes(host)) continue
       if (!hostAllowed(host)) {
         problems.push(`${name}: ${url} is on ${host}, which is not on the allowlist (${ALLOWED_HOSTS.join(', ')})`)
       }

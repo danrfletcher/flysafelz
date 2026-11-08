@@ -11,6 +11,7 @@ import { whatsHere, type HereRow, type LatLon } from '@/pick/whatsHere'
 export const CARD_TITLE = 'Over this point'
 export const CARD_FOOTNOTE = 'The chat checks everything within 2 NM.'
 export const CARD_EMPTY = 'Nothing in the loaded layers over this point.'
+export const CHAT_BUTTON = 'Chat about this LZ'
 
 const LAYER_NAMES = { airspace: 'Airspace', notams: 'NOTAMs' } as const
 
@@ -105,6 +106,8 @@ export interface WhatsHereCardProps {
   point: LatLon
   airspace: LayerState<AirspaceProps>
   notams: LayerState<NotamProps>
+  /** Opens the chat for this point. When it is not given, the card has no chat button. */
+  onChat?: (point: LatLon) => void
 }
 
 /**
@@ -113,7 +116,7 @@ export interface WhatsHereCardProps {
  * ("Still loading: ...") and a layer that answered 503 says "<layer> unavailable"; the card fills in when the data arrives.
  * A layer with `stale: true` is listed like any other: the layer panel owns the stale note.
  */
-export function WhatsHereCard({ point, airspace, notams }: WhatsHereCardProps) {
+export function WhatsHereCard({ point, airspace, notams, onChat }: WhatsHereCardProps) {
   const rows = useMemo(
     () => splitAtFl100(whatsHere(point, { airspace: airspace.features, notams: notams.features })),
     [point, airspace.features, notams.features],
@@ -141,6 +144,15 @@ export function WhatsHereCard({ point, airspace, notams }: WhatsHereCardProps) {
         <RowList rows={rows.below} />
         {rows.above.length > 0 && <AboveGroup rows={rows.above} />}
       </div>
+      {onChat && (
+        <button
+          type="button"
+          onClick={() => onChat(point)}
+          className="mt-2 w-full rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        >
+          {CHAT_BUTTON}
+        </button>
+      )}
       <p className="mt-2 border-t border-border pt-2 text-xs text-muted-foreground">{CARD_FOOTNOTE}</p>
     </section>
   )

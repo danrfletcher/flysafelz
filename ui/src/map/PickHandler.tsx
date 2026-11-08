@@ -37,10 +37,11 @@ interface PinProps {
   point: LatLon
   airspace: LayerState<AirspaceProps>
   notams: LayerState<NotamProps>
+  onChat?: (point: LatLon) => void
 }
 
 /** The pin and its open card. Mounted fresh (by its key) for each picked point, so a new point never shows an old card's open rows. */
-function Pin({ point, airspace, notams }: PinProps) {
+function Pin({ point, airspace, notams, onChat }: PinProps) {
   const marker = useRef<L.Marker>(null)
   const popup = useRef<L.Popup>(null)
 
@@ -52,7 +53,7 @@ function Pin({ point, airspace, notams }: PinProps) {
     <Marker ref={marker} position={[point.lat, point.lon]} icon={PIN_ICON} title="Picked field" keyboard>
       <Popup ref={popup} className="pick-card" closeButton={false} closeOnClick={false} autoClose={false} minWidth={240} maxWidth={320}>
         <KeepInView popup={popup}>
-          <WhatsHereCard point={point} airspace={airspace} notams={notams} />
+          <WhatsHereCard point={point} airspace={airspace} notams={notams} onChat={onChat} />
         </KeepInView>
       </Popup>
     </Marker>
@@ -62,6 +63,10 @@ function Pin({ point, airspace, notams }: PinProps) {
 export interface PickHandlerProps {
   airspace: LayerState<AirspaceProps>
   notams: LayerState<NotamProps>
+  /** The card's "Chat about this LZ" button: called with the pin's point. */
+  onChat?: (point: LatLon) => void
+  /** A new pin was put down (any earlier chat belongs to the old pin). Not called for a sea click. */
+  onPick?: (point: LatLon) => void
 }
 
 /**
@@ -70,7 +75,7 @@ export interface PickHandlerProps {
  * switched on) and makes no request of its own. Clicks inside the card and on the toast stop before the map (Leaflet's own popup
  * container does this for the card).
  */
-export function PickHandler({ airspace, notams }: PickHandlerProps) {
+export function PickHandler({ airspace, notams, onChat, onPick }: PickHandlerProps) {
   const map = useMap()
   const [point, setPoint] = useState<LatLon | null>(null)
   const [toast, setToast] = useState<number | null>(null)
@@ -79,8 +84,10 @@ export function PickHandler({ airspace, notams }: PickHandlerProps) {
     click(event) {
       // Panned round the world, a click can report a longitude past 180: bring it back. An ordinary one is kept exactly as given.
       const { lat, lng } = Math.abs(event.latlng.lng) > 180 ? event.latlng.wrap() : event.latlng
-      if (isUkLand(lat, lng)) setPoint({ lat, lon: lng })
-      else setToast((run) => (run ?? 0) + 1)
+      if (isUkLand(lat, lng)) {
+        setPoint({ lat, lon: lng })
+        onPick?.({ lat, lon: lng })
+      } else setToast((run) => (run ?? 0) + 1)
     },
   })
 
@@ -88,7 +95,7 @@ export function PickHandler({ airspace, notams }: PickHandlerProps) {
 
   return (
     <>
-      {point && <Pin key={`${point.lat},${point.lon}`} point={point} airspace={airspace} notams={notams} />}
+      {point && <Pin key={`${point.lat},${point.lon}`} point={point} airspace={airspace} notams={notams} onChat={onChat} />}
       {toast !== null && createPortal(<Toast key={toast} message={NOT_LAND_MESSAGE} onDone={dismiss} />, map.getContainer())}
     </>
   )

@@ -7,7 +7,7 @@
 //   a key that looks like one: an OpenAI-style `sk-` key, a bearer token, or a long hex or base64 string assigned to a *key* name.
 // The patterns are built from pieces so that this file does not match its own rules.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
-import { dirname, extname, join, resolve } from 'node:path'
+import { basename, dirname, extname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const join2 = (...pieces) => pieces.join('')
@@ -22,6 +22,11 @@ export const KEY_NAMES = [
   join2('ANTHROPIC', '_API', '_KEY'),
   join2('VITE_OPEN', 'AIP'),
 ]
+
+// The name of the langsmith key variable also appears in the build output, as text inside the langsmith client that the LangGraph SDK's peer
+// @langchain/core bundles (it names the variable in an error message and in the list of variables it reads, from a process.env that Vite builds as {}).
+// It is allowed in a built file only; src, public and index.html still may not name it, and the key *shapes* below are checked everywhere.
+export const BUILD_ONLY_NAMES = [join2('LANGSMITH', '_API', '_KEY')]
 
 export const KEY_SHAPES = [
   { name: 'an sk- key', pattern: /\bsk-[A-Za-z0-9_-]{20,}/ },
@@ -46,10 +51,12 @@ function textFiles(path) {
 /** Problems in the text files under `path` (a file or a folder): one line each, naming the file and the rule, never the text matched. */
 export function keyProblems(path) {
   const problems = []
+  const built = basename(resolve(path)) === 'dist' // the build output folder; BUILD_ONLY_NAMES may be there
   for (const file of textFiles(path)) {
     const text = readFileSync(file, 'utf8')
     const name = file.startsWith(path) && file !== path ? file.slice(path.length + 1) : file
     for (const word of KEY_NAMES) {
+      if (built && BUILD_ONLY_NAMES.includes(word)) continue
       if (text.includes(word)) problems.push(`${name}: names ${word}`)
     }
     for (const { name: shape, pattern } of KEY_SHAPES) {
