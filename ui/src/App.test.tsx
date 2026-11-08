@@ -1,5 +1,5 @@
 import L from 'leaflet'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -10,9 +10,13 @@ import { server } from '@/test/setup'
 import {
   AIRSPACE_FIXTURE,
   AIRSPACE_URL,
+  BLUE_MILL_AIRSPACE,
+  BLUE_MILL_NOTAMS,
   NOTAMS_FIXTURE,
   NOTAMS_URL,
+  BLUE_MILL,
   airspaceRoute,
+  blueMillRoutes,
   mapRoutes,
   notamsRoute,
   unavailable,
@@ -216,3 +220,84 @@ describe('E1: a route that fails does not break the rest', () => {
   })
 })
 
+
+const BLUE_MILL_STALE_AIRSPACE = { ...BLUE_MILL_AIRSPACE, stale: true }
+const BLUE_MILL_STALE_NOTAMS = { ...BLUE_MILL_NOTAMS, stale: true }
+
+describe('GP3: click Blue Mill', () => {
+  const clickBlueMill = (map: L.Map) => act(() => void map.fire('click', { latlng: L.latLng(BLUE_MILL.lat, BLUE_MILL.lon) }))
+
+  it('drops a pin and opens the card with the airspace and NOTAMs over the point, and each row expands', async () => {
+    server.use(...blueMillRoutes())
+    const fit = vi.spyOn(L.Map.prototype, 'fitBounds')
+    render(<App />)
+    const map = mapOf(fit)
+    await waitFor(() => expect(polygons(map, 'notams')).toBeGreaterThan(0))
+
+    clickBlueMill(map)
+    const card = await screen.findByRole('region', { name: "What's here" })
+    expect(within(card).getByText('Over this point')).toBeInTheDocument()
+    expect(within(card).getByText('The chat checks everything within 2 NM.')).toBeInTheDocument()
+    expect(within(card).getByText('BLUE MILL TEST ATZ')).toBeInTheDocument()
+    expect(within(card).getByText('H2001/26')).toBeInTheDocument()
+    expect(within(card).getByRole('button', { name: 'Above FL100 (3)' })).toHaveAttribute('aria-expanded', 'false')
+
+    const user = userEvent.setup()
+    await user.click(within(card).getByRole('button', { name: /H2001\/26/ }))
+    expect(within(card).getByText(/BEFORE FLIGHT/)).toBeInTheDocument()
+    expect(within(card).getByText(/1200FT AMSL/, { selector: 'span' })).toBeInTheDocument()
+  })
+
+  it('makes no request on the click (F2): the card reads the payloads already loaded', async () => {
+    server.use(...blueMillRoutes())
+    const fit = vi.spyOn(L.Map.prototype, 'fitBounds')
+    const fetched = vi.spyOn(globalThis, 'fetch')
+    const opened = vi.spyOn(XMLHttpRequest.prototype, 'open')
+    render(<App />)
+    const map = mapOf(fit)
+    await waitFor(() => expect(polygons(map, 'notams')).toBeGreaterThan(0))
+    const requests = fetched.mock.calls.length
+    const tiles = opened.mock.calls.length
+
+    clickBlueMill(map)
+    await screen.findByRole('region', { name: "What's here" })
+    expect(fetched.mock.calls.length).toBe(requests)
+    expect(opened.mock.calls.length).toBe(tiles)
+  })
+
+  it('lists everything loaded even with both layers switched off, and a switch changed after it opens leaves the card as it was', async () => {
+    server.use(...blueMillRoutes())
+    const fit = vi.spyOn(L.Map.prototype, 'fitBounds')
+    render(<App />)
+    const map = mapOf(fit)
+    await waitFor(() => expect(polygons(map, 'notams')).toBeGreaterThan(0))
+    const { user } = await openPanel()
+    await user.click(screen.getByRole('switch', { name: 'NOTAMs below FL100' }))
+    await user.click(screen.getByRole('switch', { name: 'Airspace below FL100' }))
+    expect([polygons(map, 'airspace'), polygons(map, 'notams')]).toEqual([0, 0])
+
+    clickBlueMill(map)
+    const card = await screen.findByRole('region', { name: "What's here" })
+    const listed = () => within(card).getAllByRole('listitem').map((item) => item.textContent)
+    const before = listed()
+    expect(before.some((text) => text?.includes('BLUE MILL TEST ATZ'))).toBe(true)
+    expect(before.some((text) => text?.includes('H2001/26'))).toBe(true)
+
+    await user.click(screen.getByRole('switch', { name: 'NOTAMs below FL100' })) // on again, after the card opened
+    await user.click(screen.getByRole('switch', { name: 'Airspace below FL100' }))
+    await user.click(screen.getByRole('switch', { name: 'NOTAMs below FL100' })) // and NOTAMs off once more
+    expect(listed()).toEqual(before)
+  })
+
+  it('shows the stale layer’s rows and none of the panel’s stale note in the card', async () => {
+    server.use(airspaceRoute({ ...BLUE_MILL_STALE_AIRSPACE }), notamsRoute({ ...BLUE_MILL_STALE_NOTAMS }))
+    const fit = vi.spyOn(L.Map.prototype, 'fitBounds')
+    render(<App />)
+    const map = mapOf(fit)
+    await waitFor(() => expect(polygons(map, 'notams')).toBeGreaterThan(0))
+    clickBlueMill(map)
+    const card = await screen.findByRole('region', { name: "What's here" })
+    expect(within(card).getByText('H2001/26')).toBeInTheDocument()
+    expect(card).not.toHaveTextContent(/stale/i)
+  })
+})

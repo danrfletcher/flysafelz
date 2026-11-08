@@ -38,9 +38,10 @@ describe('F2: no analytics, no logging of answer text', () => {
 })
 
 describe('no half-wiring: nothing here belongs to a later PR', () => {
-  it('has no motion, wind, chat-SDK or map-geometry dependency yet (the popover and switch are this PR’s)', () => {
-    const later = /^(motion|framer-motion|leaflet-velocity|@langchain\/.*|@turf\/.*|react-markdown|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
+  it('has no motion, wind, chat-SDK or markdown dependency yet, and the one Turf package is the point-in-polygon test', () => {
+    const later = /^(motion|framer-motion|leaflet-velocity|@langchain\/.*|react-markdown|@radix-ui\/react-(tooltip|toast|sheet|dropdown-menu))$/
     expect(installed.filter((name) => later.test(name))).toEqual([])
+    expect(installed.filter((name) => name.startsWith('@turf/'))).toEqual(['@turf/boolean-point-in-polygon'])
     expect(installed).toContain('@radix-ui/react-popover')
     expect(installed).toContain('@radix-ui/react-switch')
   })
@@ -69,9 +70,18 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
     expect([...new Set(routes)].sort()).toEqual(['/map/airspace', '/map/notams'])
   })
 
-  it('has no chat, sheet, drawer, toast or pin component yet', () => {
-    const names = readdirSync(resolve(UI_ROOT, 'src/components'), { recursive: true }).map(String)
-    expect(names.filter((name) => /chat|sheet|drawer|toast|pin/i.test(name))).toEqual([])
+  it('has no chat, sheet or drawer component yet (the pin, card and toast are this PR’s)', () => {
+    const names = readdirSync(resolve(UI_ROOT, 'src'), { recursive: true }).map(String)
+    expect(names.filter((name) => /chat|sheet|drawer/i.test(name))).toEqual([])
+  })
+
+  it('has no pin bounce, no chat button and no answer-highlight code: PR-12.F1, PR-5.F1 and PR-6.F1 own them', () => {
+    const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
+    const found = (pattern: RegExp) => sources.filter((path) => pattern.test(readUi(path)))
+    expect(found(word('bou', 'nce|@key', 'frames|prefers-reduced-', 'motion'))).toEqual([])
+    expect(found(word('Chat about this', ' LZ|onChat|openChat'))).toEqual([])
+    expect(found(word('high', 'light'))).toEqual([])
+    expect(found(word('overl', 'ays'))).toEqual([])
   })
 
   it('has no verdict or action colour function: the legend swatches are theme tokens', () => {
@@ -81,11 +91,12 @@ describe('no half-wiring: nothing here belongs to a later PR', () => {
 })
 
 describe('F2/F7: NOTAM text and colour', () => {
-  it('never reads a NOTAM’s `text` outside the type and the test fixtures', () => {
-    const readers = uiTextFiles()
-      .filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
-      .filter((path) => /properties\.text\b|\.text\b\s*[,)}]|\btext:/.test(readUi(path)))
-    expect(readers).toEqual(['src/map/types.ts']) // the field's declaration only
+  it('reads a NOTAM’s `text` only in the type, the What’s-here row builder and the card that shows it, and never passes it to a console call', () => {
+    const sources = uiTextFiles().filter((path) => path.startsWith('src/') && !/\.test\.|\/test\//.test(path))
+    const readers = sources.filter((path) => /properties\.text\b|\.text\b\s*[,)}]|\btext:/.test(readUi(path)))
+    expect(readers).toEqual(['src/map/types.ts', 'src/pick/WhatsHereCard.tsx', 'src/pick/whatsHere.ts']) // the declaration, the card, the row builder
+    const logging = sources.filter((path) => /console\.\w+\([^)]*\btext\b/.test(readUi(path)))
+    expect(logging).toEqual([])
   })
 
   it('decides a map colour from the airspace type and nothing else: no regex or word test on a name, text or action', () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { AIRSPACE_FIXTURE, NOTAMS_FIXTURE } from '@/test/handlers'
+import { AIRSPACE_FIXTURE, BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS, NOTAMS_FIXTURE } from '@/test/handlers'
 
 // The airspace ids are 24-character openAIP ids made of digits, so the id is left out of the scan.
 // F5: a phone number in a UI fixture is in a range Ofcom keeps for drama, never a real one. The numbers are found by a blunt rule
@@ -59,5 +59,27 @@ describe('the recorded fixtures', () => {
     expect(AIRSPACE_FIXTURE.features.length).toBeGreaterThanOrEqual(10)
     expect(AIRSPACE_FIXTURE.features.length).toBeLessThanOrEqual(20)
     expect(NOTAMS_FIXTURE.features.length).toBeLessThanOrEqual(20)
+  })
+})
+
+describe('the Blue Mill fixtures (PR-4.F1)', () => {
+  it('F5: every phone number in them is in the fiction range, and there are some', () => {
+    const found = [BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS].flatMap((payload) =>
+      payload.features.flatMap((feature) => strings({ ...feature.properties, id: '' }).flatMap(runs)),
+    )
+    expect(found.length).toBeGreaterThanOrEqual(3)
+    for (const number of found) expect(FICTION.some((prefix) => number.startsWith(prefix)), number).toBe(true)
+  })
+
+  it('hold an ATZ over Blue Mill, a NOTAM with a hole, an approx Q-circle NOTAM, an item at FL100 and one at FL105, in the route’s envelope', () => {
+    for (const payload of [BLUE_MILL_AIRSPACE, BLUE_MILL_NOTAMS]) {
+      expect(Object.keys(payload).sort()).toEqual(['features', 'stale', 'type', 'updated_at'])
+      expect(payload.stale).toBe(false)
+    }
+    expect(BLUE_MILL_AIRSPACE.features.some((f) => f.properties.type === 'atz' && f.properties.lower_ft === 0)).toBe(true)
+    expect(BLUE_MILL_AIRSPACE.features.map((f) => f.properties.lower_ft)).toEqual(expect.arrayContaining([10000, 10500]))
+    expect(BLUE_MILL_NOTAMS.features.some((f) => f.geometry.type === 'Polygon' && f.geometry.coordinates.length === 2 && !f.properties.approx)).toBe(true)
+    expect(BLUE_MILL_NOTAMS.features.some((f) => f.properties.approx)).toBe(true)
+    expect(BLUE_MILL_NOTAMS.features.map((f) => f.properties.lower_fl)).toEqual(expect.arrayContaining([null, 105]))
   })
 })

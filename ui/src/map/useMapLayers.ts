@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { apiUrl } from '@/config'
+import { warnSkippedOnce } from '@/pick/skipped'
 import type { AirspaceProps, LayerPayload, MapFeature, MapGeometry, NotamProps, Position } from '@/map/types'
 
 /** Both routes are fetched on load and then this often while the page is open. There is no refresh button. */
@@ -38,7 +39,8 @@ function isRing(value: unknown): boolean {
   return Array.isArray(value) && value.length >= 4 && value.every(isPosition)
 }
 
-function isGeometry(value: unknown): value is MapGeometry {
+/** Whether a value is a Polygon or MultiPolygon whose rings each have at least four finite [lon, lat] positions. */
+export function isGeometry(value: unknown): value is MapGeometry {
   if (!isObject(value) || !Array.isArray(value.coordinates)) return false
   if (value.type === 'Polygon') return value.coordinates.length > 0 && value.coordinates.every(isRing)
   if (value.type === 'MultiPolygon') {
@@ -58,24 +60,36 @@ function hasNotamProps(p: Record<string, unknown>): boolean {
   return isText(p.id) && isNumberOrNull(p.lower_fl) && isText(p.valid_from) && typeof p.approx === 'boolean'
 }
 
-/** The payload in a response body, or null when it is not one. A feature that cannot be drawn is left out; the rest stay. */
-export function readPayload<P>(body: unknown, hasProps: (p: Record<string, unknown>) => boolean): LayerPayload<P> | null {
+/**
+ * The payload in a response body, or null when it is not one. A feature that cannot be drawn is left out and the rest stay;
+ * one left out for its shape is named once in `console.warn` (layer and id only, never its text).
+ */
+export function readPayload<P>(
+  body: unknown,
+  hasProps: (p: Record<string, unknown>) => boolean,
+  layer = 'map',
+): LayerPayload<P> | null {
   if (!isObject(body) || !Array.isArray(body.features)) return null
   if (typeof body.updated_at !== 'string' || Number.isNaN(Date.parse(body.updated_at))) return null
   if (typeof body.stale !== 'boolean') return null
-  const features = body.features.filter(
-    (feature): feature is MapFeature<P> =>
-      isObject(feature) && isGeometry(feature.geometry) && isObject(feature.properties) && hasProps(feature.properties),
-  )
+  const features = body.features.filter((feature, position): feature is MapFeature<P> => {
+    if (!isObject(feature)) return false
+    if (!isGeometry(feature.geometry)) {
+      warnSkippedOnce(layer, isObject(feature.properties) ? feature.properties.id : undefined, position)
+      return false
+    }
+    return isObject(feature.properties) && hasProps(feature.properties)
+  })
   return { features, updated_at: body.updated_at, stale: body.stale }
 }
 
 /** One fetch of one route: the payload, or null for a 503, any other bad status, a network error or a body that is not a payload. Never rejects. */
 async function fetchLayer<P>(path: string, hasProps: (p: Record<string, unknown>) => boolean, signal: AbortSignal) {
+  const layer = path.split('/').pop() ?? path
   try {
     const response = await fetch(`${apiUrl()}${path}`, { signal })
     if (!response.ok) return null
-    return readPayload<P>(await response.json(), hasProps)
+    return readPayload<P>(await response.json(), hasProps, layer)
   } catch {
     return null
   }
