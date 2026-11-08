@@ -17,6 +17,9 @@ model_max_retries: 1
 # Minutes a fetched source is reused within a thread before it is fetched again (FR12).
 source_reuse_minutes: 15
 
+# Days after today that the system prompt's calendar lists, so the model can turn "Sunday" or "next Friday" into a date (G3, P3).
+calendar_days: 7
+
 # Model calls get_notams may make to read NOTAMs in one request; the NOTAMs beyond them are shown unread, with the reason "reader limit" (G11).
 notam_reader_calls: 3
 

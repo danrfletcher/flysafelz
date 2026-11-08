@@ -1,7 +1,7 @@
 """The input check: what a request must be before the model sees it. Runs first in every turn, as the agent's one `before_agent` hook.
 
     validate_request(state, ctx) -> dict   the state update for an accepted turn, or RequestInvalid (one line) for a rejected one
-    check_input                            the `before_agent` middleware that calls it (PR-9.F1 puts it into the one `create_agent`)
+    check_input                            the same check as a stand-alone `before_agent` hook (the contract tests' graph); the real graph runs `validate_request` from the one middleware class in middleware.py
 
 An accepted turn clears the last turn's `answer`, `guard`, `overlays` and `assessment`, and keeps the thread's LZ and time zone
 in `thread_lz`. A request outside the UK is answered here by code, with no model call, and its LZ is kept in `thread_lz` too, so
@@ -30,12 +30,11 @@ from langchain.agents.middleware import before_agent
 from langchain_core.messages import AIMessage, HumanMessage, RemoveMessage
 from langgraph.runtime import Runtime
 
-from flysafelz.agent.state import LAT_LIMIT, DropName, ReaderName, RequestState, RunContext, ThreadLZ, is_aware
+from flysafelz.agent.state import DEFAULT_TZ, LAT_LIMIT, DropName, ReaderName, RequestState, RunContext, ThreadLZ, is_aware
 from flysafelz.geo import HALF_TURN, OutsideUKCoverage, check_uk_bounds
 from flysafelz.sources import SourceError, load_case_sources
 
 UK_ONLY_ANSWER = "FlySafeLZ only covers the UK."
-DEFAULT_TZ = "Europe/London"
 READERS = get_args(ReaderName)
 DROPS = get_args(DropName)
 

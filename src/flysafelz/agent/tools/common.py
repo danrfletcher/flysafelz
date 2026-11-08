@@ -47,6 +47,11 @@ NONE_LINE = "none"
 NO_LANDING_ZONE = "No landing zone is set for this thread, so there is nothing to check."
 
 
+# `ToolRuntime` alone is `ToolRuntime[None, dict]`: its `context` is typed None, and pydantic then warns on stderr each time it copies the arguments of a
+# tool call with a real RunContext in it. Naming the context type here is what keeps a live run's stderr to the progress lines.
+AgentRuntime = ToolRuntime[RunContext, Any]
+
+
 class WindowArgs(BaseModel):
     """The arguments of a data tool. The model gives a window, or leaves both out for the default one. Nothing else.
 
@@ -57,7 +62,7 @@ class WindowArgs(BaseModel):
 
     start: str | None = Field(default=None, description="Window start as a local time, written YYYY-MM-DD HH:MM. Leave out together with `end` for the default window.")
     end: str | None = Field(default=None, description="Window end as a local time, written YYYY-MM-DD HH:MM. Leave out together with `start` for the default window.")
-    runtime: ToolRuntime = Field(default=None)  # type: ignore[assignment]  # injected; never part of the model-facing schema
+    runtime: AgentRuntime = Field(default=None)  # type: ignore[assignment]  # injected; never part of the model-facing schema
 
 
 ORDER = {">=": operator.ge, ">": operator.gt, "<=": operator.le, "<": operator.lt}  # the ordering comparisons of rules.yaml
