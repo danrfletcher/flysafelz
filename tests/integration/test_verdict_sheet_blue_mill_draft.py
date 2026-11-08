@@ -169,7 +169,7 @@ def test_the_written_draft_equals_the_built_entry(tmp_path):
     root = blue_mill_root(tmp_path)
     (ex,) = read_examples(draft_examples(tmp_path))
     built = build_draft_entry(ex, root / "fixtures" / cases.BLUE_MILL)
-    text, (parsed,), _out = build(root, draft_examples(tmp_path, "again.yaml"))
+    _text, (parsed,), _out = build(root, draft_examples(tmp_path, "again.yaml"))
     without_fingerprint = {k: v for k, v in parsed.items() if k != "fingerprint"}  # the rerun layer's key, after actions_done
     assert without_fingerprint == dict(built) and list(without_fingerprint) == list(built)
 

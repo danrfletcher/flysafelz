@@ -1,0 +1,5 @@
+$ (in a copy of the repo with fixtures/blue_mill_2026-10-30 and fixtures/bamburgh_2026-10-06 renamed) python -m evals.agent.loader --check
+evals.agent.loader: 2 fixture folder(s) missing or without case.yaml:
+  fixtures/bamburgh_2026-10-06/
+  fixtures/blue_mill_2026-10-30/
+exit 1

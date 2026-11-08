@@ -7,6 +7,7 @@ The last section (PR-5.F1, E3) reruns the command over a tmp_path copy of the ca
 `--check`. The examples file and the sheet live under tmp_path; the committed fixtures are never touched.
 """
 
+import itertools
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
@@ -116,7 +117,7 @@ def test_g1_the_rows_are_contiguous_and_cover_the_assess_hour_span():
     rows = blue_mill_entry()["rows"]
     assert rows[0]["start"] == stamp(assessment.hours[0].hour)
     assert rows[-1]["end"] == stamp(assessment.hours[-1].hour.replace(hour=assessment.hours[-1].hour.hour + 1))
-    assert all(a["end"] == b["start"] for a, b in zip(rows, rows[1:]))
+    assert all(a["end"] == b["start"] for a, b in itertools.pairwise(rows))
 
 
 # --- PR-5.F1, E3: a rerun after the fixture files change ------------------------------------------------------------------
