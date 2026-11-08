@@ -16,15 +16,17 @@ from pathlib import Path
 STRUCTURAL = (0, 1)
 
 # F7/F2: no registry, DI, provider class or memoising decorator anywhere in src/. The word `cache` is banned too, except in
-# the reader package (ticket 3 F2): G9's SQLite cache is there, and the CLI says "stored reading", so cli.py still passes.
+# the reader package (ticket 3 F2: G9's SQLite cache is there, and the CLI says "stored reading", so cli.py still passes) and in
+# the mapdata package (ticket 8 F6: the map routes' disk cache under data/map/). lru_cache, functools.cache and registry stay banned in both.
 BANNED_EVERYWHERE = re.compile(r"lru_cache|functools\.cache|registry|Registry|\binject\b|Provider\b")
 BANNED_OUTSIDE_THE_READER = re.compile(r"\bcache\b")
 
 
-def banned_words(path: Path, reader: Path) -> list[str]:
-    """The banned words in a source file. `reader` is the one directory where the word `cache` is allowed."""
+def banned_words(path: Path, reader: Path, mapdata: Path | None = None) -> list[str]:
+    """The banned words in a source file. `reader` and `mapdata` are the two directories where the word `cache` is allowed."""
     text = path.read_text(encoding="utf-8")
-    pattern = BANNED_EVERYWHERE if reader in path.parents else re.compile(f"{BANNED_EVERYWHERE.pattern}|{BANNED_OUTSIDE_THE_READER.pattern}")
+    cache_allowed = reader in path.parents or (mapdata is not None and mapdata in path.parents)
+    pattern = BANNED_EVERYWHERE if cache_allowed else re.compile(f"{BANNED_EVERYWHERE.pattern}|{BANNED_OUTSIDE_THE_READER.pattern}")
     return [match.group(0) for match in pattern.finditer(text)]
 
 
@@ -50,6 +52,7 @@ OPENAIP_KEY_READERS = {
     "verdict_sheet.py": "passes the environment on to capture for the openAIP key",
     "clients/openaip.py": "its docstring says the caller reads OPENAIP_API_KEY; the module reads none",
     "clients/pib_source.py": "its docstring says there is no .env; the module reads none",
+    "mapdata/config.py": "passes find_key the process settings for the openAIP key, and reads FLYSAFELZ_UI_ORIGIN (the one extra CORS origin)",
 }
 READER_CONFIG = "reader/config.py"
 AGENT_CONFIG = "agent/config.py"  # reads AGENT_* from os.environ, and nothing else (ticket 4 PR-1.S1)
@@ -173,11 +176,14 @@ def unreviewed_floats(relative: str, tree: ast.Module) -> list[tuple[int, float]
 #   agent/      langchain, langchain_core, langchain_openai, langgraph*, langsmith (the model only through langchain_openai)
 #   guidance/   fastembed, pypdf, and flysafelz.agent.settings (the knobs, which load without LangChain)
 #   reader/     langchain_openai and langchain_core only (ticket 3's exemption, unchanged)
-#   elsewhere   none of them, and no flysafelz.agent or flysafelz.guidance
+#   mapdata/    starlette and fastapi, the web framework the LangGraph `http.app` takes (ticket 8 F6); none of the rest, and no flysafelz.agent or flysafelz.guidance
+#   elsewhere   none of them (starlette and fastapi included), and no flysafelz.agent or flysafelz.guidance
 # openai and anthropic are banned in every package.
 AGENT_PACKAGE = "agent"
 GUIDANCE_PACKAGE = "guidance"
 READER_PACKAGE = "reader"
+MAPDATA_PACKAGE = "mapdata"
+WEB_FRAMEWORKS = ("starlette", "fastapi")  # allowed in mapdata/ only
 FRAMEWORK_PREFIXES = ("langchain", "langgraph", "langsmith")
 GUIDANCE_PREFIXES = ("fastembed", "pypdf")
 BANNED_CLIENTS = ("openai", "anthropic")
@@ -246,6 +252,8 @@ def _framework_violation(module: str, package: str) -> bool:
     top = _top(module)
     if top in BANNED_CLIENTS:
         return True
+    if top in WEB_FRAMEWORKS:
+        return package != MAPDATA_PACKAGE
     if package == AGENT_PACKAGE:
         framework_ok = top in AGENT_LANGCHAIN_MODULES or top.startswith(("langgraph", "langsmith"))
         return (top.startswith(FRAMEWORK_PREFIXES) and not framework_ok) or top.startswith(GUIDANCE_PREFIXES)

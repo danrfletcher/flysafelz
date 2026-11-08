@@ -73,10 +73,12 @@ ALLOWED_PROJECT_DEPENDENCIES = {
     "pypdf",
     "pyyaml",
     "shapely",
+    "starlette",
     "tzdata",
 }
 ALLOWED_GROUP_DEPENDENCIES = {"dev": {"langgraph-cli", "pytest", "pytest-cov", "pytest-socket", "ruff"}}
-READER = SRC / "reader"  # the one folder where the word `cache` and READER_* names are allowed (ticket 3)
+READER = SRC / "reader"  # the one folder where READER_* names are allowed (ticket 3), and with MAPDATA one of two where the word `cache` is
+MAPDATA = SRC / "mapdata"  # the map routes: the one package that may import starlette or fastapi, and the other where the word `cache` is allowed (ticket 8 F6)
 
 
 def _dependency_name(requirement: str) -> str:
@@ -642,9 +644,10 @@ def test_contract_classes_subclass_only_basemodel_or_enum():
 
 
 def test_no_registry_di_or_caching_in_source():
-    """Narrowed for the reader (ticket 3 F2): only src/flysafelz/reader/ may use the word `cache`. test_reader_cache_fence.py shows a planted one elsewhere is still caught."""
+    """Narrowed for the reader (ticket 3 F2) and for the map routes (ticket 8 F6): only src/flysafelz/reader/ and src/flysafelz/mapdata/ may use the word `cache`.
+    test_reader_cache_fence.py and test_mapdata_fence.py show a planted one elsewhere is still caught."""
     for path in PY_FILES:
-        assert banned_words(path, READER) == [], path
+        assert banned_words(path, READER, MAPDATA) == [], path
 
 
 # F8: limits and the local area cannot be adjusted by the user.
@@ -676,7 +679,7 @@ def test_rules_module_and_cli_read_no_environment():
         assert not re.search(r"environ|getenv", text), name
 
 
-# F10: no LLM env vars, no /models dependency. Narrowed for the reader (ticket 3 F2): only src/flysafelz/reader/ may name READER_*.
+# F10: no LLM env vars, no /models dependency. Narrowed for the reader (ticket 3 F2): only src/flysafelz/reader/ may name READER_*. mapdata/ gets no exemption.
 # test_reader_fence.py shows a planted READER_ or /models string outside it is still caught.
 def test_no_llm_env_vars_or_models_endpoint_in_source():
     for path in PY_FILES:
