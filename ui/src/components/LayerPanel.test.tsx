@@ -15,7 +15,7 @@ const unavailable: LayerState<unknown> = { status: 'unavailable', features: [], 
 
 /** The panel with its switches held in state, as App holds them. */
 function Panel({ airspace = ok(), notams = ok(), onChange }: { airspace?: LayerState<unknown>; notams?: LayerState<unknown>; onChange?: (id: LayerId, on: boolean) => void }) {
-  const [shown, setShown] = useState<LayerSwitches>({ airspace: true, notams: true })
+  const [shown, setShown] = useState<LayerSwitches>({ airspace: true, notams: true, answer: true })
   return (
     <LayerPanel
       states={{ airspace, notams }}
@@ -40,13 +40,24 @@ afterEach(() => {
 })
 
 describe('the switches', () => {
-  it('has exactly the two this PR adds, both on by default', async () => {
+  it('has the two base layers and the Answer overlays switch, all on by default', async () => {
     await open()
     const switches = screen.getAllByRole('switch')
-    expect(switches.map((s) => s.getAttribute('aria-checked'))).toEqual(['true', 'true'])
+    expect(switches.map((s) => s.getAttribute('aria-checked'))).toEqual(['true', 'true', 'true'])
     expect(screen.getByRole('switch', { name: 'Airspace below FL100' })).toBeChecked()
     expect(screen.getByRole('switch', { name: 'NOTAMs below FL100' })).toBeChecked()
-    expect(LAYERS.map((layer) => layer.id)).toEqual(['airspace', 'notams'])
+    expect(screen.getByRole('switch', { name: 'Answer overlays' })).toBeChecked()
+    expect(LAYERS.map((layer) => layer.id)).toEqual(['airspace', 'notams', 'answer'])
+  })
+
+  it('switches Answer overlays on its own, and gives it no update time (it is drawn from the chat, not a route)', async () => {
+    const changes: [LayerId, boolean][] = []
+    const { user, dialog } = await open(<Panel onChange={(id, on) => changes.push([id, on])} />)
+    await user.click(screen.getByRole('switch', { name: 'Answer overlays' }))
+    expect(screen.getByRole('switch', { name: 'Answer overlays' })).not.toBeChecked()
+    expect(screen.getByRole('switch', { name: 'Airspace below FL100' })).toBeChecked()
+    expect(changes).toEqual([['answer', false]])
+    expect(within(dialog).getAllByText(/^updated /)).toHaveLength(2)
   })
 
   it('toggles each on its own', async () => {
@@ -69,9 +80,9 @@ describe('the switches', () => {
     expect(screen.getByRole('switch', { name: 'Airspace below FL100' })).not.toBeChecked()
   })
 
-  it('has no switch for wind, rain, all heights, answers or the basemap', async () => {
+  it('has no switch for wind, rain, all heights or the basemap', async () => {
     const { dialog } = await open()
-    expect(within(dialog).queryByText(/wind|rain|radar|all heights|answer overlays|basemap/i)).toBeNull()
+    expect(within(dialog).queryByText(/wind|rain|radar|all heights|basemap/i)).toBeNull()
   })
 })
 

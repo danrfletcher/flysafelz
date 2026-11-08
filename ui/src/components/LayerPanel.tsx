@@ -5,18 +5,21 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Switch } from '@/components/ui/switch'
 import { formatUpdated, type LayerState } from '@/map/useMapLayers'
 
-export type LayerId = 'airspace' | 'notams'
+/** The layers that come from a map route, and so have an update time and a state. */
+export type ServerLayerId = 'airspace' | 'notams'
+export type LayerId = ServerLayerId | 'answer'
 
-/** The two switches this PR adds, in panel order. */
+/** The switches, in panel order: the two base layers, then the latest answer's highlights (drawn from the chat, not from a route). */
 export const LAYERS: readonly { id: LayerId; name: string }[] = [
   { id: 'airspace', name: 'Airspace below FL100' },
   { id: 'notams', name: 'NOTAMs below FL100' },
+  { id: 'answer', name: 'Answer overlays' },
 ]
 
 export type LayerSwitches = Record<LayerId, boolean>
 
 export interface LayerPanelProps {
-  states: Record<LayerId, LayerState<unknown>>
+  states: Record<ServerLayerId, LayerState<unknown>>
   shown: LayerSwitches
   onShownChange: (id: LayerId, on: boolean) => void
   /** The chat sheet is open: from 768 px up the button moves left to sit beside the sheet instead of under it. */
@@ -36,7 +39,7 @@ function Status({ name, state }: { name: string; state: LayerState<unknown> }) {
 }
 
 /**
- * The layer panel: a button at the top right of the map that opens a popover with one switch per layer, each layer's update time
+ * The layer panel: a button at the top right of the map that opens a popover with one switch per layer, each route layer's update time
  * and state, and the legend. The popover is never wider than the viewport, and scrolls inside when it is taller than the room it has.
  */
 export function LayerPanel({ states, shown, onShownChange, chatOpen = false }: LayerPanelProps) {
@@ -58,7 +61,11 @@ export function LayerPanel({ states, shown, onShownChange, chatOpen = false }: L
                   <label htmlFor={`layer-${id}`} className="block text-sm font-medium">
                     {name}
                   </label>
-                  <Status name={name} state={states[id]} />
+                  {id === 'answer' ? (
+                    <p className="text-xs text-muted-foreground">The latest answer: the 2 NM circle and the NOTAMs and airspace it names</p>
+                  ) : (
+                    <Status name={name} state={states[id]} />
+                  )}
                 </div>
                 <Switch id={`layer-${id}`} checked={shown[id]} onCheckedChange={(on) => onShownChange(id, on)} className="mt-0.5" />
               </li>

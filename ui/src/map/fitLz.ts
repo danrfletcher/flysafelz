@@ -4,7 +4,7 @@ import type { LatLon } from '@/pick/whatsHere'
 
 /** The radius the chat checks round the LZ, in nautical miles (the What's-here card says "within 2 NM"). */
 export const LZ_RADIUS_NM = 2
-const METRES_PER_NM = 1852
+export const METRES_PER_NM = 1852
 
 /** The width of the chat sheet on a desktop screen, in pixels (26rem at the default font size). The map is padded by this much on the right. */
 export const SHEET_WIDTH_PX = 416

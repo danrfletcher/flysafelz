@@ -1,7 +1,18 @@
 import type { PathOptions } from 'leaflet'
 
 /** The theme variables a map outline can use (src/styles/theme.css). Colour lives there and nowhere else. */
-export type ThemeToken = '--type-restricted' | '--type-danger' | '--type-controlled' | '--type-other' | '--type-notam'
+export type ThemeToken =
+  | '--type-restricted'
+  | '--type-danger'
+  | '--type-controlled'
+  | '--type-other'
+  | '--type-notam'
+  | '--action-no-fly'
+  | '--action-contact-first'
+  | '--action-check-sup'
+  | '--action-avoid-sector'
+  | '--action-awareness'
+  | '--primary'
 
 /** Every name in openAIP's CODES["type"] list (src/flysafelz/clients/openaip.py), in code order. tests/unit/test_ui_map_layers.py keeps the two equal. */
 export const AIRSPACE_TYPES = [

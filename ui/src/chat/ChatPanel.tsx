@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 
 import { Answer } from '@/chat/Answer'
+import { Badges } from '@/chat/Badges'
 import { ERROR_TEXT, STARTER_CHIPS } from '@/chat/copy'
-import { pinKey, type Sessions } from '@/chat/turns'
+import { pinKey, type Sessions, type Turn } from '@/chat/turns'
 import { useLeaveWarning } from '@/chat/useLeaveWarning'
 import { useLzThread } from '@/chat/useLzThread'
 import { Drawer, DrawerContent } from '@/components/ui/drawer'
 import { DialogTitle } from '@/components/ui/dialog'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { useIsDesktop } from '@/lib/useIsDesktop'
+import { notamsById } from '@/map/answerFeatures'
 import type { LatLon } from '@/pick/whatsHere'
 
 /** The status shown from the moment a question is sent until the first progress line arrives. */
@@ -19,14 +21,36 @@ export function formatPoint(point: LatLon): string {
   return `${point.lat.toFixed(4)}, ${point.lon.toFixed(4)}`
 }
 
-interface ConversationProps {
+/** What a click on a turn's badges or on a NOTAM id in its answer asks of the map. Both are about that turn alone. */
+export interface HighlightRequests {
+  /** Draw this turn's highlights. */
+  onShowTurn?: (turnId: string) => void
+  /** Draw this turn's highlights with this NOTAM's shape picked out, and switch the Answer overlays layer on. */
+  onShowNotam?: (turnId: string, notamId: string) => void
+}
+
+interface ConversationProps extends HighlightRequests {
   point: LatLon
   sessions: Sessions
   onClose: () => void
 }
 
+/** One answered turn: its badges (from its own `assessment`) above its answer, whose NOTAM ids that are in its own `overlays` are buttons. */
+function TurnAnswer({ turn, onShowTurn, onShowNotam }: { turn: Turn } & HighlightRequests) {
+  const notams = useMemo(() => notamsById(turn.overlays), [turn.overlays])
+  const links = useMemo(() => ({ notams, onShow: (id: string) => onShowNotam?.(turn.id, id) }), [notams, onShowNotam, turn.id])
+  return (
+    <Answer
+      answer={turn.answer ?? ''}
+      guard={turn.guard}
+      badges={<Badges assessment={turn.assessment} onSelect={() => onShowTurn?.(turn.id)} />}
+      links={links}
+    />
+  )
+}
+
 /** The chat for one LZ: header, turns, the live status line (or the error with its retry button), starter chips and the question box. */
-function Conversation({ point, sessions, onClose }: ConversationProps) {
+function Conversation({ point, sessions, onClose, onShowTurn, onShowNotam }: ConversationProps) {
   const { turns, line, running, send, retry } = useLzThread(point, sessions)
   useLeaveWarning(turns.length > 0)
   const [text, setText] = useState('')
@@ -78,7 +102,7 @@ function Conversation({ point, sessions, onClose }: ConversationProps) {
         {turns.map((turn) => (
           <section key={turn.id} className="space-y-2" aria-label="Question and answer">
             <p className="ml-auto w-fit max-w-[85%] rounded-lg bg-muted px-3 py-2 text-sm whitespace-pre-wrap [overflow-wrap:anywhere]">{turn.question}</p>
-            {turn.status === 'done' && turn.answer !== null && <Answer answer={turn.answer} guard={turn.guard} />}
+            {turn.status === 'done' && turn.answer !== null && <TurnAnswer turn={turn} onShowTurn={onShowTurn} onShowNotam={onShowNotam} />}
           </section>
         ))}
 
@@ -128,7 +152,7 @@ function Conversation({ point, sessions, onClose }: ConversationProps) {
   )
 }
 
-export interface ChatPanelProps {
+export interface ChatPanelProps extends HighlightRequests {
   /** The LZ the chat is open for, or null when it is closed. */
   point: LatLon | null
   sessions: Sessions
@@ -142,9 +166,11 @@ export interface ChatPanelProps {
  * The chat: a right-hand Sheet from 768 px up, a bottom Drawer below. Both leave the map visible and clickable. The conversation inside is
  * mounted by the pin, so another pin starts a fresh one and closing the panel ends any run that is still going.
  */
-export function ChatPanel({ point, sessions, onClose, container }: ChatPanelProps) {
+export function ChatPanel({ point, sessions, onClose, container, onShowTurn, onShowNotam }: ChatPanelProps) {
   const desktop = useIsDesktop()
-  const body = point && <Conversation key={pinKey(point)} point={point} sessions={sessions} onClose={onClose} />
+  const body = point && (
+    <Conversation key={pinKey(point)} point={point} sessions={sessions} onClose={onClose} onShowTurn={onShowTurn} onShowNotam={onShowNotam} />
+  )
   const onOpenChange = (open: boolean) => {
     if (!open) onClose()
   }
