@@ -1,0 +1,56 @@
+$ uv run python -c <driver: assess tool through the agent graph, case blue_mill_2026-10-31, now 2026-10-31T07:30Z, reader fixture> 2026-10-31 10:00 2026-10-31 16:00
+Window: Saturday 31 Oct 10:00 – 16:00 GMT.
+Data as of 07:30 GMT.
+Overall: PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+2 NOTAMs within 2 NM. 6 h assessed, 0 OUTLOOK, 0 too far.
+Flyable windows:
+- Saturday 31 Oct 10:00–16:00 GMT, flyable for 6 h 00 min
+Sources:
+- weather source: ok
+- airspace source: ok
+- notams source: ok (PIB issued 2026-10-31 07:00 GMT)
+Segments:
+Saturday 31 Oct:
+10:00–11:00 GMT  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    caution: visibility 2920 m, limit 5000
+    caution: low cloud 98 %, limit 90
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+11:00–12:00 GMT  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    caution: gust spread 4.7 mph, limit 4
+    caution: visibility 3880 m, limit 5000
+    caution: low cloud 95 %, limit 90
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+12:00–13:00 GMT  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    caution: gust spread 5.2 mph, limit 4
+    caution: low cloud 91 %, limit 90
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+13:00–14:00 GMT  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    caution: gust spread 5.2 mph, limit 4
+    caution: low cloud 91 %, limit 90
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+14:00–15:00 GMT  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    caution: gust spread 4.5 mph, limit 4
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+15:00–16:00 GMT  PILOT DISCRETION – APPROACHING LIMITS · WITH CONDITIONS
+    condition: Danger area EGD496A active 10:00–16:00 GMT (UAS BVLOS ops): phone Flylogix <PHONE_1> and fly only if they agree; details in AIP SUP 108/2026
+    condition: drone ops 0.15 NM to the SSE (circle edge), up to 800 ft AMSL: avoid that sector; reading and F/G disagree on the ceiling (700 ft AGL against 800 ft AMSL); the more restrictive is used
+    caution: gust spread 4.5 mph, limit 4
+    NOTAM H7171/26 AVOID_SECTOR bearing 169°
+    NOTAM J3857/26 CONTACT_FIRST: UAS BVLOS ops over the LZ from the surface: contact phone Flylogix <PHONE_1> first and fly only if they agree; details in AIP SUP 108/2026; activates EGD496A
+Assumptions:
+- EGD496A: not in the openAIP data; the Q-circle of NOTAM J3857/26 is used

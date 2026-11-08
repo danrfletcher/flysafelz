@@ -1,0 +1,8 @@
+"""The agent unit tests share tests/factories.py, which imports the other unit tests' helper modules by name."""
+
+import sys
+from pathlib import Path
+
+UNIT = str(Path(__file__).resolve().parents[1])
+if UNIT not in sys.path:
+    sys.path.insert(0, UNIT)

@@ -1,0 +1,28 @@
+# PR-7.F1: git status after the first make guidance run (same clone). embeddings.sqlite is untracked, not ignored; there is no staging/ folder.
+
+$ git status --porcelain --ignored data/guidance/   # after the first run
+?? data/guidance/cap1535/
+?? data/guidance/cap2562/
+?? data/guidance/embeddings.sqlite
+?? data/guidance/manifest.yaml
+(end of status)
+
+cap1535
+cap2562
+embeddings.sqlite
+manifest.yaml
+sources.yaml
+
+data/guidance/cap1535:
+0000-1.md
+0001-2.md
+0002-3.md
+0003-4.md
+0004-appendix-a.md
+
+data/guidance/cap2562:
+0000-1.md
+0001-2.md
+0002-3.md
+0003-4.md
+0004-appendix-a.md

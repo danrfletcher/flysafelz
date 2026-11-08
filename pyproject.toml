@@ -6,9 +6,14 @@ readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "astral>=3.2",
+    "fastembed>=0.9.1",
     "httpx>=0.28.1",
+    "langchain>=1",
     "langchain-openai>=1.7.4",
+    "langgraph>=1.2.20",
+    "langsmith>=0.14.17",
     "pydantic>=2",
+    "pypdf>=7.0.0",
     "pyyaml",
     "shapely>=2.2.0",
     "tzdata>=2026.6",
@@ -16,6 +21,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "langgraph-cli[inmem]>=0.4.42",
     "pytest",
     "pytest-cov>=7.1.0",
     "pytest-socket",

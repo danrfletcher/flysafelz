@@ -32,6 +32,7 @@ METRES_PER_KM = 1000  # unit: the radius in an E text may be written in km
 MIN_POLYGON_POINTS = 3  # structure: fewest distinct points that make an area (an E text with fewer is not a polygon)
 FULL_CIRCLE = 360  # degrees
 HALF_TURN = 180  # degrees
+QUARTER_TURN = 90  # degrees: the pole is this far from the equator
 WGS84_A = 6378137.0  # equatorial radius, metres
 WGS84_E2 = 0.00669437999014  # first eccentricity squared
 ON_EDGE_M = 1e-6  # an LZ this close to an edge counts as on it (float noise only)

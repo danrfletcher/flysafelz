@@ -27,6 +27,7 @@ from flysafelz.contracts import (
     Verdict,
     WeatherValues,
     display_verdict,
+    position_word,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -276,3 +277,37 @@ def test_display_verdict_never_returns_a_bare_go():
             for conditions in (False, True):
                 text = display_verdict(verdict, limits, conditions)
                 assert not re.search(r"(?<!NO-)\bGO\b", text)
+
+
+# --- position_word: the one mapping from a value and its limit to over / at / under (I10) ---------------------------------
+
+POSITIONS = [
+    # (value, limit, comparison, word)
+    (6.04, 6.0, ">", "over"),
+    (6.0, 6.0, ">", "at"),  # exactly at a strict limit is not yet over it
+    (5.9, 6.0, ">", "under"),
+    (9.3, 9.0, ">=", "over"),  # past a >= limit
+    (9.0, 9.0, ">=", "at"),  # on it: the limit is reached, and it is at it
+    (8.7, 9.0, ">=", "under"),
+    (4.0, 5.0, "<", "over"),  # a < limit is passed going down
+    (5.0, 5.0, "<", "at"),
+    (6.0, 5.0, "<", "under"),
+    (4.0, 5.0, "<=", "over"),
+    (5.0, 5.0, "<=", "at"),
+    (6.0, 5.0, "<=", "under"),
+]
+
+
+@pytest.mark.parametrize(("value", "limit", "comparison", "word"), POSITIONS)
+def test_position_word_over_the_comparisons_below_equal_and_above(value, limit, comparison, word):
+    assert position_word(value, limit, comparison) == word
+
+
+def test_position_word_takes_decimals_and_rejects_a_comparison_that_is_not_a_limit():
+    from decimal import Decimal
+
+    assert position_word(Decimal("6.04"), Decimal("6.0"), ">") == "over"
+    assert position_word(Decimal("9.0"), 9.0, ">=") == "at"
+    for comparison in ("in", "=", "", ">>"):
+        with pytest.raises(ValueError, match="not a limit"):
+            position_word(1.0, 1.0, comparison)
