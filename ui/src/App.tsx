@@ -34,7 +34,7 @@ export default function App() {
   const layers = useMapLayers()
   const wind = useWind()
   const rain = useRain()
-  // Wind, rain, airspace and NOTAMs below FL100 and the answer's highlights are on at first load; a choice is kept in this browser's local storage and read back on load.
+  // Wind, rain, airspace and NOTAMs below FL100 and the answer's highlights are on at first load (the two all-heights layers are off); a choice is kept in this browser's local storage and read back on load.
   const [shown, setShown] = useLayerPrefs(LAYERS)
   // Whether the basemap tiles are loading: only the layer panel's note and the map's background read it, so nothing else waits on it.
   const [basemap, setBasemap] = useState<BasemapStatus>('loading')
@@ -71,6 +71,8 @@ export default function App() {
             notams={layers.notams.features}
             showAirspace={shown.airspace}
             showNotams={shown.notams}
+            showAirspaceAll={shown.airspaceAll}
+            showNotamsAll={shown.notamsAll}
           />
           <PickHandler airspace={layers.airspace} notams={layers.notams} onChat={setChatPoint} onPick={closeChat} />
           <FitToLz point={chatPoint} layout={desktop ? 'sheet' : 'drawer'} />

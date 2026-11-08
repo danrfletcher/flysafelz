@@ -2,7 +2,7 @@ import L from 'leaflet'
 import { useEffect, useMemo } from 'react'
 import { useMap } from 'react-leaflet'
 
-import { airspaceBelowFl100, notamBelowFl100 } from '@/map/belowFl100'
+import { drawnAirspace, drawnNotams } from '@/map/layers'
 import { airspaceStyle, notamStyle, pathOptions } from '@/map/airspaceStyle'
 import { airspaceTooltip, notamTooltip } from '@/map/tooltips'
 import type { AirspaceProps, MapFeature, NotamProps } from '@/map/types'
@@ -76,19 +76,25 @@ export interface BaseLayersProps {
   notams: readonly MapFeature<NotamProps>[]
   showAirspace: boolean
   showNotams: boolean
+  /** The "all heights" switches: every feature of the route, whatever its lower limit. */
+  showAirspaceAll: boolean
+  showNotamsAll: boolean
 }
 
 /**
- * The two base layers inside a MapContainer: airspace and NOTAMs whose lower limit is below FL100, each drawn only while its
- * switch is on. A layer that is off is not mounted at all, so switching on and off leaves exactly one Leaflet group, or none.
+ * The base layers inside a MapContainer: airspace and NOTAMs, each route drawn as one group by its two switches ("below FL100" and "all
+ * heights", see layers.ts). Both on draws the route's features once, never twice. A route with both switches off is not mounted at all,
+ * so switching leaves exactly one Leaflet group per route, or none. The groups sit in the default overlay pane, under the answer pane.
  */
-export function BaseLayers({ airspace, notams, showAirspace, showNotams }: BaseLayersProps) {
-  const lowAirspace = useMemo(() => airspace.filter((feature) => airspaceBelowFl100(feature.properties)), [airspace])
-  const lowNotams = useMemo(() => notams.filter((feature) => notamBelowFl100(feature.properties)), [notams])
+export function BaseLayers({ airspace, notams, showAirspace, showNotams, showAirspaceAll, showNotamsAll }: BaseLayersProps) {
+  const airspaceDrawn = useMemo(() => drawnAirspace(airspace, { below: showAirspace, all: showAirspaceAll }), [airspace, showAirspace, showAirspaceAll])
+  const notamsDrawn = useMemo(() => drawnNotams(notams, { below: showNotams, all: showNotamsAll }), [notams, showNotams, showNotamsAll])
+  const airspaceOn = showAirspace || showAirspaceAll
+  const notamsOn = showNotams || showNotamsAll
   return (
     <>
-      {showAirspace && <AirspaceLayer features={lowAirspace} />}
-      {showNotams && <NotamLayer features={lowNotams} />}
+      {airspaceOn && <AirspaceLayer features={airspaceDrawn} />}
+      {notamsOn && <NotamLayer features={notamsDrawn} />}
     </>
   )
 }

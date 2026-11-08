@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { airspaceFloorFt, isAboveFl100, notamFloorFt, sortByFloor, splitAtFl100, type Sortable } from '@/pick/floor'
+import { airspaceFloorFt, notamFloorFt, sortByFloor, splitAtFl100, type Sortable } from '@/pick/floor'
 
 describe('airspaceFloorFt (C2)', () => {
   it.each([
@@ -36,14 +36,8 @@ describe('notamFloorFt (C2)', () => {
 })
 
 describe('the FL100 split', () => {
-  it('puts a floor of exactly FL100 in the group above, and 9,999 ft below', () => {
-    expect(isAboveFl100(9999)).toBe(false)
-    expect(isAboveFl100(10000)).toBe(true)
-    expect(isAboveFl100(24500)).toBe(true)
-    expect(isAboveFl100(0)).toBe(false)
-  })
-
-  const row = (name: string, floorFt: number, key = name): Sortable => ({ name, floorFt, key })
+  // Which group a row is in is the rule of belowFl100.ts (tested there and in whatsHere.test.ts); here the flag is given, as the card's rows give it.
+  const row = (name: string, floorFt: number, key = name): Sortable => ({ name, floorFt, key, aboveFl100: floorFt >= 10000 })
 
   it('sorts by floor, lowest first, then by name or id, then by key', () => {
     const sorted = sortByFloor([row('B', 1500), row('C', 0), row('A', 1500), row('Z', 0, 'z2'), row('Z', 0, 'z1'), row('D', 24500)])

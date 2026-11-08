@@ -51,6 +51,8 @@ const NOTAMS: [string, number | null, boolean][] = [
   ['lower_fl 100: exactly at, not below', 100, false],
   ['lower_fl 101: above', 101, false],
   ['lower_fl 150: above', 150, false],
+  ['lower_fl 195: above', 195, false],
+  ['lower_fl 245: above', 245, false],
   ['lower_fl 999: above', 999, false],
   ['missing lower_fl: below', null, true],
 ]

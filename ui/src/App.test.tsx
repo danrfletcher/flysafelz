@@ -135,7 +135,7 @@ describe('GP2 (this PR’s part): airspace and NOTAMs below FL100, and the layer
     await waitFor(() => expect(polygons(map, 'notams')).toBe(5))
 
     const { panel } = await openPanel()
-    expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(3)
+    expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(5)
     expect(within(panel).getByText('On the map')).toBeInTheDocument()
     expect(within(panel).getByText('For this field')).toBeInTheDocument()
     expect(within(panel).getByText('amber = near your limits, check the conditions too')).toBeInTheDocument()
@@ -169,8 +169,8 @@ describe('E1: a route that fails does not break the rest', () => {
 
     const { panel } = await openPanel()
     expect(within(panel).getByText('Airspace below FL100 unavailable')).toBeInTheDocument()
-    expect(within(panel).getByText('stale')).toBeInTheDocument()
-    expect(within(panel).getAllByText(/^updated/)).toHaveLength(2) // wind and NOTAMs
+    expect(within(panel).getAllByText('stale')).toHaveLength(2) // the NOTAM route's two layers: below FL100 and all heights
+    expect(within(panel).getAllByText(/^updated/)).toHaveLength(3) // wind and the NOTAM route's two layers
 
     // the map still pans, and the shell is still there
     const before = map.getCenter()
@@ -201,7 +201,7 @@ describe('E1: a route that fails does not break the rest', () => {
     render(<App />)
     await waitFor(() => expect(polygons(mapOf(fit), 'airspace')).toBe(15))
     const { panel } = await openPanel()
-    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(3))
+    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(5))
     expect(polygons(mapOf(fit), 'notams')).toBe(0)
     expect(panel).not.toHaveTextContent('stale')
   })

@@ -47,6 +47,8 @@ function renderLayers(props: Partial<Parameters<typeof BaseLayers>[0]> = {}) {
     notams: NOTAMS_FIXTURE.features,
     showAirspace: true,
     showNotams: true,
+    showAirspaceAll: false,
+    showNotamsAll: false,
     ...props,
   }
   const view = render(

@@ -65,7 +65,7 @@ describe('E2: the basemap is unavailable', () => {
     expect(within(panel).getByText('basemap unavailable')).toBeInTheDocument()
     expect(tiles.options.opacity).toBe(0)
     expect(view.container.querySelector('.leaflet-container')).toHaveClass('basemap-unavailable')
-    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(3)) // wind and the two route layers only; the basemap has no time
+    await waitFor(() => expect(within(panel).getAllByText(/^updated \d\d:\d\d$/)).toHaveLength(5)) // wind and the four route layers only; the basemap has no time
   })
 
   it('draws airspace and NOTAMs, drops the pin on land and opens What’s here, and shows the sea toast', async () => {

@@ -6,6 +6,8 @@ import { windRoute } from '@/mocks/wind'
 import type { AirspaceProps, LayerPayload, NotamProps } from '@/map/types'
 import airspaceFixture from '@/test/fixtures/map-airspace.json'
 import notamsFixture from '@/test/fixtures/map-notams.json'
+import allHeightsAirspace from '@/test/fixtures/map-airspace-all-heights.json'
+import allHeightsNotams from '@/test/fixtures/map-notams-all-heights.json'
 import blueMillAirspace from '@/test/fixtures/map-airspace.blue-mill.json'
 import blueMillNotams from '@/test/fixtures/map-notams.blue-mill.json'
 
@@ -39,4 +41,26 @@ export const BLUE_MILL = { lat: 53.802797, lon: -0.086644 }
 
 export function blueMillRoutes() {
   return [airspaceRoute(BLUE_MILL_AIRSPACE), notamsRoute(BLUE_MILL_NOTAMS), windRoute(), rainIndexRoute()]
+}
+
+/**
+ * The "all heights" payloads (PR-11.F1): 240 stacked airspaces (each cell has a low and a high shape over it; floors from SFC to FL195) and 60 NOTAMs
+ * (Q-line lower 0, 99, 100, 150, 195, 245 and none; every 5th is an approx circle), with fiction-range phone numbers. Four routes' answers: fresh, stale, and 503.
+ */
+export const ALL_HEIGHTS_AIRSPACE = allHeightsAirspace as unknown as LayerPayload<AirspaceProps>
+export const ALL_HEIGHTS_NOTAMS = allHeightsNotams as unknown as LayerPayload<NotamProps>
+export const ALL_HEIGHTS_AIRSPACE_STALE = { ...ALL_HEIGHTS_AIRSPACE, stale: true }
+export const ALL_HEIGHTS_NOTAMS_STALE = { ...ALL_HEIGHTS_NOTAMS, stale: true }
+
+export function allHeightsRoutes() {
+  return [airspaceRoute(ALL_HEIGHTS_AIRSPACE), notamsRoute(ALL_HEIGHTS_NOTAMS), windRoute(), rainIndexRoute()]
+}
+
+export function allHeightsStaleRoutes() {
+  return [airspaceRoute(ALL_HEIGHTS_AIRSPACE_STALE), notamsRoute(ALL_HEIGHTS_NOTAMS_STALE), windRoute(), rainIndexRoute()]
+}
+
+/** `/map/notams` answers 503 with no cache; the other routes answer as recorded. */
+export function allHeightsNotams503Routes() {
+  return [airspaceRoute(ALL_HEIGHTS_AIRSPACE), unavailable(NOTAMS_URL()), windRoute(), rainIndexRoute()]
 }

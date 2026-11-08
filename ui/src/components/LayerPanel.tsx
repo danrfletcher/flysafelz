@@ -10,10 +10,20 @@ import { formatUpdated, type LayerStatus } from '@/map/useMapLayers'
 
 /** The layers that come from a map route, and so have an update time and a state. */
 export type ServerLayerId = 'wind' | 'airspace' | 'notams'
-export type LayerId = ServerLayerId | 'rain' | 'answer'
+export type LayerId = ServerLayerId | 'airspaceAll' | 'notamsAll' | 'rain' | 'answer'
+
+/** The route each "all heights" layer is drawn from: its partner's, so the update time, "stale" and the 503 note come from one place. */
+const PARTNER_ROUTE: Partial<Record<LayerId, ServerLayerId>> = { airspaceAll: 'airspace', notamsAll: 'notams' }
+
+/** The route a layer's row reads its state from, or null for the layers that are not drawn from a route (Rain, Answer overlays). */
+function routeOf(id: LayerId): ServerLayerId | null {
+  if (id === 'rain' || id === 'answer') return null
+  return PARTNER_ROUTE[id] ?? (id as ServerLayerId)
+}
 
 /**
- * The switches, in panel order: wind, rain, the two base layers, then the latest answer's highlights (drawn from the chat, not from a route).
+ * The switches, in panel order: wind, rain, each base layer followed by its "all heights" partner, then the latest answer's highlights
+ * (drawn from the chat, not from a route). The all-heights layers are off until switched on.
  * Rain has its own row text (its frame time, not a route's update time) and is not in `states`.
  * This is also the registry of saved choices (src/lib/layerPrefs.ts): `defaultOn` is a layer's state when nothing is stored.
  */
@@ -21,7 +31,9 @@ export const LAYERS: readonly { id: LayerId; name: string; defaultOn: boolean }[
   { id: 'wind', name: 'Wind', defaultOn: true },
   { id: 'rain', name: 'Rain', defaultOn: true },
   { id: 'airspace', name: 'Airspace below FL100', defaultOn: true },
+  { id: 'airspaceAll', name: 'Airspace all heights', defaultOn: false },
   { id: 'notams', name: 'NOTAMs below FL100', defaultOn: true },
+  { id: 'notamsAll', name: 'NOTAMs all heights', defaultOn: false },
   { id: 'answer', name: 'Answer overlays', defaultOn: true },
 ]
 
@@ -39,10 +51,13 @@ export interface LayerPanelProps {
   chatOpen?: boolean
 }
 
-/** The line under a switch: loading, "updated HH:MM" (with "stale" when the route says so or a refetch failed), or "<layer> unavailable". */
-function Status({ name, state }: { name: string; state: LayerStatus }) {
+/**
+ * The line under a switch: loading, "updated HH:MM" (with "stale" when the route says so or a refetch failed), or "<layer> unavailable".
+ * `quiet` is an "all heights" row: it says the same as its partner, except that the 503 note is the partner's alone, so it shows once.
+ */
+function Status({ name, state, quiet = false }: { name: string; state: LayerStatus; quiet?: boolean }) {
   if (state.status === 'loading') return <p className="text-xs text-muted-foreground">Loading…</p>
-  if (state.status === 'unavailable') return <p className="text-xs text-destructive">{name} unavailable</p>
+  if (state.status === 'unavailable') return quiet ? null : <p className="text-xs text-destructive">{name} unavailable</p>
   return (
     <p className="text-xs text-muted-foreground">
       updated {state.updatedAt ? formatUpdated(state.updatedAt) : ''}
@@ -108,7 +123,7 @@ export function LayerPanel({ states, rain, shown, onShownChange, basemap = 'load
                   ) : id === 'rain' ? (
                     <RainStatus rain={rain} />
                   ) : (
-                    <Status name={name} state={states[id]} />
+                    <Status name={name} state={states[routeOf(id) as ServerLayerId]} quiet={id in PARTNER_ROUTE} />
                   )}
                 </div>
                 <Switch id={`layer-${id}`} checked={shown[id]} onCheckedChange={(on) => onShownChange(id, on)} className="mt-0.5" />
