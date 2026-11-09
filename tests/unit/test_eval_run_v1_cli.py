@@ -4,6 +4,7 @@ No key, no model and no network: the settings are fake values, the graph is scri
 """
 
 import io
+import os
 
 import pytest
 from eval_loader_factories import make_examples, write_dataset
@@ -88,7 +89,17 @@ def test_the_experiment_is_named_from_the_split_and_the_stamp_or_by_the_caller(t
 def test_with_no_settings_it_names_every_missing_variable_and_builds_nothing(tmp_path):
     built = write_dataset(tmp_path)
     out, err = io.StringIO(), io.StringIO()
-    code = run_v1.main([], environ={}, stdout=out, stderr=err, graph_factory=never, client_factory=never, data_dir=built.data_dir, root=built.root, cache_dir=tmp_path / "cache")
+    code = run_v1.main(
+        [],
+        environ={"READER_DOTENV_PATH": os.environ["READER_DOTENV_PATH"]},
+        stdout=out,
+        stderr=err,
+        graph_factory=never,
+        client_factory=never,
+        data_dir=built.data_dir,
+        root=built.root,
+        cache_dir=tmp_path / "cache",
+    )
     assert code == 1 and out.getvalue() == ""
     message = err.getvalue()
     assert message.count("\n") == 1
@@ -125,7 +136,7 @@ def test_only_the_variables_that_are_missing_are_named(tmp_path):
 def test_missing_judge_settings_are_named_when_the_experiment_starts_before_anything_is_built(tmp_path):
     """5a PR-7.F1: the judge's JUDGE_* settings are checked with the others, so a run never starts and then finds the judge cannot be built."""
     built = write_dataset(tmp_path)
-    environ = {k: v for k, v in FAKE_ENV.items() if k not in ("JUDGE_MODEL", "JUDGE_API_" + "KEY")}
+    environ = {k: v for k, v in FAKE_ENV.items() if k not in ("JUDGE_MODEL", "JUDGE_API_" + "KEY")} | {"READER_DOTENV_PATH": os.environ["READER_DOTENV_PATH"]}
     err = io.StringIO()
     code = run_v1.main([], environ=environ, stderr=err, graph_factory=never, client_factory=never, data_dir=built.data_dir, root=built.root, cache_dir=tmp_path / "c")
     assert code == 1 and "JUDGE_MODEL" in err.getvalue() and "JUDGE_API_" + "KEY" in err.getvalue()
