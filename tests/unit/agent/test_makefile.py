@@ -25,7 +25,7 @@ def dry_run(*arguments: str) -> str:
 
 def test_make_dev_runs_langgraph_dev_through_uv_beside_the_ui():
     """Ticket 8 PR-2.S1 (G23): the server command is the one ticket 4 used; `make dev` now starts the UI with it (tests/unit/test_ui_shell.py)."""
-    assert re.search(r"^SERVER = uv run langgraph dev$", MAKEFILE, re.MULTILINE)
+    assert re.search(r"^SERVER = uv run langgraph dev --allow-blocking$", MAKEFILE, re.MULTILINE)  # without the flag the first run fails on the index read
     assert "$(SERVER) &" in recipe("dev")
 
 
