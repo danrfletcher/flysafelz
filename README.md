@@ -77,22 +77,6 @@ A case replays a saved day. The NOTAM archive only saved the bulletin about twic
 4. **The evals:** `evals/agent/` (dataset, evaluators, judge) and the results in `evals/results/`.
 5. **The traces:** every experiment, public: [dev](https://eu.smith.langchain.com/public/217f1dfa-eca7-4da3-ba3f-b417a5bb8c71/d), [held-out](https://eu.smith.langchain.com/public/df5d87b1-f698-4fb8-b038-930e5450b565/d). One full v2 trace: [Blue Mill, Cobra Warrior day](https://eu.smith.langchain.com/public/8e70514b-91ad-4aee-b943-ea9c10a7e518/t). The harness names agent runs `v1-…` by agent type, so v2 is the later `v1-` experiment on each split (dev `…-122845`, held-out `…-130704`).
 
-## Running the UI
-
-The UI is a React + Vite + TypeScript app in `ui/` (shadcn/ui, Tailwind, Leaflet), dark theme only. It needs Node 22 or newer and npm.
-
-```
-make dev       # the LangGraph server and the UI together; Ctrl-C stops both, and if either one exits the other is stopped
-make ui        # the UI alone; runs npm --prefix ui ci first when ui/node_modules is missing
-make test-ui   # lint, Vitest with coverage (no keys, no network), the production build, then scans of ui/dist for outside URLs, unbundled fonts and keys
-```
-
-Ports: the LangGraph server is on 2024 and the UI's dev server on 5173. `vite preview` (the built app) is on 4173. The server's CORS list names exactly 5173 and 4173 (plus LangGraph Studio's two sites), so Vite is set to `strictPort`: with 5173 taken, `make ui` stops with Vite's port error instead of moving to 5174. Free the port, or add the new origin with `FLYSAFELZ_UI_ORIGIN`.
-
-The one setting the browser reads is `VITE_API_URL`, where the LangGraph server is (default `http://localhost:2024`), plus an optional public basemap key (see the variables table above). Set `VITE_API_URL` in the environment when you start the UI, for example `VITE_API_URL=http://localhost:2025 make ui`. No key or model setting ever reaches the browser. The map opens on the whole UK over CARTO Dark Matter tiles, which work without a key.
-
-The map draws two layers from the server's read-only routes, each coloured by type: airspace below FL100 (`GET /map/airspace`; restricted and prohibited red with a light fill, danger orange, CTR, CTA and ATZ sky blue, every other type slate) and NOTAMs below FL100 (`GET /map/notams`; violet dashed, an "approx" label where the shape is the NOTAM's Q-line circle). "Below FL100" means the lower limit is under FL100: airspace by its openAIP lower limit (a floor exactly at FL100, 10,000 ft, is not below; ground, surface and above-ground floors count as below), NOTAMs by the Q-line lower flight level. Both routes are fetched on load and every 15 minutes while the page is open; there is no refresh button. The Layers button at the top right opens the switches, the legend and each layer's "updated HH:MM" (browser time zone), "stale" and "unavailable" notes. The switches' choices (airspace, NOTAMs, Answer overlays) are kept in this browser's local storage (key `flysafelz.layers.v1`), so a reload keeps them; conversations are still lost on reload. If the browser blocks or fills its storage, or the stored value is unreadable, the switches start on and still work for that visit.
-
 ## Data and licences
 
 - Open-Meteo: free API, non-commercial, CC BY 4.0. The map's wind layer is Open-Meteo's current 10 m wind on a 1 degree grid over the UK, fetched by the server (`GET /map/wind`, cached 3 h) and credited in the map's attribution. Its rain grid is the Rain layer's fallback: when RainViewer's index cannot be read, the layer shows Open-Meteo's current precipitation on the same 1 degree grid (a model, not radar; `GET /map/rain-grid`, cached 3 h). The browser never calls Open-Meteo.
