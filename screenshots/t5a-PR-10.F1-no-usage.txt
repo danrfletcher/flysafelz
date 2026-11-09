@@ -1,0 +1,21 @@
+# t5a PR-10.F1 (E4): a model response with no token usage stops the run. Fake graph and recording client; nothing real was called.
+# eval_run.main returns the exit code the shell sees; 'results files written' is the contents of the run's results folder.
+
+## v1, no usage on the first response
+exit code: 1
+stderr: evals.agent.eval_run: stopped: bridge returned no token usage on the first call: tokens cannot be reported (last example: inv_dev_01)
+stdout: ''
+results files written: []
+
+## v1, usage on the first example's responses, none on a later one
+exit code: 1
+stderr: evals.agent.eval_run: stopped: bridge returned no token usage on a later call: tokens cannot be reported (last example: inv_dev_02)
+stdout: ''
+results files written: []
+
+## v0, no usage on the first response
+exit code: 1
+stderr: evals.agent.eval_run: stopped: bridge returned no token usage on the first call: tokens cannot be reported (last example: dev_01_blue_mill)
+stdout: ''
+results files written: []
+

@@ -1,0 +1,4 @@
+# t5a-PR-7.F1: build_judge with no JUDGE_* set (and no .env)
+
+JudgeConfigError: judge settings missing: JUDGE_PROVIDER, JUDGE_BASE_URL, JUDGE_API_KEY, JUDGE_MODEL (set them in the environment or in .env)
+missing = ('JUDGE_PROVIDER', 'JUDGE_BASE_URL', 'JUDGE_API_KEY', 'JUDGE_MODEL')

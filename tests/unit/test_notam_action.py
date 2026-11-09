@@ -104,7 +104,9 @@ def build(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone"
     )
 
 
-def expected(*, edge, band, d, read, category=Category.COOPERATIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions="no-exemption", subject="WU", reason=ProhibitiveReason.NONE) -> NotamAction:
+def expected(
+    *, edge, band, d, read, category=Category.COOPERATIVE, contact="phone", applies=AppliesTo.ALL_AIRCRAFT, exemptions="no-exemption", subject="WU", reason=ProhibitiveReason.NONE
+) -> NotamAction:
     """The table, written out rule by rule (first match wins). The oracle for the matrix."""
     if read and (applies in (AppliesTo.UAS_ONLY, AppliesTo.AERODROME_USERS) or exemptions == "paramotor-quoted"):
         return A.IGNORE  # row 1: does not apply to a paramotor
@@ -348,9 +350,7 @@ def test_a_none_limit_goes_on_to_fg_and_then_the_q_line_and_a_disagree_note_need
         lower_fl=20,
         upper_fl=40,
     )
-    read = reading(geometry=circle_at(1.0), floor=amsl(1000), ceiling=amsl(5000)).model_copy(
-        update={"floor": amsl(1000) if read_floor else None, "ceiling": amsl(5000) if read_ceiling else None}
-    )
+    read = reading(geometry=circle_at(1.0), floor=amsl(1000), ceiling=amsl(5000)).model_copy(update={"floor": amsl(1000) if read_floor else None, "ceiling": amsl(5000) if read_ceiling else None})
     result = act(parsed, read)
     assert result.action is A.AVOID_SECTOR
     floor = READING_FLOOR if read_floor else FG_FLOOR if fg_floor else Q_FLOOR  # the reading's, else F, else the Q-line
@@ -769,7 +769,9 @@ def test_a_conditional_exemption_with_a_phone_contact_never_makes_a_prohibitive_
 
 def test_j1812_shape_drones_only_is_ignored_and_the_conditional_one_is_not():
     parsed = notam("J1812/26", circle=circle_at(0, radius_nm=2.2), subject="RT", item_e="RA(T) INSTALLED FOR UAS ONLY", item_f="SFC")
-    read = reading(notam_id="J1812/26", activity="Duxford RA(T)", category=Category.PROHIBITIVE, geometry=circle_at(0, radius_nm=2.2), applies_to=AppliesTo.UAS_ONLY, contact=ContactKind.NONE, value=None)
+    read = reading(
+        notam_id="J1812/26", activity="Duxford RA(T)", category=Category.PROHIBITIVE, geometry=circle_at(0, radius_nm=2.2), applies_to=AppliesTo.UAS_ONLY, contact=ContactKind.NONE, value=None
+    )
     assert act(parsed, read).action is A.IGNORE
     assert act(parsed).action is A.UNREAD_OVER_LZ  # unread, nothing says it is for drones
 

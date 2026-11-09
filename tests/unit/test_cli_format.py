@@ -109,9 +109,7 @@ def test_a_caution_prints_its_numbers_from_the_assessment():
 
 def test_a_caution_without_numbers_prints_its_text():
     caution = Caution(rule_id="civil_twilight_depression", text="civil twilight: between civil dawn and sunrise, or sunset and civil dusk")
-    assert "    caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk" in cli.hour_lines(
-        whole_hour(9, approaching_limits=True, cautions=[caution])
-    )
+    assert "    caution: civil twilight: between civil dawn and sunrise, or sunset and civil dusk" in cli.hour_lines(whole_hour(9, approaching_limits=True, cautions=[caution]))
 
 
 def test_blockers_come_first_then_conditions_cautions_and_notams_in_the_order_given():
@@ -169,9 +167,7 @@ def test_an_uncut_hour_is_one_row_with_no_sub_rows():
 
 
 def test_an_outlook_hour_prints_outlook_with_wind_gust_and_rain_chance():
-    hour = HourAssessment(
-        hour=at(9), tier=Tier.OUTLOOK, weather=WeatherValues(wind_10m=12.34, gust_10m=20.0, precipitation_probability=40.0)
-    )
+    hour = HourAssessment(hour=at(9), tier=Tier.OUTLOOK, weather=WeatherValues(wind_10m=12.34, gust_10m=20.0, precipitation_probability=40.0))
     assert cli.hour_lines(hour) == ["09:00\u201310:00  OUTLOOK  wind 12.3 mph, gust 20.0 mph, rain chance 40.0 %"]
 
 
@@ -242,9 +238,7 @@ def test_overall_takes_its_qualifiers_from_the_worst_segments_only():
     assert cli.overall_line(assessment(plain, careful, bad, overall=Verdict.NO_GO)) == "Overall: NO-GO"
 
 
-@pytest.mark.parametrize(
-    ("tier", "line"), [(Tier.OUTLOOK, "Overall: No verdict: OUTLOOK only"), (Tier.TOO_FAR, "Overall: No verdict: too far out")]
-)
+@pytest.mark.parametrize(("tier", "line"), [(Tier.OUTLOOK, "Overall: No verdict: OUTLOOK only"), (Tier.TOO_FAR, "Overall: No verdict: too far out")])
 def test_without_a_verdict_the_overall_line_says_why_and_outlook_is_never_a_verdict(tier, line):
     a = assessment(HourAssessment(hour=at(9), tier=tier), overall=None, tier=tier)
     assert cli.overall_line(a) == line
@@ -285,9 +279,7 @@ def test_an_ok_source_has_no_check_by_hand_line():
 
 
 def test_the_header_names_the_case_lz_now_pib_commit_and_issue_time():
-    notams = SourceStatus(
-        source=SourceName.NOTAMS, state=SourceState.OK, fetched_at=NOW, issued_at=datetime(2026, 10, 31, 7, 0, 37, tzinfo=UTC), sha="a" * 40
-    )
+    notams = SourceStatus(source=SourceName.NOTAMS, state=SourceState.OK, fetched_at=NOW, issued_at=datetime(2026, 10, 31, 7, 0, 37, tzinfo=UTC), sha="a" * 40)
     a = assessment(whole_hour(9), overall=Verdict.PILOT_DISCRETION).model_copy(update={"source_statuses": statuses(notams=notams)})
     assert cli.header_lines(a, "case x", 53.802797, -0.086644, NOW) == [
         "FlySafeLZ assess \u2013 case x",

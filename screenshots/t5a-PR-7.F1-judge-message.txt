@@ -1,0 +1,10 @@
+# t5a-PR-7.F1: the judge's user message for dev_05_druridge_bay (has a judge note); the [path: ...] tag in the raw output is already removed
+
+Current time: Tuesday 29 September 2026, 07:30 (BST)
+Location: Druridge Bay
+Question: What's the underslung loads notice thing Amble about, does it affect me here?
+
+Final answer:
+The underslung-loads NOTAM does affect you: stay off the north side below 500 ft.
+
+Example-specific check (fold into whichever criterion it fits): Concludes it does affect him: H6448's area edge is 0.61 NM N, so avoid the north side below ~500 ft AGL. 'No, it doesn't affect you' is wrong.

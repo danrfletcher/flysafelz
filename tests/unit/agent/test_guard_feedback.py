@@ -179,7 +179,9 @@ def test_e14_a_number_the_model_invented_fails_the_guard_and_is_masked_in_the_co
     assert comment == "Round 1 (checks):\n- '<PHONE>' looks like a real phone number, which only a placeholder may stand for"
     assert "960001" not in comment
     sent = [json.dumps({key: value for key, value in (request.body or {}).items() if key != "serialized"}) for request in rec.sent]
-    assert not [text for text in sent if "960001" in text]  # nor is it in any run, input, output or feedback sent. (`serialized` is the scripted fake model's own repr of its script, which a real model does not have.)
+    assert not [
+        text for text in sent if "960001" in text
+    ]  # nor is it in any run, input, output or feedback sent. (`serialized` is the scripted fake model's own repr of its script, which a real model does not have.)
 
 
 def test_an_email_in_a_finding_is_masked_in_the_comment_too():

@@ -37,9 +37,7 @@ def masked(assessment):
 def test_every_verdict_equals_the_utc_run(tz):
     plain = cases.run(CASE)
     zoned = cases.run(CASE, tz=tz)
-    assert [(s.start, s.end, s.verdict, s.approaching_limits, display(s)) for s in segments(zoned)] == [
-        (s.start, s.end, s.verdict, s.approaching_limits, display(s)) for s in segments(plain)
-    ]
+    assert [(s.start, s.end, s.verdict, s.approaching_limits, display(s)) for s in segments(zoned)] == [(s.start, s.end, s.verdict, s.approaching_limits, display(s)) for s in segments(plain)]
     assert (zoned.overall_verdict, zoned.overall_tier, zoned.flyable_windows) == (plain.overall_verdict, plain.overall_tier, plain.flyable_windows)
     assert masked(zoned) == masked(plain)
 

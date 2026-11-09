@@ -38,6 +38,10 @@ ALSO_EXPORTED = {
     "LANGCHAIN_PROJECT": "dummy-project",
     "OPENAI_API_" + "KEY": "dummy-openai-token",
     "OPENAI_BASE_URL": "http://127.0.0.1:1/v1",
+    "JUDGE_API_" + "KEY": "dummy-judge-token",  # the eval judge's settings (5a PR-7.F1)
+    "JUDGE_BASE_URL": "http://127.0.0.1:1/v1",
+    "JUDGE_MODEL": "dummy/judge",
+    "JUDGE_PROVIDER": "dummy",
 }
 
 INNER_TEST = f"""

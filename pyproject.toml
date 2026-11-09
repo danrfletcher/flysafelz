@@ -5,6 +5,7 @@ description = "Deterministic go/no-go core for UK paramotor landing zones"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "agentevals>=0.0.9",
     "astral>=3.2",
     "fastembed>=0.9.1",
     "httpx>=0.28.1",
@@ -15,6 +16,7 @@ dependencies = [
     "pydantic>=2",
     "pypdf>=7.0.0",
     "pyyaml",
+    "scikit-learn>=1.9.1",
     "shapely>=2.2.0",
     "starlette>=1.0",
     "tzdata>=2026.6",
@@ -48,3 +50,11 @@ target-version = "py312"
 [tool.ruff.lint]
 # ruff's defaults (E4, E7, E9, F) plus import order and blind excepts.
 extend-select = ["I", "BLE"]
+
+[tool.ruff.lint.per-file-ignores]
+# Four findings in code from before slice 7. They are ignored here, not edited in the source: PR-7.F1's fence (F1) says the slice
+# changes nothing under src/flysafelz, and any byte change to assess.py would also make the finalised verdict sheet stale
+# (it hashes assess.py), which needs Dan's `make dataset` re-finalise. No behaviour is involved in any of them.
+"src/flysafelz/assess.py" = ["RUF007"]  # zip(edges, edges[1:]) is clear; itertools.pairwise would only be a byte change
+"src/flysafelz/reader/prompt.py" = ["TRY004"]  # ValueError is the contract: callers and tests catch it for every bad abbreviation file
+"src/flysafelz/verdict_sheet.py" = ["I001", "PLC0414"]  # the two verdict_sheet_check import lines; `load_sheet as load_sheet` is the re-export 5a imports

@@ -118,10 +118,18 @@ def test_no_fixture_holds_the_key_variable_or_a_request_header(name):
         assert KEY_VARIABLE not in text, path.name
 
 
+def labelled_case_names() -> list[str]:
+    """The case folders in labelled-fixtures.sha256 (5a PR-1.S1): Dan's 23 labelled cases, committed byte for byte."""
+    sums = (FIXTURES / "labelled-fixtures.sha256").read_text(encoding="utf-8").splitlines()
+    return sorted({line.split("  ", 1)[1].removeprefix("./").split("/")[0] for line in sums if line.strip()})
+
+
 def test_fixtures_dir_holds_only_the_known_cases_and_nothing_with_a_key():
-    assert sorted(p.name for p in FIXTURES.iterdir()) == sorted([*CASES, *LABELLED, CONSTRUCTED])
+    """Ticket 5a PR-1.S1 adds Dan's labelled cases and their two list files (the checksums and the named exceptions); tests/test_labelled_fixtures_committed.py checks those."""
+    assert sorted(p.name for p in FIXTURES.iterdir() if p.is_dir()) == sorted({*CASES, *labelled_case_names(), CONSTRUCTED})
+    assert sorted(p.name for p in FIXTURES.iterdir() if p.is_file()) == ["labelled-fixtures.sha256", "labelled_exceptions.yaml"]
     for path in FIXTURES.rglob("*"):
-        assert path.is_dir() or path.name in FILES, path
+        assert path.is_dir() or path.name in FILES or path.parent == FIXTURES, path
         if path.is_file():
             assert KEY_VARIABLE not in path.read_text(encoding="utf-8"), path
 

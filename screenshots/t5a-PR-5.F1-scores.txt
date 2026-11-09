@@ -1,0 +1,30 @@
+== correct
+harmful_missed_blocker: {"key": "harmful_missed_blocker", "score": 0, "comment": "blue_mill_today: no missed blocker."}
+hard_restriction_recall: {"key": "hard_restriction_recall", "score": 1.0, "comment": "blue_mill_today: 1 of 1 hard restrictions surfaced with their labelled action."}
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "blue_mill_today: predicted path assess, the example's path is assess: a hit"}
+verdict_match: {"key": "verdict_match", "score": 1.0, "comment": "blue_mill_today: 660 of 660 labelled minutes agree on the verdict"}
+approaching_limits_match: {"key": "approaching_limits_match", "score": 1.0, "comment": "blue_mill_today: 660 of 660 labelled minutes agree on the approaching-limits flag"}
+window_iou: {"key": "window_iou", "score": 1.0, "comment": "blue_mill_today: IoU in minutes per verdict: NO_GO 1.000, PILOT_DISCRETION 1.000; mean 1.000 over 2 verdict(s)"}
+notam_action_match: {"key": "notam_action_match", "score": 1.0, "comment": "blue_mill_today: 20 of 20 labelled NOTAMs have the labelled action"}
+no_verdict_beyond_day3: {"key": "no_verdict_beyond_day3", "score": 1, "comment": "blue_mill_today: no segment carries a verdict beyond London day 3"}
+unverified_on_dropped_source: None (does not apply)
+== e12
+harmful_missed_blocker: {"key": "harmful_missed_blocker", "score": 1, "comment": "blue_mill_today: missed blocker: PILOT_DISCRETION where the sheet says NO_GO or UNVERIFIED, first at 2026-10-31 17:06\u201317:20Z (14 min)."}
+hard_restriction_recall: {"key": "hard_restriction_recall", "score": 1.0, "comment": "blue_mill_today: 1 of 1 hard restrictions surfaced with their labelled action."}
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "blue_mill_today: predicted path assess, the example's path is assess: a hit"}
+verdict_match: {"key": "verdict_match", "score": 0.9787878787878788, "comment": "blue_mill_today: 646 of 660 labelled minutes agree on the verdict; 14 min disagree, first at 2026-10-31 17:06\u201317:20Z (14 min): answer PILOT_DISCRETION, sheet NO_GO"}
+approaching_limits_match: {"key": "approaching_limits_match", "score": 1.0, "comment": "blue_mill_today: 660 of 660 labelled minutes agree on the approaching-limits flag"}
+window_iou: {"key": "window_iou", "score": 0.9457701149425287, "comment": "blue_mill_today: IoU in minutes per verdict: NO_GO 0.920, PILOT_DISCRETION 0.972; mean 0.946 over 2 verdict(s)"}
+notam_action_match: {"key": "notam_action_match", "score": 1.0, "comment": "blue_mill_today: 20 of 20 labelled NOTAMs have the labelled action"}
+no_verdict_beyond_day3: {"key": "no_verdict_beyond_day3", "score": 1, "comment": "blue_mill_today: no segment carries a verdict beyond London day 3"}
+unverified_on_dropped_source: None (does not apply)
+== downgraded
+harmful_missed_blocker: {"key": "harmful_missed_blocker", "score": 1, "comment": "blue_mill_today: missed blocker: NOTAM J3857/26 labelled CONTACT_FIRST, surfaced as AWARENESS."}
+hard_restriction_recall: {"key": "hard_restriction_recall", "score": 0.0, "comment": "blue_mill_today: 0 of 1 hard restrictions surfaced with their labelled action; missed: J3857/26 labelled CONTACT_FIRST, surfaced as AWARENESS."}
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "blue_mill_today: predicted path assess, the example's path is assess: a hit"}
+verdict_match: {"key": "verdict_match", "score": 1.0, "comment": "blue_mill_today: 660 of 660 labelled minutes agree on the verdict"}
+approaching_limits_match: {"key": "approaching_limits_match", "score": 1.0, "comment": "blue_mill_today: 660 of 660 labelled minutes agree on the approaching-limits flag"}
+window_iou: {"key": "window_iou", "score": 1.0, "comment": "blue_mill_today: IoU in minutes per verdict: NO_GO 1.000, PILOT_DISCRETION 1.000; mean 1.000 over 2 verdict(s)"}
+notam_action_match: {"key": "notam_action_match", "score": 0.95, "comment": "blue_mill_today: 19 of 20 labelled NOTAMs have the labelled action; mismatches: J3857/26 labelled CONTACT_FIRST, answered AWARENESS"}
+no_verdict_beyond_day3: {"key": "no_verdict_beyond_day3", "score": 1, "comment": "blue_mill_today: no segment carries a verdict beyond London day 3"}
+unverified_on_dropped_source: None (does not apply)

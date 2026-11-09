@@ -184,6 +184,4 @@ def test_z_and_plus_00_00_give_the_same_output(capsys):
 
 
 def test_a_start_with_an_offset_is_read_as_the_same_instant_in_utc(capsys):
-    assert window_line(capsys, [*CASE, "--start", "2026-10-31T09:00+01:00", "--end", "2026-10-31T10:00Z"]) == (
-        "Window 2026-10-31T08:00Z to 2026-10-31T10:00Z (end exclusive). All times UTC."
-    )
+    assert window_line(capsys, [*CASE, "--start", "2026-10-31T09:00+01:00", "--end", "2026-10-31T10:00Z"]) == ("Window 2026-10-31T08:00Z to 2026-10-31T10:00Z (end exclusive). All times UTC.")

@@ -1,0 +1,4 @@
+# Files in the labelled fixtures that are allowed to differ from labelled-fixtures.sha256, each with its reason.
+# An entry for a file that matches its checksum fails the fixture test (a stale exception), so this list cannot grow silently.
+- path: druridge_bay_2026-07-22/readings.yaml
+  reason: 3b PR-8 appended the H2483 reading

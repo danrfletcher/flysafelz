@@ -1,0 +1,7 @@
+$ make test   (header, loader rows, totals)
+network: --disable-socket in effect
+evals/agent/loader.py                          294      7    98%   155-156, 283-284, 400-402, 495
+evals/agent/recording_client.py                 63      0   100%
+TOTAL                                         8546    136    98%
+Required test coverage of 90% reached. Total coverage: 98.41%
+=========== 10561 passed, 1 skipped, 8 xfailed in 196.19s (0:03:16) ============

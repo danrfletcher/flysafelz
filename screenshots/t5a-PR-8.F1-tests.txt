@@ -1,0 +1,18 @@
+# t5a-PR-8.F1: make test (full suite, sockets disabled), coverage floor 90%
+
+$ make test
+============================= test session starts ==============================
+================================ tests coverage ================================
+evals/agent/agreement.py   270   7   97%   219, 233-235, 357, 427, 456
+evals/agent/annotate.py   236   1   99%   417
+evals/agent/judge.py   200   1   99%   373
+evals/agent/judge_config.py   64   0   100%
+evals/agent/loader.py   297   7   98%   155-156, 292-293, 407-409, 502
+evals/agent/runner.py   364   0   100%
+TOTAL   10597   156   99%
+Required test coverage of 90% reached. Total coverage: 98.53%
+=========== 11878 passed, 1 skipped, 8 xfailed in 406.86s (0:06:46) ============
+exit 0
+
+$ uv run ruff check .
+All checks passed!

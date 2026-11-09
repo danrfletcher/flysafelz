@@ -77,7 +77,7 @@ def test_the_danger_area_is_decided_once_by_airspace_and_not_repeated_by_the_not
 
 
 def test_the_debug_list_carries_each_ignored_31_oct_notam_with_a_reason():
-    case, _forecast, _airspace, pib, _readings = cases.load(CASE)
+    _case, _forecast, _airspace, pib, _readings = cases.load(CASE)
     assessment = cases.run(CASE)
     listed = {a.notam_id for s in segments(assessment) for a in s.notam_actions}
     debug = {i.notam_id: i.reason for i in assessment.ignored_notams}

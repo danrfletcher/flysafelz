@@ -67,7 +67,13 @@ def run_tools(
 ) -> ToolRun:
     """Send one turn through a graph whose model asks for `steps` in turn and then says "done."; return what the tools did."""
     ctx = ctx or RunContext(now=BLUE_MILL_NOW, case="blue_mill_2026-10-31")
-    tools = {"get_weather": build_get_weather(source_cache), "get_airspace": build_get_airspace(source_cache), "get_notams": build_get_notams(source_cache), "assess": build_assess(source_cache), **{t.name: t for t in extra_tools}}
+    tools = {
+        "get_weather": build_get_weather(source_cache),
+        "get_airspace": build_get_airspace(source_cache),
+        "get_notams": build_get_notams(source_cache),
+        "assess": build_assess(source_cache),
+        **{t.name: t for t in extra_tools},
+    }
     script = [AIMessage("", tool_calls=[{"name": name, "args": args, "id": f"call-{n}-{i}"} for i, (name, args) in enumerate(step)]) for n, step in enumerate(steps)]
     model = FakeToolChatModel(script=[*script, AIMessage("done.")])
     graph: Any = create_agent(model=model, tools=list(tools.values()), middleware=[check_input], state_schema=RequestState, context_schema=RunContext, checkpointer=InMemorySaver())

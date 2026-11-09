@@ -1,0 +1,24 @@
+$ rm evals/agent/data/*.yaml   # committed copies, removed so the run below has something to copy
+$ DATASET_SRC=~/.local/share/vector/inputs/flysafelz/dataset make dataset
+verified examples.yaml, verdict_sheet.yaml, guidance_questions.yaml against dataset.sha256
+copied: examples.yaml -> data/examples.yaml
+copied: verdict_sheet.yaml -> data/verdict_sheet.yaml
+copied: guidance_questions.yaml -> data/guidance_questions.yaml
+exit 0
+$ (cd ~/.local/share/vector/inputs/flysafelz/dataset && shasum -a 256 -c ../dataset.sha256)   # the mirror
+examples.yaml: OK
+guidance_questions.yaml: OK
+verdict_sheet.yaml: OK
+$ (cd evals/agent/data && shasum -a 256 -c ~/.local/share/vector/inputs/flysafelz/dataset.sha256)   # the repo copies
+examples.yaml: OK
+guidance_questions.yaml: OK
+verdict_sheet.yaml: OK
+$ git status --short evals/agent/data   # empty: the copy is byte-identical to the committed one
+$ DATASET_SRC=~/.local/share/vector/inputs/flysafelz/dataset make dataset   # second run
+verified examples.yaml, verdict_sheet.yaml, guidance_questions.yaml against dataset.sha256
+unchanged: examples.yaml -> data/examples.yaml
+unchanged: verdict_sheet.yaml -> data/verdict_sheet.yaml
+unchanged: guidance_questions.yaml -> data/guidance_questions.yaml
+exit 0
+$ git status --short   # clean
+?? screenshots/PR-1.S1-dataset.txt

@@ -98,7 +98,10 @@ def test_added_actions_done_true_with_only_null_values_loads_every_listed_notam_
 
 def test_added_actions_done_true_with_an_empty_notam_actions_loads_an_empty_mapping_that_still_ignores(tmp_path):
     path = tmp_path / "s.yaml"
-    path.write_text("- id: none\n  mode: blind\n  window: {start: '2026-10-31T07:00:00Z', end: '2026-10-31T08:00:00Z'}\n  actions_done: true\n  notam_actions: {}\n  rows:\n    - {start: '2026-10-31T07:00:00Z', end: '2026-10-31T08:00:00Z'}\n", encoding="utf-8")
+    path.write_text(
+        "- id: none\n  mode: blind\n  window: {start: '2026-10-31T07:00:00Z', end: '2026-10-31T08:00:00Z'}\n  actions_done: true\n  notam_actions: {}\n  rows:\n    - {start: '2026-10-31T07:00:00Z', end: '2026-10-31T08:00:00Z'}\n",
+        encoding="utf-8",
+    )
     assert load_sheet(path)["none"]["notam_actions"]["any/26"] == "IGNORE"
 
 

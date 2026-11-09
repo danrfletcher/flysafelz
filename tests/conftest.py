@@ -19,10 +19,10 @@ pytest_plugins = ["pytester"]
 READER_VARIABLES = ("READER_PROVIDER", "READER_BASE_URL", "READER_API_KEY", "READER_MODEL")
 DOTENV_PATH = "READER_DOTENV_PATH"
 
-# The agent's settings and LangSmith's are cleared by prefix, so a variable added later is cleared too. The legacy names are the ones
+# The agent's settings, LangSmith's and the eval judge's (JUDGE_*, 5a PR-7.F1) are cleared by prefix, so a variable added later is cleared too. The legacy names are the ones
 # langsmith and langchain still honour to switch tracing on or to supply a key or an endpoint; the OPENAI_* pair is what an OpenAI client
 # would fall back to. Then tracing is switched off explicitly.
-CLEARED_PREFIXES = ("AGENT_", "LANGSMITH_")
+CLEARED_PREFIXES = ("AGENT_", "LANGSMITH_", "JUDGE_")
 LEGACY_VARIABLES = (
     "LANGCHAIN_TRACING_V2",
     "LANGCHAIN_TRACING",
@@ -84,7 +84,7 @@ def isolated_environment(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
     The reader's settings are cleared too: every READER_* variable is removed, and READER_DOTENV_PATH names a file that does
     not exist, so reader/config.py can never load a real .env (E15). A test that needs reader settings sets its own.
 
-    The agent's settings and LangSmith's are cleared too: every AGENT_* and LANGSMITH_* variable, the legacy LANGCHAIN_* names that
+    The agent's settings, LangSmith's and the eval judge's are cleared too: every AGENT_*, LANGSMITH_* and JUDGE_* variable, the legacy LANGCHAIN_* names that
     switch on tracing or supply a key, and OPENAI_API_KEY / OPENAI_BASE_URL are removed, then LANGSMITH_TRACING is set to false. The
     reader's and the agent's model clients would otherwise send every prompt to LangSmith from a developer's shell that has it on. A
     test that needs one sets its own.

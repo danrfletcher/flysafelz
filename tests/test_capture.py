@@ -281,7 +281,7 @@ def test_json_is_written_with_sorted_keys_and_a_two_space_indent_and_ends_in_a_n
     for name in ("weather.json", "airspace.json"):
         text = (root / "fixtures" / CASE / name).read_text(encoding="utf-8")
         assert text.endswith("}\n")
-        assert text.splitlines()[1].startswith('  "') and not text.splitlines()[1].startswith('   ')
+        assert text.splitlines()[1].startswith('  "') and not text.splitlines()[1].startswith("   ")
         assert text == json.dumps(json.loads(text), sort_keys=True, indent=2) + "\n"
 
 
