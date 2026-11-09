@@ -8,6 +8,7 @@
     shared_case_groups(records)               the groups of example ids that share a case
     reader_outcomes(state)                    the reader failures that became UNVERIFIED, and the NOTAMs left unread by the reader limit
     ModelCalls                                a LangChain callback handler: the agent's model calls as they happen (usage of every one, failures the agent hides)
+    ReaderMeter                               the NOTAM reader's model responses: wraps the reader's chat model (`wrap`) and hands each reply's usage to the run in progress
 
 The records are the loader's (`evals.agent.loader.load_examples`): id, inputs {lat, lon, question, now}, fixtures {case, drop}. The runner reads nothing
 else of an example and opens no case file: it never opens `readings.yaml` (the run's `reader` is "live"), and it imports the agent but does not patch,
@@ -45,12 +46,18 @@ reply with a tool call that cannot be parsed also gets the agent's fallback answ
 Nothing is written to src/, to the dataset copy or to the dataset's source folder. A KeyboardInterrupt (SIGINT) stops the run at once and cleanly: the run in progress is not recorded and is not errored, `interrupted` is set, and the cache file is left where it is.
 
 Usage (E4). The first model response the agent gets from the bridge must carry usage: `usage_metadata`, or the API-style `usage` (or `token_usage`) in
-`response_metadata`, with tokens above zero. If it carries neither the run stops, naming the bridge and the missing field, before a second example starts.
+`response_metadata`, with tokens above zero. If it carries neither the run stops, naming the bridge and the missing field, before a second example starts. `make eval` runs it strict (`strict_usage`, PR-10.F1): a
+later response without usage stops the run too, naming its example, so no token total is ever short and none is summed as 0. Strict mode checks the responses of EVERY
+attempt, one that failed (raised, timed out) included, before the failure is handled: an errored run whose last response had no usage cannot slip by.
 "A model response" is one the model returned (ModelCalls sees it end); an AI message the agent's code wrote (the model-failure answer, the UK-only reply) is not
 one, and a run whose model call failed has no response to check. Each run keeps the sum over every model call it made, in every attempt and including the
 drafts the guard threw away (those never reach `messages`, so only the callbacks see them) and the calls of an errored run's failed attempts: `usage`, with
 `model_calls`. A run with no usage keeps None,
-never zeros. Only the agent's own model node is counted (`langgraph_node` "model"): the NOTAM reader's calls run inside the tool node and are left out.
+never zeros. `usage` is the agent's own model node only (`langgraph_node` "model").
+
+The NOTAM reader's responses are kept apart, in `reader_usage` (same shape, None when the run made no reader call). The reader reads its NOTAMs on a thread pool inside a tool,
+and LangChain does not carry the run's callbacks into those threads, so ModelCalls never sees a reader call. The reader's chat model is wrapped instead (`ReaderMeter.wrap`, returned by a SourceCache subclass's `reader_llm`, see eval_run.default_graph_factory: nothing in src/ changes) and each reply it returns is counted for the example in progress (examples run one at a time). A reading
+the cache returns (status STORED) makes no call, so it is not counted and is not a zero. A reader reply without usage is E4 in strict mode, like an agent reply without usage.
 
 LangSmith. With a client, the runner makes one experiment (a LangSmith project named after the experiment, linked to the split's dataset) and logs each
 finished run to it with `create_run`, tagged `rep:<n>` and carrying the rep in its metadata. Phones in an answer are masked by the client's anonymiser
@@ -98,6 +105,9 @@ AGENT_MODEL_NODE = "model"  # create_agent's model node: the `langgraph_node` of
 RATE_LIMIT_STATUS = 429
 FATAL_ERROR_NAMES = frozenset({"RateLimitError", "APIConnectionError"})  # the OpenAI client's names for a 429 and for an endpoint that cannot be reached
 BRIDGE_VARIABLE = "AGENT_BASE_URL"
+STRICT_USAGE_FIRST = "bridge returned no token usage on the first call: tokens cannot be reported"  # E4, strict mode (PR-10.F1)
+STRICT_USAGE_LATER = "bridge returned no token usage on a later call: tokens cannot be reported"
+STRICT_USAGE_READER = " (a NOTAM reader response)"  # added to either text when the response without usage was the reader's, not the agent's
 
 GraphFactory = Callable[[], Any]
 Timeout = Callable[[Callable[[], Any], float], Any]
@@ -255,6 +265,7 @@ class ModelCalls(BaseCallbackHandler):
         self._lock = threading.Lock()
         self._watched: set[UUID] = set()
         self.responses: list[tuple[int, int] | None] = []
+        self.reader_responses: list[tuple[int, int] | None] = []  # the NOTAM reader's replies (ReaderMeter), same shape as `responses`
         self.failures: list[BaseException] = []
 
     def begin_attempt(self) -> None:
@@ -282,15 +293,70 @@ class ModelCalls(BaseCallbackHandler):
             if run_id in self._watched and is_model_failure(error):
                 self.failures.append(error)
 
-    def usage(self) -> dict[str, int] | None:
-        """The tokens summed over every model response: input_tokens, output_tokens, total_tokens, model_calls, calls_without_usage. None when none had usage."""
+    def add_reader_response(self, reply: Any) -> None:
+        """One reply the NOTAM reader's model returned (ReaderMeter calls this, from the reader's worker threads)."""
         with self._lock:
-            found = list(self.responses)
+            self.reader_responses.append(_usage_of_message(reply))
+
+    @staticmethod
+    def _sum(found: Sequence[tuple[int, int] | None]) -> dict[str, int] | None:
         counted = [pair for pair in found if pair is not None]
         if not counted:
             return None
         tokens_in, tokens_out = sum(p[0] for p in counted), sum(p[1] for p in counted)
         return {"input_tokens": tokens_in, "output_tokens": tokens_out, "total_tokens": tokens_in + tokens_out, "model_calls": len(found), "calls_without_usage": len(found) - len(counted)}
+
+    def usage(self) -> dict[str, int] | None:
+        """The tokens summed over every agent model response: input_tokens, output_tokens, total_tokens, model_calls, calls_without_usage. None when none had usage."""
+        with self._lock:
+            return self._sum(list(self.responses))
+
+    def reader_usage(self) -> dict[str, int] | None:
+        """The same sum over the NOTAM reader's replies; None when it made no call that came back with usage."""
+        with self._lock:
+            return self._sum(list(self.reader_responses))
+
+
+class MeteredReader:
+    """The NOTAM reader's chat model with its replies counted: `invoke` is the model's, and each reply goes to the meter. Every other attribute is the model's own (its name keys the cache)."""
+
+    def __init__(self, llm: Any, meter: "ReaderMeter"):
+        self._llm, self._meter = llm, meter
+
+    def invoke(self, *args: Any, **kwargs: Any) -> Any:
+        reply = self._llm.invoke(*args, **kwargs)  # a call that raises has no reply, so nothing is counted
+        self._meter.record(reply)
+        return reply
+
+    def __getattr__(self, name: str) -> Any:
+        if name in ("_llm", "_meter"):
+            raise AttributeError(name)
+        return getattr(self._llm, name)
+
+
+class ReaderMeter:
+    """Counts the NOTAM reader's model replies for the example in progress. The runner `attach`es each example's ModelCalls and `detach`es it when the example is done."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._calls: ModelCalls | None = None
+
+    def attach(self, calls: ModelCalls) -> None:
+        with self._lock:
+            self._calls = calls
+
+    def detach(self) -> None:
+        with self._lock:
+            self._calls = None
+
+    def record(self, reply: Any) -> None:
+        with self._lock:
+            calls = self._calls
+        if calls is not None:
+            calls.add_reader_response(reply)
+
+    def wrap(self, llm: Any) -> MeteredReader:
+        return MeteredReader(llm, self)
 
 
 def _field(item: Any, name: str) -> Any:
@@ -375,6 +441,7 @@ class RunRecord:
     model_failures: tuple[str, ...] = ()  # model calls that failed with a 5xx and that the agent turned into its fallback answer, in the kept attempt (not 429, timeout, connection)
     langsmith_run_id: uuid.UUID | None = None
     started_at: datetime | None = None
+    reader_usage: dict[str, int] | None = None  # the NOTAM reader's replies summed (same keys as `usage`); None: it made no call that came back with usage
 
     @property
     def errored(self) -> bool:
@@ -495,7 +562,11 @@ class _Run:
         project_metadata: Mapping[str, Any] | None = None,
         run_metadata: Callable[[RunRecord], Mapping[str, Any]] | None = None,
         require_usage: bool = True,
+        strict_usage: bool = False,
+        reader_meter: ReaderMeter | None = None,
     ):
+        self.strict_usage = strict_usage
+        self.reader_meter = reader_meter
         self.result, self.graph, self.client = result, graph, client
         self.project_metadata, self.run_metadata, self.require_usage = dict(project_metadata or {}), run_metadata, require_usage
         self.timeout_s, self.retries, self.backoff = timeout_s, retries, tuple(backoff)
@@ -517,12 +588,29 @@ class _Run:
         inputs = record["inputs"]
         return {"messages": [HumanMessage(inputs["question"])], "lat": inputs["lat"], "lon": inputs["lon"]}
 
+    def check_strict(self, calls: ModelCalls, example_id: str) -> None:
+        """Strict mode (PR-10.F1, E4): every model response so far, the agent's and the NOTAM reader's, must carry usage. Run on every attempt, one that failed too.
+
+        The first one of the experiment with none stops the run with STRICT_USAGE_FIRST when it is the very first response, else STRICT_USAGE_LATER, and names the example.
+        """
+        if not (self.strict_usage and self.require_usage):
+            return
+        seen = [*calls.responses, *calls.reader_responses]
+        if not seen:
+            return
+        first, self.usage_checked = not self.usage_checked, True
+        if any(response is None for response in seen):
+            text = STRICT_USAGE_FIRST if first and seen[0] is None else STRICT_USAGE_LATER
+            if all(response is not None for response in calls.responses):
+                text += STRICT_USAGE_READER
+            raise UsageMissingError(text, example_id, self.result)
+
     def check_usage(self, calls: ModelCalls, example_id: str) -> None:
-        """The first model response of the experiment must carry usage (E4). Checked once, on the first run that has a model response at all.
+        """Not strict: the first model response of the experiment must carry usage (E4). Checked once, on the first run that has a model response at all.
 
         A run with none (the UK-only reply, or a model call that failed and became the fallback answer) says nothing about the bridge's usage, so it is skipped.
         """
-        if not self.require_usage or self.usage_checked or not calls.responses:
+        if self.strict_usage or not self.require_usage or not calls.responses or self.usage_checked:
             return
         self.usage_checked = True
         if calls.responses[0] is None:
@@ -541,7 +629,12 @@ class _Run:
             "callbacks": [calls],
         }
         request, context = self.request_for(record), self.context_for(record)
-        state = self.timeout(lambda: self.graph.invoke(request, config, context=context), self.timeout_s)
+        try:
+            state = self.timeout(lambda: self.graph.invoke(request, config, context=context), self.timeout_s)
+        except (Exception, ExampleTimeout):  # a failed attempt's responses were paid for too: strict mode checks them before the failure is handled (a KeyboardInterrupt is not checked)
+            self.check_strict(calls, record["id"])
+            raise
+        self.check_strict(calls, record["id"])
         if not isinstance(state, Mapping):
             raise NoFinalAnswer("the graph returned no state")
         self.check_usage(calls, record["id"])
@@ -560,20 +653,26 @@ class _Run:
         last_error: BaseException | None = None
         state: Mapping[str, Any] | None = None
         attempts = 0
-        for attempts in range(1, self.retries + 2):
-            try:
-                state = self.attempt(record, rep, attempts, calls)
-                break
-            except ExampleTimeout as error:  # a BaseException by design
-                last_error = error
-            except FatalRunError:
-                raise
-            except Exception as error:  # noqa: BLE001 - anything the graph raises is a harness failure; it is retried and, at the end, recorded
-                last_error = error
-            if attempts <= self.retries:
-                wait = self.backoff[min(attempts - 1, len(self.backoff) - 1)] if self.backoff else 0.0
-                waits.append(wait)
-                self.sleep(wait)
+        if self.reader_meter is not None:
+            self.reader_meter.attach(calls)
+        try:
+            for attempts in range(1, self.retries + 2):
+                try:
+                    state = self.attempt(record, rep, attempts, calls)
+                    break
+                except ExampleTimeout as error:  # a BaseException by design
+                    last_error = error
+                except FatalRunError:
+                    raise
+                except Exception as error:  # noqa: BLE001 - anything the graph raises is a harness failure; it is retried and, at the end, recorded
+                    last_error = error
+                if attempts <= self.retries:
+                    wait = self.backoff[min(attempts - 1, len(self.backoff) - 1)] if self.backoff else 0.0
+                    waits.append(wait)
+                    self.sleep(wait)
+        finally:
+            if self.reader_meter is not None:
+                self.reader_meter.detach()
         latency = self.clock() - started
         context = self.context_for(record)
         if state is None:
@@ -582,7 +681,18 @@ class _Run:
             if kind is not None:
                 raise FatalRunError(f"the model bridge kept failing ({kind}) after {attempts} attempts: {_short(last_error)}", record["id"], self.result)
             return RunRecord(
-                record["id"], rep, record["fixtures"]["case"], "errored", attempts, tuple(waits), latency, context, last_error=_short(last_error), usage=calls.usage(), started_at=started_at
+                record["id"],
+                rep,
+                record["fixtures"]["case"],
+                "errored",
+                attempts,
+                tuple(waits),
+                latency,
+                context,
+                last_error=_short(last_error),
+                usage=calls.usage(),
+                started_at=started_at,
+                reader_usage=calls.reader_usage(),
             )
         outcomes = reader_outcomes(state)
         return RunRecord(
@@ -601,6 +711,7 @@ class _Run:
             reader_limited=outcomes.limited,
             model_failures=tuple(_short(error) for error in calls.failures),
             started_at=started_at,
+            reader_usage=calls.reader_usage(),
         )
 
     # LangSmith: one experiment, one logged run per finished run
@@ -673,12 +784,17 @@ def run_experiment(
     project_metadata: Mapping[str, Any] | None = None,
     run_metadata: Callable[[RunRecord], Mapping[str, Any]] | None = None,
     require_usage: bool = True,
+    strict_usage: bool = False,
+    reader_meter: ReaderMeter | None = None,
 ) -> ExperimentResult:
     """Run every record `reps` times, rep by rep, one at a time, and return the result. See the module doc for the rules.
 
     The last four are for the v0 baseline (evals.agent.v0, PR-9.F1), which runs through this same code: `agent` names the runs, their tag and the experiment's metadata
     ("v1" unless told); `project_metadata` is added to the experiment's metadata; `run_metadata(run)` is added to the metadata of each logged run, an errored one too; and
     `require_usage=False` keeps a run whose first model response has no usage (its usage is stored absent, as None) instead of stopping the run (E4).
+    `strict_usage=True` (PR-10.F1: `make eval`) stops the run on ANY model response without usage (tokens above zero, input and output both there), the first or a later one,
+    with the message STRICT_USAGE_FIRST or STRICT_USAGE_LATER and the example's id. Without it only the first response of the experiment is checked.
+    `reader_meter` (PR-10.F1) is the ReaderMeter the graph's NOTAM reader model was wrapped with: the runner points it at each example, and the run's `reader_usage` is what it counted.
 
     The experiment name and its cache path are checked first (RunnerError, CacheExistsError), before the graph is built or anything is sent.
     Raises FatalRunError (with `.partial`) for a stop that no retry fixes. A KeyboardInterrupt does not raise: the result comes back with `interrupted` set.
@@ -703,6 +819,8 @@ def run_experiment(
         project_metadata=project_metadata,
         run_metadata=run_metadata,
         require_usage=require_usage,
+        strict_usage=strict_usage,
+        reader_meter=reader_meter,
     )
     try:
         run.open_experiment()

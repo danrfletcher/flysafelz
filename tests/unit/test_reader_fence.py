@@ -313,7 +313,22 @@ def test_a_planted_asyncio_in_the_reader_is_caught(source_copy, planted):
 def test_the_makefile_has_the_eval_target_and_only_test_runs_the_suite():
     """PR-8 adds `eval-reader`, the one target that calls the model. `make test` does not run it and mentions no READER_* setting. `guidance` (ticket 4 PR-7.F1) fetches documents and embeds them; `eval-guidance` (PR-8.F1) scores guidance search against the labelled questions; neither calls a chat model. `dev` (the LangGraph server) and `run` (one question in the terminal) are ticket 4 PR-9.F1's; they call the agent's model, and `make test` runs neither. `dataset` (ticket 5a PR-1.S1) copies Dan's checked dataset files and calls no model. `annotate` and `agreement` (ticket 5a PR-8.F1) calibrate the judge: the first queues dev answers in LangSmith, the second reads Dan's labels back and calls the judge once per answer (cached); `make test` runs neither."""
     makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
-    assert re.findall(r"^([a-z-]+):", makefile, re.MULTILINE) == ["setup", "test", "fixtures", "dataset", "eval-reader", "guidance", "eval-guidance", "dev", "run", "annotate", "agreement"]
+    assert re.findall(r"^([a-z0-9-]+):", makefile, re.MULTILINE) == [
+        "setup",
+        "test",
+        "fixtures",
+        "dataset",
+        "eval-reader",
+        "guidance",
+        "eval-guidance",
+        "dev",
+        "run",
+        "annotate",
+        "agreement",
+        "eval",
+        "eval-v0",
+        "rag-eval",
+    ]
     test_recipe = re.search(r"^test:[^\n]*\n((?:\t[^\n]*\n?)+)", makefile, re.MULTILINE)
     assert test_recipe and "eval-reader" not in test_recipe[1] and "READER" not in test_recipe[1] and "reader_eval.run" not in test_recipe[1]
     assert "-m flysafelz.agent.run" not in test_recipe[1] and "langgraph" not in test_recipe[1]

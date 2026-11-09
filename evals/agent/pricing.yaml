@@ -1,0 +1,20 @@
+# List prices for the est. cost line of a results file (evals/results/<experiment>.md). Read by evals/agent/pricing.py.
+#
+# One entry per model, named as the endpoint is told it (the value of AGENT_MODEL for the agent and the v0 baseline, and of READER_MODEL for the NOTAM reader). Each entry needs:
+#   input_per_m   dollars per million input tokens
+#   output_per_m  dollars per million output tokens
+#   url           the page the price was read from
+#   date          the day it was read (YYYY-MM-DD)
+# The runs go through a subscription bridge, so the figure is "est. cost at list price" and nothing like it was charged.
+#
+# `make eval` looks the agent model and the reader model up here, and `make eval-v0` the v0 model, BEFORE the first example. They stop, naming the model and this file, when there is no entry,
+# or when the entry has no url or no date: a run is never paid for and then left without a cost. No price is written here for you:
+# Dan adds the entry for each model he runs, from the provider's own price page, and checks it is current at Review. Example (not a real price):
+#
+#   models:
+#     example-model-name:
+#       input_per_m: 3.00
+#       output_per_m: 15.00
+#       url: https://provider.example/pricing
+#       date: 2026-11-09
+models: {}

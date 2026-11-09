@@ -201,8 +201,9 @@ WRITE_ATTRIBUTES = {
     "copyfile", "copy", "copy2", "copytree", "move", "rmtree", "remove", "removedirs", "mkstemp", "mkdtemp", "NamedTemporaryFile", "TemporaryDirectory", "makedirs", "fdopen", "chown", "utime",
 }  # fmt: skip
 # the functions that may write; every other function in the module, and every module not named here, may not
+# report.py (5a PR-10.F1) writes the results file, whole, in one go, and only under the folder it is given (write_report); rag_eval.py and eval_run.py write through it.
 # agreement.py (5a PR-8.F1) writes the judge cache (write_cache, atomically) and the report (main), into the two folders it is given; annotate.py writes no file
-MAY_WRITE = {"import_dataset.py": {"write_all"}, "import_fixtures.py": {"copy_folder", "import_fixtures"}, "agreement.py": {"write_cache", "main"}}
+MAY_WRITE = {"import_dataset.py": {"write_all"}, "import_fixtures.py": {"copy_folder", "import_fixtures"}, "agreement.py": {"write_cache", "main"}, "report.py": {"write_report"}}
 
 
 def write_calls(source: str) -> list[tuple[str, str]]:

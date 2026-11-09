@@ -172,22 +172,30 @@ def run_split(
     expected: Mapping[str, int] = EXPECTED,
     cache_dir: Path = runner.CACHE_DIR,
     moment: datetime | None = None,
+    make_target: str | None = None,
     **runner_options: Any,
 ) -> V0Run:
-    """The steps in the module text. `runner_options` go to run_experiment (sleep, clock, timeout, reps, ...)."""
+    """The steps in the module text. `runner_options` go to run_experiment (sleep, clock, timeout, reps, ...).
+
+    `make_target` is the make target that started the run (`make eval-v0` passes "eval-v0"): the missing-settings message then names that target and what it loads, instead of this module's own command.
+    """
     environ = os.environ if environ is None else environ
     dataset = load_dataset(split, data_dir=data_dir, root=root, expected=expected)
     problems = missing_settings(environ)
     if problems:
-        raise runner.RunnerError(
-            f"missing settings: {', '.join(problems)} (AGENT_* and LANGSMITH_API_KEY come from the environment only; to use a .env, run `uv run --env-file .env python -m {PROGRAM}`); nothing was built, sent or written"
+        how = (
+            f"AGENT_* and LANGSMITH_API_KEY come from the environment only; to use a .env, run `uv run --env-file .env python -m {PROGRAM}`"
+            if make_target is None
+            else f"AGENT_* and LANGSMITH_API_KEY come from the environment or from a .env in the repo root, which `make {make_target}` loads when the file exists; set them there or export them, then run `make {make_target}` again"
         )
+        raise runner.RunnerError(f"missing settings: {', '.join(problems)} ({how}); nothing was built, sent or written")
     records = assess_records(dataset.records)
     name = experiment or runner.default_experiment_name(split, moment, AGENT)
     runner.cache_path_for(name, cache_dir)  # refuses a bad name before any client exists; it creates nothing
     client = (client_factory or default_client_factory)(environ)
     upload_dataset(split, client, data_dir=data_dir, root=root, expected=expected)
     model = (model_factory or default_model_factory)(environ)
+    options = {"require_usage": False, **runner_options}  # PR-10.F1: `make eval-v0` passes require_usage=True and strict_usage=True (evals.agent.eval_run)
     result = runner.run_experiment(
         records,
         experiment=name,
@@ -198,8 +206,7 @@ def run_split(
         agent=AGENT,
         project_metadata={"report_line": REPORT_LINE, "source": SOURCE},
         run_metadata=run_metadata,
-        require_usage=False,
-        **runner_options,
+        **options,
     )
     pairs = scored_runs(result, records)
     evaluation = evaluate_runs(scored for _run, scored in pairs)
