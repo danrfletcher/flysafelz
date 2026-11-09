@@ -62,7 +62,9 @@ eval-guidance:
 
 # The LangGraph dev server with Studio, loading the graph named in langgraph.json and the settings in .env (AGENT_*, and LANGSMITH_* for traces).
 # It hot-reloads on a code change. It serves on port 2024, which the UI's VITE_API_URL defaults to.
-SERVER = uv run langgraph dev
+# --allow-blocking: the graph factory reads the guidance index (SQLite) once per process, on the first run, inside the server's event loop.
+# `langgraph dev` refuses any blocking call there, so without the flag every chat fails with BlockingError.
+SERVER = uv run langgraph dev --allow-blocking
 
 # The UI's dependencies, installed from ui/package-lock.json only when ui/node_modules is missing.
 UI_INSTALL = if [ ! -d ui/node_modules ]; then npm --prefix ui ci; fi

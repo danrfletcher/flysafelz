@@ -54,7 +54,7 @@ def test_make_ui_installs_when_node_modules_is_missing_then_runs_vite_on_5173_wi
 @NEEDS_MAKE
 def test_a_dry_run_of_make_dev_shows_the_server_and_the_ui_and_starts_neither():
     out = dry_run("dev")
-    assert "uv run langgraph dev & server=$!" in out
+    assert "uv run langgraph dev --allow-blocking & server=$!" in out
     assert "npm --prefix ui run dev -- --port 5173 --strictPort & ui=$!" in out
     assert "kill -TERM" in out and "trap" in out
 
