@@ -157,7 +157,7 @@ def test_no_eval_harness_judge_baseline_or_dataset_code_for_the_agent_is_added()
     ]
     assert names == []
     folders = {p.name for p in (ROOT / "evals").iterdir() if p.is_dir() and p.name != "__pycache__"}
-    assert folders <= {"agent", "guidance", "reader", "reader_eval"}  # guidance/ is the one folder ticket 4 adds (Dan's labelled questions); reader* are ticket 3's; agent/ is ticket 5a's
+    assert folders <= {"agent", "guidance", "online", "reader", "reader_eval"}  # guidance/ is the one folder ticket 4 adds (Dan's labelled questions); reader* are ticket 3's; agent/ is ticket 5a's; online/ is ticket 7's online eval job
 
 
 def test_make_run_streams_only_custom_progress_and_state_values_never_message_chunks():
