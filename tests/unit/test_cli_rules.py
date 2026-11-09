@@ -1,14 +1,12 @@
-"""GP8: `cli rules` prints one Markdown table, and the README carries the same table."""
+"""GP8: `cli rules` prints one Markdown table (the README links to rules.yaml rather than copying it)."""
 
 import re
-from pathlib import Path
 
 import pytest
 
 from flysafelz import cli
 from flysafelz.rules import RULES
 
-README = Path(__file__).resolve().parents[2] / "README.md"
 HEADER = ["id", "value", "unit", "comparison", "source", "confidence", "note"]
 
 
@@ -37,20 +35,6 @@ def test_rules_prints_header_and_one_row_per_rule(capsys):
         assert cells[5] == rule.confidence.value
         assert cells[6] == rule.note
         assert all(cell.strip() for cell in cells)
-
-
-def test_readme_rules_table_is_byte_identical_to_the_output(capsys):
-    cli.main(["rules"])
-    printed = capsys.readouterr().out
-    lines = README.read_text(encoding="utf-8").splitlines()
-    start = lines.index("## Rules")
-    table = []
-    for line in lines[start + 1 :]:
-        if line.startswith("|"):
-            table.append(line)
-        elif table:
-            break
-    assert "\n".join(table) + "\n" == printed
 
 
 def test_the_word_go_never_appears_alone_in_the_output(capsys):

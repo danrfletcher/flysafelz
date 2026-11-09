@@ -249,7 +249,7 @@ def test_no_real_number_is_in_the_source_scripts_tests_or_docs():
     """Nothing this PR adds holds a real number. Real numbers live in the committed PIB and fixture XML; docs and tests use Ofcom's drama-range numbers."""
     leaks = leak_list()
     new_tests = ["test_redact", "test_notam_area", "test_notam_area_corpus", "test_reader_items", "phone_leaks", "fence_scan"]
-    files = [ROOT / "README.md", ROOT / "Makefile", *ROOT.glob("src/**/*.py"), *ROOT.glob("src/**/*.yaml"), *ROOT.glob("scripts/*.py")]
+    files = [ROOT / "README.md", ROOT / "Makefile", *ROOT.glob("src/**/*.py"), *ROOT.glob("src/**/*.yaml"), *ROOT.glob("scripts/*.py"), *ROOT.glob("docs/**/*.md")]
     files += [ROOT / "tests" / "unit" / f"{name}.py" for name in new_tests] + list(READER.glob("*.yaml"))  # ticket 2's test data is not this PR's
     assert len(files) > 20
     for path in files:
