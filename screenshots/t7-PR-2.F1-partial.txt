@@ -1,0 +1,11 @@
+# E5: create_feedback raises on online.step_cap of the second run; then the fill-in rerun
+--- failure report
+project flysafelz, evaluator version 0123456789ab: 3 run(s)
+723d21a7-db66-57ea-bb55-5951cb57b85a scored, posted 9: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.evaluator_version
+a7464b99-a9e1-5ab2-a5a7-06aebaebaeae errored at post online.step_cap: RuntimeError: simulated LangSmith error posting online.step_cap (posted 6 before it)
+4873e2c2-1c9d-512a-929f-3dc242255903 scored, posted 9: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.evaluator_version
+2 scored, 0 already scored, 1 errored; 24 feedback posted
+--- fill-in rerun posts
+a7464b99-a9e1-5ab2-a5a7-06aebaebaeae online.step_cap
+a7464b99-a9e1-5ab2-a5a7-06aebaebaeae online.decline_no_tools
+a7464b99-a9e1-5ab2-a5a7-06aebaebaeae online.evaluator_version

@@ -1,0 +1,11 @@
+# GP3: one scored seed-style run (the assess run of three), keys in posting order, version last
+--- run 723d21a7-db66-57ea-bb55-5951cb57b85a (assess), evaluator version 0123456789ab
+online.guard_pass                  score=1     723d21a7-db66-57ea-bb55-5951cb57b85a: the guard passed the first draft | evaluator_version=0123456789ab
+online.decision_first              score=1     723d21a7-db66-57ea-bb55-5951cb57b85a: the first sentence holds a verdict word | evaluator_version=0123456789ab
+online.cited_guidance              score=1     723d21a7-db66-57ea-bb55-5951cb57b85a: the answer names CAP 1535, which search_guidance returned | evaluator_version=0123456789ab
+online.recheck_stated              score=1     723d21a7-db66-57ea-bb55-5951cb57b85a: the window starts after the current hour and the answer carries the re-check line | evaluator_version=0123456789ab
+online.assumed_window_stated       score=1     723d21a7-db66-57ea-bb55-5951cb57b85a: the answer states the window 10:00-16:00 (Europe/London) | evaluator_version=0123456789ab
+online.no_verdict_beyond_day3      score=1     723d21a7-db66-57ea-bb55-5951cb57b85a: no segment carries a verdict beyond London day 3 | evaluator_version=0123456789ab
+online.step_cap                    score=1     723d21a7-db66-57ea-bb55-5951cb57b85a: 2 step(s), within the cap of 9999 | evaluator_version=0123456789ab
+online.decline_no_tools            score=None  not applicable | evaluator_version=0123456789ab
+online.evaluator_version           score=1     all keys posted | evaluator_version=0123456789ab
