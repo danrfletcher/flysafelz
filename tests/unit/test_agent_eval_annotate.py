@@ -278,6 +278,26 @@ def test_one_run_whose_example_metadata_split_is_not_dev_stops_the_whole_command
     assert "nothing was queued" in err and client.queues == {}
 
 
+def test_the_judges_own_model_calls_logged_as_root_runs_in_the_experiment_are_not_answers():
+    experiment = fake_experiment()
+    first = experiment.runs[0]
+    experiment.runs.append(
+        first.model_copy(
+            update={
+                "id": uuid.uuid4(),
+                "name": "judge",
+                "reference_example_id": None,
+                "tags": [],
+                "extra": {"metadata": {"source": judge.SOURCE, "example_id": "dev_01_blue_mill"}},
+            }
+        )
+    )
+    client = CalibrationClient(experiment)
+    code, _out, err = annotate_main(client)
+    assert (code, err) == (0, "")
+    assert len(client.queued(queue_name(EXPERIMENT))) == 39
+
+
 def test_a_run_on_an_example_that_is_not_one_of_the_committed_dev_examples_is_refused():
     experiment = fake_experiment()
     experiment.runs[5].reference_example_id = uuid.uuid4()  # an example the dev split does not have, whatever its metadata says
