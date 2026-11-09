@@ -7,6 +7,7 @@ import ast
 import io
 import os
 import subprocess
+import tomllib
 from pathlib import Path
 
 import pytest
@@ -67,7 +68,8 @@ def test_the_scan_for_a_network_import_fires_on_a_planted_one():
 
 
 def test_sockets_stay_disabled_for_the_whole_suite():
-    assert '"--disable-socket"' in (REPO / "pyproject.toml").read_text(encoding="utf-8")
+    addopts = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))["tool"]["pytest"]["ini_options"]["addopts"]
+    assert "--disable-socket" in addopts.split()  # `--allow-unix-socket` (map-data routes) only lets asyncio's local socketpair through
 
 
 def test_the_tests_run_with_no_langsmith_or_judge_setting_in_the_environment():

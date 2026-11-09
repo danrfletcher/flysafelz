@@ -18,6 +18,7 @@ dependencies = [
     "pyyaml",
     "scikit-learn>=1.9.1",
     "shapely>=2.2.0",
+    "starlette>=1.0",
     "tzdata>=2026.6",
 ]
 
@@ -35,7 +36,8 @@ requires = ["uv_build>=0.12.17,<0.13.0"]
 build-backend = "uv_build"
 
 [tool.pytest.ini_options]
-addopts = "--disable-socket"
+# Internet sockets stay blocked. Unix sockets are allowed because asyncio's event loop opens a socketpair, which the map routes' ASGI tests need.
+addopts = "--disable-socket --allow-unix-socket"
 testpaths = ["tests"]
 # The reader eval's scoring package, evals/reader_eval, sits at the repository root, outside src/.
 pythonpath = ["."]

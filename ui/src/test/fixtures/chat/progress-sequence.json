@@ -1,0 +1,18 @@
+{
+ "events": [
+  "Checking weather…",
+  "Checking airspace…",
+  "Reading 2 NOTAMs (1/2)…",
+  "Reading 2 NOTAMs (2/2)…",
+  "Assessing…",
+  "Checking the answer…"
+ ],
+ "lines": [
+  "Checking weather…",
+  "Checking airspace…",
+  "Reading 2 NOTAMs (1/2)…",
+  "Reading 2 NOTAMs (2/2)…",
+  "Assessing…",
+  "Checking the answer…"
+ ]
+}

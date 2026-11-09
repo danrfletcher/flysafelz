@@ -1,0 +1,59 @@
+{
+ "lat": 49.2,
+ "lon": -2.13,
+ "question": "What is the weather like here?",
+ "events": [
+  {
+   "event": "metadata",
+   "data": {
+    "run_id": "run-decline",
+    "attempt": 1
+   }
+  },
+  {
+   "event": "values",
+   "data": {
+    "messages": [
+     {
+      "content": "What is the weather like here?",
+      "type": "human",
+      "id": "11111111-1111-4111-8111-111111111111",
+      "additional_kwargs": {},
+      "response_metadata": {}
+     }
+    ],
+    "answer": null,
+    "guard": null,
+    "overlays": [],
+    "assessment": null
+   }
+  },
+  {
+   "event": "values",
+   "data": {
+    "messages": [
+     {
+      "content": "What is the weather like here?",
+      "type": "human",
+      "id": "11111111-1111-4111-8111-111111111111",
+      "additional_kwargs": {},
+      "response_metadata": {}
+     },
+     {
+      "content": "FlySafeLZ only covers the UK.",
+      "type": "ai",
+      "id": "run-decline-ai",
+      "tool_calls": [],
+      "invalid_tool_calls": [],
+      "additional_kwargs": {},
+      "response_metadata": {}
+     }
+    ],
+    "answer": "FlySafeLZ only covers the UK.",
+    "guard": "passed",
+    "overlays": [],
+    "assessment": null
+   }
+  }
+ ]
+}
