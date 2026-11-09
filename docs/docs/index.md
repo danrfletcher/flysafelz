@@ -2,7 +2,7 @@
 
 **Some context on why this was chosen first:** Below is me landing my 7th paramotor flight last Saturday (30th October), just moments before a man in orange high-viz ran onto the field waving his arms and signalling for us to pack up. He was from a drone company surveying for methane over the North Sea and they had a “NOTAM” over the field. It had appeared on Gaggle (flight recorder app for paramotor pilots), and yet none of us really knew what it meant.
 
-[![Watch the video](https://img.youtube.com/vi/Y7-MUShAdAk/hqdefault.jpg)](https://youtube.com/shorts/Y7-MUShAdAk)
+<iframe src="https://www.youtube-nocookie.com/embed/Y7-MUShAdAk" title="Landing 7" style="width: 100%; max-width: 360px; aspect-ratio: 9 / 16; border: 0;" allow="encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>
 
 Since learning to fly this July, the question of safety has been top of mind. Paramotoring follows as extreme “low risk, high consequence” risk profile. Hence, systematic checking and rigour are literally life saving. On the other hand, as an unregulated sport, anyone can strap a motor to their back and take to the skies. 
 

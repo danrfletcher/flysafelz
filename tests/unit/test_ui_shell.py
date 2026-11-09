@@ -18,6 +18,8 @@ ROOT = Path(__file__).resolve().parents[2]
 UI = ROOT / "ui"
 MAKEFILE = (ROOT / "Makefile").read_text(encoding="utf-8")
 README = (ROOT / "README.md").read_text(encoding="utf-8")
+# Running the UI lives on the write-up site's Running it page; Data and licences is on both.
+RUNNING_IT = (ROOT / "docs" / "docs" / "running-it.md").read_text(encoding="utf-8")
 NEEDS_MAKE = pytest.mark.skipif(shutil.which("make") is None, reason="make is not installed")
 
 
@@ -155,14 +157,14 @@ def test_ctrl_c_stops_both(tmp_path):
 # --- README ---------------------------------------------------------------------------------------------------------------------------
 
 
-def section(title: str) -> str:
-    found = re.search(rf"^## {re.escape(title)}\n(.*?)(?=^## |\Z)", README, re.MULTILINE | re.DOTALL)
-    assert found, f"README has no '## {title}' section"
+def section(title: str, text: str = README) -> str:
+    found = re.search(rf"^## {re.escape(title)}\n(.*?)(?=^## |\Z)", text, re.MULTILINE | re.DOTALL)
+    assert found, f"no '## {title}' section"
     return found[1]
 
 
-def test_readme_running_the_ui_names_node_the_targets_the_ports_and_vite_api_url():
-    text = section("Running the UI")
+def test_running_the_ui_names_node_the_targets_the_ports_and_vite_api_url():
+    text = section("Running the UI", RUNNING_IT)
     for needed in ("Node 22", "make dev", "make ui", "make test-ui", "2024", "5173", "4173", "VITE_API_URL", "http://localhost:2024"):
         assert needed in text, needed
     node = (UI / "package.json").read_text(encoding="utf-8")
@@ -179,8 +181,8 @@ def test_readme_data_and_licences_has_one_line_per_source_and_ends_with_the_demo
     assert "GET /map/rain-grid" in lines[0] and "model, not radar" in lines[0]  # the Open-Meteo line carries the rain-grid fallback
 
 
-def test_readme_has_no_placeholder_for_the_pieces_later_prs_add():
-    text = section("Running the UI")
+def test_running_the_ui_has_no_placeholder_for_the_pieces_later_prs_add():
+    text = section("Running the UI", RUNNING_IT)
     assert "CARTO key" not in text and "VITE_CARTO_KEY" not in text
     assert "TODO" not in text and "coming soon" not in text.lower()
     # Layer choices are saved since the persistence PR: the old "not saved" note is gone, and the line that replaced it says what is kept and what is lost.
