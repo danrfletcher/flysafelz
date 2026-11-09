@@ -5,6 +5,7 @@ The client is the recording stand-in holding Dan-style labels; the judge is a fa
 
 import io
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -368,7 +369,7 @@ def test_a_corrupt_cache_is_exit_2_and_is_not_overwritten(labelled):
 
 
 def test_unset_judge_settings_are_exit_2_naming_each_one_before_any_langsmith_call(labelled):
-    code, out, err = labelled.run(judge_factory=None)  # the real builder, with the settings of an empty environment
+    code, out, err = labelled.run(judge_factory=None, environ={"READER_DOTENV_PATH": os.environ["READER_DOTENV_PATH"]})  # the real builder, an empty environment and no real .env
     assert code == 2 and out == ""
     for name in ("JUDGE_PROVIDER", "JUDGE_BASE_URL", "JUDGE_API_KEY", "JUDGE_MODEL"):
         assert name in err

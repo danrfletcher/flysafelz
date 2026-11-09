@@ -1,4 +1,4 @@
-"""G12 / GP6 (7 PR-5.F1): the README's "Production evals" section is there, sits after "Assessing a landing zone", says what GP6 lists, and the Setup block lists the two commands.
+"""G12 / GP6 (7 PR-5.F1): the README's "Production evals" section is there, sits after "Assessing a landing zone from the terminal", says what GP6 lists, and the Quickstart block lists the two commands.
 
 The section is read from the real README. Each check also has a negative fixture: the same text with the phrase taken out fails it.
 """
@@ -10,7 +10,7 @@ import pytest
 
 README = Path(__file__).resolve().parents[2] / "README.md"
 HEADING = "## Production evals"
-AFTER = "## Assessing a landing zone"
+AFTER = "### Assessing a landing zone from the terminal (deterministic core only)"  # a `###` under Quickstart in the current README
 
 # GP6: what the section says. Each pattern is one claim, written as the words the README uses for it.
 CLAIMS = {
@@ -50,7 +50,7 @@ def readme() -> str:
 
 
 def test_the_section_exists_once_and_comes_right_after_assessing_a_landing_zone():
-    headings = [line for line in readme().splitlines() if line.startswith("## ")]
+    headings = [line for line in readme().splitlines() if re.match(r"#{2,3} ", line)]  # `##` and `###`, so the `###` Assessing heading is found
     assert headings.count(HEADING) == 1
     assert headings[headings.index(AFTER) + 1] == HEADING
 
@@ -72,8 +72,8 @@ def test_the_section_names_the_two_commands_the_seed_and_the_job_and_the_summary
         assert text in section, text
 
 
-def test_the_setup_block_lists_make_online_seed_and_make_online_eval():
-    setup = sections(readme())["## Setup and tests"]
+def test_the_quickstart_block_lists_make_online_seed_and_make_online_eval():
+    setup = sections(readme())["## Quickstart"]
     block = setup.split("```")[1]
     assert re.search(r"^make online-seed\s+#", block, re.MULTILINE) and re.search(r"^make online-eval\s+#", block, re.MULTILINE)
     assert block.index("make test") < block.index("make online-seed") < block.index("make online-eval")

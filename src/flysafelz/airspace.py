@@ -494,7 +494,8 @@ def _qcircle_areas(areas: list[Airspace], activations: Sequence[Activation], seg
             reason = f"{activation.designator} is activated by NOTAM {activation.notam_id}, but openAIP does not have the area and the NOTAM has no Q-circle: {activation.e_text}"
             findings.append(Finding(area=activation.designator, outcome=Outcome.UNVERIFIED, reason=reason))
             continue
-        floor = activation.reading.floor if activation.reading else Limit(value=0, unit=LimitUnit.FT, datum=Datum.SFC)
+        # no reading, or a reading whose E text states no floor: the stand-in comes down to the surface (the cautious side)
+        floor = (activation.reading.floor if activation.reading else None) or Limit(value=0, unit=LimitUnit.FT, datum=Datum.SFC)
         stand_ins.append(
             Airspace(
                 id=f"qcircle:{activation.designator}",

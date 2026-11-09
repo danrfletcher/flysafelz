@@ -32,7 +32,7 @@ import httpx
 
 from flysafelz.agent.settings import SETTINGS, embedding_folder, repository_root
 from flysafelz.guidance import corpus
-from flysafelz.guidance.chunker import Chunk, NoHeadingsError, PdfUnreadable, chunk_pages, read_pdf_pages
+from flysafelz.guidance.chunker import Chunk, NoHeadingsError, PdfUnreadable, chunk_pages, chunk_typeset, read_pdf_pages, read_pdf_runs
 from flysafelz.guidance.corpus import EMBEDDINGS_NAME, MANIFEST_NAME, CorpusError
 from flysafelz.guidance.embedder import Embedder, EmbeddingModelMissing, load_embedder
 from flysafelz.guidance.eval import hit4_of_index
@@ -197,10 +197,14 @@ def _gather(
                 missing.append(source.id)
             continue
         try:
-            chunks = chunk_pages(pages, source.id, source.edition, tokens_min, tokens_max)
-        except NoHeadingsError as error:
-            print(f"{source.id}: {error}")
-            raise IngestStop(str(error)) from error
+            try:
+                chunks = chunk_pages(pages, source.id, source.edition, tokens_min, tokens_max)
+            except NoHeadingsError:
+                chunks = chunk_typeset(read_pdf_runs(data), source.id, source.edition, tokens_min, tokens_max)  # rule 7: unnumbered headings
+        except (NoHeadingsError, PdfUnreadable) as error:
+            message = str(error) if isinstance(error, NoHeadingsError) else "no section headings found"
+            print(f"{source.id}: {message}")
+            raise IngestStop(message) from error
         print(f"{source.id}: {'updated' if kept else 'added'}, {len(chunks)} sections")
         fresh[source.id] = chunks
         entries[source.id] = {

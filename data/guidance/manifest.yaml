@@ -1,0 +1,18 @@
+corpus_key: 1c06851e0c307a52cee4760d2c33798beb6ccc78c05216ee521f5e981d87e7e4
+model: BAAI/bge-small-en-v1.5
+chunker_version: 2
+documents:
+- id: cap1535
+  title: 'CAP 1535: The Skyway Code (airspace, NOTAM and danger-area sections)'
+  edition: Version 4, 28 November 2023
+  url: https://www.caa.co.uk/media/3lxhzwko/cap1535p.pdf
+  sha256: 5972134bb518ba7372c6efc13dcb527f7d807300b9b8b0540a981a54a1ab379b
+  chunker_version: 2
+  sections: 223
+- id: cap2562
+  title: 'CAP 2562: The Paramotor Code'
+  edition: Version 2, 24 September 2024
+  url: https://www.caa.co.uk/publication/download/20600
+  sha256: cf6c0aeee90c8c96fba2a7806c4ee5321fc378280b48cd14b9391b8c12a4e17e
+  chunker_version: 2
+  sections: 23

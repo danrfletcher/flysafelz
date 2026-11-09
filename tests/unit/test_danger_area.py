@@ -505,6 +505,12 @@ def test_a_q_circle_stand_in_takes_its_floor_from_the_reading():
     assert finding.outcome is Outcome.CEILING and finding.condition == "stay below 1,800 ft QNH"
 
 
+
+def test_a_q_circle_stand_in_whose_reading_states_no_floor_comes_down_to_the_surface():
+    no_floor = reading().model_copy(update={"floor": None})
+    finding = only(assess([], activations=[activation(read=no_floor, circle=QCIRCLE)]))
+    assert finding.outcome is Outcome.CONTACT_FIRST and finding.condition == PHONE_CONDITION
+
 # --- above SFC, and inactive ------------------------------------------------------------------------
 
 

@@ -1,0 +1,55 @@
+site_name: FlySafeLZ
+site_description: A map and chat agent that tells UK paramotor pilots whether a landing zone is safe and legal to fly from, with the evals behind it.
+site_url: https://danrfletcher.github.io/flysafelz/
+repo_url: https://github.com/danrfletcher/flysafelz
+repo_name: danrfletcher/flysafelz
+edit_uri: edit/main/docs/docs/
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - tables
+  - toc:
+      permalink: true
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: cyan
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: cyan
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+  features:
+    - navigation.top
+    - navigation.indexes
+    - navigation.sections
+    - toc.follow
+    - content.code.copy
+    - search.suggest
+validation:
+  links:
+    anchors: warn
+nav:
+  - Overview: index.md
+  - The problem: problem.md
+  - How it works: how-it-works.md
+  - Evals: evals.md
+  - Results: results.md
+  - Where it struggles: where-it-struggles.md
+  - Production: production.md
+  - How I built it: how-i-built-it.md
+  - Running it: running-it.md
+plugins:
+  - search

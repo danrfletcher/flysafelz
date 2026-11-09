@@ -58,6 +58,7 @@ from typing import Any
 
 from evals.agent.import_dataset import DatasetError
 from evals.agent.judge import CRITERIA, CRITERIA_BY_PATH, DEFINITIONS, criteria_for, lz_name_from_case, place_text
+from evals.agent.judge import SOURCE as JUDGE_SOURCE
 from evals.agent.loader import DEFAULT_SPLIT, Record, example_uuid, experiment_target, load_dataset, make_client
 from evals.agent.runner import EXPERIMENT_NAME, REPS
 
@@ -247,8 +248,10 @@ def select(runs: Sequence[Any], records: Sequence[Record]) -> Selection:
 
 
 def fetch_runs(client: Client, experiment: str) -> list[Any]:
-    """The experiment's logged runs (the runner's one root run per example and rep)."""
-    return list(client.list_runs(project_name=experiment, is_root=True))
+    """The experiment's logged runs (the runner's one root run per example and rep). The judge's own model calls are root runs in the same project
+    (metadata `source` "judge") and are not answers, so they are left out."""
+    runs = client.list_runs(project_name=experiment, is_root=True)
+    return [run for run in runs if ((getattr(run, "extra", None) or {}).get("metadata") or {}).get("source") != JUDGE_SOURCE]
 
 
 def count_line(selection: Selection) -> str:

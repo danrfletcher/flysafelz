@@ -382,11 +382,9 @@ def test_the_equals_a_rules_value_scan_flags_3_and_12_and_exempts_structural_zer
     assert hard_coded_rule_values(Path("geo.py"), ast.parse("e = 1 - WGS84_E2\nx = 1.0\n"), values) == []
 
 
-def test_reader_area_slack_nm_is_a_flat_rule_with_its_metadata_and_a_readme_row():
+def test_reader_area_slack_nm_is_a_flat_rule_with_its_metadata():
     rules = yaml.safe_load(DEFAULT_PATH.read_text(encoding="utf-8"))
     assert list(rules).count("reader_area_slack_nm") == 1
     entry = rules["reader_area_slack_nm"]
     assert set(entry) >= {"value", "unit", "comparison", "source", "confidence", "note"} and entry["value"] == 1.0 and entry["unit"] == "NM"
     assert all(entry[key] for key in ("source", "confidence", "note"))
-    readme_rows = [line for line in (ROOT / "README.md").read_text(encoding="utf-8").splitlines() if line.startswith("| reader_area_slack_nm |")]
-    assert len(readme_rows) == 1

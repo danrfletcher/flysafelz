@@ -8,6 +8,7 @@ the test that asks the loader for the held_out split of the committed data.
 """
 
 import io
+import os
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -336,7 +337,7 @@ def test_a_v1_response_without_usage_stops_the_run_with_e4_and_no_file(tmp_path)
 
 
 def test_the_v1_missing_setting_message_points_at_make_eval_and_the_root_env_file(tmp_path):
-    code, _out, err, results, client = v1_command(tmp_path, ScriptedGraph(), None, environ={})
+    code, _out, err, results, client = v1_command(tmp_path, ScriptedGraph(), None, environ={"READER_DOTENV_PATH": os.environ["READER_DOTENV_PATH"]})
     assert code == 1 and files(results) == [] and client.runs == []
     for name in ("AGENT_MODEL", "READER_MODEL", "JUDGE_MODEL", "LANGSMITH_API_KEY"):
         assert name in err

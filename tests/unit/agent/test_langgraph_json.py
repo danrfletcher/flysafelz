@@ -77,7 +77,7 @@ def test_a_path_that_names_no_file_is_caught_by_the_loader(bad):
 # --- ticket 8: the map routes are mounted as http.app, and the server's own CORS is the two dev origins --------------------------------------
 
 APP_ENTRY = "./src/flysafelz/mapdata/app.py:app"
-DEV_ORIGINS = ["http://localhost:5173", "http://localhost:4173"]
+DEV_ORIGINS = ["http://localhost:5173", "http://localhost:4173", "https://smith.langchain.com", "https://eu.smith.langchain.com"]
 
 
 def test_http_app_names_the_map_routes_app():
@@ -93,7 +93,7 @@ def test_the_http_app_entry_loads_as_the_server_loads_it_and_is_a_starlette_app_
     assert {route.path for route in app.routes if isinstance(route, Route)} == {"/map/airspace", "/map/notams", "/map/wind", "/map/rain-grid"}
 
 
-def test_the_servers_cors_lists_exactly_the_two_dev_origins_and_never_a_wildcard():
+def test_the_servers_cors_lists_exactly_the_two_dev_origins_and_studios_two_and_never_a_wildcard():
     cors = config()["http"]["cors"]
     assert cors["allow_origins"] == DEV_ORIGINS
     assert "*" not in cors["allow_origins"]
@@ -117,6 +117,14 @@ def test_the_map_apps_cors_middleware_is_built_from_those_same_lists_and_the_ui_
     (layer,) = [m for m in create_app(settings=settings).user_middleware if m.cls is CORSMiddleware]
     assert layer.kwargs["allow_origins"] == ui_origins(settings) and "https://ui.flysafe.example" in layer.kwargs["allow_origins"]
     assert (layer.kwargs["allow_methods"], layer.kwargs["allow_headers"], layer.kwargs["expose_headers"]) == (SERVER_METHODS, SERVER_HEADERS, SERVER_EXPOSED)
+
+
+def test_studio_can_call_the_server_because_both_cors_layers_allow_its_origins():
+    """Studio's preflight passes the map app's middleware first (it sits outside the server's layer), so both lists need Studio's origins."""
+    from flysafelz.mapdata.config import STUDIO_ORIGINS, ui_origins
+
+    assert set(STUDIO_ORIGINS) <= set(config()["http"]["cors"]["allow_origins"])
+    assert set(STUDIO_ORIGINS) <= set(ui_origins({}))
 
 
 def test_the_installed_langgraph_api_still_puts_the_custom_apps_middleware_outside_its_own_cors_layer():

@@ -17,4 +17,14 @@
 #       output_per_m: 15.00
 #       url: https://provider.example/pricing
 #       date: 2026-11-09
-models: {}
+models:
+  anthropic/claude-sonnet-5-5:  # AGENT_MODEL (agent and v0 baseline)
+    input_per_m: 2.00
+    output_per_m: 10.00
+    url: https://openrouter.ai/anthropic/claude-sonnet-5.5
+    date: 2026-11-09
+  anthropic/claude-haiku-5-5:  # READER_MODEL (NOTAM reader)
+    input_per_m: 0.10
+    output_per_m: 0.50
+    url: https://openrouter.ai/anthropic/claude-haiku-5.5
+    date: 2026-11-09
