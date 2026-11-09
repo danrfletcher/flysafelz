@@ -96,9 +96,7 @@ def test_text_outside_a_match_is_unchanged_byte_for_byte():
 
 
 def test_a_phone_in_a_mixed_notam_text_is_the_only_thing_that_changes():
-    text = (
-        "UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W, SFC-700FT AGL. 0800-1800 DAILY.\nFOR INFO CTC 01632 960001 ON 119.130. AR-2026-10264/01."
-    )
+    text = "UAS OPR WI 0.5NM RADIUS OF 534732N 0000459W, SFC-700FT AGL. 0800-1800 DAILY.\nFOR INFO CTC 01632 960001 ON 119.130. AR-2026-10264/01."
     out, found = redact_phones(text)
     assert out == text.replace("01632 960001", "<PHONE_1>")
     assert found == {"<PHONE_1>": "01632 960001"}

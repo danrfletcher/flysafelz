@@ -92,4 +92,4 @@ def test_f5_the_tests_never_open_a_socket_read_env_or_ask_the_clock(path):
 
 def test_f5_pytest_runs_with_sockets_disabled():
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    assert '--disable-socket' in pyproject
+    assert "--disable-socket" in pyproject

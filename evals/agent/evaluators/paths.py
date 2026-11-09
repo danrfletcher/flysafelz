@@ -1,6 +1,6 @@
 """Path accuracy and the NOTAM action confusion (5a PR-5.F1, G9, I5, E9).
 
-    path_accuracy(example, answer) -> Feedback         1 when the predicted path is the example's primary `reference.path`, else 0; applies to every path
+    path_accuracy(example, answer) -> Feedback | None  1 when the predicted path is the example's primary `reference.path`, else 0; applies to every path of a v1 run, and is None for a v0 run (v0 does no routing, PR-9.F1)
     path_pair(example, answer) -> (labelled, predicted)
     PATH_ROWS, PATH_COLUMNS                            the labelled paths (assess, explain, act, clarify, decline) and the predicted ones plus "unknown"
     path_confusion(pairs) -> {labelled: {predicted: n}}   5 rows, each with the 5 paths and an `unknown` column, keyed by path name
@@ -24,7 +24,7 @@ is one) is a label value with no change here.
 from collections.abc import Iterable, Mapping
 from typing import Any
 
-from evals.agent.evaluators.answer import PATHS, UNKNOWN_PATH, ScoredAnswer
+from evals.agent.evaluators.answer import PATHS, UNKNOWN_PATH, V0, ScoredAnswer
 from evals.agent.evaluators.blocker import surfaced, unlisted_ids
 from evals.agent.evaluators.labels import Feedback, example_id, feedback, primary_path, sheet_labels
 from flysafelz.contracts import NotamAction
@@ -44,7 +44,9 @@ def path_pair(example: Mapping[str, Any], answer: ScoredAnswer) -> tuple[str, st
     return labelled, answer.path
 
 
-def path_accuracy(example: Mapping[str, Any], answer: ScoredAnswer) -> Feedback:
+def path_accuracy(example: Mapping[str, Any], answer: ScoredAnswer) -> Feedback | None:
+    if answer.kind == V0:
+        return None  # the baseline makes one call and routes nothing: it has no path to be right or wrong about (G14)
     labelled, predicted = path_pair(example, answer)
     hit = labelled == predicted
     outcome = "a hit" if hit else "a miss: the path tag was missing (unknown)" if predicted == UNKNOWN_PATH else "a miss"

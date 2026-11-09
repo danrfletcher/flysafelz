@@ -193,9 +193,7 @@ def test_random_ids_coordinates_and_phones_absent_from_the_sources_always_produc
 
 
 def test_an_overlay_point_and_the_dms_in_an_overlays_text_are_places_a_tool_printed():
-    turn_with_map = weather_turn(
-        5.0, "mph", overlays=[point_feature(53.9, -0.5), point_feature(53.2, -1.1, text="AREA 534732N 0000459W")]
-    )
+    turn_with_map = weather_turn(5.0, "mph", overlays=[point_feature(53.9, -0.5), point_feature(53.2, -1.1, text="AREA 534732N 0000459W")])
     assert findings("Marked at 53.9, -0.5 and 53.2, -1.1 and 53.7922, -0.0831.", turn_with_map) == []
     assert findings("Marked at 53.9, -0.6.", turn_with_map) == ["'53.9, -0.6' is not a place any tool printed this turn"]
 

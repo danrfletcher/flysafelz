@@ -267,8 +267,13 @@ def test_g13_the_airspace_condition_names_the_sup_of_the_item_e_it_was_found_in(
 
 def test_g13_a_check_sup_beside_a_no_fly_activation_of_another_area_is_no_go_and_still_lists_the_condition():
     byelaws = owned_danger(
-        "EGD496B", "TEMPORARY DANGER AREA EGD496B ACTIVATED. ENTRY PROHIBITED UNDER BYELAWS.", contact=ContactKind.PHONE, value="01632 960123", notam_id="J5/26",
-        reason=ProhibitiveReason.BYELAWS, quote="ENTRY PROHIBITED UNDER BYELAWS",
+        "EGD496B",
+        "TEMPORARY DANGER AREA EGD496B ACTIVATED. ENTRY PROHIBITED UNDER BYELAWS.",
+        contact=ContactKind.PHONE,
+        value="01632 960123",
+        notam_id="J5/26",
+        reason=ProhibitiveReason.BYELAWS,
+        quote="ENTRY PROHIBITED UNDER BYELAWS",
     )
     seg = owned_segment(OWNED_CHECK_SUP, byelaws)
     assert seg.verdict is Verdict.NO_GO and display(seg) == "NO-GO"

@@ -191,9 +191,7 @@ def test_a_number_equal_to_a_printed_limit_is_grounded_unless_a_value_that_cross
 def test_the_fixed_sentence_for_a_limit_a_crossing_value_rounds_onto():
     """The spec's own example, word for word: the retry reads it and knows the fix."""
     found = findings("Gust spread is 6 mph, which is over the limit.", weather_turn(6.04, "mph", 6.0, ">"))
-    assert found == [
-        "'6 mph' is the limit that gust spread 6.04 mph exceeds. Give each value exactly as the tool printed it. Don't restate limit values: code adds a line stating each limit reached."
-    ]
+    assert found == ["'6 mph' is the limit that gust spread 6.04 mph exceeds. Give each value exactly as the tool printed it. Don't restate limit values: code adds a line stating each limit reached."]
 
 
 # I10: the guard reads numbers, not prose. The same number gives the same answer in every frame of words, whatever the frame says about the limit.
@@ -376,7 +374,12 @@ def test_the_limit_phrase_is_checked_for_its_number_its_word_and_a_negation(answ
 def test_a_limit_phrase_that_is_not_the_fixed_phrase_is_not_read():
     """Only 'over|above|under|below|at the <number> <unit> limit' is a phrase; the number in any other wording is a bare number, whatever the words say."""
     clear = weather_turn(7.0, "mph", 6.0, ">")  # the 6 is a printed limit and nothing rounds onto it
-    for answer in ("Gust spread is 7 mph, past the 6 mph limit.", "Gust spread is 7 mph, under 6 mph.", "Gust spread is 7 mph and the 6 mph threshold is under.", "Gust spread is 7 mph, under the 6 mph limits."):
+    for answer in (
+        "Gust spread is 7 mph, past the 6 mph limit.",
+        "Gust spread is 7 mph, under 6 mph.",
+        "Gust spread is 7 mph and the 6 mph threshold is under.",
+        "Gust spread is 7 mph, under the 6 mph limits.",
+    ):
         assert findings(answer, clear) == [], answer
     near = weather_turn(6.04, "mph", 6.0, ">")
     assert findings("Gust spread is 6.04 mph, past the 6.0 mph limit.", near) == [IS_THE_LIMIT.format("6.0 mph", "6.04 mph", "exceeds")]  # number-only, as before

@@ -262,7 +262,22 @@ def item(**fields):
 
 @pytest.mark.parametrize(
     ("code", "name"),
-    [(0, "other"), (1, "restricted"), (2, "danger"), (3, "prohibited"), (4, "ctr"), (5, "tmz"), (6, "rmz"), (7, "tma"), (13, "atz"), (14, "matz"), (15, "airway"), (21, "gliding"), (26, "cta"), (36, "mctr")],
+    [
+        (0, "other"),
+        (1, "restricted"),
+        (2, "danger"),
+        (3, "prohibited"),
+        (4, "ctr"),
+        (5, "tmz"),
+        (6, "rmz"),
+        (7, "tma"),
+        (13, "atz"),
+        (14, "matz"),
+        (15, "airway"),
+        (21, "gliding"),
+        (26, "cta"),
+        (36, "mctr"),
+    ],
 )
 def test_type_codes(code, name):
     area = parse_airspace(item(type=code))
@@ -317,7 +332,14 @@ def test_a_missing_lower_limit_is_sfc_and_a_missing_upper_is_unlimited_and_both_
 
 @pytest.mark.parametrize(
     "raw",
-    [{"value": "high", "unit": 1, "referenceDatum": 1}, {"value": 5, "unit": 9, "referenceDatum": 1}, {"value": 5, "unit": 1, "referenceDatum": 9}, {"unit": 1}, "FL65", {"value": True, "unit": 1, "referenceDatum": 1}],
+    [
+        {"value": "high", "unit": 1, "referenceDatum": 1},
+        {"value": 5, "unit": 9, "referenceDatum": 1},
+        {"value": 5, "unit": 1, "referenceDatum": 9},
+        {"unit": 1},
+        "FL65",
+        {"value": True, "unit": 1, "referenceDatum": 1},
+    ],
 )
 def test_an_unreadable_limit_is_read_the_fail_closed_way(raw):
     area = parse_airspace(item(lowerLimit=raw, upperLimit=raw))
@@ -407,7 +429,17 @@ def test_a_multipolygon_keeps_every_part_and_a_hole():
     assert not shape_over(1.5, 1.5, area.shape) and shape_over(3.0, 3.0, area.shape) and shape_over(10.5, 10.5, area.shape)
 
 
-@pytest.mark.parametrize("geometry", [None, {}, {"type": "Point", "coordinates": [0, 0]}, {"type": "Polygon", "coordinates": []}, {"type": "Polygon", "coordinates": [[[0, 0], [1, 1]]]}, {"type": "Polygon", "coordinates": [[[0, 95], [1, 95], [1, 96]]]}])
+@pytest.mark.parametrize(
+    "geometry",
+    [
+        None,
+        {},
+        {"type": "Point", "coordinates": [0, 0]},
+        {"type": "Polygon", "coordinates": []},
+        {"type": "Polygon", "coordinates": [[[0, 0], [1, 1]]]},
+        {"type": "Polygon", "coordinates": [[[0, 95], [1, 95], [1, 96]]]},
+    ],
+)
 def test_no_usable_polygon_raises(geometry):
     with pytest.raises(OpenAipError):
         parse_airspace(item(geometry=geometry))
