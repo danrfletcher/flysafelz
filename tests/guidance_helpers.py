@@ -17,7 +17,7 @@ RIGHT_COLUMN = 310
 HEADER = "CAP 0000 Sample Guidance"
 SOFT_HYPHEN = "\u00ad"
 
-Item = tuple[int, int, str]
+Item = tuple[int, int, str] | tuple[int, int, str, int]  # x, y, text and, optionally, the type size (11 when left out)
 
 
 def _literal(text: str) -> bytes:
@@ -32,7 +32,7 @@ def _literal(text: str) -> bytes:
 
 
 def _content(items: list[Item]) -> bytes:
-    return b"\n".join(b"BT /F1 11 Tf %d %d Td %s Tj ET" % (x, y, _literal(text)) for x, y, text in items)
+    return b"\n".join(b"BT /F1 %d Tf %d %d Td %s Tj ET" % ((item[3] if len(item) == 4 else 11), item[0], item[1], _literal(item[2])) for item in items)
 
 
 def build_pdf(pages: list[list[Item]]) -> bytes:

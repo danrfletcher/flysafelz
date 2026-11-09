@@ -30,7 +30,7 @@ embedding_cache_dir: .cache/fastembed
 
 # Part of the corpus key: bump it whenever the chunker's rules change (the list is in guidance/chunker.py's docstring), so `make guidance`
 # splits every document again and the committed embeddings are rebuilt (G17, G18). guidance/ingest.py exposes it as CHUNKER_VERSION.
-chunker_version: 1
+chunker_version: 2
 
 # The LangSmith project runs go to when LANGSMITH_PROJECT is not set (G20).
 langsmith_project: flysafelz
