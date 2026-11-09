@@ -1,0 +1,6 @@
+# E10: the 50-run boundary at the default percentage (20)
+n=50: eligible=50 judged=50 not_sampled=0 judge_calls=50
+  rerun n=50: new judge calls=0 new posts=0
+n=51: eligible=51 judged=9 not_sampled=42 judge_calls=9
+  rerun n=51: new judge calls=0 new posts=0
+n=50 judges every run, none not_sampled; n=51 applies the sample

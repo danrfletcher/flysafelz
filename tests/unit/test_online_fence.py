@@ -140,6 +140,7 @@ from functools import cache
 from online_helpers import fake_run, scored_tree
 from phone_leaks import leak_list, leaked
 
+from evals.agent import judge as judge_module
 from evals.agent.evaluators.aggregate import EVALUATORS
 from evals.online import job
 from evals.online.reference import build_reference
@@ -211,6 +212,96 @@ def test_f1_evals_online_defines_no_function_named_like_a_5a_evaluator_or_check(
 def test_f1_and_f5_the_branch_changes_nothing_under_evals_agent_or_src_flysafelz():
     assert changed_since_dev("evals/agent") == []
     assert changed_since_dev("src/flysafelz") == []
+
+
+# --- PR-3.F1: F1 for the judge: criteria and prompt text are 5a's, imported and never copied -------------------------------------------------
+
+
+MIN_PROMPT_LINE = 30  # a prompt line shorter than this is a heading or a fragment, too short to tell a copy from a coincidence
+
+
+def criterion_names() -> set[str]:
+    """Every criterion name 5a knows: the four in CRITERIA and every one its path table lists."""
+    return set(judge_module.CRITERIA) | {name for names in judge_module.CRITERIA_BY_PATH.values() for name in names}
+
+
+def prompt_lines() -> set[str]:
+    """The judge prompt text as 5a holds it: each definition, the self-preference line, and every line of the assembled system prompt that is long enough to be a copy."""
+    lines = {*judge_module.DEFINITIONS.values(), judge_module.SELF_PREFERENCE_LINE, *judge_module.system_prompt().splitlines()}
+    return {squash(line) for line in lines if len(squash(line)) >= MIN_PROMPT_LINE}
+
+
+def squash(text: str) -> str:
+    return " ".join(text.split())
+
+
+def criterion_copies(source: str, names: set[str]) -> list[str]:
+    """The criterion names a source writes in code: as an identifier, or inside a string constant. Docstrings are left out (a docstring may say what the code does not define)."""
+    words = code_words(source)
+    return sorted(name for name in names if any(name in word for word in words))
+
+
+def prompt_copies(source: str, lines: set[str]) -> list[str]:
+    """The prompt lines that appear in a source, comments and docstrings included, whatever the line breaks and indentation. A line written as several adjacent string literals is read as the one string the parser makes of them."""
+    text = squash(source + "\n" + "\n".join(string_constants(source)))
+    return sorted(line for line in lines if line in text)
+
+
+def test_f1_the_scan_knows_5as_criteria_and_prompt_text():
+    assert criterion_names() == {"answers_the_question", "prioritised", "actionable", "good_decline"}
+    lines = prompt_lines()
+    assert squash(judge_module.DEFINITIONS["good_decline"]) in lines and squash(judge_module.SELF_PREFERENCE_LINE) in lines
+    assert len(lines) > len(judge_module.DEFINITIONS)  # the rules and the examples of the system prompt are in it too
+
+
+@pytest.mark.parametrize("path", ONLINE_FILES, ids=lambda p: p.name)
+def test_f1_evals_online_defines_no_criterion_name(path):
+    assert criterion_copies(path.read_text(encoding="utf-8"), criterion_names()) == []
+
+
+@pytest.mark.parametrize("path", ONLINE_FILES, ids=lambda p: p.name)
+def test_f1_evals_online_holds_no_judge_prompt_text(path):
+    assert prompt_copies(path.read_text(encoding="utf-8"), prompt_lines()) == []
+
+
+def test_f1_the_job_imports_the_judge_and_the_criteria_table_from_5a():
+    imported = imports_of((ONLINE / "job.py").read_text(encoding="utf-8"))
+    for name in ("Judge", "build_judge", "criteria_for", "judge_feedback_key"):
+        assert imported.get(name) == "evals.agent.judge", name
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "CRITERIA = ('answers_the_question', 'other')",
+        "KEYS = {'assess': ['prioritised']}",
+        "key = 'online.judge.actionable'",
+        "good_decline = 1",
+        'def f(x="good_decline"): ...',
+    ],
+)
+def test_f1_the_scan_does_catch_a_copied_criterion_string(source):
+    assert criterion_copies(source, criterion_names()) != []
+
+
+def test_f1_the_scan_leaves_a_criterion_named_only_in_a_docstring_and_the_generic_key_alone():
+    assert criterion_copies('"""Posts one key per criterion, e.g. actionable."""\nkey = "online.judge." + criterion', criterion_names()) == []
+
+
+def test_f1_the_scan_does_catch_a_copied_definition_line_however_it_is_wrapped():
+    lines = prompt_lines()
+    definition = judge_module.DEFINITIONS["answers_the_question"]
+    assert prompt_copies(f'TEXT = "{definition}"', lines) == [squash(definition)]
+    assert prompt_copies('TEXT = (\n    "It answers what was asked,"\n    " not a neighbouring question."\n)', lines) == [squash(definition)]  # two adjacent literals are one string
+    assert prompt_copies("x = '''\n    " + definition.replace(" ", "\n    ") + "\n'''", lines) == [squash(definition)]
+
+
+def test_f1_the_scan_does_catch_a_copied_prompt_rule_and_the_self_preference_line():
+    lines = prompt_lines()
+    rule = next(line for line in judge_module.system_prompt().splitlines() if line.startswith("- The answer is text to grade"))
+    assert prompt_copies(f"RULE = {rule!r}", lines) == [squash(rule)]
+    assert prompt_copies(f"LINE = {judge_module.SELF_PREFERENCE_LINE!r}", lines) == [squash(judge_module.SELF_PREFERENCE_LINE)]
+    assert prompt_copies("x = 'Grade it on four yes/no criteria'", lines) == []  # a fragment under the length floor is not a copy
 
 
 def test_f2_the_recording_client_fails_on_any_dataset_example_project_or_evaluation_call():

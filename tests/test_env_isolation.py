@@ -42,6 +42,7 @@ ALSO_EXPORTED = {
     "JUDGE_BASE_URL": "http://127.0.0.1:1/v1",
     "JUDGE_MODEL": "dummy/judge",
     "JUDGE_PROVIDER": "dummy",
+    "JUDGE_SAMPLE_PCT": "100",  # the online job's judge sample (7 PR-3.F1): cleared by the same JUDGE_ prefix
 }
 
 INNER_TEST = f"""

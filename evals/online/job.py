@@ -2,10 +2,12 @@
 
     ONLINE_CHECKS                                    {online check name: 5a function}, the only place the 5a evaluators are imported
     evaluator_version(root=None) -> str              the first 12 hex characters of a SHA-256 over the files that decide a score (below)
-    applicable_keys(run, reference) -> tuple[str]    the feedback keys that apply to a run, without the version marker (PR-3.F1 adds the judge keys here)
+    applicable_keys(run, reference) -> tuple[str]    the deterministic feedback keys that apply to a run, without the version marker (the judge keys are `judge_keys_for(path)`: they apply only when a judge is set up)
     missing_keys(applicable, existing, version)      the keys still to post: those not present at `version`, then the version marker if it is not present either
     score_run(run, reference, tree) -> {key: KeyScore}   every applicable check on one run, pure
-    score_and_post(client, project, runs, version=None) -> OnlineResult   score each run, post what it is missing, report each run
+    score_and_post(client, project, runs, version=None, judge=None, *, judge_missing=(), sample_pct=20) -> OnlineResult   score each run, judge a sample, post what it is missing, report each run
+    select_for_judge(run_ids, pct) -> (judged, not_sampled)   which eligible runs the judge is called on: pure, no clock, no randomness (PR-3.F1)
+    judge_setup_from_env(environ=None) -> JudgeSetup          JUDGE_SAMPLE_PCT (exit 2 on a bad value) and the judge, or the JUDGE_* names that are not set (PR-3.F1)
 
 Nothing here builds a LangSmith client or reads a key: the client is passed in (PR-4.F1's `make online-eval` builds the real one). It makes no scoring decision of its own: it builds
 what 5a's evaluators read (an `example` mapping and a `ScoredAnswer`) from the run and its trace, calls them unchanged, and turns each result into a score of 1, 0 or null.
@@ -43,24 +45,47 @@ every applicable key and the version marker exist at this version; it then gets 
 (the version marker included), and the job goes on to the next run; a rerun posts only what is missing. If `list_feedback` raises, nothing is posted for that run (a blind post could duplicate a key) and the run is reported as errored.
 A trace that cannot be read or built into a reference is reported as errored too. `read_project` failing is not caught: with no project UUID nothing can be posted.
 
+The sampled judge (PR-3.F1, G8). 5a's judge is imported unchanged (`Judge`, `criteria_for`, `build_judge`) and called as `judge.judge(example, answer)`, once per judged run. It is given what 5a gives it for a labelled
+example, built from the run alone: `inputs.question` (the last pilot message of the run's inputs), `inputs.now`, `inputs.lat` and `inputs.lon`, and `reference.path`, which is the run's own path. The answer is the
+delivered answer with the path tag removed by ticket 4's `split_path`. 5a's `Judge.judge` takes no LZ name, so the run's `lz_name` is passed as the example's `fixtures.case`, which 5a turns into the place line
+(`lz_name_from_case`: the words are capitalised and an underscore is a space, so `Blue Mill` comes back as `Blue Mill`); with no `lz_name` there is no `fixtures`, and 5a writes the coordinates. A run with neither
+a name nor coordinates, or with no pilot question in its inputs, cannot be given to the judge: it is that run's judge error. Nothing reads a label, and no model output is written anywhere but LangSmith feedback.
+    key                          posted for
+    online.judge.<criterion>     every criterion of the run's path in 5a's table (`criteria_for(path)`); a criterion 5a returns no grade for is a null, `no result from the judge`; 5a's own `judge error: ...` null is posted as it is
+    online.judge.sampled         a run the sample left out: value `not_sampled`, score null, a comment holding the reason, `sample_pct=<n>` and the evaluator version
+A run whose path is `unknown` (or any path 5a's table has no criteria for) has no judge key: 5a's table gives it none, so the key set is the deterministic one and nothing is posted for the judge.
+Eligible runs: not errored, not skipped by the pull, with at least one judge key of their path missing at this version, and with no `not_sampled` record at this version made at the same percentage. A run that is not
+eligible is not counted, not judged and not recorded. Of the eligible runs, with 50 or fewer every one is judged; with more, a run is judged when its run-id hash bucket is below `JUDGE_SAMPLE_PCT` (default 20), and the others
+get one `not_sampled` record each (`JUDGE_SAMPLE_PCT` is 0 to 100; 100 judges all). A run left out is reconsidered only when `JUDGE_SAMPLE_PCT` differs from the `sample_pct` in its record; when it is left out again nothing is
+posted, because the key exists at this version. The order of a run's posts is the deterministic keys, the judge keys (or the `not_sampled` record), then `online.evaluator_version`. A run whose judge call raised keeps its deterministic posts, has no judge key and no version marker, is reported as errored with stage `judge`, and is judged again by the next pass.
+5a's `Judge.judge` catches a failed model call and an unreadable reply itself and returns the `judge error: ...` null for every criterion: that is 5a's handling, it is posted, and a null is never retried at this version.
+With any of the JUDGE_* variables unset (`judge_setup_from_env`) no judge is built, nothing about the judge is posted, and the names are in `OnlineResult.judge_missing`.
+
 The evaluator version covers the files that decide a score: `evals/agent/evaluators/*.py`, `evals/agent/judge.py` (it holds the judge's prompt), `evals/agent/judge_examples.yaml`, and `evals/online/*.py` except `seed.py`.
 """
 
 import hashlib
+import os
 import re
+import sys
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, NoReturn, Protocol
 from uuid import UUID
 
 from evals.agent.evaluators.answer import UNKNOWN_PATH, V1, ScoredAnswer, ToolCall
 from evals.agent.evaluators.form import cited_guidance, decision_first, guard_pass, recheck_stated, window_stated
 from evals.agent.evaluators.safety import no_verdict_beyond_day3
 from evals.agent.evaluators.trajectory import forbidden_tools, step_cap_ok
+from evals.agent.judge import Judge, build_judge, criteria_for
+from evals.agent.judge import feedback_key as judge_feedback_key
+from evals.agent.judge_config import missing_judge_settings
+from evals.online.pull import USAGE_EXIT
 from evals.online.reference import OnlineReference, build_reference
-from evals.online.runs import final_answer, mapping, outputs_of
+from evals.online.runs import final_answer, inputs_of, mapping, outputs_of
+from flysafelz.agent.guard_flow import split_path
 
 ROOT = Path(__file__).resolve().parents[2]
 PREFIX = "online."
@@ -93,7 +118,14 @@ NOT_APPLICABLE = "not applicable"
 CHECK_ERROR = "check error"
 
 SCORED, ALREADY_SCORED, ERRORED = "scored", "already scored", "errored"
-READ_TRACE, LIST_FEEDBACK, POST = "read trace", "list feedback", "post"  # where a run's error happened
+READ_TRACE, LIST_FEEDBACK, POST, JUDGE = "read trace", "list feedback", "post", "judge"  # where a run's error happened
+JUDGED, NOT_SAMPLED = "judged", "not_sampled"  # what the sample decided for an eligible run; NOT_SAMPLED is also the value of the `online.judge.sampled` feedback
+SAMPLED_KEY = PREFIX + "judge.sampled"
+SAMPLE_PCT_VARIABLE = "JUDGE_SAMPLE_PCT"
+DEFAULT_SAMPLE_PCT = 20
+JUDGE_ALL_LIMIT = 50  # with this many eligible runs or fewer, every one is judged
+NO_JUDGE_RESULT = "no result from the judge"
+SAMPLE_PCT_PATTERN = re.compile(r"sample_pct=([0-9]+)")
 
 GUARD_RESULTS = ("passed", "retried", "fallback")  # ticket 4's GuardResult
 TOOL_RUN = "tool"
@@ -218,11 +250,13 @@ def example_of(run: Any, reference: OnlineReference) -> dict[str, Any]:
 
 @dataclass(frozen=True)
 class KeyScore:
-    """One key's score on one run: 1, 0 or None, and its reason (without the version)."""
+    """One key's score on one run: 1, 0 or None, and its reason (without the version). `value` and `extra` are for the one key that has them (`online.judge.sampled`)."""
 
     key: str
     score: int | None
     comment: str
+    value: str | None = None
+    extra: Mapping[str, Any] | None = None
 
 
 def normalise_score(value: object) -> int | None:
@@ -260,7 +294,9 @@ def _score_one(check: str, function: Callable[..., Any], example: Mapping[str, A
 
 
 def applicable_keys(run: Any, reference: OnlineReference) -> tuple[str, ...]:
-    """The feedback keys that apply to a run, in posting order, without `online.evaluator_version`. Every deterministic check applies to every run (a check that does not apply is a null)."""
+    """The deterministic feedback keys that apply to a run, in posting order, without `online.evaluator_version`. Every deterministic check applies to every run (a check that does not apply is a null).
+
+    The judge keys are not here: they apply only to a run the judge is called on (`judge_keys_for`)."""
     return DETERMINISTIC_KEYS
 
 
@@ -282,12 +318,168 @@ def missing_keys(applicable: Iterable[str], existing: Iterable[Any], version: st
     return missing if VERSION_KEY in present else [*missing, VERSION_KEY]
 
 
+# --- the sampled judge (G8) ------------------------------------------------------------------------------------------------------------------
+
+
+def _refuse(message: str) -> NoReturn:
+    print(message, file=sys.stderr)
+    raise SystemExit(USAGE_EXIT)
+
+
+def parse_sample_pct(text: str) -> int:
+    """`JUDGE_SAMPLE_PCT` as a whole number from 0 to 100. Anything else (`-1`, `101`, `abc`, empty) exits 2 and names the variable."""
+    stripped = text.strip()
+    if re.fullmatch(r"[0-9]+", stripped) is None or int(stripped) > 100:
+        _refuse(f"{SAMPLE_PCT_VARIABLE}={text!r} is not a percentage: use a whole number from 0 to 100, for example 20.")
+    return int(stripped)
+
+
+def _checked_pct(pct: int) -> int:
+    if isinstance(pct, bool) or not isinstance(pct, int) or not 0 <= pct <= 100:
+        raise ValueError(f"the judge sample percentage must be a whole number from 0 to 100, not {pct!r}")
+    return pct
+
+
+def run_bucket(run_id: object) -> int:
+    """The run's place in the sample, 0 to 99: its id's SHA-256 as a number, modulo 100. The same id always has the same bucket."""
+    return int(hashlib.sha256(str(run_id).encode()).hexdigest(), 16) % 100
+
+
+def select_for_judge[T](run_ids: Iterable[T], pct: int) -> tuple[list[T], list[T]]:
+    """(judged, not_sampled) of the eligible run ids, each in the order given. With JUDGE_ALL_LIMIT or fewer every run is judged. With more, a run is judged when its bucket is below `pct`.
+
+    Pure: no clock, no randomness, and the split does not depend on the order of the ids."""
+    ids = list(run_ids)
+    _checked_pct(pct)
+    if len(ids) <= JUDGE_ALL_LIMIT:
+        return ids, []
+    judged = [run_id for run_id in ids if run_bucket(run_id) < pct]
+    return judged, [run_id for run_id in ids if run_bucket(run_id) >= pct]
+
+
+def judge_key(criterion: str) -> str:
+    """`online.judge.<criterion>`: 5a's own `judge.<criterion>` key under the online prefix."""
+    return PREFIX + judge_feedback_key(criterion)
+
+
+def judge_keys_for(path: object) -> tuple[str, ...]:
+    """The judge keys of a run's own path, from 5a's table in its order. `()` for `unknown` and every path the table has no criteria for."""
+    return tuple(judge_key(criterion) for criterion in criteria_for(path))
+
+
+def _present_at(existing: Iterable[Any], version: str) -> set[str]:
+    return {posted.key for posted in existing if version_of(posted) == version}
+
+
+def sampled_pct_at(existing: Iterable[Any], version: str) -> int | None:
+    """The percentage in the run's `not_sampled` record at `version`; None when it has no record at that version, -1 when the record's comment holds no percentage."""
+    found: int | None = None
+    for posted in existing:
+        if posted.key == SAMPLED_KEY and version_of(posted) == version:
+            match = SAMPLE_PCT_PATTERN.search(str(getattr(posted, "comment", None) or ""))
+            found = int(match.group(1)) if match else -1
+    return found
+
+
+def judge_eligible(path: object, existing: Iterable[Any], version: str, pct: int) -> bool:
+    """Whether the judge's sample is to consider this run: its path has judge keys, at least one is missing at `version`, and it has no `not_sampled` record at `version` made at `pct`."""
+    keys = judge_keys_for(path)
+    existing = list(existing)
+    if not keys or all(key in _present_at(existing, version) for key in keys):
+        return False
+    return sampled_pct_at(existing, version) != pct
+
+
+def _human_text(message: object) -> str | None:
+    """The text of one entry of a run's `messages` input when it is the pilot's: a plain string, or a human / user message as a LangChain or OpenAI mapping."""
+    if isinstance(message, str):
+        return message.strip() or None
+    found = mapping(message)
+    found = mapping(found.get("kwargs")) or found  # a serialised LangChain message keeps its fields under `kwargs`
+    if found.get("role", found.get("type")) not in ("human", "user"):
+        return None
+    content = found.get("content")
+    if isinstance(content, list):
+        content = " ".join(part if isinstance(part, str) else str(mapping(part).get("text") or "") for part in content)
+    return content.strip() or None if isinstance(content, str) else None
+
+
+def question_of(run: Any) -> str:
+    """The pilot's question: `inputs.question` when the run has one, else the last pilot message of `inputs.messages`. ValueError when there is none."""
+    inputs = inputs_of(run)
+    asked = inputs.get("question")
+    if isinstance(asked, str) and asked.strip():
+        return asked.strip()
+    messages = inputs.get("messages")
+    for message in reversed(messages if isinstance(messages, list) else []):
+        text = _human_text(message)
+        if text:
+            return text
+    raise ValueError("no pilot question in the run's inputs")
+
+
+def judge_input(run: Any, reference: OnlineReference) -> tuple[dict[str, Any], ScoredAnswer]:
+    """What 5a's `Judge.judge` is given for one run: an example with the question, `now`, the place and the run's own path, and the delivered answer with its path tag removed (ticket 4's `split_path`).
+
+    The place is the run's `lz_name` (as the example's `fixtures.case`, see the module text), else the run's coordinates, which 5a writes as `the launch zone at <lat>, <lon>`. ValueError when there is no
+    pilot question, or neither a name nor coordinates."""
+    name = reference.lz_name
+    if name is None and (reference.lat is None or reference.lon is None):
+        raise ValueError("the run has no lz_name and no lat and lon in its inputs")
+    inputs = {"question": question_of(run), "now": reference.now.isoformat(), "lat": 0.0 if reference.lat is None else reference.lat, "lon": 0.0 if reference.lon is None else reference.lon}
+    example: dict[str, Any] = {"id": str(getattr(run, "id", "run")), "inputs": inputs, "reference": {"path": reference.path}}
+    if name is not None:
+        example["fixtures"] = {"case": name}
+    return example, ScoredAnswer(path=reference.path, text=split_path(final_answer(run))[1], kind=V1)
+
+
+def judge_scores_of(path: object, grades: Mapping[str, Any]) -> dict[str, KeyScore]:
+    """5a's grades for one run as online key scores, for the criteria of the run's path only. A criterion with no grade is a null, `no result from the judge`; everything else is 5a's score and comment."""
+    scores: dict[str, KeyScore] = {}
+    for criterion in criteria_for(path):
+        grade = grades.get(judge_feedback_key(criterion))
+        if grade is None:
+            scores[judge_key(criterion)] = KeyScore(judge_key(criterion), None, NO_JUDGE_RESULT)
+        else:
+            scores[judge_key(criterion)] = KeyScore(judge_key(criterion), normalise_score(grade["score"]), str(grade.get("comment") or NO_JUDGE_RESULT))
+    return scores
+
+
+def not_sampled_score(eligible: int, pct: int) -> KeyScore:
+    """The `online.judge.sampled` record of a run the sample left out: value `not_sampled`, score null, and a comment with the reason and the percentage (the version is added when it is posted)."""
+    reason = f"left out of the judge sample: {eligible} eligible runs, more than {JUDGE_ALL_LIMIT}, chosen by run-id hash at sample_pct={pct}"
+    return KeyScore(SAMPLED_KEY, None, reason, value=NOT_SAMPLED, extra={"judge_sample_pct": pct})
+
+
+class JudgeLike(Protocol):
+    """What the job needs of a judge: 5a's `Judge.judge`. Tests pass a fake with the same method."""
+
+    def judge(self, example: Mapping[str, Any], answer: ScoredAnswer) -> Mapping[str, Any]: ...
+
+
+@dataclass(frozen=True)
+class JudgeSetup:
+    """What the environment says about the judge: the sample percentage, and either the judge or the JUDGE_* names that are not set (then `judge` is None and nothing was built)."""
+
+    judge: Judge | None
+    pct: int
+    missing: tuple[str, ...] = ()
+
+
+def judge_setup_from_env(environ: Mapping[str, str] | None = None, build: Callable[[Mapping[str, str]], Judge] = build_judge) -> JudgeSetup:
+    """`JUDGE_SAMPLE_PCT` first (a bad value exits 2 naming it, before any client exists), then the judge: `build(environ)` only when every JUDGE_* variable is set, else the missing names and no judge."""
+    env = os.environ if environ is None else environ
+    pct = parse_sample_pct(env[SAMPLE_PCT_VARIABLE]) if SAMPLE_PCT_VARIABLE in env else DEFAULT_SAMPLE_PCT
+    missing = tuple(missing_judge_settings(env))
+    return JudgeSetup(None if missing else build(env), pct, missing)
+
+
 # --- one run, and the job --------------------------------------------------------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
 class RunError:
-    stage: str  # READ_TRACE, LIST_FEEDBACK or POST
+    stage: str  # READ_TRACE, LIST_FEEDBACK, POST or JUDGE
     error_class: str
     message: str
     key: str | None = None  # the key that failed to post
@@ -299,12 +491,15 @@ class RunResult:
     status: str = SCORED  # SCORED, ALREADY_SCORED or ERRORED
     path: str = UNKNOWN_PATH
     path_unknown: bool = False  # E2: PR-4.F1 counts these
-    scores: dict[str, KeyScore] = field(default_factory=dict)  # every applicable key, whether or not this pass posted it
+    scores: dict[str, KeyScore] = field(default_factory=dict)  # every applicable deterministic key, whether or not this pass posted it
     posted: list[str] = field(default_factory=list)  # the keys this pass posted, in order
     error: RunError | None = None
+    judge: str | None = None  # JUDGED or NOT_SAMPLED when the sample decided this run this pass; None when it did not (no judge, not eligible, or the run errored first)
+    judge_scores: dict[str, KeyScore] = field(default_factory=dict)  # what the judge gave this pass (every key of the run's path, whether or not it was posted); empty when it was not called or raised
+    judge_error: RunError | None = None  # the judge call raised: the run's judge keys stay missing for the next pass
 
     def record(self) -> dict[str, Any]:
-        """What describes the run's scores and nothing about this pass: the same on a rerun that posts nothing (GP5)."""
+        """What describes the run's deterministic scores and nothing about this pass: the same on a rerun that posts nothing (GP5)."""
         return {"run_id": str(self.run_id), "path": self.path, "path_unknown": self.path_unknown, "scores": {key: (kept.score, kept.comment) for key, kept in self.scores.items()}}
 
 
@@ -313,6 +508,11 @@ class OnlineResult:
     project: str
     version: str
     runs: list[RunResult] = field(default_factory=list)
+    judge_enabled: bool = False  # a judge was passed in
+    judge_missing: tuple[str, ...] = ()  # the JUDGE_* names that were not set, for PR-4.F1's summary (E4); the judge was not built
+    sample_pct: int = DEFAULT_SAMPLE_PCT
+    eligible: int = 0  # the runs the sample considered
+    judge_calls: int = 0  # times `judge.judge` was called, one per judged run, a call that raised included
 
     @property
     def posted(self) -> int:
@@ -321,80 +521,166 @@ class OnlineResult:
     def with_status(self, status: str) -> list[RunResult]:
         return [result for result in self.runs if result.status == status]
 
+    def with_judge(self, decision: str) -> list[RunResult]:
+        """The runs the sample judged (JUDGED) or left out (NOT_SAMPLED) this pass."""
+        return [result for result in self.runs if result.judge == decision]
+
     @property
     def errors(self) -> list[RunResult]:
         return self.with_status(ERRORED)
+
+
+@dataclass
+class _Prepared:
+    """One run read and scored, with the feedback it already has: `reference` and `existing` are None when reading or listing failed (the run is then already errored)."""
+
+    run: Any
+    result: RunResult
+    reference: OnlineReference | None = None
+    existing: list[Any] | None = None
+
+    @property
+    def ready(self) -> bool:
+        return self.reference is not None and self.existing is not None
 
 
 def _short(error: Exception) -> str:
     return str(error).replace("\n", " ")[:MESSAGE_LIMIT]
 
 
-def _read_and_score(client: Any, project: str, run: Any, result: RunResult) -> None:
+def _read_and_score(client: Any, project: str, run: Any, result: RunResult) -> OnlineReference:
     rows = client.list_runs(project_name=project, trace_id=getattr(run, "trace_id", None) or run.id)
     tree = [row for row in rows if row.id != run.id]
     reference = build_reference(run, tree)
     result.path, result.path_unknown = reference.path, reference.path == UNKNOWN_PATH
     result.scores = score_run(run, reference, tree)
+    return reference
 
 
-def _post(client: Any, run: Any, keys: Sequence[str], result: RunResult, session_id: UUID, version: str) -> None:
+def _post(client: Any, run: Any, keys: Sequence[str], scores: Mapping[str, KeyScore], result: RunResult, session_id: UUID, version: str) -> None:
     for key in keys:
         if key == VERSION_KEY:
-            score, reason = 1, "all keys posted"
+            kept = KeyScore(key, 1, "all keys posted")
         else:
-            kept = result.scores[key]
-            score, reason = kept.score, kept.comment
+            kept = scores[key]
+        extra = {VERSION_EXTRA: version, **(kept.extra or {})}
+        value = {} if kept.value is None else {"value": kept.value}
         try:
-            client.create_feedback(run_id=run.id, key=key, score=score, comment=comment_with_version(reason, version), extra={VERSION_EXTRA: version}, session_id=session_id)
+            client.create_feedback(run_id=run.id, key=key, score=kept.score, comment=comment_with_version(kept.comment, version), extra=extra, session_id=session_id, **value)
         except Exception as error:  # noqa: BLE001 - a LangSmith error on one key is reported for this run; the job goes on
             result.status, result.error = ERRORED, RunError(POST, type(error).__name__, _short(error), key)
             return  # the keys after it, and the version marker, wait for a rerun
         result.posted.append(key)
 
 
-def _process(client: Any, project: str, session_id: UUID, run: Any, version: str) -> RunResult:
-    result = RunResult(run.id)
+def _prepare(client: Any, project: str, run: Any) -> _Prepared:
+    """Read the run's trace, score it, and read its existing feedback. A failure is the run's error, not the job's, and nothing is posted for it."""
+    item = _Prepared(run, RunResult(run.id))
     try:
-        _read_and_score(client, project, run, result)
+        item.reference = _read_and_score(client, project, run, item.result)
     except Exception as error:  # noqa: BLE001 - a trace that cannot be read or built is this run's error, not the job's
-        result.status, result.error = ERRORED, RunError(READ_TRACE, type(error).__name__, _short(error))
-        return result
+        item.reference = None
+        item.result.status, item.result.error = ERRORED, RunError(READ_TRACE, type(error).__name__, _short(error))
+        return item
     try:
-        existing = list(client.list_feedback(run_ids=[run.id]))
+        item.existing = list(client.list_feedback(run_ids=[run.id]))
     except Exception as error:  # noqa: BLE001 - without the existing feedback a post could duplicate a key, so nothing is posted
-        result.status, result.error = ERRORED, RunError(LIST_FEEDBACK, type(error).__name__, _short(error))
+        item.result.status, item.result.error = ERRORED, RunError(LIST_FEEDBACK, type(error).__name__, _short(error))
+    return item
+
+
+def _decide(prepared: Sequence[_Prepared], judge: JudgeLike | None, pct: int, summary: OnlineResult) -> dict[UUID, str]:
+    """For each eligible run, JUDGED or NOT_SAMPLED. Counts the eligible runs in `summary`. With no judge nothing is eligible: the judge is not set up, so no run is considered."""
+    if judge is None:
+        return {}
+    eligible = [item for item in prepared if item.reference is not None and item.existing is not None and judge_eligible(item.reference.path, item.existing, summary.version, pct)]
+    summary.eligible = len(eligible)
+    judged, left_out = select_for_judge([item.run.id for item in eligible], pct)
+    return {**dict.fromkeys(left_out, NOT_SAMPLED), **dict.fromkeys(judged, JUDGED)}
+
+
+def _complete(client: Any, session_id: UUID, item: _Prepared, summary: OnlineResult, judge: JudgeLike | None, decision: str | None) -> RunResult:
+    """Call the judge when the sample picked this run, then post what the run is missing: the deterministic keys, the judge keys or the `not_sampled` record, and the version marker last."""
+    result = item.result
+    if item.reference is None or item.existing is None:
         return result
-    keys = missing_keys(result.scores, existing, version)
-    if not keys:
+    version, scores, applicable = summary.version, dict(result.scores), list(result.scores)
+    if decision == JUDGED and judge is not None:
+        try:
+            example, answer = judge_input(item.run, item.reference)
+            summary.judge_calls += 1
+            result.judge_scores = judge_scores_of(item.reference.path, judge.judge(example, answer))
+        except Exception as error:  # noqa: BLE001 - a judge call that raises is this run's judge error: its judge keys stay missing, and the other runs are still judged
+            result.judge_scores = {}
+            result.judge_error = RunError(JUDGE, type(error).__name__, _short(error))
+        else:
+            result.judge = JUDGED
+            scores.update(result.judge_scores)
+            applicable.extend(result.judge_scores)
+    elif decision == NOT_SAMPLED:
+        result.judge = NOT_SAMPLED
+        if sampled_pct_at(item.existing, version) is None:  # a record at this version at another percentage is kept: nothing new is posted
+            scores[SAMPLED_KEY] = not_sampled_score(summary.eligible, summary.sample_pct)
+            applicable.append(SAMPLED_KEY)
+    keys = missing_keys(applicable, item.existing, version)
+    if result.judge_error is not None:
+        keys = [key for key in keys if key != VERSION_KEY]  # the marker means every key posted: the judge's did not
+        result.status = ERRORED
+    elif not keys:
         result.status = ALREADY_SCORED
-        return result
-    _post(client, run, keys, result, session_id, version)
+    _post(client, item.run, keys, scores, result, session_id, version)
     return result
 
 
-def score_and_post(client: Any, project: str, runs: Sequence[Any], version: str | None = None) -> OnlineResult:
-    """Score each run and post the feedback it is missing at `version` (default: the code's own). With no runs nothing is read or posted, and `read_project` is not called."""
-    result = OnlineResult(project, evaluator_version() if version is None else version)
+def score_and_post(
+    client: Any, project: str, runs: Sequence[Any], version: str | None = None, judge: JudgeLike | None = None, *, judge_missing: Sequence[str] = (), sample_pct: int = DEFAULT_SAMPLE_PCT
+) -> OnlineResult:
+    """Score each run, judge the sample, and post the feedback each run is missing at `version` (default: the code's own). With no runs nothing is read or posted, and `read_project` is not called.
+
+    `judge` is 5a's judge (or anything with its `.judge(example, answer)`); None leaves every judge key missing for a later pass, and `judge_missing` (the JUDGE_* names `judge_setup_from_env` found unset)
+    is carried in the result. `sample_pct` is JUDGE_SAMPLE_PCT. Every run is read before any is posted, because the 50-run rule needs the eligible count of the whole pass.
+    """
+    _checked_pct(sample_pct)
+    result = OnlineResult(project, evaluator_version() if version is None else version, judge_enabled=judge is not None, judge_missing=tuple(judge_missing), sample_pct=sample_pct)
     if not runs:
         return result
     session_id = client.read_project(project_name=project).id
-    for run in runs:
-        result.runs.append(_process(client, project, session_id, run, result.version))
+    prepared = [_prepare(client, project, run) for run in runs]
+    decisions = _decide(prepared, judge, sample_pct, result)
+    for item in prepared:
+        result.runs.append(_complete(client, session_id, item, result, judge, decisions.get(item.run.id)))
     return result
 
 
+def _judge_line(result: OnlineResult) -> str | None:
+    if result.judge_missing:
+        return f"judge not run: {', '.join(result.judge_missing)} not set; the judge keys stay missing for a later pass"
+    if not result.judge_enabled:
+        return None
+    return (
+        f"judge: {result.eligible} eligible, {len(result.with_judge(JUDGED))} judged ({result.judge_calls} call(s)), "
+        f"{len(result.with_judge(NOT_SAMPLED))} not sampled, at {SAMPLE_PCT_VARIABLE}={result.sample_pct}"
+    )
+
+
 def report_lines(result: OnlineResult) -> list[str]:
-    """A plain-text report of a pass: one line per run, then the totals."""
+    """A plain-text report of a pass: one line per run (a run whose judge call raised has a second line), the judge's line when there is one, then the totals."""
     lines = [f"project {result.project}, evaluator version {result.version}: {len(result.runs)} run(s)"]
     for item in result.runs:
         if item.status == ERRORED and item.error is not None:
             where = f"{item.error.stage} {item.error.key}" if item.error.key else item.error.stage
             lines.append(f"{item.run_id} errored at {where}: {item.error.error_class}: {item.error.message} (posted {len(item.posted)} before it)")
+        elif item.status == ERRORED and item.judge_error is None:
+            lines.append(f"{item.run_id} errored")
         elif item.status == ALREADY_SCORED:
             lines.append(f"{item.run_id} already scored")
-        else:
+        elif item.status == SCORED:
             lines.append(f"{item.run_id} scored, posted {len(item.posted)}: {', '.join(item.posted)}")
+        if item.judge_error is not None:
+            lines.append(f"{item.run_id} errored at {item.judge_error.stage}: {item.judge_error.error_class}: {item.judge_error.message} (judge keys not posted; posted {len(item.posted)} other)")
+    judged = _judge_line(result)
+    if judged is not None:
+        lines.append(judged)
     lines.append(f"{len(result.with_status(SCORED))} scored, {len(result.with_status(ALREADY_SCORED))} already scored, {len(result.errors)} errored; {result.posted} feedback posted")
     return lines
 
@@ -403,9 +689,13 @@ __all__ = [
     "ALREADY_SCORED",
     "DETERMINISTIC_KEYS",
     "ERRORED",
+    "JUDGED",
+    "NOT_SAMPLED",
     "ONLINE_CHECKS",
+    "SAMPLED_KEY",
     "SCORED",
     "VERSION_KEY",
+    "JudgeSetup",
     "KeyScore",
     "OnlineResult",
     "RunError",
@@ -413,9 +703,16 @@ __all__ = [
     "applicable_keys",
     "evaluator_version",
     "feedback_key",
+    "judge_eligible",
+    "judge_input",
+    "judge_key",
+    "judge_keys_for",
+    "judge_setup_from_env",
     "missing_keys",
     "normalise_score",
+    "parse_sample_pct",
     "report_lines",
     "score_and_post",
     "score_run",
+    "select_for_judge",
 ]

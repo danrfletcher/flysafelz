@@ -19,7 +19,7 @@
 
 import uuid
 from collections.abc import Iterable, Iterator, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 from typing import Any
@@ -123,6 +123,7 @@ def tool_run(name: str, root: ls_schemas.Run, *, outputs: dict[str, Any] | None 
 class FakeTree:
     root: ls_schemas.Run
     children: list[ls_schemas.Run]
+    feedback: list[tuple[str, str | None]] = field(default_factory=list)  # (key, evaluator version) of feedback the run already has: `judge_client` stores it
 
 
 def fake_tree(children: Sequence[str | ls_schemas.Run] = (), root: ls_schemas.Run | None = None, **root_overrides: Any) -> FakeTree:
@@ -216,7 +217,9 @@ class OnlineRecordingClient(RecordingClient):
         triple = (run_id, key, (extra or {}).get("evaluator_version"))
         if triple in self.stored_triples():
             self.duplicate_posts.append(triple)
-        stored = ls_schemas.Feedback(id=uuid.uuid4(), created_at=NOW, modified_at=NOW, run_id=run_id, trace_id=run_id, key=key, score=score, comment=comment, extra=extra, session_id=session_id)
+        stored = ls_schemas.Feedback(
+            id=uuid.uuid4(), created_at=NOW, modified_at=NOW, run_id=run_id, trace_id=run_id, key=key, score=score, value=kw.get("value"), comment=comment, extra=extra, session_id=session_id
+        )
         self.feedback.append(stored)
         return stored
 
