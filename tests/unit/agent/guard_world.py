@@ -50,9 +50,7 @@ def text_turn(*texts: str, **kwargs) -> TurnSources:
     return turn_of(*(ToolResult("get_notams", text) for text in texts), **kwargs)
 
 
-def weather_turn(
-    value: float, unit: str, limit: float | None = None, comparison: str = ">=", text: str = "", *, limit_unit: str | None = None, overlays: list | None = None
-) -> TurnSources:
+def weather_turn(value: float, unit: str, limit: float | None = None, comparison: str = ">=", text: str = "", *, limit_unit: str | None = None, overlays: list | None = None) -> TurnSources:
     """One weather value, and one limit it is checked against when `limit` is given. The text is empty, so the artifact is the only source."""
     limits = [] if limit is None else [RuleLimit(rule_id="gust_spread_caution", kind="caution", comparison=comparison, limit=limit, unit=limit_unit or unit)]
     source = SourceInfo(source="weather", state="ok", reason="", fetched_at=FRESH, check_by_hand=None)

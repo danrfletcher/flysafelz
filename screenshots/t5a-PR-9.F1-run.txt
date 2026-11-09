@@ -1,0 +1,39 @@
+# t5a PR-9.F1: `python -m evals.agent.v0` (default split dev) on the FAKE chat model and the RECORDING LangSmith client (tests/unit/v0_helpers.py).
+# Nothing real was called; the settings are fake values. The shipping command has no fake-model flag: this is v0.main(...) with model_factory and client_factory.
+# exit code: 0
+# structured model calls: 48 (16 assess examples x 3 reps)
+# runs logged to the recording client: 48
+# run metadata source values: ['v0']
+# experiment metadata report_line: v1's advantage covers reading plus arithmetic; not separated (v0b, v0 with reader output, is the named next experiment)
+
+experiment v0-dev-20261108-160700 (split dev): 48 of 48 runs, one example at a time
+  rep 1: 16 runs (dev_01_blue_mill … blue_mill_today)
+  rep 2: 16 runs (dev_01_blue_mill … blue_mill_today)
+  rep 3: 16 runs (dev_01_blue_mill … blue_mill_today)
+errored: 0 of 48 runs
+incomplete: false
+evaluators (mean over the runs each applied to):
+  harmful_missed_blocker: 81% (48 runs)
+  hard_restriction_recall: 0% (18 runs)
+  path_accuracy: n/a (0 runs)
+  verdict_match: 31% (45 runs)
+  approaching_limits_match: 21% (45 runs)
+  window_iou: 22% (45 runs)
+  notam_action_match: 43% (42 runs)
+  no_verdict_beyond_day3: 94% (48 runs)
+  unverified_on_dropped_source: 0% (6 runs)
+  noise_rate: 0% (30 runs)
+  required_tools: n/a (0 runs)
+  forbidden_tools: n/a (0 runs)
+  step_cap: n/a (0 runs)
+  guard_pass: n/a (0 runs)
+  decision_first: n/a (0 runs)
+  cited: n/a (0 runs)
+  window_stated: 100% (48 runs)
+  recheck_stated: n/a (0 runs)
+  must_mention: 0% (3 runs)
+  must_not_mention: n/a (0 runs)
+feedback items sent to LangSmith: 378
+v1's advantage covers reading plus arithmetic; not separated (v0b, v0 with reader output, is the named next experiment)
+
+stderr: ''

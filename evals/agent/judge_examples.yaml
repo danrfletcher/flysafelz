@@ -1,0 +1,72 @@
+# The judge's 8 prompt examples (5a PR-7.F1, G12): one pass and one fail for each of the four criteria.
+#
+# Everything here is invented: the launch zones, the questions, the airspace names, the NOTAM ids and the phone number are made up and match nothing in
+# the dataset (a test checks it against examples.yaml and verdict_sheet.yaml). The only phone number is in the fiction range (01632 960xxx). No coordinates.
+#
+# Each entry has the four things the judge's message carries (`lz`, `now`, `question`, `answer`) and why it gets its grade: `why_passes` for a pass, and
+# `why_fails` for a fail, which names its ONE reason. A fail example fails for that reason alone, and the judge reads it as a single-criterion example:
+# the other criteria are not shown for it. `now` is UTC; the judge's message writes it as Europe/London time with the weekday.
+
+answers_the_question:
+  pass:
+    lz: Fennick Ridge
+    now: "2026-05-02T06:00Z"
+    question: "Is it flyable at Fennick Ridge this evening?"
+    answer: |
+      PILOT DISCRETION this evening, 18:00 to 20:30 (sunset 20:41). The wind is 9 mph from the west with gusts to 17 mph: inside the limit, but the gusts are close to it. Nothing in the NOTAMs or the airspace touches the launch zone. I assumed 18:00 until shortly before sunset. Check again at 17:00 for the latest forecast.
+    why_passes: "It gives a verdict for this evening at Fennick Ridge, the time and place the pilot asked about."
+  fail:
+    lz: Harlow Mere
+    now: "2026-06-12T17:00Z"
+    question: "Can I fly Harlow Mere tomorrow morning?"
+    answer: |
+      PILOT DISCRETION from 17:00 to 20:00 tomorrow. The wind is 7 mph from the south-west with gusts to 12 mph. Nothing in the NOTAMs or the airspace touches the launch zone. Check again at 15:00 for the latest forecast.
+    why_fails: "It assesses tomorrow evening, not the tomorrow morning the pilot asked about."
+
+prioritised:
+  pass:
+    lz: Tarn Hollow
+    now: "2026-07-18T08:00Z"
+    question: "What do I need to know before flying at Tarn Hollow at 10:00 today?"
+    answer: |
+      NO-GO at 10:00 today. NOTAM X0101/26 closes the airspace over the launch zone for a drone display from 09:00 to 13:00. The weather would be fine: wind 6 mph from the north, gusts to 10 mph. The first window is 13:30 to 18:00 once the NOTAM ends. Check again at 12:30.
+    why_passes: "It opens with the NOTAM that closes the launch zone (a hard limit) and puts the fine weather after it."
+  fail:
+    lz: Dunmere Edge
+    now: "2026-07-18T08:00Z"
+    question: "What do I need to know before flying at Dunmere Edge at 10:00 today?"
+    answer: |
+      The wind at 10:00 is 6 mph from the north with gusts to 10 mph, the cloud base is 3,000 ft, visibility is 20 km and sunrise was at 04:58. Temperatures reach 19 C by noon and there is no rain forecast before evening. The wind eases through the afternoon. Last, NOTAM X0187/26 covers a parachute drop over the launch zone from 09:30 to 12:00, so this is a NO-GO until 12:30.
+    why_fails: "The NO-GO NOTAM, a hard limit, comes in the last sentence, after routine weather details."
+
+actionable:
+  pass:
+    lz: Quillon Down
+    now: "2026-09-19T17:00Z"
+    question: "Is Quillon Down OK for a flight tomorrow at 08:00?"
+    answer: |
+      NO-GO at 08:00 tomorrow: the forecast gust is 24 mph against the 18 mph limit. The wind eases after 11:00 (gusts 14 mph), so aim for 11:30 to 14:00. Check the forecast again at 10:00 before you set off. If you want to launch earlier, the site contact is on 01632 960123.
+    why_passes: "It tells the pilot what to do: aim for 11:30 to 14:00, check again at 10:00, and who to phone."
+  fail:
+    lz: Quillon Down
+    now: "2026-09-19T17:00Z"
+    question: "Is Quillon Down OK for a flight tomorrow at 08:00?"
+    answer: |
+      NO-GO at 08:00 tomorrow. The forecast gust is 24 mph against the 18 mph limit. Conditions are strong that morning and forecasts can change. There is also a NOTAM in the area.
+    why_fails: "The pilot is not told what to do: there is no time to wait for, nothing to check and nobody to phone."
+
+good_decline:
+  pass:
+    lz: Oakley Mere
+    now: "2026-04-11T09:00Z"
+    question: "How should I handle the rotor behind the tree line when I launch at Oakley Mere?"
+    answer: |
+      Sorry, I can't help with launch technique: I only cover flying conditions at a launch zone, which means the forecast, the airspace and the NOTAMs. For rotor and tree-line technique, your instructor or school is the right person to ask.
+    why_passes: "It is polite, says what it does cover, and points to the instructor for the technique question."
+  fail:
+    lz: Oakley Mere
+    now: "2026-04-11T09:00Z"
+    question: "Which reserve parachute should I buy for my paramotor?"
+    answer: |
+      Sorry, I can't help with that. I only cover flying conditions at a launch zone, which means the forecast, the airspace and the NOTAMs.
+    why_fails: "The question is safety-relevant and the reply points the pilot to no one who can answer it, such as an instructor or the manufacturer."

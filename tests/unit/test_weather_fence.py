@@ -8,9 +8,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 MODULES = [ROOT / "src" / "flysafelz" / "clients" / "open_meteo.py", ROOT / "src" / "flysafelz" / "weather.py"]
-TESTS = [
-    Path(__file__).parent / f"{name}.py" for name in ("test_open_meteo", "test_weather_checks", "test_weather_rows", "test_weather_tier")
-]
+TESTS = [Path(__file__).parent / f"{name}.py" for name in ("test_open_meteo", "test_weather_checks", "test_weather_rows", "test_weather_tier")]
 
 
 def tree(path: Path) -> ast.Module:
@@ -61,6 +59,4 @@ def test_f7_f10_plain_functions_and_models_and_no_key_or_llm_variable(path):
 @pytest.mark.parametrize("path", TESTS, ids=lambda p: p.name)
 def test_f5_the_weather_tests_never_open_a_socket_read_env_or_ask_the_clock(path):
     text = path.read_text(encoding="utf-8")
-    assert not re.search(
-        r"\.now\(|utcnow|\.today\(|time\.time\(|freezegun|dotenv|environ|getenv|\.env\b|import socket|requests|urllib", text
-    )
+    assert not re.search(r"\.now\(|utcnow|\.today\(|time\.time\(|freezegun|dotenv|environ|getenv|\.env\b|import socket|requests|urllib", text)

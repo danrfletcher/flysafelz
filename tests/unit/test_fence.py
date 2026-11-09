@@ -61,7 +61,9 @@ def test_source_files_are_found():
 
 # F6: the dependency allowlist. The names declared in [project] dependencies and in each dependency group must equal these sets, so a new
 # package (openai, anthropic, chromadb, ...) fails until it is added here on purpose. langgraph-cli sits in the dev group only.
+# agentevals and scikit-learn are ticket 5a's eval harness (trajectory match, Cohen's kappa); langsmith is also its dataset and experiment client.
 ALLOWED_PROJECT_DEPENDENCIES = {
+    "agentevals",
     "astral",
     "fastembed",
     "httpx",
@@ -72,6 +74,7 @@ ALLOWED_PROJECT_DEPENDENCIES = {
     "pydantic",
     "pypdf",
     "pyyaml",
+    "scikit-learn",
     "shapely",
     "starlette",
     "tzdata",
@@ -371,11 +374,7 @@ def test_the_verdict_sheet_defines_no_cut_point_logic_of_its_own():
 
 def test_the_cut_point_scan_catches_planted_uses():
     planted = ast.parse(
-        "from flysafelz.assess import active_intervals\n"
-        "import flysafelz.daylight as d\n"
-        "from flysafelz.daylight import daylight_edges as edges\n"
-        "a = active_intervals(x)\n"
-        "b = d.daylight_edges(y)\n"
+        "from flysafelz.assess import active_intervals\nimport flysafelz.daylight as d\nfrom flysafelz.daylight import daylight_edges as edges\na = active_intervals(x)\nb = d.daylight_edges(y)\n"
     )
     uses = [kind for _, kind in _cut_point_uses(planted)]
     assert sorted(uses) == [
@@ -419,6 +418,23 @@ def test_no_numeric_literal_equals_a_rules_yaml_value():
     for path in PY_FILES:
         for lineno, value in hard_coded_rule_values(path, _parse(path), values):
             pytest.fail(f"{path}:{lineno} hard-codes {value}, which is a rules.yaml value")
+
+
+EVALUATOR_FILES = sorted((ROOT / "evals" / "agent" / "evaluators").glob("*.py"))
+
+
+def test_no_numeric_literal_in_the_eval_harness_evaluators_equals_a_rules_yaml_value():
+    """5a PR-5.F1 F6: the same scan, over evals/agent/evaluators/. The horizon day is read through load_rules, not written as a 3."""
+    values = _rule_values()
+    assert len(EVALUATOR_FILES) >= 8, "the evaluator modules were not found"
+    for path in EVALUATOR_FILES:
+        for lineno, value in hard_coded_rule_values(path, _parse(path), values):
+            pytest.fail(f"{path}:{lineno} hard-codes {value}, which is a rules.yaml value")
+
+
+def test_the_evaluator_scan_flags_a_planted_horizon_literal():
+    planted = ROOT / "evals" / "agent" / "evaluators" / "planted.py"
+    assert [v for _, v in hard_coded_rule_values(planted, ast.parse("if day > 3:\n    pass\n"), _rule_values())] == [3]
 
 
 # F7 (ticket 4): the two scans above cover agent/ and guidance/ too. A knob that equals a rules.yaml value (top_k 4, the 300 token minimum, the 3 of
@@ -627,6 +643,7 @@ def test_env_is_gitignored_and_example_is_empty():
     # Names split so this file never matches the F6 scan.
     listed = {"OPENAIP_API_" + "KEY=", "READER_PROVIDER=", "READER_BASE_URL=", "READER_API_" + "KEY=", "READER_MODEL="}
     listed |= {"AGENT_BASE_URL=", "AGENT_MODEL=", "AGENT_API_" + "KEY=", "LANGSMITH_API_" + "KEY=", "LANGSMITH_PROJECT="}
+    listed |= {"JUDGE_PROVIDER=", "JUDGE_BASE_URL=", "JUDGE_API_" + "KEY=", "JUDGE_MODEL="}
     assert set(lines) == listed and len(lines) == len(listed)
 
 

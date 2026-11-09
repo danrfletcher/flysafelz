@@ -1,0 +1,168 @@
+== dev_14_town_moor (good)
+harmful_missed_blocker: {"key": "harmful_missed_blocker", "score": 0, "comment": "dev_14_town_moor: no missed blocker."}
+hard_restriction_recall: {"key": "hard_restriction_recall", "score": 1.0, "comment": "dev_14_town_moor: 2 of 2 hard restrictions surfaced with their labelled action."}
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_14_town_moor: predicted path assess, the example's path is assess: a hit"}
+verdict_match: {"key": "verdict_match", "score": 1.0, "comment": "dev_14_town_moor: 360 of 360 labelled minutes agree on the verdict"}
+approaching_limits_match: {"key": "approaching_limits_match", "score": 1.0, "comment": "dev_14_town_moor: 360 of 360 labelled minutes agree on the approaching-limits flag"}
+window_iou: {"key": "window_iou", "score": 1.0, "comment": "dev_14_town_moor: IoU in minutes per verdict: NO_GO 1.000; mean 1.000 over 1 verdict(s)"}
+notam_action_match: {"key": "notam_action_match", "score": 1.0, "comment": "dev_14_town_moor: 6 of 6 labelled NOTAMs have the labelled action"}
+no_verdict_beyond_day3: {"key": "no_verdict_beyond_day3", "score": 1, "comment": "dev_14_town_moor: no segment carries a verdict beyond London day 3"}
+unverified_on_dropped_source: None (does not apply)
+noise_rate: {"key": "noise_rate", "score": 0.0, "comment": "dev_14_town_moor: 0 of 1 IGNORE-labelled NOTAMs surfaced"}
+required_tools: {"key": "required_tools", "score": 1, "comment": "dev_14_town_moor: every required tool was called (assess)"}
+forbidden_tools: None (does not apply)
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_14_town_moor: 1 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 1, "comment": "dev_14_town_moor: the guard passed the first draft"}
+decision_first: {"key": "decision_first", "score": 1, "comment": "dev_14_town_moor: the first sentence holds a verdict word"}
+cited: None (does not apply)
+window_stated: {"key": "window_stated", "score": 1, "comment": "dev_14_town_moor: the answer states the window 18:00-00:00 (Europe/London)"}
+recheck_stated: {"key": "recheck_stated", "score": 1, "comment": "dev_14_town_moor: the window starts after the current hour and the answer carries the re-check line"}
+must_mention: None (does not apply)
+must_not_mention: None (does not apply)
+== dev_14_town_moor (bad)
+harmful_missed_blocker: {"key": "harmful_missed_blocker", "score": 1, "comment": "dev_14_town_moor: missed blocker: NOTAM H1633/26 labelled CONTACT_FIRST, surfaced as IGNORE; NOTAM I2608/26 labelled CONTACT_FIRST, surfaced as IGNORE."}
+hard_restriction_recall: {"key": "hard_restriction_recall", "score": 0.0, "comment": "dev_14_town_moor: 0 of 2 hard restrictions surfaced with their labelled action; missed: H1633/26 labelled CONTACT_FIRST, surfaced as IGNORE; I2608/26 labelled CONTACT_FIRST, surfaced as IGNORE."}
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_14_town_moor: predicted path assess, the example's path is assess: a hit"}
+verdict_match: {"key": "verdict_match", "score": 0.0, "comment": "dev_14_town_moor: 0 of 360 labelled minutes agree on the verdict; 360 min disagree, first at 2026-07-11 17:00\u201323:00Z (360 min): answer no answer, sheet NO_GO"}
+approaching_limits_match: {"key": "approaching_limits_match", "score": 0.0, "comment": "dev_14_town_moor: 0 of 360 labelled minutes agree on the approaching-limits flag; 360 min disagree, first at 2026-07-11 17:00\u201323:00Z (360 min): answer no answer, sheet approaching_limits true"}
+window_iou: {"key": "window_iou", "score": 0.0, "comment": "dev_14_town_moor: IoU in minutes per verdict: NO_GO 0.000; mean 0.000 over 1 verdict(s)"}
+notam_action_match: {"key": "notam_action_match", "score": 0.16666666666666666, "comment": "dev_14_town_moor: 1 of 6 labelled NOTAMs have the labelled action; mismatches: H1633/26 labelled CONTACT_FIRST, answered IGNORE; H3369/26 labelled AVOID_SECTOR, answered IGNORE; I2608/26 labelled CONTACT_FIRST, answered IGNORE; I4150/26 labelled AVOID_SECTOR, answered IGNORE; N331/26 labelled AVOID_SECTOR, answered IGNORE"}
+no_verdict_beyond_day3: {"key": "no_verdict_beyond_day3", "score": 1, "comment": "dev_14_town_moor: no segment carries a verdict beyond London day 3"}
+unverified_on_dropped_source: None (does not apply)
+noise_rate: {"key": "noise_rate", "score": 0.0, "comment": "dev_14_town_moor: 0 of 1 IGNORE-labelled NOTAMs surfaced"}
+required_tools: {"key": "required_tools", "score": 0, "comment": "dev_14_town_moor: required tool(s) not called: assess; called: none"}
+forbidden_tools: None (does not apply)
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_14_town_moor: 0 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 0, "comment": "dev_14_town_moor: the guard result was fallback"}
+decision_first: {"key": "decision_first", "score": 0, "comment": "dev_14_town_moor: the first sentence holds no verdict word (NO-GO, UNVERIFIED, PILOT DISCRETION): '(empty answer)'"}
+cited: None (does not apply)
+window_stated: {"key": "window_stated", "score": 0, "comment": "dev_14_town_moor: the answer does not state the window 18:00-00:00 (Europe/London); missing 18:00, 00:00"}
+recheck_stated: {"key": "recheck_stated", "score": 0, "comment": "dev_14_town_moor: the window starts after the current hour but the answer lacks the re-check line 'Re-check the weather and NOTAMs when you get to the LZ.'"}
+must_mention: None (does not apply)
+must_not_mention: None (does not apply)
+== dev_16_buttermere (good)
+harmful_missed_blocker: None (does not apply)
+hard_restriction_recall: None (does not apply)
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_16_buttermere: predicted path explain, the example's path is explain: a hit"}
+verdict_match: None (does not apply)
+approaching_limits_match: None (does not apply)
+window_iou: None (does not apply)
+notam_action_match: None (does not apply)
+no_verdict_beyond_day3: None (does not apply)
+unverified_on_dropped_source: None (does not apply)
+noise_rate: None (does not apply)
+required_tools: {"key": "required_tools", "score": 1, "comment": "dev_16_buttermere: every required tool was called (get_notams, get_weather)"}
+forbidden_tools: None (does not apply)
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_16_buttermere: 2 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 1, "comment": "dev_16_buttermere: the guard passed the first draft"}
+decision_first: None (does not apply)
+cited: {"key": "cited", "score": 1, "comment": "dev_16_buttermere: the answer cites H6217"}
+window_stated: None (does not apply)
+recheck_stated: None (does not apply)
+must_mention: {"key": "must_mention", "score": 1, "comment": "dev_16_buttermere: the answer mentions all 1 required entries"}
+must_not_mention: None (does not apply)
+== dev_16_buttermere (bad)
+harmful_missed_blocker: None (does not apply)
+hard_restriction_recall: None (does not apply)
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_16_buttermere: predicted path explain, the example's path is explain: a hit"}
+verdict_match: None (does not apply)
+approaching_limits_match: None (does not apply)
+window_iou: None (does not apply)
+notam_action_match: None (does not apply)
+no_verdict_beyond_day3: None (does not apply)
+unverified_on_dropped_source: None (does not apply)
+noise_rate: None (does not apply)
+required_tools: {"key": "required_tools", "score": 0, "comment": "dev_16_buttermere: required tool(s) not called: get_notams, get_weather; called: none"}
+forbidden_tools: None (does not apply)
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_16_buttermere: 0 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 0, "comment": "dev_16_buttermere: the guard result was fallback"}
+decision_first: None (does not apply)
+cited: {"key": "cited", "score": 0, "comment": "dev_16_buttermere: the answer does not cite H6217"}
+window_stated: None (does not apply)
+recheck_stated: None (does not apply)
+must_mention: {"key": "must_mention", "score": 0, "comment": "dev_16_buttermere: the answer does not mention 'H6217'"}
+must_not_mention: None (does not apply)
+== dev_17_sherburn (good)
+harmful_missed_blocker: None (does not apply)
+hard_restriction_recall: None (does not apply)
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_17_sherburn: predicted path clarify, the example's path is clarify: a hit"}
+verdict_match: None (does not apply)
+approaching_limits_match: None (does not apply)
+window_iou: None (does not apply)
+notam_action_match: None (does not apply)
+no_verdict_beyond_day3: None (does not apply)
+unverified_on_dropped_source: None (does not apply)
+noise_rate: None (does not apply)
+required_tools: {"key": "required_tools", "score": 1, "comment": "dev_17_sherburn: every required tool was called (get_airspace)"}
+forbidden_tools: {"key": "forbidden_tools", "score": 1, "comment": "dev_17_sherburn: none of the 4 forbidden tools was called"}
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_17_sherburn: 1 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 1, "comment": "dev_17_sherburn: the guard passed the first draft"}
+decision_first: None (does not apply)
+cited: None (does not apply)
+window_stated: None (does not apply)
+recheck_stated: None (does not apply)
+must_mention: {"key": "must_mention", "score": 1, "comment": "dev_17_sherburn: the answer mentions all 1 required entries"}
+must_not_mention: {"key": "must_not_mention", "score": 1, "comment": "dev_17_sherburn: the answer mentions none of the 2 forbidden entries"}
+== dev_17_sherburn (bad)
+harmful_missed_blocker: None (does not apply)
+hard_restriction_recall: None (does not apply)
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_17_sherburn: predicted path clarify, the example's path is clarify: a hit"}
+verdict_match: None (does not apply)
+approaching_limits_match: None (does not apply)
+window_iou: None (does not apply)
+notam_action_match: None (does not apply)
+no_verdict_beyond_day3: None (does not apply)
+unverified_on_dropped_source: None (does not apply)
+noise_rate: None (does not apply)
+required_tools: {"key": "required_tools", "score": 0, "comment": "dev_17_sherburn: required tool(s) not called: get_airspace; called: none"}
+forbidden_tools: {"key": "forbidden_tools", "score": 1, "comment": "dev_17_sherburn: none of the 4 forbidden tools was called"}
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_17_sherburn: 0 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 0, "comment": "dev_17_sherburn: the guard result was fallback"}
+decision_first: None (does not apply)
+cited: None (does not apply)
+window_stated: None (does not apply)
+recheck_stated: None (does not apply)
+must_mention: {"key": "must_mention", "score": 0, "comment": "dev_17_sherburn: the answer does not mention 'Sherburn'"}
+must_not_mention: {"key": "must_not_mention", "score": 1, "comment": "dev_17_sherburn: the answer mentions none of the 2 forbidden entries"}
+== dev_27_sherburn (good)
+harmful_missed_blocker: {"key": "harmful_missed_blocker", "score": 0, "comment": "dev_27_sherburn: no missed blocker."}
+hard_restriction_recall: None (does not apply)
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_27_sherburn: predicted path assess, the example's path is assess: a hit"}
+verdict_match: {"key": "verdict_match", "score": 1.0, "comment": "dev_27_sherburn: 120 of 120 labelled minutes agree on the verdict"}
+approaching_limits_match: {"key": "approaching_limits_match", "score": 1.0, "comment": "dev_27_sherburn: 120 of 120 labelled minutes agree on the approaching-limits flag"}
+window_iou: {"key": "window_iou", "score": 1.0, "comment": "dev_27_sherburn: IoU in minutes per verdict: NO_GO 1.000; mean 1.000 over 1 verdict(s)"}
+notam_action_match: None (does not apply)
+no_verdict_beyond_day3: {"key": "no_verdict_beyond_day3", "score": 1, "comment": "dev_27_sherburn: no segment carries a verdict beyond London day 3"}
+unverified_on_dropped_source: {"key": "unverified_on_dropped_source", "score": 1, "comment": "dev_27_sherburn: dropped pib: every labelled minute is UNVERIFIED (or NO_GO where the sheet says so)"}
+noise_rate: None (does not apply)
+required_tools: {"key": "required_tools", "score": 1, "comment": "dev_27_sherburn: every required tool was called (assess)"}
+forbidden_tools: None (does not apply)
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_27_sherburn: 1 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 1, "comment": "dev_27_sherburn: the guard passed the first draft"}
+decision_first: {"key": "decision_first", "score": 1, "comment": "dev_27_sherburn: the first sentence holds a verdict word"}
+cited: None (does not apply)
+window_stated: {"key": "window_stated", "score": 1, "comment": "dev_27_sherburn: the answer states the window 10:00-12:00 (Europe/London)"}
+recheck_stated: {"key": "recheck_stated", "score": 1, "comment": "dev_27_sherburn: the window starts after the current hour and the answer carries the re-check line"}
+must_mention: None (does not apply)
+must_not_mention: None (does not apply)
+== dev_27_sherburn (bad)
+harmful_missed_blocker: {"key": "harmful_missed_blocker", "score": 0, "comment": "dev_27_sherburn: no missed blocker."}
+hard_restriction_recall: None (does not apply)
+path_accuracy: {"key": "path_accuracy", "score": 1, "comment": "dev_27_sherburn: predicted path assess, the example's path is assess: a hit"}
+verdict_match: {"key": "verdict_match", "score": 0.0, "comment": "dev_27_sherburn: 0 of 120 labelled minutes agree on the verdict; 120 min disagree, first at 2026-10-10 09:00\u201311:00Z (120 min): answer no answer, sheet NO_GO"}
+approaching_limits_match: {"key": "approaching_limits_match", "score": 0.0, "comment": "dev_27_sherburn: 0 of 120 labelled minutes agree on the approaching-limits flag; 120 min disagree, first at 2026-10-10 09:00\u201311:00Z (120 min): answer no answer, sheet approaching_limits true"}
+window_iou: {"key": "window_iou", "score": 0.0, "comment": "dev_27_sherburn: IoU in minutes per verdict: NO_GO 0.000; mean 0.000 over 1 verdict(s)"}
+notam_action_match: None (does not apply)
+no_verdict_beyond_day3: {"key": "no_verdict_beyond_day3", "score": 1, "comment": "dev_27_sherburn: no segment carries a verdict beyond London day 3"}
+unverified_on_dropped_source: {"key": "unverified_on_dropped_source", "score": 0, "comment": "dev_27_sherburn: dropped pib: 120 min are not UNVERIFIED, first at 2026-10-10 09:00\u201311:00Z (answer no answer, sheet NO_GO)"}
+noise_rate: None (does not apply)
+required_tools: {"key": "required_tools", "score": 0, "comment": "dev_27_sherburn: required tool(s) not called: assess; called: none"}
+forbidden_tools: None (does not apply)
+step_cap: {"key": "step_cap", "score": 1, "comment": "dev_27_sherburn: 0 step(s), within the cap of 9999"}
+guard_pass: {"key": "guard_pass", "score": 0, "comment": "dev_27_sherburn: the guard result was fallback"}
+decision_first: {"key": "decision_first", "score": 0, "comment": "dev_27_sherburn: the first sentence holds no verdict word (NO-GO, UNVERIFIED, PILOT DISCRETION): '(empty answer)'"}
+cited: None (does not apply)
+window_stated: {"key": "window_stated", "score": 0, "comment": "dev_27_sherburn: the answer does not state the window 10:00-12:00 (Europe/London); missing 10:00, 12:00"}
+recheck_stated: {"key": "recheck_stated", "score": 0, "comment": "dev_27_sherburn: the window starts after the current hour but the answer lacks the re-check line 'Re-check the weather and NOTAMs when you get to the LZ.'"}
+must_mention: None (does not apply)
+must_not_mention: None (does not apply)

@@ -144,7 +144,6 @@ def test_a_live_run_with_the_window_wholly_in_the_past_has_no_hours_and_no_error
     assert assessment.flyable_windows == []
 
 
-
 # --- inputs that are refused (E16 and the window checks) -------------------------------------
 
 

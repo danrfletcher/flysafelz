@@ -75,7 +75,10 @@ def test_reader_settings_exported_in_the_shell_that_runs_pytest_are_cleared_befo
     real_dotenv = tmp_path / "real.env"
     real_dotenv.write_text("".join(f"{name}=exported-{name}\n" for name in READER_VARIABLES), encoding="utf-8")
     exported = {name: f"exported-{name}" for name in READER_VARIABLES} | {DOTENV_PATH: str(real_dotenv)}
-    inner = [f"{THIS_FILE}::test_every_reader_setting_is_removed_and_the_dotenv_path_is_a_file_that_does_not_exist", f"{THIS_FILE}::test_the_reader_config_then_sees_no_settings_and_no_test_can_load_a_real_dotenv"]
+    inner = [
+        f"{THIS_FILE}::test_every_reader_setting_is_removed_and_the_dotenv_path_is_a_file_that_does_not_exist",
+        f"{THIS_FILE}::test_the_reader_config_then_sees_no_settings_and_no_test_can_load_a_real_dotenv",
+    ]
 
     result = subprocess.run([sys.executable, "-m", "pytest", "-p", "no:cacheprovider", *inner], cwd=ROOT, env={**os.environ, **exported}, capture_output=True, text=True, check=False)
 

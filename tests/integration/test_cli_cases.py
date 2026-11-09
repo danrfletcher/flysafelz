@@ -195,9 +195,7 @@ def test_gp5_from_08_every_segment_lists_both_notams_with_the_right_actions(caps
             assert f"condition: {DANGER_AREA}" in lines, (hour, segment)
             sector = [line for line in lines if line.startswith("NOTAM H7171/26 AVOID_SECTOR")]
             assert len(sector) == 1, (hour, segment)
-            assert any(
-                line.startswith(f"condition: drone ops 0.15 NM to the {word} (circle edge), up to ") and "avoid that sector" in line for line in lines
-            ), (hour, segment)
+            assert any(line.startswith(f"condition: drone ops 0.15 NM to the {word} (circle edge), up to ") and "avoid that sector" in line for line in lines), (hour, segment)
 
 
 def test_gp5_h7171_bearing_is_printed_in_degrees_168_6(capsys):

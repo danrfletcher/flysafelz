@@ -70,7 +70,11 @@ def test_a_good_entry_has_no_error_and_a_07_30_window_starts_its_rows_at_07_00()
 
 # (what is wrong, the entry, words that every message about it must contain)
 RULES = [
-    ("verdict not in the enum", with_rows(row("07:00", "08:00", verdict="MAYBE", approaching_limits=False), row("08:00", "09:00")), ["example e1", "row 1", "2026-10-31T07:00:00Z", "'MAYBE'", "NO_GO"]),
+    (
+        "verdict not in the enum",
+        with_rows(row("07:00", "08:00", verdict="MAYBE", approaching_limits=False), row("08:00", "09:00")),
+        ["example e1", "row 1", "2026-10-31T07:00:00Z", "'MAYBE'", "NO_GO"],
+    ),
     ("verdict in the wrong case", with_rows(row("07:00", "08:00"), row("08:00", "09:00", verdict="no_go", approaching_limits=False)), ["example e1", "row 2", "'no_go'"]),
     ("verdict is not text", with_rows(row("07:00", "08:00", verdict=["NO_GO"], approaching_limits=False), row("08:00", "09:00")), ["example e1", "row 1"]),
     ("approaching_limits is not a boolean", with_rows(row("07:00", "08:00", verdict="NO_GO", approaching_limits="yes"), row("08:00", "09:00")), ["example e1", "row 1", "approaching_limits", "'yes'"]),
@@ -84,7 +88,11 @@ RULES = [
     ("a row that ends before it starts", with_rows(row("07:00", "08:00"), row("09:00", "08:00")), ["example e1", "row 2"]),
     ("a time that is not a time", with_rows(row("07:00", "08:00"), {**row("08:00", "09:00"), "end": "soon"}), ["example e1", "row 2", "timezone"]),
     ("a row that is not a mapping", with_rows(row("07:00", "08:00"), "08:00-09:00"), ["example e1", "row 2"]),
-    ("a tier that is neither OUTLOOK nor TOO_FAR", with_rows(row("07:00", "08:00"), {"start": "2026-10-31T08:00:00Z", "end": "2026-10-31T09:00:00Z", "tier": "VERDICT"}), ["example e1", "row 2", "tier"]),
+    (
+        "a tier that is neither OUTLOOK nor TOO_FAR",
+        with_rows(row("07:00", "08:00"), {"start": "2026-10-31T08:00:00Z", "end": "2026-10-31T09:00:00Z", "tier": "VERDICT"}),
+        ["example e1", "row 2", "tier"],
+    ),
     ("no rows", edited(rows=[]), ["example e1", "no rows"]),
     ("rows is not a list", edited(rows="none"), ["example e1", "rows"]),
     ("a window that is neither default nor a start and end", edited(window="today"), ["example e1", "window"]),
@@ -210,7 +218,9 @@ def test_gp5_check_prints_one_line_per_example_with_the_columns_and_exits_0(buil
     assert code == 0 and err == ""
     lines = out.splitlines()
     assert lines[0] == "e1 (blind): rows 3, labelled 0, unlabelled 3, unread left 0, actions done no (NOTAM actions not done), stale no"
-    assert lines[-1] == "1 entries checked: 0 errors, 0 stale, 0 orphans" and len(lines) == 2
+    # 5a PR-2.F1: an `actions_done: false` entry is also reported as not finalised (a note, not an error), before the summary line
+    assert lines[1] == "note: example e1 is not finalised (NOTAM actions not done)"
+    assert lines[-1] == "1 entries checked: 0 errors, 0 stale, 0 orphans" and len(lines) == 3
 
 
 def test_gp5_the_counts_follow_the_labels_dan_types_and_actions_done(built, capsys):
@@ -220,8 +230,10 @@ def test_gp5_the_counts_follow_the_labels_dan_types_and_actions_done(built, caps
     text = text.replace("X1/26: null", "X1/26: UNREAD_OVER_LZ")
     sheet.write_text(text, encoding="utf-8")
     code, out, _err = run_check(built, capsys)
-    assert code == 0
+    # 5a PR-2.F1: the counts line is as before, but an `actions_done: true` entry that was never finalised is now an error (exit 1)
+    assert code == 1
     assert out.splitlines()[0] == "e1 (blind): rows 3, labelled 1, unlabelled 2, unread left 1, actions done yes, stale no"
+    assert "error: example e1: verdict sheet is stale (finalised stamp missing): run make dataset" in out.splitlines()
 
 
 def test_gp5_a_bad_verdict_prints_the_error_with_example_and_row_and_exits_1(built, capsys):

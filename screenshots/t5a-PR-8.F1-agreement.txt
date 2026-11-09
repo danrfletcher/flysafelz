@@ -1,0 +1,43 @@
+# t5a-PR-8.F1: agreement on the fake experiment: Dan-style labels on all 39 answers, fake judge (run 1 = logged feedback, run 2 = one fresh fake pass); recording client
+
+# Judge calibration: v1-dev-20261108-160700
+
+39 answers (annotation queue flysafelz-calibration-v1-dev-20261108-160700), 39 of 39 labelled by Dan.
+15 decline answers from 5 questions (the good_decline figures rest on these).
+
+## Judge vs Dan
+
+Judge = its grade of run 1 (the feedback logged on the experiment). Only labelled pairs count; a criterion that does not apply to an answer's path is null and not counted.
+
+| criterion            | n  | agreement | kappa           | unlabelled | no judge grade | flag |
+|----------------------|----|-----------|-----------------|------------|----------------|------------------------|
+| answers_the_question | 39 | 94.9%     | 0.000           | 0          | 0              | weak (kappa < 0.4) |
+| prioritised          | 21 | 95.2%     | 0.859           | 0          | 0              | |
+| actionable           | 21 | 100.0%    | n/a (one class) | 0          | 0              | weak (kappa undefined) |
+| good_decline         | 15 | 100.0%    | 1.000           | 0          | 0              | weak (n=15 < 20) |
+
+## Judge self-agreement
+
+The same answers judged twice: run 1 = the logged feedback, run 2 = one fresh judge pass (39 answers judged now, 0 from the cache).
+
+| criterion            | n  | agreement | kappa           | missing a grade | flag |
+|----------------------|----|-----------|-----------------|-----------------|------------------------|
+| answers_the_question | 39 | 100.0%    | n/a (one class) | 0               | weak (kappa undefined) |
+| prioritised          | 21 | 95.2%     | 0.829           | 0               | |
+| actionable           | 21 | 100.0%    | n/a (one class) | 0               | weak (kappa undefined) |
+| good_decline         | 15 | 93.3%     | 0.762           | 0               | weak (n=15 < 20) |
+
+Weak = n < 20 or kappa < 0.4 or kappa undefined. Kappa is Cohen's (sklearn.metrics.cohen_kappa_score) over pass/fail.
+The judge and the agent are the same model family, so the judge may favour answers written in its own style (self-preference risk); calibration against Dan's labels is the check.
+
+written: <tmp>/results/v1-dev-20261108-160700-agreement.md
+[exit 0]
+
+$ rerun: the cache holds all 39 second-pass verdicts, so the judge is not built (judge factory raises if called)
+The same answers judged twice: run 1 = the logged feedback, run 2 = one fresh judge pass (0 answers judged now, 39 from the cache).
+[exit 0]
+
+$ before Dan has labelled anything
+[stderr]
+evals.agent.agreement: 0 of 39 answers labelled: label the answers in the LangSmith annotation queue flysafelz-calibration-v1-dev-20261108-160700 first, then run it again
+[exit 2]

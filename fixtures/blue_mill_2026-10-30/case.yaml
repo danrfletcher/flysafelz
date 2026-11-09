@@ -1,0 +1,9 @@
+lat: 53.802797
+lon: -0.086644
+now: '2026-10-30T07:30:00Z'
+window:
+  start: '2026-10-30T12:00:00Z'
+  end: '2026-10-30T18:00:00Z'
+capture:
+  pib_issued: '2026-10-30T02:00:52Z'
+  sha: 640b2e83a5a9127ced0cdbee660b66d2eb34a724

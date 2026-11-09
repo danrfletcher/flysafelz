@@ -130,7 +130,10 @@ def _weekday_segment(hour: int, day: int = 4) -> TimeSpan:
 @pytest.mark.parametrize("top_level_only", [False, True])
 def test_r1_published_hours_and_by_notam_is_active_inside_the_hours_with_no_notam(top_level_only):
     """'MON-FRI 0800-1700, other times by NOTAM' (openAIP: hours plus a byNotam entry, or a top-level byNotam)."""
-    geometry = {"type": "Polygon", "coordinates": [[[LZ[1] - 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] - 0.01]]]}
+    geometry = {
+        "type": "Polygon",
+        "coordinates": [[[LZ[1] - 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] - 0.01]]],
+    }
     hours = [{"dayOfWeek": d, "startTime": "08:00", "endTime": "17:00"} for d in range(1, 6)]
     raw = {"_id": "x", "name": "EGD496A", "type": 2, "geometry": geometry, "hoursOfOperation": {"operatingHours": hours}}
     if top_level_only:
@@ -380,7 +383,10 @@ def test_an_activation_outside_the_segment_is_not_counted_among_them():
 
 
 def test_there_is_one_finding_per_danger_area_however_many_activations():
-    result = assess([blue_mill_tda()], activations=[activation(read=reading()), activation(notam_id="J3858/26", read=reading()), activation(notam_id="J3859/26", read=reading(contact=ContactKind.NONE, value=None))])
+    result = assess(
+        [blue_mill_tda()],
+        activations=[activation(read=reading()), activation(notam_id="J3858/26", read=reading()), activation(notam_id="J3859/26", read=reading(contact=ContactKind.NONE, value=None))],
+    )
     assert len(result.findings) == 1
 
 
@@ -430,7 +436,10 @@ def test_the_module_docstring_table_matches_the_rules():
 @pytest.mark.parametrize("area_name", ["D496A", "EGD 496A", "EGD496A", "EG D496A"])
 @pytest.mark.parametrize("notam_text", ["D496A", "EGD 496A", "EGD496A", "egd496a"])
 def test_a_designator_written_any_way_in_openaip_or_the_notam_is_the_same_area(area_name, notam_text):
-    geometry = {"type": "Polygon", "coordinates": [[[LZ[1] - 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] - 0.01]]]}
+    geometry = {
+        "type": "Polygon",
+        "coordinates": [[[LZ[1] - 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] - 0.01], [LZ[1] + 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] + 0.01], [LZ[1] - 0.01, LZ[0] - 0.01]]],
+    }
     area = parse_airspace({"_id": "x", "name": area_name, "type": 2, "byNotam": True, "geometry": geometry})
     finding = only(assess([area], activations=[activation(notam_text, read=reading())]))
     assert finding.outcome is Outcome.CONTACT_FIRST

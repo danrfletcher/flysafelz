@@ -103,10 +103,7 @@ def test_two_missing_variables_in_one_hour_are_both_named():
 
 
 def test_an_optional_variable_missing_keeps_the_tier():
-    samples = {
-        t: calm(precipitation_probability=None, cloud_cover=None, direction_10m=None)
-        for t in calm_forecast(utc(2026, 10, 31, 8, 0), utc(2026, 10, 31, 12, 0)).samples
-    }
+    samples = {t: calm(precipitation_probability=None, cloud_cover=None, direction_10m=None) for t in calm_forecast(utc(2026, 10, 31, 8, 0), utc(2026, 10, 31, 12, 0)).samples}
     rows = build_rows(forecast_of(samples), utc(2026, 10, 31, 8, 0), utc(2026, 10, 31, 11, 0))
     for row in rows:
         tier = weather_tier(row.hour, rows, NOW)

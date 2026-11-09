@@ -6,12 +6,12 @@ from the environment dict main is given, and no socket opens (the suite runs wit
 """
 
 import ast
+import itertools
 import json
 import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-import httpx
 import pytest
 import yaml
 from capture_helpers import FAKE_KEY, MIDDLE, OLDEST, TODAY, case_yaml, listing, london_date_of, make_root, run, server_for
@@ -205,7 +205,7 @@ def test_weather_json_has_a_row_for_every_utc_hour_of_the_london_days_plus_the_e
     assert len(times) == rows
     assert times[0] == start.strftime("%Y-%m-%dT%H:%M") and times[-1] == end.strftime("%Y-%m-%dT%H:%M")
     stamps = [datetime.fromisoformat(t).replace(tzinfo=UTC) for t in times]
-    assert all(b - a == ONE_HOUR for a, b in zip(stamps, stamps[1:], strict=False))  # no gap, no repeat
+    assert all(b - a == ONE_HOUR for a, b in itertools.pairwise(stamps))  # no gap, no repeat
     # exactly one Open-Meteo request, for the UTC dates that cover the span
     weather = [r for r in server.seen if r.url.host.endswith("open-meteo.com")]
     assert len(weather) == 1 and str(weather[0].url).split("?")[0] == HISTORICAL_URL
@@ -236,7 +236,7 @@ def test_weather_json_is_the_existing_shape_and_open_meteo_parse_response_reads_
 
 
 def test_a_body_missing_the_end_hour_is_one_line_and_the_old_fixture_stays_byte_identical(tmp_path, capsys):
-    start, end, _ = expected_span(GMT_NOW, 5)
+    _start, end, _ = expected_span(GMT_NOW, 5)
     old = {"weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib", "readings.yaml": b"- keep me\n"}
     root = make_root(tmp_path, NAME, whole_span_case(GMT_NOW, 5), files=old)
     before = listing(root / "fixtures" / NAME)
@@ -432,7 +432,10 @@ def test_days_adds_no_environment_read():
 
 
 def test_no_committed_case_yaml_has_a_days_key():
-    case_files = sorted((REPO / "fixtures").glob("*/case.yaml"))
+    """The cases committed before `days` existed are untouched. Dan's labelled cases (5a PR-1.S1) are the exception: some were captured with
+    `days` and are committed byte for byte, so the folders in labelled-fixtures.sha256 are left out."""
+    labelled = {line.split("  ", 1)[1].removeprefix("./").split("/")[0] for line in (REPO / "fixtures" / "labelled-fixtures.sha256").read_text(encoding="utf-8").splitlines() if line.strip()}
+    case_files = sorted(p for p in (REPO / "fixtures").glob("*/case.yaml") if p.parent.name not in labelled)
     assert case_files
     for path in case_files:
         assert "days" not in yaml.safe_load(path.read_text(encoding="utf-8")), path

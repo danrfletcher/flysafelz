@@ -1,0 +1,3 @@
+# Hand-written NotamReading entries for this case (see flysafelz.contracts.NotamReading).
+# make fixtures never overwrites this file. An empty list means no NOTAM has a reading.
+[]

@@ -6,6 +6,7 @@ verdict_sheet.main() in-process with root=tmp_path and synthetic cases written b
 Capture is never called for real: it is monkeypatched, and --disable-socket stays on.
 """
 
+import itertools
 import shutil
 import subprocess
 import sys
@@ -302,7 +303,7 @@ def test_e12_g9_no_window_on_a_two_day_case_runs_from_nows_hour_to_the_end_of_to
     rows = entry["rows"]
     assert rows[0]["start"] == "2026-10-31T07:00:00Z" and rows[0]["edge"] == "window start"
     assert rows[-1]["end"] == "2026-11-02T00:00:00Z"  # the end of 1 Nov in London (GMT)
-    assert all(a["end"] == b["start"] for a, b in zip(rows, rows[1:]))
+    assert all(a["end"] == b["start"] for a, b in itertools.pairwise(rows))
     assert {r["start"][:13] for r in rows if r["start"].endswith(":00:00Z")} == {f"2026-10-31T{h:02d}" for h in range(7, 24)} | {f"2026-11-01T{h:02d}" for h in range(24)}
     assert all(set(r) == {"start", "end", "edge", "verdict", "approaching_limits"} for r in rows)
 
