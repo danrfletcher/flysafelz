@@ -1,6 +1,6 @@
 # FlySafeLZ
 
-**Some context on why this was chosen first:** Below is me landing my 7th paramotor flight last Saturday (30th October), just moments before a man in orange high-viz ran onto the field waving his arms and signalling for us to pack up. He was from a drone company surveying for methane over the North Sea and they had a “NOTAM” over the field. It had appeared on Gaggle (flight recorder app for paramotor pilots), and yet none of us really knew what it meant.
+**Some context on why this was chosen first:** The video below is me landing my 7th paramotor flight last Saturday (30th October), just moments before a man in orange high-viz ran onto the field waving his arms and signalling for us to pack up. He was from a drone company surveying for methane over the North Sea and they had a “NOTAM” over the field. It had appeared on Gaggle (flight recorder app for paramotor pilots), and yet none of us really knew what it meant.
 
 [![Watch the video](https://img.youtube.com/vi/Y7-MUShAdAk/hqdefault.jpg)](https://youtube.com/shorts/Y7-MUShAdAk)
 
