@@ -246,5 +246,7 @@ def test_a_run_that_stops_for_a_missing_price_writes_nothing_at_all(tmp_path, mo
     assert code == 1 and writes.paths == [] and not (tmp_path / "results").exists() and not (tmp_path / "cache").exists()
 
 
-def test_the_committed_price_list_is_a_valid_empty_list_and_the_fake_env_names_a_priced_model_only_in_tests():
-    assert load_prices() == {} and FAKE_ENV["AGENT_MODEL"] == "fake-agent-model"
+def test_the_committed_price_list_prices_the_real_models_and_never_the_fake_test_model():
+    prices = load_prices()
+    assert prices and all(p.input_per_m > 0 and p.output_per_m > 0 and p.url and p.date for p in prices.values())
+    assert FAKE_ENV["AGENT_MODEL"] == "fake-agent-model" and "fake-agent-model" not in prices
