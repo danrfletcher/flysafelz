@@ -136,13 +136,14 @@ def test_input_check_py_is_not_given_to_create_agent_by_the_real_graph():
 # --- F8: not in this PR -------------------------------------------------------------------------------------------------------------------------
 
 
-def test_no_ui_files_or_folders_exist():
+def test_no_ui_files_or_folders_exist_outside_ui():
+    """Ticket 8 PR-2.S1 adds the web UI, in `ui/` and only there; this ticket's own fence (no UI) still holds everywhere else."""
     found = []
     for path in ROOT.rglob("*"):
         parts = path.relative_to(ROOT).parts
-        if SKIPPED_DIRS & set(parts):
+        if SKIPPED_DIRS & set(parts) or parts[0] == "ui":
             continue
-        if path.suffix in {".tsx", ".jsx", ".vue", ".svelte"} or (path.is_dir() and parts[0] in {"ui", "web", "frontend"} and len(parts) == 1):
+        if path.suffix in {".tsx", ".jsx", ".vue", ".svelte"} or (path.is_dir() and parts[0] in {"web", "frontend"} and len(parts) == 1):
             found.append("/".join(parts))
     assert found == []
 

@@ -23,8 +23,10 @@ def dry_run(*arguments: str) -> str:
     return done.stdout
 
 
-def test_make_dev_runs_langgraph_dev_through_uv():
-    assert recipe("dev").strip() == "@uv run langgraph dev"
+def test_make_dev_runs_langgraph_dev_through_uv_beside_the_ui():
+    """Ticket 8 PR-2.S1 (G23): the server command is the one ticket 4 used; `make dev` now starts the UI with it (tests/unit/test_ui_shell.py)."""
+    assert re.search(r"^SERVER = uv run langgraph dev$", MAKEFILE, re.MULTILINE)
+    assert "$(SERVER) &" in recipe("dev")
 
 
 def test_make_run_names_no_value_in_its_recipe_so_the_shell_never_parses_one():

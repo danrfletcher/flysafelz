@@ -96,11 +96,14 @@ def test_a_planted_dependency_in_a_copy_of_the_pyproject_is_caught(tmp_path, pla
 
 
 def scan_the_copy(copy: Path) -> dict[str, list[str]]:
-    """Run the three real scans (imports, LLM strings, the word cache) over every file of a copy of the tree; keep the files with a hit."""
+    """Run the three real scans (imports, LLM strings, the word cache) over every file of a copy of the tree; keep the files with a hit.
+
+    The word `cache` is allowed in reader/ and in mapdata/ (ticket 8 F6); test_mapdata_fence.py plants violations in mapdata/.
+    """
     reader = copy / "reader"
     hits: dict[str, list[str]] = {}
     for path in sorted(copy.rglob("*.py")):
-        found = import_violations(path, copy) + llm_env_words(path, reader) + banned_words(path, reader)
+        found = import_violations(path, copy) + llm_env_words(path, reader) + banned_words(path, reader, copy / "mapdata")
         if found:
             hits[path.relative_to(copy).as_posix()] = found
     return hits
@@ -153,12 +156,13 @@ def test_inside_reader_only_the_two_allowed_packages_may_be_imported(source_copy
 
 
 def test_the_real_tree_uses_each_exemption_and_nothing_outside_reader_does():
+    """The word `cache` is also allowed in mapdata/ (ticket 8 F6), so that folder is checked for it with the mapdata exemption."""
     assert any(m.startswith("langchain_openai") for m in imports_of(CONFIG_PY))  # config.py builds ChatOpenAI
     assert any(re.search(r"\bcache\b", path.read_text(encoding="utf-8")) for path in READER_FILES)
     assert "READER_" in CONFIG_PY.read_text(encoding="utf-8")
     for path in PY_FILES:
         if READER not in path.parents:
-            assert import_violations(path, SRC) + llm_env_words(path, READER) + banned_words(path, READER) == [], path
+            assert import_violations(path, SRC) + llm_env_words(path, READER) + banned_words(path, READER, SRC / "mapdata") == [], path
 
 
 CLI_READER_IMPORTS = {
@@ -311,7 +315,7 @@ def test_a_planted_asyncio_in_the_reader_is_caught(source_copy, planted):
 
 
 def test_the_makefile_has_the_eval_target_and_only_test_runs_the_suite():
-    """PR-8 adds `eval-reader`, the one target that calls the model. `make test` does not run it and mentions no READER_* setting. `guidance` (ticket 4 PR-7.F1) fetches documents and embeds them; `eval-guidance` (PR-8.F1) scores guidance search against the labelled questions; neither calls a chat model. `dev` (the LangGraph server) and `run` (one question in the terminal) are ticket 4 PR-9.F1's; they call the agent's model, and `make test` runs neither. `dataset` (ticket 5a PR-1.S1) copies Dan's checked dataset files and calls no model. `annotate` and `agreement` (ticket 5a PR-8.F1) calibrate the judge: the first queues dev answers in LangSmith, the second reads Dan's labels back and calls the judge once per answer (cached); `make test` runs neither."""
+    """PR-8 adds `eval-reader`, the one target that calls the model. `make test` does not run it and mentions no READER_* setting. `guidance` (ticket 4 PR-7.F1) fetches documents and embeds them; `eval-guidance` (PR-8.F1) scores guidance search against the labelled questions; neither calls a chat model. `dev` (the LangGraph server) and `run` (one question in the terminal) are ticket 4 PR-9.F1's; they call the agent's model, and `make test` runs neither. `dataset` (ticket 5a PR-1.S1) copies Dan's checked dataset files and calls no model. `annotate` and `agreement` (ticket 5a PR-8.F1) calibrate the judge: the first queues dev answers in LangSmith, the second reads Dan's labels back and calls the judge once per answer (cached); `make test` runs neither. `ui` and `test-ui` (ticket 8 PR-2.S1) run the web UI and its checks, and `make test` runs neither."""
     makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
     assert re.findall(r"^([a-z0-9-]+):", makefile, re.MULTILINE) == [
         "setup",
@@ -322,6 +326,8 @@ def test_the_makefile_has_the_eval_target_and_only_test_runs_the_suite():
         "guidance",
         "eval-guidance",
         "dev",
+        "ui",
+        "test-ui",
         "run",
         "annotate",
         "agreement",

@@ -311,6 +311,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "scikit-learn" },
     { name = "shapely" },
+    { name = "starlette" },
     { name = "tzdata" },
 ]
 
@@ -338,6 +339,7 @@ requires-dist = [
     { name = "pyyaml" },
     { name = "scikit-learn", specifier = ">=1.9.1" },
     { name = "shapely", specifier = ">=2.2.0" },
+    { name = "starlette", specifier = ">=1.0" },
     { name = "tzdata", specifier = ">=2026.6" },
 ]
 

@@ -1,0 +1,71 @@
+/* The "Dusk cockpit" theme: dark only, every colour, the radius, the border width and the shadow in one place.
+   Variable names follow shadcn/ui. The type and verdict tokens are read by the layer, legend and badge PRs that come after this one.
+   `<html class="dark">` is set in index.html and there is no theme toggle, so these are the only values. */
+
+:root {
+  color-scheme: dark;
+
+  /* Surfaces: slate */
+  --background: #0b1220;
+  --foreground: #e2e8f0;
+  --card: #111a2c;
+  --card-foreground: #e2e8f0;
+  --popover: #111a2c;
+  --popover-foreground: #e2e8f0;
+
+  /* Accent: sky blue */
+  --primary: #38bdf8;
+  --primary-foreground: #04121f;
+  --secondary: #1c2740;
+  --secondary-foreground: #e2e8f0;
+  --muted: #1c2740;
+  --muted-foreground: #94a3b8;
+  --accent: #1c2740;
+  --accent-foreground: #e2e8f0;
+  --destructive: #ef4444;
+  --destructive-foreground: #fff5f5;
+
+  /* The map's own colour: what shows behind the tiles, and on its own when the basemap tiles fail */
+  --map-background: var(--background);
+
+  /* Lines and focus */
+  --border: #2b3a55;
+  --input: #2b3a55;
+  --ring: #38bdf8;
+
+  /* Shape and depth */
+  --radius: 12px;
+  --border-width: 1px;
+  --shadow: 0 8px 24px rgb(2 6 16 / 0.55);
+
+  /* Map layers by type (never by action) */
+  --type-restricted: #ef4444;
+  --type-danger: #f97316;
+  --type-controlled: #38bdf8;
+  --type-other: #64748b;
+  --type-notam: #a78bfa;
+
+  /* Wind by speed (light under 4 m/s, moderate to 8, strong to 12, severe above): pale, so the particles do not drown the type colours.
+     Shown with their text in the legend. */
+  --wind-light: #cbd5e1;
+  --wind-moderate: #99f6e4;
+  --wind-strong: #fde68a;
+  --wind-severe: #fda4af;
+
+  /* Rain: the legend's swatch and the model-rain cells (the radar tiles carry RainViewer's own colours). Shown with its text. */
+  --rain: #60a5fa;
+
+  /* Verdict colours: always shown with their text */
+  --verdict-no-go: #ef4444;
+  --verdict-unverified: #94a3b8;
+  --verdict-amber: #f59e0b;
+  --verdict-conditions: #3b82f6;
+  --verdict-discretion: #22c55e;
+
+  /* What an answer says about a shape for one field: the legend's second set. The colour function that uses them is a later PR's. */
+  --action-no-fly: var(--verdict-no-go);
+  --action-contact-first: var(--verdict-amber);
+  --action-check-sup: var(--verdict-conditions);
+  --action-avoid-sector: var(--type-danger);
+  --action-awareness: var(--verdict-unverified);
+}
