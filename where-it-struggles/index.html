@@ -1,0 +1,752 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A map and chat agent that tells UK paramotor pilots whether a landing zone is safe and legal to fly from, with the evals behind it.">
+      
+      
+      
+        <link rel="canonical" href="https://danrfletcher.github.io/flysafelz/where-it-struggles/">
+      
+      
+        <link rel="prev" href="../results/">
+      
+      
+        <link rel="next" href="../production/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Where it struggles - FlySafeLZ</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="cyan" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#where-it-struggles" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="FlySafeLZ" class="md-header__button md-logo" aria-label="FlySafeLZ" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FlySafeLZ
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Where it struggles
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/danrfletcher/flysafelz" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    danrfletcher/flysafelz
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="FlySafeLZ" class="md-nav__button md-logo" aria-label="FlySafeLZ" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    FlySafeLZ
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/danrfletcher/flysafelz" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    danrfletcher/flysafelz
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The problem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-it-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How it works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../evals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Where it struggles
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Where it struggles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#seen-in-the-evals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seen in the evals:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-gaps-and-tradeoffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known gaps and tradeoffs
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../production/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-i-built-it/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How I built it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running-it/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#seen-in-the-evals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seen in the evals:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-gaps-and-tradeoffs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known gaps and tradeoffs
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="where-it-struggles">Where it struggles<a class="headerlink" href="#where-it-struggles" title="Permanent link">&para;</a></h1>
+<h2 id="seen-in-the-evals">Seen in the evals:<a class="headerlink" href="#seen-in-the-evals" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Missed blockers: 27 flagged runs, 16 real.</strong> I read the trace of every run v2 was scored as missing a blocker (15 on dev, 12 on held-out). The real misses are two failures from the ranked list:<ul>
+<li><strong>A vague time gets a question back (#3):</strong> dev_03 ("later tonight"), dev_14 ("tonight", one repeat) and ho_a2 ("later on"). No tool runs, so no NOTAM is surfaced.</li>
+<li><strong>A phone-first NOTAM read as awareness (#2):</strong> dev_12 and ho_a7 (the same NOTAM, H2483, on every repeat), dev_14 and dev_20 (one repeat). The same NOTAM misread on both splits points at the reader or the action table, not chance.</li>
+<li>In every real miss the overall verdict was NO-GO or UNVERIFIED, or there was no verdict, so on this data no pilot was told to fly. On a flyable day the same misread would be the failure this design exists to stop.</li>
+</ul>
+</li>
+<li><strong>The other 11 flags are a scoring gap</strong> (blue_mill_today, dev_23, ho_a1, ho_d3): the answer told the pilot to phone the drone operator for danger area EGD496A and fly only if they agree. See the gap below.</li>
+<li><strong>The guard still forces a fallback</strong> in about a third of runs (#4).</li>
+<li><strong>The reader can over-read a NOTAM (ho_a3, Sherburn, 9am).</strong> The window was right and code ran, but the reader read a wing-walking NOTAM at the nearby airfield ("no overhead or crosswind joins") as a no-fly over the field. I labelled it avoid-the-sector. One misread turned the whole morning NO-GO, so the verdict disagreed with every labelled minute. It's over-caution, not a missed blocker, and the reverse of #2: the reader is wrong in both directions. All three repeats used the same cached reading, so this is one misread, not three. The guard then rejected the model's prose twice for real errors ("over the 90 % limit" for 72 % cloud), which is the guard doing its job.</li>
+</ul>
+<h2 id="known-gaps-and-tradeoffs">Known gaps and tradeoffs<a class="headerlink" href="#known-gaps-and-tradeoffs" title="Permanent link">&para;</a></h2>
+<p><strong>High Priority for Production:</strong> <em>(roughly in priority order of what I’d fix)</em></p>
+<ul>
+<li><strong>Privacy:</strong> coordinates are full precision in traces for debugging now. In production they'd be rounded to about 1 km in traces and logs.</li>
+<li><strong>The area and height bands are arbitrary.</strong> The 2 NM radius and the 5,000 / 10,000 ft bands are my choice, and they're the known weak point. That matters most for restricted airspace aloft: today anything with a floor above 5,000 ft is shown as awareness, but for a pilot who climbs that high it's a real limit, so in production the pilot's own ceiling would decide how strongly it's flagged.</li>
+<li><strong>One pilot's labels and policy — no expert confirmation.</strong> The limits in <a href="https://github.com/danrfletcher/flysafelz/blob/main/src/flysafelz/rules.yaml"><code>rules.yaml</code></a> are school best practice plus my own calls, each marked sourced, best practice or educated guess. The eval checks that the code applies the policy, not that the policy is right.</li>
+<li><strong>Wind is only checked up to 120 m</strong>, and pilots fly much higher, where strong wind can stop them getting back. In production it would check the forecast winds up to the pilot's planned height.</li>
+<li><strong>Gust spread is a light heuristic.</strong> Hourly forecasts don't show how fast a gust hits (rate of onset) or the ratio of the gust to the base wind (gust factor). 6 mph over 4 mph is much rougher than 6 over 14. In production the rules would add a gust-factor limit.</li>
+<li><strong>One point, not a route.</strong> It assesses the field and a fixed 2 NM around it. In production the pilot would draw a route or an area on the map and ask about that.</li>
+<li><strong>It judges the forecast, not the flight that would have happened.</strong> It says whether the data points to a flyable slot, never whether it was. And when it says don't fly, nobody flies, so over-caution can't be fully measured (the rejected flight is never observed).</li>
+<li><strong>No AIP supplements.</strong> Where a danger area's NOTAM doesn't settle it, the pilot is told to phone or read the supplement. In production the agent would fetch and read the supplement itself.</li>
+<li><strong>Thermals are predicted, not seen.</strong> It reads thermic conditions from the forecast, not individual thermals over a field. Will always be a guide, very difficult to rectify accurately without live telemetry on the field itself.</li>
+<li><strong>Replay:</strong> The watch I cut, re-checks a field every hour and alerts you if the verdict changes, could be tested on the past. Jonty's archive saves the NOTAM bulletin over time, so I'd run the watch through it in order and check that it would have alerted the pilot before the man in hi-vis turned up at Blue Mill.</li>
+<li><strong>The NOTAM reader isn't evaluated on its own.</strong> It's the agent's second model call, and it's measured end to end: a misread shows up in the agent eval as a wrong NOTAM action or a missed blocker. What that can't tell me is whether a wrong action came from the reader misreading the text or from the action table. The harness for a separate reader eval is built (<code>make eval-reader</code>, with a 40-NOTAM labelling sheet covering 24 NOTAM types, run 3 times, harmful downgrades first), but I cut the labelling for time. </li>
+<li><strong>The missed-blocker scorer only reads the NOTAM list.</strong> A NOTAM that switches on a danger area over the field, but sits more than 2 NM away itself, reaches the answer through the airspace check ("EGD496A, activated by J3857/26"), never the NOTAM list. The scorer counts it as ignored, so the answer that says "phone the operator and fly only if they agree" scores as a missed blocker. 11 of the 27 flags across v2 dev and held-out were this, all at Blue Mill, and it's likely why hard-restriction recall sits near 0%. The fix is for the scorer to also read the NOTAM recorded against each airspace entry.</li>
+</ul>
+<p><strong>Noteworthy, Low Priority:</strong></p>
+<ul>
+<li><strong>NOTAM Reader vs a parser isn't measured.</strong> A coordinate and height parser might match the reader on the common formats, cheaper. Either way the reader would still be needed for what takes understanding: stay-out reasons, exemptions and what the activity is.</li>
+<li><strong>The guard reads fixed formats, not meaning — prose can contradict the guard.</strong> It catches a wrong number, an invented NOTAM ID, a made-up phone number or a second verdict word. A paraphrase that contradicts a true fact ("you'll be fine on wind") can get past it. Code adds the limit lines itself so the facts are always on screen, but the prose can still disagree with them. A faithfulness judge would cover it; I left it out because it needs its own calibration labels.</li>
+<li><strong>A failed judge call reads as "not graded".</strong> On my first v1 run every judge call failed at the model endpoint, and the report showed the judge's scores as <code>n/a</code> instead of stopping. I caught it in the report and re-ran. In production, judge errors would be counted apart from "not graded", and a run where more than a few fail would stop like any other incomplete run.</li>
+<li><strong>Calibration items don't show which criteria to grade (low priority).</strong> <code>make annotate</code> tags each copy <code>label:&lt;criterion&gt;</code>, but LangSmith's queue view doesn't show tags, so I graded from a lookup table. The fix is to put the criteria in each copy's inputs when it's created.</li>
+<li><strong>The judge saw notes I didn't.</strong> Each example's notes (e.g. "points to the landowner") go to the judge, but weren't shown to me while labelling, so <code>good_decline</code> agreement mixes two different standards. The fix is to show me the same notes, or hide them from the judge.</li>
+<li><strong>The decline half of a mixed question isn't graded.</strong> Criteria come from the question's main path, so "can I fly tonight, and is there a pub nearby?" is graded as an assessment, and nobody checks the pub decline.</li>
+<li><strong>No crossing services.</strong> Some danger areas let you cross with permission. The agent doesn't model that, so a restricted area is NO-GO even where a pilot could technically get a clearance.</li>
+<li><strong>NOTAMs code ignores are never checked by a label.</strong> NOTAMs the code filters out early never reach the reader or my labelling sheets. Every ignored NOTAM has its reason recorded in the trace, and the filter rules are tested against real NOTAMs, but no label can contradict them. Rule tests against real NOTAMs, recorded reasons for them being dropped catch these instead.</li>
+<li><strong>Danger areas active on schedule stay NO-GO.</strong> With no NOTAM, there's no text to read for a reason to stay out, so it's stricter than it needs to be. In production it would read the area's entry in the official AIP.</li>
+<li><strong>Low Flying Areas and routes aren't mapped.</strong> Some NOTAMs list military Low Flying Areas by number only, or give a route as waypoints and times (the Red Arrows). Without the shapes, they're flagged for awareness, not placed on the map. In production: load the area boundaries from the UK military AIP, and turn routes into corridors with times.</li>
+<li><strong>openAIP is community data,</strong> not the official AIP. In production it would be cross-checked against the NATS AIP.</li>
+<li><strong>Days-ahead weather is hindsight.</strong> The weather in the examples is the forecast issued close to each hour, not the one available when the question was asked. So the dataset tests verdicts given a forecast, not how well a forecast three days out holds up. The re-check line covers that for pilots.</li>
+<li><strong>Free data plans.</strong> This is a non-commercial demo. A real deployment would move to commercial plans (an Open-Meteo subscription, a licensed radar feed).</li>
+<li><strong>Some checks share code with the labels.</strong> The time segments on my labelling sheets come from the same code being tested, so an edge wrong in both can't be caught by the dataset. Unit tests pin the edge logic (rounding direction, midnight crossings, failing closed) against fixed expected times and real NOTAM text. They trust astral itself for the sun maths.</li>
+<li><strong>Phone numbers in odd formats.</strong> Traces mask phone numbers by pattern, built from the formats in the real bulletins. An unusual format could reach a trace. Two public facility numbers written with hyphens or brackets reach the model as published.</li>
+<li><strong>A danger area with no hours in openAIP is treated as active.</strong> Over-cautious on purpose.</li>
+<li><strong>The guard's retry has no tools.</strong> If the model names a verdict without running <code>assess</code> that turn, the retry can't fix it, so the pilot gets the raw tool text.</li>
+<li><strong>The server runs with <code>--allow-blocking</code>.</strong> The graph loads the guidance index (a SQLite read) on its first run, inside the server's event loop, which <code>langgraph dev</code> refuses by default. In production the index would load before the server takes runs.</li>
+<li><strong>The dark basemap makes it hard to pick a field.</strong> Fields, hedges and power lines barely show. In production the default would be satellite imagery, with a switch back to the dark map for reading airspace.</li>
+<li><strong>The map draws every UK NOTAM.</strong> About 900, two-thirds as approximate Q-circles labelled "approx", so it's cluttered zoomed out. The agent filters them before reading; in production the map would apply the same filter.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.indexes", "navigation.sections", "toc.follow", "content.code.copy", "search.suggest"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>

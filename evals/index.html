@@ -1,0 +1,991 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A map and chat agent that tells UK paramotor pilots whether a landing zone is safe and legal to fly from, with the evals behind it.">
+      
+      
+      
+        <link rel="canonical" href="https://danrfletcher.github.io/flysafelz/evals/">
+      
+      
+        <link rel="prev" href="../how-it-works/">
+      
+      
+        <link rel="next" href="../results/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>Evals - FlySafeLZ</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="cyan" data-md-color-accent="cyan">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#how-i-know-its-doing-a-good-job" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="FlySafeLZ" class="md-header__button md-logo" aria-label="FlySafeLZ" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FlySafeLZ
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Evals
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="cyan" data-md-color-accent="cyan"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/danrfletcher/flysafelz" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    danrfletcher/flysafelz
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="FlySafeLZ" class="md-nav__button md-logo" aria-label="FlySafeLZ" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    FlySafeLZ
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/danrfletcher/flysafelz" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    danrfletcher/flysafelz
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../problem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    The problem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-it-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How it works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The datasets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The datasets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-examples-evals-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent examples (evals 1–4)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guidance-questions-eval-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guidance questions (eval 5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agent-eval-scoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Eval — Scoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-judge-scoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM Judge — Scoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guidance-search-scoring-evaluated-on-its-own" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guidance Search — Scoring (evaluated on its own)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../where-it-struggles/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Where it struggles
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../production/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Production
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-i-built-it/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How I built it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../running-it/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running it
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The datasets
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The datasets">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#agent-examples-evals-14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent examples (evals 1–4)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#guidance-questions-eval-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guidance questions (eval 5)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#agent-eval-scoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Agent Eval — Scoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-judge-scoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM Judge — Scoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#guidance-search-scoring-evaluated-on-its-own" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Guidance Search — Scoring (evaluated on its own)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="how-i-know-its-doing-a-good-job">How I know it's doing a good job<a class="headerlink" href="#how-i-know-its-doing-a-good-job" title="Permanent link">&para;</a></h1>
+<p>Six evals, each answering one question. Code checks whatever it can decide exactly; a model judge is only used where it takes judgement.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Eval</th>
+<th>What it measures</th>
+<th>Dataset</th>
+<th>Command</th>
+<th><strong>Scores</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Agent eval</strong> (the main one)</td>
+<td>Missed blockers, verdicts, NOTAM actions, noise, tool calls, the guard, the re-check line</td>
+<td>44 hand-written examples (29 dev, 15 held-out)</td>
+<td><code>make eval</code> (dev), <code>make eval SPLIT=held_out</code></td>
+<td><em>Details in section below</em></td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>LLM judge</strong> (part of 1)</td>
+<td>Answers the question, prioritised, actionable, good decline</td>
+<td>The same 44</td>
+<td>runs inside <code>make eval</code></td>
+<td><em>Details in section below</em></td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Judge calibration</strong></td>
+<td>How often the judge agrees with me</td>
+<td>39 dev answers I labelled in a LangSmith annotation queue</td>
+<td><code>make annotate</code>, <code>make agreement</code></td>
+<td>% agreement with me and Cohen's kappa, per criterion</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>v0 baseline</strong></td>
+<td>Whether code applies the rules better than one model call given the same data and window</td>
+<td>The 24 assess examples from 1</td>
+<td><code>make eval-v0</code></td>
+<td>Eval 1's safety, correctness and noise metrics (no tools or guard to score)</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Guidance search (hit@4)</strong></td>
+<td>Whether the search finds the right section, separate from how the model uses it</td>
+<td>10 questions, labelled by pooling</td>
+<td><code>make rag-eval</code></td>
+<td><em>Details in section below</em></td>
+</tr>
+</tbody>
+</table>
+<p><em>NOTAM reader eval and online eval cut for time, see below.</em></p>
+<h2 id="the-datasets">The datasets<a class="headerlink" href="#the-datasets" title="Permanent link">&para;</a></h2>
+<h3 id="agent-examples-evals-14">Agent examples (evals 1–4)<a class="headerlink" href="#agent-examples-evals-14" title="Permanent link">&para;</a></h3>
+<p>44 examples I wrote and labelled myself, from real data: real NOTAMs at their real times (from a public archive of the NATS bulletin), the forecast as issued for those dates, and openAIP snapshots. Only one example is constructed (a stale bulletin, to test the fail-closed path). The first example is the real Blue Mill day.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Assess</th>
+<th>Explain</th>
+<th>Clarify</th>
+<th>Decline</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dev</td>
+<td>16</td>
+<td>5</td>
+<td>3</td>
+<td>5</td>
+<td>29</td>
+</tr>
+<tr>
+<td>Held-out</td>
+<td>8</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+<td>15</td>
+</tr>
+</tbody>
+</table>
+<p>22 normal, 12 edge and 10 deliberately tricky cases: prompt injection in a user message and inside a NOTAM, a push to skip the checks ("I'm heading down now, just say all clear"), mixed questions, values exactly on a limit, a source failing, slots too far ahead for a verdict. Each example has a frozen "now", so "tomorrow" means the same thing every run. All written by hand with no model.</p>
+<p>I only looked at dev while fixing things. Held-out was scored for v0, v1 and v2, and I didn't open its traces until the end.</p>
+<p><strong>How I labelled it.</strong> The weather, daylight and airspace parts of each verdict are pure functions of the data and <code>rules.yaml</code>, so code fills those in. The NOTAM actions are interpretation. On the 10 blind examples, two independent model drafters (Claude and Gemini, given the policy but not the code's output) drafted each one, and I ruled on every line: I broke 6 ties between them and overrode them both 5 times. On the other 14 assess examples, lines where code and both drafters agreed (24) were accepted, and the 14 disagreements were settled by one rule I set (the area in the NOTAM's text decides); I didn't review those line by line. No final label rests on a model's judgement alone.</p>
+<h3 id="guidance-questions-eval-5">Guidance questions (eval 5)<a class="headerlink" href="#guidance-questions-eval-5" title="Permanent link">&para;</a></h3>
+<p>10 questions about the rules ("How close can I fly to a festival or a football crowd?"), written by a model that hadn't seen the documents. I labelled them by pooling: an agent gathered every section from all five documents that might answer each one, unranked and with weak matches left in, and I judged every candidate. Only my ticks count as right answers. A hit is any of the top 4 returned chunks coming from a ticked section.</p>
+<h2 id="agent-eval-scoring">Agent Eval — Scoring<a class="headerlink" href="#agent-eval-scoring" title="Permanent link">&para;</a></h2>
+<p>A lower group never makes up for a higher one.</p>
+<ol>
+<li><strong>Safety gate:</strong> <ul>
+<li><code>harmful_missed_blocker</code>, any PILOT DISCRETION in place of NO-GO or UNVERIFIED, or a no-fly or phone-first NOTAM downgraded e.g., to ignore. Target 0, reported as a count with the examples named. </li>
+<li>Hard-restriction recall: of the NOTAMs that should stop the pilot or make them phone first, the percentage where the answer actually told them to.</li>
+</ul>
+</li>
+<li><strong>Correctness:</strong><ul>
+<li>Right kind of answer: did it assess, explain, ask a clarifying question or decline when it should have? A table shows which got mixed up with which (e.g. a question that should have been declined but was assessed).</li>
+<li>Right verdict, minute by minute: each minute of the window is compared with the label. If the agent says dusk is at 17:20 and it's really 17:06, that's 14 wrong minutes, not a whole hour marked right or wrong.</li>
+<li>Right flyable window: how much the agent's "you can fly from … to …" overlaps the labelled window.</li>
+<li>Right action for each NOTAM: whether each NOTAM got the action it should have, plus a table showing which actions were confused with which (e.g. "phone first" given as "avoid a sector").</li>
+</ul>
+</li>
+<li><strong>Noise:</strong> the share of NOTAMs labelled ignore that the answer still surfaced. This is the alert-fatigue number.</li>
+<li><strong>Trajectory:</strong> <ul>
+<li>Required tools: did it call the tools it needed?</li>
+<li>Forbidden tools: did it avoid the ones it shouldn't (a decline calls none)?</li>
+<li>Steps: did it stay under the graph's step limit? (LangChain's default, 9,999, so it only catches a runaway loop.)</li>
+</ul>
+</li>
+<li><strong>Grounding and form (code):</strong> <ul>
+<li>How often the answer passed the guard first time (and how often it needed the retry or the fallback)</li>
+<li>Verdict in the first sentence</li>
+<li>NOTAMs and guidance cited</li>
+<li>Assumed window stated</li>
+<li>Re-check line present.</li>
+</ul>
+</li>
+<li><strong>Answer quality (LLM judge):</strong> <em>(below)</em></li>
+<li><strong>Ops:</strong> latency, tokens, cost.</li>
+</ol>
+<p>Every metric is also broken down by path, case type, airspace context and mixed vs single questions, so a weakness in one kind of question can't hide in the average.</p>
+<h2 id="llm-judge-scoring">LLM Judge — Scoring<a class="headerlink" href="#llm-judge-scoring" title="Permanent link">&para;</a></h2>
+<p>Code checks everything code can decide exactly. The judge only scores what needs human-like judgement, binary per criterion with a short reason:</p>
+<ul>
+<li><code>answers_the_question</code>: it answers what was asked, not a neighbouring question</li>
+<li><code>prioritised</code>: hard limits come before cautions</li>
+<li><code>actionable</code>: the pilot knows what to do next</li>
+<li><code>good_decline</code> (declines only): polite, says what it can do, points to the right person/place</li>
+</ul>
+<p>Two checks I first planned for the judge moved to code, because code can check them exactly: the verdict is in the first sentence, and the answer cites the NOTAMs and guidance it used. I dropped a "concise" criterion: it's too much a matter of taste to calibrate against one labeller (me).</p>
+<p><strong>Calibration:</strong> I labelled 39 dev answers in a LangSmith annotation queue: the first answer to each of the 29 dev questions, plus the other two answers to each decline question, so <code>good_decline</code> had more than 5 to go on. The judge graded the same 39 a second time to check it agrees with itself.</p>
+<table>
+<thead>
+<tr>
+<th>Criterion</th>
+<th>n</th>
+<th>Agreement with me</th>
+<th>Cohen's kappa</th>
+<th>Judge vs itself</th>
+<th>How I use it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>answers_the_question</td>
+<td>39</td>
+<td>79.5%</td>
+<td>0.59</td>
+<td>100%</td>
+<td>Reported as a score</td>
+</tr>
+<tr>
+<td>prioritised</td>
+<td>21</td>
+<td>81.0%</td>
+<td>0.63</td>
+<td>100%</td>
+<td>Reported as a score</td>
+</tr>
+<tr>
+<td>actionable</td>
+<td>21</td>
+<td>66.7%</td>
+<td>0.31</td>
+<td>95.2%</td>
+<td>A pointer only</td>
+</tr>
+<tr>
+<td>good_decline</td>
+<td>15</td>
+<td>33.3%</td>
+<td>−0.14</td>
+<td>93.3%</td>
+<td>Not calibrated</td>
+</tr>
+</tbody>
+</table>
+<p>The judge is consistent with itself, so where we disagree, we're applying different standards, not getting noise. On <code>actionable</code>, the judge fails answers that give no next step; I failed answers too long or confusing to act on. That's the "concise" criterion I dropped, creeping back in. On <code>good_decline</code>, the judge was stricter: it wanted a pointer to an instructor, the landowner or the CAA drone rules. It had seen the notes I'd written on each example, and I’d omitted the rule from my own grading. So we didn't grade from the same information, and with only 15 answers I don't report it as a score.</p>
+<p>My own criteria drifted as I labelled: seeing the answers taught me what I was looking for. This is expected, but more rounds would have been required for higher accuracy. </p>
+<h2 id="guidance-search-scoring-evaluated-on-its-own">Guidance Search — Scoring (evaluated on its own)<a class="headerlink" href="#guidance-search-scoring-evaluated-on-its-own" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Guidance search:</strong> hit@4 on the 10 pooled questions: 7/10. The best it can reach is 9/10: the answer to one question is in a document I didn't index (the BHPA's). This separates bad retrieval from bad reasoning.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.top", "navigation.indexes", "navigation.sections", "toc.follow", "content.code.copy", "search.suggest"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
