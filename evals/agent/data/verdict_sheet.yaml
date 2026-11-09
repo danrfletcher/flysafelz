@@ -12,7 +12,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -37,7 +37,7 @@
     pib.xml: 976856978a94df29adef9f55528877c39c9ef3af9d5b42b5dab4c987942cca8a
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 7e03cad91324e9f31c91bc75ba8460ea39823f053e3e84d97c695c55dff6e969
-    seal: 863043ede1151082c0da852f8b3ef69beadbf03e45e2c0e5af78c519422ec196
+    seal: 1b612fcbf544c7ad1be6fe12ca736f6c75c5d12f0a746261ac39b77f6d862667
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -113,7 +113,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -138,7 +138,7 @@
     pib.xml: 18b455098935c5fc434b3bc38e2534303216536f186744e48286408333ab1789
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: c9cef5c1c67eb819858d933090d1b7523c7c77bbb2ef7cf11de12a44fcf3eaa8
-    seal: 0e1db799e64f6759a353a24bcdaba087b45423dd511f3c0fe66d002af08e6af5
+    seal: aaddb4fe8b606fd660a6236dae0d487b87ff26c8531bd7781a3bf4b49f182161
   notam_actions:
     H5829/26: IGNORE
     H5874/26: IGNORE
@@ -274,7 +274,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -299,7 +299,7 @@
     pib.xml: a4a08a5ee8e103b4c50ed6ba21720a3e6295baba849cafb233246af036f9148b
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: a2d909a798c2d00557a525ba53d7e821cdee73000c6fc35158efd78fdda3861d
-    seal: 6386ee4e53c43c9f9b28c7bb4f9e64cc2a4efc857532a53d39da60b5489af047
+    seal: 0d9a401e2fc7e76581593ec2d9da98ced4127351d0d231c7ecfdd1194cdf7082
   notam_actions:
     B1508/26: IGNORE
     H5914/26: IGNORE
@@ -358,7 +358,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -383,7 +383,7 @@
     pib.xml: 196e0798c65dbda4c8fcf389535e06649358440385ffd6691e10ffda343103ef
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: a9e10e25e323bdda2d82a72c9ec01efb3929c34ba57e281d8fc6d114de047c42
-    seal: 8bcb41257e4622fcf89015b3415bd2be7466c67845c2734ef4238632e9b281d2
+    seal: f9a16e0fa892d44f141220f17999aa9f3fb2d9bcbcb95b4552b780dce406d45c
   notam_actions:
     H5829/26: CONTACT_FIRST
     H5874/26: IGNORE
@@ -434,7 +434,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -459,7 +459,7 @@
     pib.xml: c574f9769d1eb82712fca2611682042ce2ce1f2d18c4970301829616aad083e1
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 502f4dd3b23ed75ab3f738214076bedd8ee5897c571b2bf123f9347898a908ac
-    seal: fefffb1649da7e5e221c85a6676d529d7adb8993ebdb0559663476ce37e9005b
+    seal: 581df9cb75de15121b45162847ba00d0750a7e2f4698e4b7df1cee1170d1b2df
   notam_actions:
     B1476/26: AWARENESS
     B1508/26: IGNORE
@@ -531,7 +531,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -556,7 +556,7 @@
     pib.xml: 783fa385b4b2db5d86f9bfa9c1eb0b52af7c829e782efdfda2f4a32ff168488b
     readings.yaml: 0d2a4e3afe27933e370f07473e25cb26969dfaeedcd8b1b0cb86ea1a6a64a26d
     labels: 213409e5cb829ed6ef4f88988404522b514575be006415a8c03186a927211cca
-    seal: c8945f586ae6bff35592b28c375893d6f5f7e4dcb082bdc3766b6cdf4d19c3ab
+    seal: 77e4dcb8f407c5a34e684810fc45cdd62cdc4639d77f994379f7e6f65edf6417
   notam_actions:
     B1139/26: IGNORE
     B914/26: IGNORE
@@ -616,7 +616,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -641,7 +641,7 @@
     pib.xml: 976856978a94df29adef9f55528877c39c9ef3af9d5b42b5dab4c987942cca8a
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 1613e99ede9496bb4e8658a353c4d6b1d0cf579a56113251a9a80bf53530fccb
-    seal: ab209dcf9bf284aa97649634b4bf5490cf9bd389bfbf6331e81a9543049db164
+    seal: ef30218dd4d7d44d73a95b56802d4669d7c4c1d192d16519e8a09f342278d364
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -692,7 +692,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -717,7 +717,7 @@
     pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 828c3ceacfccaebd2a442832c91656cb6564d51133dc6190a7039fe2b4d6e9e8
-    seal: 1a0ef7d5a142a60daee6c3b84dadad2c7243c89d527232ff645fc52d612ac259
+    seal: 8cbe1be06ea188a5b6cda5621f920b4a1003da1104c6fb6704dff4a3c348480f
   notam_actions:
     B1434/26: IGNORE
     B1563/26: IGNORE
@@ -761,7 +761,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -786,7 +786,7 @@
     pib.xml: bb99ec04266071d300ab341c3f18ea0616e4475ac2a70d6d552f1b580325bad4
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 17548ee7c87734d990cbda7d56efc303d0c718a6c581f0fc41a048b60f5e4286
-    seal: b0d890d180938210251d1a2e0d82e2436f8fd8a038ef0d6aff8bc8da0c682dfa
+    seal: 3cd03d3c96aba2c103501b20b5d8880a57bea3b4eb27dbf3286a39980a8695ad
   notam_actions:
     B1476/26: AVOID_SECTOR
     B1508/26: IGNORE
@@ -855,7 +855,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -880,7 +880,7 @@
     pib.xml: b35d3de8898f35c830655a32c4f445c5a089636f64c559545b2cd044ba68173a
     readings.yaml: a0d07c01e67c9b4be16e3bc5d93fcd815f216ea93e87b0339c2c7b33ddfbbdd1
     labels: 01000eb1ab285ca50dbfb3c93f6ed336c467e96c1cc57039c8fc3336af42fdaa
-    seal: f30bad34c7f671945756e852fae53fed3ed29d5e8b3810fc2089bf6f4b0cf181
+    seal: 8dbc0bfb2b1a1d56448cbbf6231da3cb9f68fbadb46c39599d7258e8c98ac20d
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -986,7 +986,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1011,7 +1011,7 @@
     pib.xml: 390eba671f43c0aa387b2f45c8816448d6e4d17ac07197f381da1e62059b12a3
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 5ec9cc52bd09d4632f3341b1bd264a1b3aa0441d59e7434f4f65c64b413a8ce7
-    seal: 0e7eacd8ec85fabfdfc76912f0543c1edefc5aa61a2db50aca406e2c570780fa
+    seal: 9618ec24cc6b333287ee913592ef65c16138dcfeac0f91ee7168bfdaa27c8692
   notam_actions:
     # ignored by code (add a line above to overrule):
     # H6627/26: ended 2026-10-06T16:00:00Z, at or before the window start 2026-10-10T06:00:00Z
@@ -1064,7 +1064,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1089,7 +1089,7 @@
     pib.xml: 059778f8161a6d1876f1338d3e78c864cc6549e488d17346307656691c091be6
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 6c27c1b0d9fdb50f15f16371f9aea614261796233596d336e838589814bc4ba2
-    seal: 06f362f85eddecbae9234de59fec3a8379e44dfe59e91a0bc5993a46819dadeb
+    seal: dab2a20e5906d8f74dddd71d2845a7c5c3dc918bc27bf6b3c987d2f280de77fd
   notam_actions:
     H3868/26: CONTACT_FIRST
     H3971/26: CONTACT_FIRST
@@ -1182,7 +1182,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1207,7 +1207,7 @@
     pib.xml: b04936bff2aaa05d765e2c66ac4068df13fefd0619daac834037b007ecfa47ea
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 98f97139ddb07cc24cc6db4940a79f474815b99b56d9f1135dbd03b69c0ea58f
-    seal: 602b85c16d1dca84274f9fda4a6ccc66bafec48af4d6eb480bbee377c207ef60
+    seal: 745d6391e8ef359a794944099d9ac8bd3066f7d7deab43e7cbb4955422e2f4f7
   notam_actions:
     H5915/26: IGNORE
     H5918/26: IGNORE
@@ -1271,7 +1271,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1296,7 +1296,7 @@
     pib.xml: 53abcc0dc25fc6ce02bae45b87da674f889c1b5d944d816ed2ec6ce51e58f1ee
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: f6779284b6ad475cc0b8145b0c86be9715b11bbe480c6776bc8ea2018b23d419
-    seal: 9f6a9264d114fe5b32d8d17a07b47f191e0b0e67168ead600ccb171d37056d69
+    seal: f004fca5567d86c4093e5ecd0c3be981ec02adcb63166ac651155a9c88009ea0
   notam_actions:
     H4821/26: AVOID_SECTOR
     H4878/26: AWARENESS
@@ -1362,7 +1362,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1387,7 +1387,7 @@
     pib.xml: fc82e1c3a4ba74420f9b24a7054d7bf5205708288a6022004b3eb2edc2a767d0
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: fd73e39173c3466fed851e4b393433d712e5cf5e123292841558dfc42556cbf4
-    seal: 76ea0157eca7e0888caf4c84c89b089a0a8fe80322e703626724a87fd15bf275
+    seal: d8adbec7a7bb714faba1429080043a77581b7293398f9626d86db62da5c9b529
   notam_actions:
     # ignored by code (add a line above to overrule):
     # H4420/26: ended 2026-07-22T18:30:00Z, at or before the window start 2026-07-26T06:00:00Z
@@ -1467,7 +1467,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1492,7 +1492,7 @@
     pib.xml: 49f98f2d5967c2d73a8845cbe822ec354ce17cd05f2ab1fa705e034ad2e495a4
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 8650b8f2961565efd5b9d875f5035eb27f4bf03f00effb79f48ce4b9e3be5335
-    seal: 23f00cb984667839423e14c724b5a321435210b835ddf4fe8fe822727778a83e
+    seal: 7ab55b49bdff8cb4e14bfbcdea0487ae52041b961c7fa75c184026173021ac0a
   notam_actions:
     H4701/26: IGNORE
     B1139/26: AWARENESS
@@ -1540,7 +1540,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1565,7 +1565,7 @@
     pib.xml: 575cb812de9def24a3fef27bfe0193570dfd2b6bcd13d9d53239390d0ab36e92
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 05a586c96555999d895b33be90d20154fcc571ad1bc1ed134edfdd81b20501f7
-    seal: bec9e2cb45b9c7476d86007973a893902f28f6fb15d4967c068c2b394a8e3dcf
+    seal: a484f1cad9903975856e524eead2e393e519fd302d8f30b2989d14ce9e7a78d4
   notam_actions:
     H5829/26: IGNORE
     H6767/26: IGNORE
@@ -1733,7 +1733,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1758,7 +1758,7 @@
     pib.xml: b02b7d46fffbefaabce9130e06a350be44b775881b45dc7263350a74a74a889d
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 150763914b8a3861c4b5b1a035fe8b1d28b6a5415ddc481bd7999946120fb71f
-    seal: b78da3adfe5f75735527115015a5310465c4f6210dbc49a9e75aa4f306546ad0
+    seal: d211bb2575a8945d357f9f0946f2784edb65921695da05b0582ffd4f44b23e55
   notam_actions:
     H1633/26: CONTACT_FIRST
     H3369/26: AVOID_SECTOR
@@ -1852,7 +1852,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1877,7 +1877,7 @@
     pib.xml: cd0f8f906f9653ef144d8d5ec070047b0e97d9ad7e85328f89b9c1cb53e828cd
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 1b9696b8f3e1b2cff95a1196e9ffae26bbb5249aacf31497aec0b492005311ea
-    seal: 61b75b827ac10c3dac28a4e7d7ac91faecafcfdb9fe07f2ed4e4cfb0dc2446dd
+    seal: 4e95c61aaa4daeee7b45b07db8e47dbbe2434650cf1a1e14cd2eccd6d05dbc09
   notam_actions:
     H6447/26: CONTACT_FIRST
     H6448/26: AVOID_SECTOR
@@ -1953,7 +1953,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -1978,7 +1978,7 @@
     pib.xml: 22b793d4603bb43bcd432032040338321b2b25901aefd8716d55e1c7adffcbfb
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: e2bdff4ddfcd65340c3c6a0feb9642e17aac19fb9e8695e5cc05e627b21ae8c9
-    seal: 1c72ce054dddd5c9507e421b8443318f4e5b1424137d7e2bf0e7ee756ea0964f
+    seal: 7e9836d759a03c3273402e5a24ffecbfc07e0e4288ca2eba5d60bd4a84c99b28
   notam_actions:
     H5078/26: AWARENESS
     # ignored by code (add a line above to overrule):
@@ -2032,7 +2032,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -2057,7 +2057,7 @@
     pib.xml: 1cf4a25433b3d0bff08059ea262dab2052a83229056e61393431fc4db9694172
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 00519bc208f2234500247493e85875a5b182f87f992868c510f257044bdb482e
-    seal: 96ce4b5d2b1dfe3ae081a866d32f94d526a47e79a1665ddc6b146ab1af217a09
+    seal: 2f652ece53e727e7fee0a9140171aab22d08eca1a76b5161afb472ae762a0503
   notam_actions:
     B1139/26: IGNORE
     H2483/26: IGNORE
@@ -2117,7 +2117,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -2142,7 +2142,7 @@
     pib.xml: 76c35ea66ca7b00cda77a2dae702fa2c6eeb854a1d646f80595a7e18460f58f2
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 940ec802e5e09893382ea631aaf9f2cc37eca19736664d02d540a6b9faa551f6
-    seal: 8d1a0c9bc2300861662ced92d82b4a54da65e6c23b445f95f23985a0302e074e
+    seal: bf534eb0cccda5b7e349ad73e24a7713bb4b47806068b13b057a87986b2e0173
   notam_actions:
     H7171/26: AVOID_SECTOR
     J3857/26: CONTACT_FIRST
@@ -2479,7 +2479,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -2504,7 +2504,7 @@
     pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 7669af757b485dfa24a1f8745a2e06f3cd9e28077d5aaff0721415dbf7e371e2
-    seal: fa52d786d22654f01cc261eb9bc726f729a3f283b4322e8e23e53334c1c0386a
+    seal: e276cb681719f9435c8bf5c391865830526cbff08b88780cca895b9ec3a8caef
   notam_actions:
     J3220/26: AWARENESS
     H6449/26: IGNORE
@@ -2555,7 +2555,7 @@
     rules: 491f6e2bd9e98931bcc7092b8dcd3f8760a92d462570de419c69a0006925960f
     modules:
       src/flysafelz/__init__.py: aefc73dbec14bd3c0c26a184dd71d3ec9088fc20cf49d2ca074001a13cd7004a
-      src/flysafelz/airspace.py: 343ba8167d4fbd7668ea2930cc33a798df3863076c369556fcee821408053520
+      src/flysafelz/airspace.py: 100efe0f75723156eadd43b666636a814bab855d35c46fa19776c09b5442fd94
       src/flysafelz/assess.py: 659736195b681438ef7dffb68f27c637be5dcc316c1b683a1cd5d72e680553ab
       src/flysafelz/clients/__init__.py: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
       src/flysafelz/clients/open_meteo.py: 648eff27a39ed007a4b2954ed4fc38390a55b6dac93a4a8858136d01e2e95d55
@@ -2580,7 +2580,7 @@
     pib.xml: 8c88bb840d8bebaa96c345e1fc62258a3473f0651d0f032016f5800b4818959e
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 6fb0eb93953e447f403f89dc7c8aa5380dd7326cf826d020f6d99afdbf033366
-    seal: 1521a4b030e4f70f2e11b1aa09e8cdf379e7ecf9836802d4ec2331971fece847
+    seal: d948c24f23d04c3f4a8f22197c0ed0c0235be071cc1d961dad8f41ad1f4cb704
   notam_actions:
   rows:
   - start: '2026-10-10T09:00:00Z'
