@@ -491,6 +491,16 @@ def test_a_pdf_with_no_headings_stops_the_run_naming_the_document_and_promotes_n
     assert result.embedder.calls == []
 
 
+def test_a_pdf_with_headings_set_in_larger_type_is_indexed_by_rule_7(project, site):
+    """CAP 1535 and CAP 2562 number none of their headings: a page title and subheads in larger type are read as sections instead."""
+    body = "Pilots must keep clear of the area while it is active and check the notice before every flight in the region."
+    typeset = [[(56, 760, title, 22), (56, 730, "Danger areas", 14), *[(56, 712 - 14 * n, body, 11) for n in range(8)]] for title in ("Airspace", "Airspace", "Sites", "Sites", "Sites")]
+    site.responses[BETA_URL] = build_pdf(typeset)
+    result = project.run()
+    assert "beta: added, 7 sections" in result.out  # Airspace and its two Danger areas, Sites and its three and result.code == 0
+    assert {d["id"] for d in project.manifest()["documents"]} == {"alpha", "beta"}
+
+
 def test_a_caa_style_pdf_of_contents_links_chart_labels_and_a_footer_stops_the_run_and_promotes_nothing(project, site):
     """The lines the CAA's CAP 1535 and CAP 2562 PDFs gave the heading rule before it learned to refuse them (R6)."""
     contents = [(56, 700 - 20 * n, text) for n, text in enumerate(("Contents", "07 Pilot >", "07 Aircraft >", "13 UK VOLMET Frequencies >"))]

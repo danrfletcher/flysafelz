@@ -119,5 +119,6 @@ def test_a_missing_file_is_a_pricing_error_naming_it(tmp_path):
         price_for("model-a", path)
 
 
-def test_the_committed_price_list_loads_and_holds_no_invented_price():
-    assert load_prices(pricing.PRICING_PATH) == {}  # Dan adds the real entry from the provider's page; no price is made up here
+def test_the_committed_price_list_loads_and_every_price_names_its_source_page_and_date():
+    prices = load_prices(pricing.PRICING_PATH)  # Dan's entries, read from the provider's page; load_prices refuses one with no url or date
+    assert prices and all(p.url.startswith("https://") and p.date for p in prices.values())

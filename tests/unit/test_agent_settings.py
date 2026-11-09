@@ -46,7 +46,7 @@ def test_the_shipped_file_loads_with_the_values_the_plan_names():
         "notam_reader_calls": 3,
         "embedding_model": "BAAI/bge-small-en-v1.5",
         "embedding_cache_dir": ".cache/fastembed",
-        "chunker_version": 1,
+        "chunker_version": 2,
         "langsmith_project": "flysafelz",
     }
     assert set(shipped()) == set(KEYS)
