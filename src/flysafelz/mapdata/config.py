@@ -3,7 +3,7 @@
     project_root()                 the repository root (this file is src/flysafelz/mapdata/config.py)
     cache_dir(root)                <root>/data/map, the only folder these routes write to
     process_settings()             the process's settings (the variables the server was started with)
-    ui_origins(environ)            the two dev UI origins plus FLYSAFELZ_UI_ORIGIN when it is set and is a plain origin
+    ui_origins(environ)            the two dev UI origins, LangGraph Studio's two, plus FLYSAFELZ_UI_ORIGIN when it is set and is a plain origin
     openaip_key(environ, root)     the openAIP key, read the way capture.find_key reads it (environment, then .env)
 
 CORS never uses a wildcard: an origin is allowed only when it is on that list, character for character.
@@ -18,6 +18,7 @@ from flysafelz.capture import find_key
 
 DEV_UI_ORIGIN = "http://localhost:5173"  # `make dev`: Vite's dev server
 PREVIEW_UI_ORIGIN = "http://localhost:4173"  # `vite preview`, which the tester uses
+STUDIO_ORIGINS = ("https://smith.langchain.com", "https://eu.smith.langchain.com")  # LangGraph Studio (US and EU), which calls the local server from the browser
 UI_ORIGIN_VARIABLE = "FLYSAFELZ_UI_ORIGIN"
 CACHE_FOLDER = ("data", "map")
 ORIGIN = re.compile(r"https?://[A-Za-z0-9.-]+(?::\d+)?")  # scheme, host and optional port: no path, no wildcard
@@ -33,7 +34,7 @@ def cache_dir(root: Path) -> Path:
 
 def ui_origins(environ: Mapping[str, str]) -> list[str]:
     """The origins that may call the map routes. FLYSAFELZ_UI_ORIGIN is added when it is one plain origin (a trailing slash is dropped); anything else is ignored."""
-    origins = [DEV_UI_ORIGIN, PREVIEW_UI_ORIGIN]
+    origins = [DEV_UI_ORIGIN, PREVIEW_UI_ORIGIN, *STUDIO_ORIGINS]
     extra = environ.get(UI_ORIGIN_VARIABLE, "").strip().rstrip("/")
     if ORIGIN.fullmatch(extra) and extra not in origins:
         origins.append(extra)

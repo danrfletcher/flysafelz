@@ -78,7 +78,7 @@ def test_the_ui_origins_the_server_allows_are_the_ports_vite_serves_on():
     import json
 
     origins = json.loads((ROOT / "langgraph.json").read_text(encoding="utf-8"))["http"]["cors"]["allow_origins"]
-    assert origins == ["http://localhost:5173", "http://localhost:4173"]
+    assert origins[:2] == ["http://localhost:5173", "http://localhost:4173"]  # then Studio's two origins
 
 
 # --- `make dev` stops both processes -------------------------------------------------------------------------------------------------
