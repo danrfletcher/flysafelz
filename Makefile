@@ -1,4 +1,4 @@
-.PHONY: setup test fixtures dataset eval-reader guidance eval-guidance dev run annotate agreement
+.PHONY: setup test fixtures dataset eval-reader guidance eval-guidance dev run annotate agreement eval eval-v0 rag-eval
 
 # Needs no API key: installs the project and its dependencies, then stores the embedding model (name and folder from
 # src/flysafelz/agent/settings.yaml, the folder git-ignored) so the app never downloads at runtime. A second run downloads
@@ -8,9 +8,9 @@ setup:
 	uv run python -m flysafelz.guidance.embedding_model
 
 # Runs the whole suite with sockets disabled (see addopts in pyproject.toml).
-# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, agent graph, system-prompt, middleware, guard, guard flow, tracing (anonymiser, client, feedback), answer (re-check line, limit lines, rehydration), `make run`, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess, search_guidance and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model, embedder, search index, eval), time-text, eval-harness (evals.agent: checksums, dataset and fixture import, loader and upload, and the v1 runner: evals.agent.runner and run_v1, and the evaluators: evals.agent.evaluators, and the judge: evals.agent.judge and judge_config, and its calibration: evals.agent.annotate and evals.agent.agreement, and the v0 baseline: evals.agent.v0, v0_prompt and v0_output) and verdict-sheet finalise (flysafelz.verdict_sheet_finalise) modules must stay at 90% line coverage or better (the modules together).
+# The weather, NOTAM, airspace, NOTAM-action, assess, case-loader, redaction, NOTAM-area, NOTAM-reader, SUP-reference, designator, reader-eval scoring, agent-config, agent-settings, agent-state, input-check, agent graph, system-prompt, middleware, guard, guard flow, tracing (anonymiser, client, feedback), answer (re-check line, limit lines, rehydration), `make run`, window, tool-text redaction, progress, source-cache, data-tool (get_weather, get_airspace, get_notams, assess, search_guidance and their shared helpers), guidance (register, chunker, hit@4, corpus files, ingest, embedding-model, embedder, search index, eval), time-text, eval-harness (evals.agent: checksums, dataset and fixture import, loader and upload, and the v1 runner: evals.agent.runner and run_v1, and the evaluators: evals.agent.evaluators, and the judge: evals.agent.judge and judge_config, and its calibration: evals.agent.annotate and evals.agent.agreement, and the v0 baseline: evals.agent.v0, v0_prompt and v0_output, and the results file: evals.agent.report, pricing, rag_eval and eval_run) and verdict-sheet finalise (flysafelz.verdict_sheet_finalise) modules must stay at 90% line coverage or better (the modules together).
 test:
-	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.graph --cov=flysafelz.agent.prompts --cov=flysafelz.agent.middleware --cov=flysafelz.agent.run --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.guard --cov=flysafelz.agent.guard_flow --cov=flysafelz.agent.tracing --cov=flysafelz.agent.answer --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov=evals.agent --cov=evals.agent.loader --cov=evals.agent.runner --cov=evals.agent.evaluators --cov=evals.agent.judge --cov=evals.agent.judge_config --cov=evals.agent.annotate --cov=evals.agent.agreement --cov=evals.agent.v0 --cov=evals.agent.v0_prompt --cov=evals.agent.v0_output --cov=flysafelz.verdict_sheet_finalise --cov-report=term-missing --cov-fail-under=90
+	uv run pytest --cov=flysafelz.clients.open_meteo --cov=flysafelz.weather --cov=flysafelz.clients.pib_source --cov=flysafelz.pib --cov=flysafelz.clients.openaip --cov=flysafelz.airspace --cov=flysafelz.notam_action --cov=flysafelz.assess --cov=flysafelz.cases --cov=flysafelz.redact --cov=flysafelz.notam_area --cov=flysafelz.reader --cov=flysafelz.sup_refs --cov=flysafelz.designators --cov=evals.reader_eval --cov=flysafelz.agent.config --cov=flysafelz.agent.settings --cov=flysafelz.agent.state --cov=flysafelz.agent.input_check --cov=flysafelz.agent.graph --cov=flysafelz.agent.prompts --cov=flysafelz.agent.middleware --cov=flysafelz.agent.run --cov=flysafelz.agent.window --cov=flysafelz.agent.redaction --cov=flysafelz.agent.progress --cov=flysafelz.agent.sources --cov=flysafelz.agent.guard --cov=flysafelz.agent.guard_flow --cov=flysafelz.agent.tracing --cov=flysafelz.agent.answer --cov=flysafelz.agent.tools --cov=flysafelz.shapes --cov=flysafelz.guidance --cov=flysafelz.timetext --cov=evals.agent --cov=evals.agent.loader --cov=evals.agent.runner --cov=evals.agent.evaluators --cov=evals.agent.judge --cov=evals.agent.judge_config --cov=evals.agent.annotate --cov=evals.agent.agreement --cov=evals.agent.v0 --cov=evals.agent.v0_prompt --cov=evals.agent.v0_output --cov=evals.agent.report --cov=evals.agent.pricing --cov=evals.agent.rag_eval --cov=evals.agent.eval_run --cov=flysafelz.verdict_sheet_finalise --cov-report=term-missing --cov-fail-under=90
 
 # Capture a NEW case: make fixtures CASE=blue_mill_2026-10-31_3day
 # case.yaml takes an optional `days: N` (1 to 8, Europe/London days from the day of `now`) for a multi-day window.
@@ -90,3 +90,22 @@ annotate:
 #   make agreement EXPERIMENT=v1-dev-20261108-160700
 agreement:
 	@uv run $(if $(wildcard .env),--env-file .env) python -m evals.agent.agreement
+
+# The v1 eval (5a PR-10.F1). Runs the agent over the dev split (SPLIT=held_out runs the held-out split instead, in its own LangSmith project), 3 reps, scores it with the code
+# evaluators and the judge, and writes evals/results/v1-<split>-<stamp>.md: headline, slices, failing ids, errored ids, Ops (tokens, est. cost at list price, latency, wall-clock)
+# and models. It calls the models: it needs the AGENT_*, READER_*, JUDGE_* and LANGSMITH_API_KEY settings (environment or .env, which is loaded as `make run` does) and an entry for
+# AGENT_MODEL in evals/agent/pricing.yaml, and stops, naming what is missing, before the first example. A model response with no token usage stops the run with exit 1 and no file.
+# SPLIT reaches the program through the environment (as CASE does for `make fixtures`), so the shell never parses it. `make test` never runs it.
+#   make eval            make eval SPLIT=held_out
+eval:
+	@uv run $(if $(wildcard .env),--env-file .env) python -m evals.agent.eval_run v1 $${SPLIT:+--split "$$SPLIT"}
+
+# The v0 baseline (one structured model call per assess example), same split rules, same strict usage check and the same results file as `make eval`: evals/results/v0-<split>-<stamp>.md.
+# It needs the AGENT_* settings, LANGSMITH_API_KEY and the pricing entry; no READER_* or JUDGE_*.
+eval-v0:
+	@uv run $(if $(wildcard .env),--env-file .env) python -m evals.agent.eval_run v0 $${SPLIT:+--split "$$SPLIT"}
+
+# RAG hit@4 over the 10 questions in evals/agent/data/guidance_questions.yaml: prints "hit@4: k/10" and one line per miss, and writes evals/results/rag-<stamp>.md. It searches the
+# committed guidance index with the embedding model `make setup` stored; it makes no agent, judge or LangSmith call and needs no key.
+rag-eval:
+	@uv run python -m evals.agent.rag_eval

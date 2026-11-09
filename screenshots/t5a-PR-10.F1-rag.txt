@@ -1,0 +1,8 @@
+# t5a PR-10.F1 (GP8): `make rag-eval` stdout on a FAKE retriever that finds the expected place for the first 8 of the 10 committed questions and nothing for the last 2.
+# No index, embedding model, agent, judge or LangSmith call was used: this is rag_eval.main(..., search_factory=...) as the integration test calls it.
+# exit code: 0; stderr: ''
+
+hit@4: 8/10 (80%)
+miss: How do I register our group's flying location so low-flying military jets and helicopters know to watch out for us? | expected: BHPA › Notices to Aviation (NOTAMs); BHPA › Civil Aircraft Notification Procedure (CANP) | got: nothing
+miss: How close can I legally get to the boundary of a nearby airfield before I need their permission to be there? | expected: CAP 2562 › Air Traffic Zones; CAP 1535 › Plan to avoid infringements; CAP 1535 › Aerodrome traffic zones; CAP 1535 › Avoiding Airspace Infringements | got: nothing
+results: <results dir>/rag-20261109-120000.md

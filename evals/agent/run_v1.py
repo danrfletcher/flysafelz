@@ -11,7 +11,7 @@ The order, each step before the next (the first two before any client is built, 
   1. the loader (evals.agent.loader.load_dataset): a missing fixture folder, a stale or unfinalised sheet or a wrong count stops the run, its message as it is;
   2. the settings: AGENT_* (the model), READER_* (the NOTAM reader), JUDGE_* (the LLM judge, PR-7.F1) and LANGSMITH_API_KEY must be set. One message names every one that is not.
      Only READER_* and JUDGE_* are also read from .env (reader/config.py, judge_config.py); the agent reads AGENT_* from the process environment alone (agent/config.py), so a run that keeps its keys in .env is started as
-     `uv run --env-file .env python -m evals.agent.run_v1`, the way `make run` does. PR-10's `make eval` must do the same;
+     `uv run --env-file .env python -m evals.agent.run_v1`, the way `make run` does. `make eval` (evals.agent.eval_run) does the same from the Makefile, and passes `make_target` so its message names itself;
   3. the experiment's cache path: a file already there stops the run, naming it;
   4. the LangSmith client (tracing.build_client, with the phone anonymiser) and the split's dataset upload (loader.upload_dataset);
   5. the runner (evals.agent.runner.run_experiment): rep 1, then rep 2, then rep 3.
@@ -87,16 +87,23 @@ def run_split(
     expected: Mapping[str, int] = EXPECTED,
     cache_dir: Path = runner.CACHE_DIR,
     moment: datetime | None = None,
+    make_target: str | None = None,
     **runner_options: Any,
 ) -> runner.ExperimentResult:
-    """The five steps in the module doc. `runner_options` go to run_experiment (sleep, clock, timeout, ...)."""
+    """The five steps in the module doc. `runner_options` go to run_experiment (sleep, clock, timeout, ...).
+
+    `make_target` is the make target that started the run (`make eval` passes "eval"): the missing-settings message then names that target and what it loads, instead of this module's own command.
+    """
     environ = os.environ if environ is None else environ
     dataset = load_dataset(split, data_dir=data_dir, root=root, expected=expected)
     problems = missing_settings(environ)
     if problems:
-        raise runner.RunnerError(
-            f"missing settings: {', '.join(problems)} (AGENT_* and LANGSMITH_API_KEY come from the environment only, this command does not read .env; to use one, run `uv run --env-file .env python -m {PROGRAM}`, as `make run` does); nothing was built, sent or written"
+        how = (
+            f"AGENT_* and LANGSMITH_API_KEY come from the environment only, this command does not read .env; to use one, run `uv run --env-file .env python -m {PROGRAM}`, as `make run` does"
+            if make_target is None
+            else f"AGENT_* and LANGSMITH_API_KEY come from the environment or from a .env in the repo root, which `make {make_target}` loads when the file exists; set them there or export them, then run `make {make_target}` again"
         )
+        raise runner.RunnerError(f"missing settings: {', '.join(problems)} ({how}); nothing was built, sent or written")
     name = experiment or runner.default_experiment_name(split, moment)
     runner.cache_path_for(name, cache_dir)  # refuses a name or an existing file before any client exists
     client = client_factory(environ)

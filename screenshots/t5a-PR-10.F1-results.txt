@@ -1,0 +1,130 @@
+# t5a PR-10.F1 (GP4): the results file `make eval` writes for a v1 run over the dev split, on a FAKE graph, a FAKE judge and the RECORDING LangSmith client.
+# Nothing real was called: the settings are fake values, the dataset is the invented one of tests/unit/eval_loader_factories.py (write_dataset), the prices are the test's pricing file.
+# command: eval_run.main(['v1'], ...) as tests/integration/test_make_eval_targets.py::v1_command; exit code: 0; stderr: ''
+# stdout last line: results: <results dir>/v1-dev-20261109-120000.md
+# file name: v1-dev-20261109-120000.md
+
+# v1-dev-20261109-120000
+
+v1 over the dev split, 3 reps: 87 of 87 planned runs, 0 errored. Status: complete.
+
+## Headline
+
+Mean over the per-rep means, with the min–max of those means beside it. `n/a`: the metric does not apply to any run.
+
+| metric | mean (min–max over reps) |
+| --- | --- |
+| missed blockers (share of runs with one; lower is better) | 100.0% (100.0%–100.0%) |
+| hard-restriction recall | 0.0% (0.0%–0.0%) |
+| verdict match | 0.0% (0.0%–0.0%) |
+| path accuracy | 0.0% (0.0%–0.0%) |
+| noise (share of IGNORE-labelled NOTAMs surfaced; lower is better) | n/a |
+| trajectory: required tools | 0.0% (0.0%–0.0%) |
+| trajectory: forbidden tools | n/a |
+| trajectory: step cap | 100.0% (100.0%–100.0%) |
+| guard pass | 100.0% (100.0%–100.0%) |
+| judge: answers_the_question pass rate | n/a |
+| judge: prioritised pass rate | n/a |
+| judge: actionable pass rate | n/a |
+| judge: good_decline pass rate | n/a |
+
+## Slices
+
+### by path
+
+| path | n | metrics that apply (mean over the slice's scored runs) |
+| --- | --- | --- |
+| assess | 16 | missed blockers 100.0%; hard-restriction recall 0.0%; verdict match 0.0%; path accuracy 0.0%; trajectory: required tools 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+| clarify | 5 | path accuracy 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+| decline | 4 | path accuracy 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+| explain | 4 | path accuracy 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+
+### by case_type
+
+| case_type | n | metrics that apply (mean over the slice's scored runs) |
+| --- | --- | --- |
+| plain | 29 | missed blockers 100.0%; hard-restriction recall 0.0%; verdict match 0.0%; path accuracy 0.0%; trajectory: required tools 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+
+### by failure_source
+
+| failure_source | n | metrics that apply (mean over the slice's scored runs) |
+| --- | --- | --- |
+| none | 29 | missed blockers 100.0%; hard-restriction recall 0.0%; verdict match 0.0%; path accuracy 0.0%; trajectory: required tools 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+
+### by notam_category
+
+| notam_category | n | metrics that apply (mean over the slice's scored runs) |
+| --- | --- | --- |
+| (none) | 29 | missed blockers 100.0%; hard-restriction recall 0.0%; verdict match 0.0%; path accuracy 0.0%; trajectory: required tools 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+
+### by airspace_context
+
+| airspace_context | n | metrics that apply (mean over the slice's scored runs) |
+| --- | --- | --- |
+| none | 29 | missed blockers 100.0%; hard-restriction recall 0.0%; verdict match 0.0%; path accuracy 0.0%; trajectory: required tools 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+
+### by compound
+
+| compound | n | metrics that apply (mean over the slice's scored runs) |
+| --- | --- | --- |
+| false | 29 | missed blockers 100.0%; hard-restriction recall 0.0%; verdict match 0.0%; path accuracy 0.0%; trajectory: required tools 0.0%; trajectory: step cap 100.0%; guard pass 100.0% |
+
+## Failing ids
+
+An example with a scored run that failed a check (a missed blocker, or a recall, verdict, path, trajectory, guard or judge score below full):
+
+- inv_dev_01: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run a9a0e6e5-bda8-4685-9085-d3bab5fb867c); rep 2 (run ccb4121a-96ab-45eb-ba07-12f1a48043a9); rep 3 (run 23f7b845-e8d2-4570-868b-8f014d190454)
+- inv_dev_02: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run cb9bdc1c-c032-4e7e-b042-8e644df1de54); rep 2 (run 9d82c4ba-e5c3-45d2-b1e5-61ec0488ef1a); rep 3 (run ef026ff6-d4a9-4e8e-8952-22ce9d9db4d4)
+- inv_dev_03: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run b5a186d8-c3a6-477e-9637-58b5e8838ec8); rep 2 (run 8694e5a9-e5bb-4405-ac59-16d99de4f91d); rep 3 (run e5098ce3-e589-485e-add7-c7f1cad475a6)
+- inv_dev_04: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run e79cffc9-4329-45c3-9453-d3ce5b03894f); rep 2 (run 25b846d1-04c1-4c4f-b6c8-ab34910e8b23); rep 3 (run 752a9aff-178f-4196-a7f9-b394b401f4e2)
+- inv_dev_05: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run b0bfd817-b253-4d37-b23b-5fd44759e167); rep 2 (run cdd3a6c2-f95d-46ad-933d-19df393114d9); rep 3 (run 045aaf0a-b03c-4c85-af73-3d291215d713)
+- inv_dev_06: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run ed89e3fc-e8c2-4042-9b05-1d22b7dbd151); rep 2 (run 861aaa01-2642-4e08-8ac1-72421ed4c914); rep 3 (run e51fe1f8-3a6f-4be4-a607-29a7c2eaa603)
+- inv_dev_07: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run 314b8906-f370-46a8-a8f8-3014e8bda9c0); rep 2 (run b771d226-4360-4f16-8a78-113ceb026e54); rep 3 (run 9bfc59fa-d270-485b-90cc-dc0ba90f073e)
+- inv_dev_08: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run b684f867-a4cd-4be1-ae54-51b9c2c0f0f9); rep 2 (run f3f1a9e2-0b96-4866-b759-eea732a1d5ae); rep 3 (run 0d084512-c7ad-4b33-837a-d4b19b6203a4)
+- inv_dev_09: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run 8d344dfb-0bc0-4a20-bfb8-52cd0bbc6fbe); rep 2 (run 836e1551-362a-4201-874f-1900a46d76a2); rep 3 (run 23807430-6ce1-46e5-860a-5b828646501d)
+- inv_dev_10: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run 3a536906-35d3-4224-a555-f5f5571d7773); rep 2 (run 6f92c70b-72d7-4ef9-af68-836bb6ee32c0); rep 3 (run 39861ea5-1f37-4c2f-98ed-07df806b132b)
+- inv_dev_11: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run 40a77a32-2f23-433d-aed9-a987cb0d9598); rep 2 (run 502b615d-2fcc-4499-a62e-25be7addafa4); rep 3 (run 998eff36-2f13-48aa-bcb6-2982e9973d22)
+- inv_dev_12: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run 01956e9d-2bb8-4622-b442-47f27776ba92); rep 2 (run b2808ee5-622c-4add-88a0-e86e04cd4923); rep 3 (run be8336cc-867e-4675-a706-cc26be7c81d3)
+- inv_dev_13: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run c16b0c1b-6933-49e3-b833-4b0db2c15b78); rep 2 (run c1c08783-4b2a-4aee-b49d-d2ce95779f67); rep 3 (run 0f47ab15-ee0b-4cb9-9692-d6966ae5243a)
+- inv_dev_14: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run 730f2ece-f316-4e10-b14c-fe43128d7604); rep 2 (run a89ce330-c43b-4ea6-a750-8f2a46d1f790); rep 3 (run 0a8eba4a-fc1e-40e3-96fe-b7aafc138768)
+- inv_dev_15: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run ef48c43e-2d72-40b7-be20-de0945c85f12); rep 2 (run 8dfe5fdb-61b9-4a2a-a14a-ed10a22e7826); rep 3 (run 1fb414fe-3a7f-4129-86f2-b438254921d3)
+- inv_dev_16: harmful_missed_blocker, hard_restriction_recall, verdict_match, path_accuracy, required_tools. rep 1 (run 99675166-22f2-4ec6-860d-fd3c0f359e2f); rep 2 (run 634bfe79-8585-485f-99ee-9f9dd2c54ed3); rep 3 (run dfa8c1b8-d5b1-4ca6-9e74-bd13a7977552)
+- inv_dev_17: path_accuracy. rep 1 (run 164a99fe-3776-4047-bfd2-ed0dbc27b3b8); rep 2 (run 17114bbf-dd40-4cdc-b643-aa52dcb1d7ea); rep 3 (run 5a6f163f-dc8e-4d71-b8bd-54f810865a3e)
+- inv_dev_18: path_accuracy. rep 1 (run 9ff1c555-1bd2-4226-aa24-3fb546887557); rep 2 (run 0736bc40-2ba1-49e2-aeff-d07c0ad76668); rep 3 (run 816b3724-e4f2-40c4-985e-aef545137ddc)
+- inv_dev_19: path_accuracy. rep 1 (run f16ded72-b7ec-4d23-b9c2-099af76a6283); rep 2 (run 03fe945c-f3eb-409b-a8d2-0506f8d751fc); rep 3 (run c775b606-1b52-4add-864a-dd7e0be98629)
+- inv_dev_20: path_accuracy. rep 1 (run 84d1c705-021e-4060-9728-025a3bd3a3eb); rep 2 (run 2ddffd1d-1310-4618-93ce-fdb02b4661e2); rep 3 (run 26c04a3c-81a7-4c15-a902-15b5c834059d)
+- inv_dev_21: path_accuracy. rep 1 (run 5e3d2ec4-1d0f-474f-9155-15435b2a3265); rep 2 (run 9334ffe2-b1da-4f14-80a5-2e659bc5487c); rep 3 (run 6f97e505-df8b-43bb-b1b5-50c112cb8702)
+- inv_dev_22: path_accuracy. rep 1 (run 5489e3c2-3d99-493a-b38c-696a2e123ec4); rep 2 (run 4a3858eb-0504-4d99-9504-4dea1cda1036); rep 3 (run 2a3d66e2-ca99-49b0-a726-a9a7e4c35049)
+- inv_dev_23: path_accuracy. rep 1 (run 0512872b-847e-44c4-94a4-09b1a19d73db); rep 2 (run f63be047-8f4a-4736-af77-987119b98b7b); rep 3 (run dd240efc-d580-4cd9-ab96-5e1329b3a351)
+- inv_dev_24: path_accuracy. rep 1 (run cf3afa76-11d9-456d-a265-847c147c8dab); rep 2 (run 67509d98-fc1d-4507-bfab-02df3c6ab83a); rep 3 (run 08634a27-74b8-4336-ab9f-c1b707b15377)
+- inv_dev_25: path_accuracy. rep 1 (run 5ac18878-f444-42fd-8777-8fce084a02c8); rep 2 (run 185589fc-fc7e-46c4-a077-ece57f5b553a); rep 3 (run ea7227d6-17ee-49b2-bce5-15475691d3e7)
+- inv_dev_26: path_accuracy. rep 1 (run 62113989-7286-4553-9fc6-1c10de593c6a); rep 2 (run c4c85491-6651-47f0-ac67-af7b17e9735d); rep 3 (run 6a87da99-d14d-466e-81da-8cb0e7f7ad6e)
+- inv_dev_27: path_accuracy. rep 1 (run af65cafd-9520-4648-a904-33c2ce5fccfb); rep 2 (run d041cc5d-3549-43ec-af78-96de9b3dbb61); rep 3 (run 8c622ede-e5af-4048-91bd-20840df170ac)
+- inv_dev_28: path_accuracy. rep 1 (run be521041-feea-4c8f-8ea1-2788b162d510); rep 2 (run 3a133407-701d-4b76-bba2-259f2ba9e6e6); rep 3 (run ec352f50-e8ce-4c75-843b-36f024a1edf8)
+- inv_dev_29: path_accuracy. rep 1 (run c7cca406-559c-4f39-b058-912615f49d0f); rep 2 (run 2a11f870-4c79-4b71-9d51-d0de7424d6e4); rep 3 (run 9fb514eb-3b14-4f11-b9ae-f4367d0b095f)
+
+## Errored ids
+
+0 of 87 planned runs errored. incomplete: false (more than 10% of the planned runs errored makes a run incomplete; exactly 10% does not).
+
+No run errored.
+
+## Ops
+
+- latency per example run (p50 / p95, nearest rank, 87 scored runs): 0.00 s / 0.00 s
+- tokens from response usage: input 8,700, output 1,740
+  - agent model: input 8,700, output 1,740; reader model: no call came back (readings came from the stored readings, or no NOTAM needed one); the judge's calls are not in these totals
+- est. cost at list price; runs used a subscription bridge: $0.0522 (fake-agent-model: $3.00 per M input, $15.00 per M output; source https://provider.invalid/pricing, read 2026-11-09)
+- reader calls that failed and became UNVERIFIED: 0
+- wall-clock time: 0 min 0 s
+
+## Models
+
+- agent: fake-agent-model
+- reader: fake-reader-model
+- judge: fake-judge-model
+- v0: not used in this experiment
+
+Examples that share a case reused rep-1 readings: the reader cache is one file per experiment, so a reading made once is stored and read back by later reps and by other examples of the case.
+
+The judge and the agent are the same model family, so the judge may favour answers written in its own style (self-preference risk); calibration against Dan's labels is the check.
