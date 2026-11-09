@@ -610,4 +610,6 @@ def test_the_makefile_passes_split_to_the_eval_targets_only_when_it_is_set(tmp_p
     assert run("eval", SPLIT="held_out")[-5:] == ["[-m]", "[evals.agent.eval_run]", "[v1]", "[--split]", "[held_out]"]
     assert run("eval-v0")[-1] == "[v0]" and run("eval-v0", SPLIT="held_out")[-2:] == ["[--split]", "[held_out]"]
     assert run("rag-eval")[-2:] == ["[-m]", "[evals.agent.rag_eval]"]
+    assert run("online-eval")[-3:] == ["[python]", "[-m]", "[evals.online.job]"]
+    assert run("online-eval", SINCE="24h; echo pwned", LIMIT="5", JUDGE_SAMPLE_PCT="100")[-3:] == ["[python]", "[-m]", "[evals.online.job]"]  # SINCE, LIMIT and the percentage go through the environment: never argv
     assert run("eval", SPLIT="x; echo pwned")[-2:] == ["[--split]", "[x; echo pwned]"]  # one argument, never parsed by the shell

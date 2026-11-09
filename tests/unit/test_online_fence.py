@@ -367,7 +367,16 @@ def test_f7_a_run_that_carries_label_fields_scores_exactly_as_one_that_does_not(
     assert fake_run("x", metadata={"intended_path": "decline"}).extra["metadata"]["intended_path"] == "decline"
 
 
-NEW_FILES = [ONLINE / "job.py", ROOT / "tests" / "online_helpers.py", *sorted((ROOT / "tests" / "unit").glob("test_online_*.py")), ROOT / "tests" / "integration" / "test_online_job_rerun.py"]
+NEW_FILES = [
+    ONLINE / "job.py",
+    ONLINE / "summary.py",
+    ROOT / "tests" / "online_helpers.py",
+    ROOT / "tests" / "online_summary_helpers.py",
+    ROOT / "tests" / "online_job_helpers.py",
+    *sorted((ROOT / "tests" / "unit").glob("test_online_*.py")),
+    ROOT / "tests" / "integration" / "test_online_job_rerun.py",
+    ROOT / "tests" / "integration" / "test_online_eval_job.py",
+]
 
 
 @cache
@@ -384,3 +393,58 @@ def test_f6_phone_numbers_in_online_code_and_tests_are_fiction_range_only(path):
 
 def test_f6_the_phone_scan_does_catch_a_real_looking_number():
     assert [shape for shape in PHONE_SHAPE.findall("call " + "01912" + " 345678 or 01632 960123") if not FICTION_RANGE.fullmatch(shape)] == ["01912" + " 345678"]
+
+
+# --- PR-4.F1: the summary's fence (F1, F3, the privacy scan) ----------------------------------------------------------------------------------------------
+
+SUMMARY = ONLINE / "summary.py"
+SCHEDULERS = re.compile(r"crontab|launchd|LaunchAgents|dagu", re.IGNORECASE)
+LOCAL_PACKAGES = {"evals.agent", "evals.online"}
+
+
+def modules_imported(source: str) -> set[str]:
+    found = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            found.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            found.add(node.module)
+    return found
+
+
+def foreign_imports(source: str) -> set[str]:
+    """The imported modules that are neither the standard library nor 5a's `evals.agent` nor this package."""
+    import sys
+
+    return {name for name in modules_imported(source) if name.split(".")[0] not in sys.stdlib_module_names and not any(name == pkg or name.startswith(pkg + ".") for pkg in LOCAL_PACKAGES)}
+
+
+def test_f1_the_summary_imports_the_standard_library_5a_and_the_online_package_only():
+    assert SUMMARY.exists() and foreign_imports(SUMMARY.read_text(encoding="utf-8")) == set()
+    assert {"evals.agent.report", "evals.agent.judge"} <= modules_imported(SUMMARY.read_text(encoding="utf-8"))  # the table formatting and the criteria table come from 5a
+
+
+def test_f1_the_scan_does_catch_an_import_from_outside_5a():
+    assert foreign_imports("import requests\nfrom evals.reader_eval.report import render_markdown\nfrom evals.agent.report import write_report") == {"requests", "evals.reader_eval.report"}
+
+
+def test_f1_the_summary_writes_through_5as_write_report_and_defines_no_metric_name():
+    source = SUMMARY.read_text(encoding="utf-8")
+    assert "write_report" in _names_called(source)
+    assert not [name for name in string_constants(source) if name.startswith(("online.", "judge.")) and name not in {"online.", "online.judge."}]
+
+
+def test_f3_nothing_schedules_the_online_eval():
+    places = [*ONLINE_FILES, ROOT / "Makefile", ROOT / "README.md", *sorted((ROOT / "scripts").glob("*"))]
+    hits = {path.name: SCHEDULERS.findall(path.read_text(encoding="utf-8")) for path in places if path.is_file()}
+    assert {name: found for name, found in hits.items() if found} == {}
+    assert SCHEDULERS.search("0 8 * * * crontab -l") and SCHEDULERS.search("~/Library/LaunchAgents/x.plist") and SCHEDULERS.search("dagu start online")
+
+
+def test_f3_the_online_eval_target_is_in_phony_and_nothing_else_calls_it():
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+    assert re.search(r"^\.PHONY:.*\bonline-eval\b", makefile, re.MULTILINE)
+    recipes = [line for line in makefile.splitlines() if line.startswith("\t")]
+    assert not [line for line in recipes if "online-eval" in line.replace("online-eval:", "") and "evals.online.job" not in line]  # no recipe calls the target: the one recipe line runs the module
+    test_recipe = re.search(r"^test:[^\n]*\n((?:\t[^\n]*\n?)+)", makefile, re.MULTILINE)
+    assert test_recipe and "online-eval" not in test_recipe[1] and "evals.online.job" not in test_recipe[1]

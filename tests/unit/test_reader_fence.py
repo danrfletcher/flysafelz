@@ -334,6 +334,7 @@ def test_the_makefile_has_the_eval_target_and_only_test_runs_the_suite():
         "eval",
         "eval-v0",
         "rag-eval",
+        "online-eval",
     ]
     test_recipe = re.search(r"^test:[^\n]*\n((?:\t[^\n]*\n?)+)", makefile, re.MULTILINE)
     assert test_recipe and "eval-reader" not in test_recipe[1] and "READER" not in test_recipe[1] and "reader_eval.run" not in test_recipe[1]

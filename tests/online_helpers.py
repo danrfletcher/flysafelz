@@ -183,6 +183,7 @@ class OnlineRecordingClient(RecordingClient):
         self.feedback: list[ls_schemas.Feedback] = []
         self.fail_feedback = set(fail_feedback)
         self.fail_list_feedback = set(fail_list_feedback)
+        self.fail_run_url = False
         self.duplicate_posts: list[tuple[uuid.UUID, str, str | None]] = []  # a (run id, key, version) that was posted when feedback of that triple already existed
 
     def list_runs(self, **kw: Any) -> Iterator[ls_schemas.Run]:
@@ -222,6 +223,13 @@ class OnlineRecordingClient(RecordingClient):
         )
         self.feedback.append(stored)
         return stored
+
+    def get_run_url(self, *, run: ls_schemas.Run, project_name: str | None = None, project_id: uuid.UUID | None = None, address: Any = None) -> str:
+        """LangSmith's `get_run_url(run=, project_name=)`: a fixed url for the run, recorded. `fail_run_url` makes it raise (a client that cannot say)."""
+        self._record("get_run_url", run_id=run.id, project_name=project_name)
+        if self.fail_run_url:
+            raise RuntimeError("simulated LangSmith error in get_run_url")
+        return f"https://smith.example/o/org/projects/p/{project_name}/r/{run.id}"
 
     def seed_feedback(self, run: ls_schemas.Run, key: str, *, version: str | None, score: float | None = 1, comment: str = "earlier", extra_returned: bool = True) -> ls_schemas.Feedback:
         """Feedback already on a run, as an earlier pass left it: written at `version` (in `extra`, unless `extra_returned` is false, and at the end of the comment), or by something else when

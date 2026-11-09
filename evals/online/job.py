@@ -8,8 +8,10 @@
     score_and_post(client, project, runs, version=None, judge=None, *, judge_missing=(), sample_pct=20) -> OnlineResult   score each run, judge a sample, post what it is missing, report each run
     select_for_judge(run_ids, pct) -> (judged, not_sampled)   which eligible runs the judge is called on: pure, no clock, no randomness (PR-3.F1)
     judge_setup_from_env(environ=None) -> JudgeSetup          JUDGE_SAMPLE_PCT (exit 2 on a bad value) and the judge, or the JUDGE_* names that are not set (PR-3.F1)
+    main(argv=None, ...) -> int                       `make online-eval`: pull, score, judge, post, then the summary file `evals/results/online-<date>.md` (evals/online/summary.py); 0, or 1 when a run has an error (PR-4.F1)
+    make_client(environ=None) -> Client               the real LangSmith client, built only when LANGSMITH_API_KEY is set (PR-4.F1)
 
-Nothing here builds a LangSmith client or reads a key: the client is passed in (PR-4.F1's `make online-eval` builds the real one). It makes no scoring decision of its own: it builds
+Nothing above `main` builds a LangSmith client or reads a key: the client is passed in. It makes no scoring decision of its own: it builds
 what 5a's evaluators read (an `example` mapping and a `ScoredAnswer`) from the run and its trace, calls them unchanged, and turns each result into a score of 1, 0 or null.
 
 The checks (G7). ONLINE_CHECKS maps the online name to the 5a function; the feedback key is `online.<name>`, in this order, which is the order they are posted in:
@@ -82,7 +84,7 @@ from evals.agent.evaluators.trajectory import forbidden_tools, step_cap_ok
 from evals.agent.judge import Judge, build_judge, criteria_for
 from evals.agent.judge import feedback_key as judge_feedback_key
 from evals.agent.judge_config import missing_judge_settings
-from evals.online.pull import USAGE_EXIT
+from evals.online.pull import DEFAULT_SINCE, SINCE_VARIABLE, USAGE_EXIT, pull_runs, settings_from_env
 from evals.online.reference import OnlineReference, build_reference
 from evals.online.runs import final_answer, inputs_of, mapping, outputs_of
 from flysafelz.agent.guard_flow import split_path
@@ -685,6 +687,85 @@ def report_lines(result: OnlineResult) -> list[str]:
     return lines
 
 
+# --- the command: `make online-eval` (PR-4.F1, G11, GP2) -------------------------------------------------------------------------------------
+
+
+API_KEY_VARIABLE = "LANGSMITH_API_KEY"
+PROGRAM = "evals.online.job"
+FAILED_EXIT = 1  # the summary was written, and at least one run has an error: a rerun posts only what is missing
+
+
+def make_client(environ: Mapping[str, str] | None = None, factory: Callable[..., Any] | None = None) -> Any:
+    """The real LangSmith client, the one place one is built. Exits 2, naming LANGSMITH_API_KEY and before anything is built or sent, when the key is not set. `factory` is for tests."""
+    env = os.environ if environ is None else environ
+    key = env.get(API_KEY_VARIABLE, "").strip()
+    if not key:
+        _refuse(f"{API_KEY_VARIABLE} is not set: it is needed to read the production runs and post feedback on LangSmith. Nothing was sent. Set it in the environment or in .env, then run `make online-eval` again.")
+    if factory is None:
+        from langsmith import Client
+
+        factory = Client
+    return factory(api_key=key)
+
+
+def utc_now() -> datetime:
+    return datetime.now(UTC)
+
+
+def main(
+    argv: Sequence[str] | None = None,
+    *,
+    environ: Mapping[str, str] | None = None,
+    client: Any = None,
+    clock: Callable[[], datetime] = utc_now,
+    build: Callable[[Mapping[str, str]], Judge] = build_judge,
+    results_dir: Path | None = None,
+) -> int:
+    """The whole job: pull, allow-list, score, judge the sample, post, then write the summary (`evals/results/online-<date>.md`, dated in Europe/London) and print its lines and path.
+
+    Everything it is told comes through the environment (`LANGSMITH_API_KEY`, `LANGSMITH_PROJECT`, `SINCE`, `LIMIT`, `JUDGE_SAMPLE_PCT`, `JUDGE_*`), never argv. The order is: the project guard, `SINCE` and `LIMIT`
+    (each a bad value exits 2 naming it), then the key (exit 2 naming it), then `JUDGE_SAMPLE_PCT` and the judge (a bad percentage exits 2 naming it), then the first LangSmith call, so a refusal writes no file and makes no call. Returns 0, or 1 when the summary was
+    written and a run has an error (a post that failed, a judge call that raised, a trace or its feedback that could not be read): the file is never lost, and a rerun posts only what is missing.
+    `client`, `clock`, `build` (the judge builder) and `results_dir` are for tests.
+    """
+    from evals.online import summary  # here, not at the top: the summary reads this module's keys and constants
+
+    env = os.environ if environ is None else environ
+    if list(argv or []):
+        _refuse(f"{PROGRAM} takes no arguments: set SINCE, LIMIT and JUDGE_SAMPLE_PCT in the environment (make online-eval SINCE=24h)")
+    settings = settings_from_env(env)
+    live = make_client(env) if client is None else client
+    setup = judge_setup_from_env(env, build)
+    now = clock()
+    pulled = pull_runs(live, settings.project, settings.since, settings.limit, now)
+    result = score_and_post(live, settings.project, pulled.runs, judge=setup.judge, judge_missing=setup.missing, sample_pct=setup.pct)
+    print("\n".join(report_lines(result)))
+    scored = summary.collect(live, result, pulled.runs)
+    data = summary.ReportInput(
+        day=summary.summary_date(now),
+        project=settings.project,
+        version=result.version,
+        since=env.get(SINCE_VARIABLE, DEFAULT_SINCE).strip(),
+        limit=settings.limit,
+        limit_hit=pulled.limit_hit,
+        read=pulled.read,
+        runs=scored,
+        skipped_by_source=dict(pulled.by_source),
+        skipped_by_reason=dict(pulled.by_reason),
+        judge_missing=result.judge_missing,
+        link=summary.run_link(live, settings.project, pulled.runs),
+    )
+    report = summary.build_report(data)
+    written = summary.write_summary(summary.render_markdown(report), data.day, summary.RESULTS_DIR if results_dir is None else results_dir)
+    print("\n".join(summary.summary_lines(report)))
+    print(f"summary written: {written}")
+    errored = [item for item in scored if item.error is not None]
+    if errored:
+        print(f"{len(errored)} run(s) had an error and are listed in the summary: run `make online-eval` again, it posts only what is missing", file=sys.stderr)
+        return FAILED_EXIT
+    return 0
+
+
 __all__ = [
     "ALREADY_SCORED",
     "DETERMINISTIC_KEYS",
@@ -708,6 +789,8 @@ __all__ = [
     "judge_key",
     "judge_keys_for",
     "judge_setup_from_env",
+    "main",
+    "make_client",
     "missing_keys",
     "normalise_score",
     "parse_sample_pct",
@@ -716,3 +799,7 @@ __all__ = [
     "score_run",
     "select_for_judge",
 ]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))
