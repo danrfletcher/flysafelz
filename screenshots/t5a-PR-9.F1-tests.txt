@@ -1,0 +1,47 @@
+# t5a PR-9.F1: make test (whole suite, sockets off, fake model and recording client only), exit 0
+# $ make test   (coverage section and summary below; the per-file progress lines are left out)
+
+================================ tests coverage ================================
+______________ coverage: platform darwin, python 3.12.14-final-0 _______________
+
+Name                                         Stmts   Miss  Cover   Missing
+--------------------------------------------------------------------------
+evals/agent/__init__.py                          0      0   100%
+evals/agent/agreement.py                       270      7    97%   219, 233-235, 357, 427, 456
+evals/agent/annotate.py                        236      1    99%   417
+evals/agent/checksums.py                       114      0   100%
+evals/agent/evaluators/__init__.py               0      0   100%
+evals/agent/evaluators/aggregate.py             72      1    99%   142
+evals/agent/evaluators/answer.py               109      3    97%   105-108
+evals/agent/evaluators/blocker.py               54      0   100%
+evals/agent/evaluators/form.py                 105      0   100%
+evals/agent/evaluators/labels.py                48      2    96%   79-80
+evals/agent/evaluators/mentions.py              47      0   100%
+evals/agent/evaluators/minutes.py               80      0   100%
+evals/agent/evaluators/noise.py                 17      0   100%
+evals/agent/evaluators/paths.py                 53      0   100%
+evals/agent/evaluators/safety.py                55      0   100%
+evals/agent/evaluators/trajectory.py            73      1    99%   59
+evals/agent/evaluators/verdict.py               54      0   100%
+evals/agent/import_dataset.py                   85      5    94%   51, 70-71, 73, 124
+evals/agent/import_fixtures.py                  78      1    99%   112
+evals/agent/judge.py                           200      1    99%   373
+evals/agent/judge_config.py                     64      0   100%
+evals/agent/loader.py                          297      7    98%   155-156, 292-293, 407-409, 502
+evals/agent/recording_client.py                 63      0   100%
+evals/agent/run_v1.py                           72      1    99%   133
+evals/agent/runner.py                          368      0   100%
+evals/agent/score_form_demo.py                  51      2    96%   59, 84
+evals/agent/score_synthetic.py                  33      1    97%   60
+evals/agent/v0.py                              138      9    93%   111, 215-217, 222-227, 256
+evals/agent/v0_output.py                        56      0   100%
+evals/agent/v0_prompt.py                       181      6    97%   212, 242, 244, 278, 283, 304
+--------------------------------------------------------------------------
+TOTAL                                        10985    171    98%
+Required test coverage of 90% reached. Total coverage: 98.44%
+=========== 12017 passed, 1 skipped, 8 xfailed in 413.70s (0:06:53) ============
+
+# $ uv run ruff check .
+All checks passed!
+# $ git diff --stat 5a85e04 -- src tests/golden rules.yaml   (the F1 fence: must be empty)
+(empty)

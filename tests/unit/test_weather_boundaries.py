@@ -144,10 +144,7 @@ def test_the_trace_rain_caution_says_on_the_limit_and_how_to_check_for_showers()
     [found] = check_row(_row("precipitation", R.precipitation_no_go.value))
     assert found.rule_id == "precipitation_no_go"
     assert "on the limit" in found.text
-    assert found.text == (
-        "precipitation 0.1 mm/h, on the limit 0.1; "
-        "trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown"
-    )
+    assert found.text == ("precipitation 0.1 mm/h, on the limit 0.1; trace rain forecast: check live radar for active showers before launch; a wet wing must not be flown")
     assert TRACE_RAIN_HINT in found.text
     assert (found.value, found.limit) == (0.1, 0.1)
 

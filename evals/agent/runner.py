@@ -2,7 +2,8 @@
 
     run_experiment(records, *, experiment, graph_factory, ...) -> ExperimentResult
     cache_path_for(experiment, cache_dir)     data/eval-cache/<experiment>.sqlite; refuses a name that is not a plain name and a file that already exists
-    default_experiment_name(split, moment)    v1-<split>-<UTC stamp>
+    default_experiment_name(split, moment, agent)    <agent>-<split>-<UTC stamp>: v1-<split>-... unless the v0 baseline (evals.agent.v0, PR-9.F1) asks for v0-... It runs through this same runner,
+                                              with a `graph` of its own whose `invoke` makes the one model call, and `require_usage=False` (a response without usage is stored as None)
     call_with_timeout(call, seconds)          the per-example timeout (SIGALRM, main thread only)
     shared_case_groups(records)               the groups of example ids that share a case
     reader_outcomes(state)                    the reader failures that became UNVERIFIED, and the NOTAMs left unread by the reader limit
@@ -167,10 +168,10 @@ def call_with_timeout(call: Callable[[], Any], seconds: float) -> Any:
 # --- names and paths ---------------------------------------------------------------------------------------------------
 
 
-def default_experiment_name(split: str = DEFAULT_SPLIT, moment: datetime | None = None) -> str:
-    """v1-<split>-<UTC stamp>, e.g. v1-dev-20261108-160700."""
+def default_experiment_name(split: str = DEFAULT_SPLIT, moment: datetime | None = None, agent: str = AGENT_LABEL) -> str:
+    """<agent>-<split>-<UTC stamp>, e.g. v1-dev-20261108-160700 (the v0 baseline, PR-9.F1, passes agent="v0")."""
     moment = datetime.now(UTC) if moment is None else moment.astimezone(UTC)
-    return f"{AGENT_LABEL}-{split}-{moment:%Y%m%d-%H%M%S}"
+    return f"{agent}-{split}-{moment:%Y%m%d-%H%M%S}"
 
 
 def cache_path_for(experiment: str, cache_dir: Path = CACHE_DIR) -> Path:
@@ -398,6 +399,7 @@ class ExperimentResult:
     shared_case_groups: list[list[str]]
     records: list[RunRecord] = field(default_factory=list)
     interrupted: bool = False
+    agent: str = AGENT_LABEL  # "v1", or "v0" for the single-call baseline (evals.agent.v0): v0 has no reader, so its summary has no reader lines
 
     @property
     def errored(self) -> dict[int, list[ErroredRun]]:
@@ -443,7 +445,8 @@ class ExperimentResult:
     def summary_lines(self) -> list[str]:
         """The run in a few lines: the experiment, the cache, the runs per rep in order, the errored ids, the ops count."""
         lines = [f"experiment {self.experiment} (split {self.split}): {len(self.records)} of {self.planned_runs} runs, one example at a time"]
-        lines.append(f"reader cache: {self.cache_path}")
+        if self.agent == AGENT_LABEL:
+            lines.append(f"reader cache: {self.cache_path}")
         for rep in range(1, self.reps + 1):
             ids = [r.example_id for r in self.records if r.rep == rep]
             span = f"{ids[0]} … {ids[-1]}" if ids else "none"
@@ -457,8 +460,9 @@ class ExperimentResult:
         failed = self.reader_failed_to_unverified
         if self.model_failed_runs:
             lines.append(f"runs kept with the agent's fallback answer because its model call failed (5xx): {self.model_failed_runs}")
-        lines.append("reader calls failed and became UNVERIFIED: " + str(failed["total"]) + " (" + ", ".join(f"rep {rep}: {n}" for rep, n in failed["per_rep"].items()) + ")")
-        if self.shared_case_groups:
+        if self.agent == AGENT_LABEL:
+            lines.append("reader calls failed and became UNVERIFIED: " + str(failed["total"]) + " (" + ", ".join(f"rep {rep}: {n}" for rep, n in failed["per_rep"].items()) + ")")
+        if self.shared_case_groups and self.agent == AGENT_LABEL:
             lines.append(f"examples sharing a case (they and the later reps reuse one cache file): {len(self.shared_case_groups)} groups")
         if self.interrupted:
             lines.append("INTERRUPTED: the run was stopped; the cache file was left in place")
@@ -488,8 +492,12 @@ class _Run:
         clock: Callable[[], float],
         now_fn: Callable[[], datetime],
         timeout: Timeout,
+        project_metadata: Mapping[str, Any] | None = None,
+        run_metadata: Callable[[RunRecord], Mapping[str, Any]] | None = None,
+        require_usage: bool = True,
     ):
         self.result, self.graph, self.client = result, graph, client
+        self.project_metadata, self.run_metadata, self.require_usage = dict(project_metadata or {}), run_metadata, require_usage
         self.timeout_s, self.retries, self.backoff = timeout_s, retries, tuple(backoff)
         self.sleep, self.clock, self.now_fn, self.timeout = sleep, clock, now_fn, timeout
         self.usage_checked = False
@@ -514,7 +522,7 @@ class _Run:
 
         A run with none (the UK-only reply, or a model call that failed and became the fallback answer) says nothing about the bridge's usage, so it is skipped.
         """
-        if self.usage_checked or not calls.responses:
+        if not self.require_usage or self.usage_checked or not calls.responses:
             return
         self.usage_checked = True
         if calls.responses[0] is None:
@@ -606,8 +614,8 @@ class _Run:
             self.client.create_project(
                 project_name=self.result.experiment,
                 reference_dataset_id=dataset.id,
-                description=f"FlySafeLZ {AGENT_LABEL} over the {self.result.split} split, {self.result.reps} reps, one example at a time",
-                metadata={"agent": AGENT_LABEL, "split": self.result.split, "reps": self.result.reps, "split_project": target.project},
+                description=f"FlySafeLZ {self.result.agent} over the {self.result.split} split, {self.result.reps} reps, one example at a time",
+                metadata={"agent": self.result.agent, "split": self.result.split, "reps": self.result.reps, "split_project": target.project, **self.project_metadata},
             )
         except Exception as error:
             raise FatalRunError(f"LangSmith could not open the experiment {self.result.experiment}: {_short(error)}", None, self.result) from error
@@ -619,7 +627,7 @@ class _Run:
         try:
             self.client.create_run(
                 id=run.langsmith_run_id,
-                name=f"{AGENT_LABEL}-{record['id']}",
+                name=f"{self.result.agent}-{record['id']}",
                 run_type="chain",
                 project_name=self.result.experiment,
                 reference_example_id=example_uuid(record["id"]),
@@ -628,9 +636,17 @@ class _Run:
                 error=run.last_error,
                 start_time=run.started_at,
                 end_time=self.now_fn(),
-                tags=[f"rep:{run.rep}", AGENT_LABEL],
+                tags=[f"rep:{run.rep}", self.result.agent],
                 extra={
-                    "metadata": {"rep": run.rep, "example_id": record["id"], "experiment": self.result.experiment, "split": self.result.split, "attempts": run.attempts, "latency_s": run.latency_s}
+                    "metadata": {
+                        "rep": run.rep,
+                        "example_id": record["id"],
+                        "experiment": self.result.experiment,
+                        "split": self.result.split,
+                        "attempts": run.attempts,
+                        "latency_s": run.latency_s,
+                        **(self.run_metadata(run) if self.run_metadata is not None else {}),
+                    }
                 },
             )
         except Exception as error:
@@ -653,19 +669,41 @@ def run_experiment(
     clock: Callable[[], float] = time.monotonic,
     now_fn: Callable[[], datetime] = _utc_now,
     timeout: Timeout = call_with_timeout,
+    agent: str = AGENT_LABEL,
+    project_metadata: Mapping[str, Any] | None = None,
+    run_metadata: Callable[[RunRecord], Mapping[str, Any]] | None = None,
+    require_usage: bool = True,
 ) -> ExperimentResult:
     """Run every record `reps` times, rep by rep, one at a time, and return the result. See the module doc for the rules.
+
+    The last four are for the v0 baseline (evals.agent.v0, PR-9.F1), which runs through this same code: `agent` names the runs, their tag and the experiment's metadata
+    ("v1" unless told); `project_metadata` is added to the experiment's metadata; `run_metadata(run)` is added to the metadata of each logged run, an errored one too; and
+    `require_usage=False` keeps a run whose first model response has no usage (its usage is stored absent, as None) instead of stopping the run (E4).
 
     The experiment name and its cache path are checked first (RunnerError, CacheExistsError), before the graph is built or anything is sent.
     Raises FatalRunError (with `.partial`) for a stop that no retry fixes. A KeyboardInterrupt does not raise: the result comes back with `interrupted` set.
     """
     cache_path = cache_path_for(experiment, cache_dir)
-    result = ExperimentResult(experiment, split, cache_path, reps, len(records) * reps, shared_case_groups(records))
+    result = ExperimentResult(experiment, split, cache_path, reps, len(records) * reps, shared_case_groups(records), agent=agent)
     try:
         graph = graph_factory()
     except Exception as error:
         raise FatalRunError(f"the agent graph could not be built: {_short(error)}", None, result) from error
-    run = _Run(result, graph, client, timeout_s=timeout_s, retries=retries, backoff=backoff, sleep=sleep, clock=clock, now_fn=now_fn, timeout=timeout)
+    run = _Run(
+        result,
+        graph,
+        client,
+        timeout_s=timeout_s,
+        retries=retries,
+        backoff=backoff,
+        sleep=sleep,
+        clock=clock,
+        now_fn=now_fn,
+        timeout=timeout,
+        project_metadata=project_metadata,
+        run_metadata=run_metadata,
+        require_usage=require_usage,
+    )
     try:
         run.open_experiment()
         for rep in range(1, reps + 1):

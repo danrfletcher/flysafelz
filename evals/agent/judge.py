@@ -38,7 +38,7 @@ dropped and are None. An applicable one becomes {key: judge.<criterion>, score: 
 
 What is None, and what is an error:
   - a criterion that does not apply to the path: None (E5), never a fail, nothing sent to LangSmith;
-  - no final answer text (a v0 run returns segments, no prose): every criterion None, and the model is not called;
+  - a v0 run (its text is built by code from its segments, PR-9.F1) or no final answer text: every criterion None, and the model is not called;
   - the model call raises, or its output fails the schema: every applicable criterion gets {score: None, comment: "judge error: <reason>"}, and the run goes on. Only failures are
     counted; there is no retry here. The reason has the API key scrubbed out of it.
 
@@ -65,7 +65,7 @@ from langchain_core.tracers.langchain import LangChainTracer
 from pydantic import BaseModel, ConfigDict, field_validator
 
 from evals.agent.evaluators.aggregate import EVALUATORS
-from evals.agent.evaluators.answer import ScoredAnswer
+from evals.agent.evaluators.answer import V0, ScoredAnswer
 from evals.agent.evaluators.labels import Evaluator, Feedback, example_id
 from evals.agent.judge_config import JudgeConfigError, build_judge_llm, judge_config
 from flysafelz.agent.guard_flow import split_path
@@ -341,8 +341,8 @@ class Judge:
         """The grades for all four keys, with None for every criterion that is not graded. A fresh model call every time it is called."""
         applicable = criteria_for((example.get("reference") or {}).get("path"))
         grades: dict[str, Feedback | None] = {feedback_key(name): None for name in CRITERIA}
-        if not applicable or not delivered_text(answer).strip():
-            return grades  # nothing applies, or there is no prose to grade (a v0 run): the model is not called
+        if not applicable or answer.kind == V0 or not delivered_text(answer).strip():
+            return grades  # nothing applies, the run is the v0 baseline's (its text is built by code from its segments, not prose to grade), or there is no text: the model is not called
         message = judge_message(example, answer)
         try:
             output = self._ask(message, example)

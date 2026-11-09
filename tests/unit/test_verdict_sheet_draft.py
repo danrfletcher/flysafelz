@@ -101,7 +101,7 @@ def test_g3_why_comes_from_the_text_fields_not_the_rule_id_or_source():
     ("raw", "shown"),
     [
         ("NOTAM H7171/26: drone ops # not a key", "NOTAM H7171/26: drone ops # not a key"),
-        ('say "yes" and \'no\'', 'say "yes" and \'no\''),
+        ("say \"yes\" and 'no'", "say \"yes\" and 'no'"),
         ("line one\nline two\r\nline three", "line one line two line three"),
         ("tab\tsplit  and   runs", "tab split and runs"),
         ("ceiling 800 ft \u00b0 and \u2013 dash \u00e9", "ceiling 800 ft \u00b0 and \u2013 dash \u00e9"),
@@ -117,11 +117,11 @@ def awkward_entry(why: str) -> DraftEntry:
     a = assessment(s)
     rows = fill_rows([{"start": "2026-10-31T09:00:00Z", "end": "2026-10-31T10:00:00Z", "edge": "window start", "verdict": None, "approaching_limits": None}], a)
     entry = DraftEntry({"id": "x", "mode": "draft", "window": "default", "actions_done": False, "notam_actions": {}, "rows": rows})
-    entry.ignored = [("A1/26", "reason with # and : and \"quotes\"\nand a newline and \u00b0")]
+    entry.ignored = [("A1/26", 'reason with # and : and "quotes"\nand a newline and \u00b0')]
     return entry
 
 
-@pytest.mark.parametrize("why", ["NOTAM H7171/26: avoid #1 \"sector\"", "up\nand\ndown", "wind 9 mph \u00b0 \u2013 caf\u00e9", "- starts like a list: yes", "key: [flow, {mapping}]", "a \x00 b"])
+@pytest.mark.parametrize("why", ['NOTAM H7171/26: avoid #1 "sector"', "up\nand\ndown", "wind 9 mph \u00b0 \u2013 caf\u00e9", "- starts like a list: yes", "key: [flow, {mapping}]", "a \x00 b"])
 def test_f4_an_awkward_why_stays_one_comment_line_the_file_parses_and_no_row_gains_a_key(why):
     entry = awkward_entry(why)
     text = render_entry(entry)
@@ -227,7 +227,11 @@ def test_g4_a_segment_s_worst_action_picks_check_sup_over_contact_first_and_list
 def test_g4_each_notam_is_listed_once_with_its_worst_action_in_severity_order_then_id():
     a = assessment(
         seg(start=HOUR, actions=(result("Z1/26", A.AWARENESS), result("B2/26", A.CONTACT_FIRST), result("A3/26", A.AVOID_SECTOR))),
-        seg(start=datetime(2026, 10, 31, 10, tzinfo=UTC), end=datetime(2026, 10, 31, 11, tzinfo=UTC), actions=(result("B2/26", A.NO_FLY), result("A3/26", A.AWARENESS_MAP), result("C4/26", A.UNREAD_OVER_LZ), result("A0/26", A.AVOID_SECTOR))),
+        seg(
+            start=datetime(2026, 10, 31, 10, tzinfo=UTC),
+            end=datetime(2026, 10, 31, 11, tzinfo=UTC),
+            actions=(result("B2/26", A.NO_FLY), result("A3/26", A.AWARENESS_MAP), result("C4/26", A.UNREAD_OVER_LZ), result("A0/26", A.AVOID_SECTOR)),
+        ),
     )
     listed = draft_actions(a)
     assert listed == {"B2/26": "NO_FLY", "C4/26": "UNREAD_OVER_LZ", "A0/26": "AVOID_SECTOR", "A3/26": "AVOID_SECTOR", "Z1/26": "AWARENESS"}
@@ -337,8 +341,8 @@ def test_the_block_comes_after_every_action_line_under_notam_actions_and_before_
 
 
 def test_a_reason_is_one_comment_line_whatever_it_holds():
-    text = render_entry(entry_with({}, [("A1/26", "reason: a # b\nsecond line \u00b0 \"q\"")]))
-    assert "    # A1/26: reason: a # b second line \u00b0 \"q\"\n" in text
+    text = render_entry(entry_with({}, [("A1/26", 'reason: a # b\nsecond line \u00b0 "q"')]))
+    assert '    # A1/26: reason: a # b second line \u00b0 "q"\n' in text
     (parsed,) = yaml.safe_load(text)
     assert parsed["notam_actions"] == {}
 

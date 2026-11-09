@@ -137,9 +137,7 @@ def test_text_for_other_units():
     assert check_row(calm_row(precipitation_probability=60))[0].text == "rain chance 60 %, limit 50"
     assert check_row(calm_row(precipitation=0.3))[0].text == "precipitation 0.3 mm/h, limit 0.1"
     assert check_row(calm_row(wind_120m=17))[0].text == "wind at 120 m 17 mph, limit 16"
-    assert check_row(calm_row(shortwave_radiation=650, cape=350))[0].text == (
-        "thermic: shortwave 650 W/m² (limit 600) and CAPE 350 J/kg, limit 300"
-    )
+    assert check_row(calm_row(shortwave_radiation=650, cape=350))[0].text == ("thermic: shortwave 650 W/m² (limit 600) and CAPE 350 J/kg, limit 300")
 
 
 def test_results_come_blockers_first_then_cautions_in_a_fixed_order():

@@ -143,7 +143,9 @@ E_TEXT = "DANGER AREA EGD496A. FLY ONLY WITH ATC PERMISSION. SEE AIP SUP 108/202
 def test_f2_no_danger_area_over_the_lz_from_sfc_comes_out_ignore_or_awareness_and_no_fly_needs_a_reason(category, reason, contact, exemptions):
     kind, value = CONTACTS[contact]
     parsed = notam(circle=circle_at(0), item_f="SFC", item_e=E_TEXT, subject="RD")
-    read = reading(geometry=circle_at(0), category=category, contact=kind, value=value, reason=reason, quote=None if reason is ProhibitiveReason.NONE else "ENTRY PROHIBITED", exemptions=EXEMPTIONS[exemptions])
+    read = reading(
+        geometry=circle_at(0), category=category, contact=kind, value=value, reason=reason, quote=None if reason is ProhibitiveReason.NONE else "ENTRY PROHIBITED", exemptions=EXEMPTIONS[exemptions]
+    )
     action = act_on(parsed, read, LZ, segment()).action
     assert action not in (NotamAction.IGNORE, NotamAction.AWARENESS, NotamAction.AWARENESS_MAP, NotamAction.AVOID_SECTOR, NotamAction.UNREAD_OVER_LZ)
     assert (action is NotamAction.NO_FLY) == (reason is not ProhibitiveReason.NONE)
@@ -229,7 +231,9 @@ def test_f7_the_action_and_reason_of_every_other_row_are_byte_for_byte_what_they
     assert (result.action, result.reason) == UNCHANGED[name]
 
 
-@pytest.mark.parametrize("name", [n for n in UNCHANGED if n not in ("prohibitive", "prohibitive reason", "cooperative, contact", "cooperative, no contact", "cooperative, radio only", "informational")])
+@pytest.mark.parametrize(
+    "name", [n for n in UNCHANGED if n not in ("prohibitive", "prohibitive reason", "cooperative, contact", "cooperative, no contact", "cooperative, radio only", "informational")]
+)
 def test_f7_rows_1_and_4_to_6_are_the_same_for_a_danger_area(name):
     plain, danger = (act_on(*unchanged_case(name, subject), LZ, segment()) for subject in ("WU", "RD"))
     assert (danger.action, danger.reason) == (plain.action, plain.reason)

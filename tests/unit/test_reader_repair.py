@@ -314,7 +314,9 @@ def test_a_failed_check_b_never_changes_a_coded_field():
     area = build_area(timed)[0]
     assert isinstance(area, Circle)
     quote = "UAS OPR WI 0.5NM"  # the reason's quote, which is in this E text
-    inverted = good(prohibitive_quote=quote, floor={"value": 900, "unit": "ft", "datum": "AMSL"}, ceiling={"value": 300, "unit": "ft", "datum": "AMSL"}, contact={"kind": "phone", "value": "<PHONE_1>"})
+    inverted = good(
+        prohibitive_quote=quote, floor={"value": 900, "unit": "ft", "datum": "AMSL"}, ceiling={"value": 300, "unit": "ft", "datum": "AMSL"}, contact={"kind": "phone", "value": "<PHONE_1>"}
+    )
     result = read_notam(timed, scripted(inverted, inverted))
     assert (result.status, result.reading) == (FAILED, None)  # no reading to "fix"
     assert "900 ft AMSL" in result.failed_checks[0] and "300 ft AMSL" in result.failed_checks[0]
@@ -370,7 +372,9 @@ def test_each_failed_check_is_one_bullet_with_no_trailing_space():
 
 # --- E1: a prohibitive reason whose quote is not in the NOTAM text -------------------------------------------------
 
-QRD_OVER_LZ = notam("J3857/26", circle=circle_at(0), subject="RD", item_e="TEMPO DANGER AREA EGD496A ACTIVATED. ENTRY PROHIBITED BY BYELAW. CALL 07700 900123.", item_f=None, item_g=None, lower_fl=0, upper_fl=8)
+QRD_OVER_LZ = notam(
+    "J3857/26", circle=circle_at(0), subject="RD", item_e="TEMPO DANGER AREA EGD496A ACTIVATED. ENTRY PROHIBITED BY BYELAW. CALL 07700 900123.", item_f=None, item_g=None, lower_fl=0, upper_fl=8
+)
 LIVE_FIRING = {"category": "prohibitive", "prohibitive_reason": "live firing", "contact": {"kind": "phone", "value": "<PHONE_1>"}, "activates_designators": ["EGD496A"]}
 
 

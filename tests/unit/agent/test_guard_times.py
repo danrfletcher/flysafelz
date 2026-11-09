@@ -65,9 +65,7 @@ def test_the_scan_reads_each_kind_once():
 
 def test_a_clarify_answer_naming_a_day_in_the_calendar_passes():
     assert findings("Did you mean Sunday 1 Nov?", turn_of(calendar=(date(2026, 10, 31), date(2026, 11, 1)))) == []
-    assert findings("Did you mean Monday 2 Nov?", turn_of(calendar=(date(2026, 10, 31), date(2026, 11, 1)))) == [
-        "'Monday 2 Nov' is not a date the calendar or any tool lists this turn"
-    ]
+    assert findings("Did you mean Monday 2 Nov?", turn_of(calendar=(date(2026, 10, 31), date(2026, 11, 1)))) == ["'Monday 2 Nov' is not a date the calendar or any tool lists this turn"]
 
 
 @pytest.mark.parametrize("label", ["GMT", "BST", "UTC", "local time", "Z"])

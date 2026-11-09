@@ -15,14 +15,15 @@ The rule is literal and is not widened:
 
 must_mention scores 1 when every entry is there, else 0, and the comment lists the missing ones. must_not_mention scores 1 when none is there, else 0, and the comment lists
 the ones found. An empty or whitespace-only answer holds nothing: must_mention fails and must_not_mention passes. Both return None when the list is absent or empty, and
-apply to every path and to both run kinds. An entry that normalises to nothing (empty or only whitespace) raises ValueError naming the example: it would match every answer.
+apply to every path and to both run kinds, except that a v0 run of a compound example (`metadata.compound` true) is not scored by either: the baseline answers the
+verdicts and the NOTAM actions only, so the extra parts a compound example asks for are not its to mention (PR-9.F1, E9). An entry that normalises to nothing (empty or only whitespace) raises ValueError naming the example: it would match every answer.
 """
 
 import re
 from collections.abc import Mapping
 from typing import Any
 
-from evals.agent.evaluators.answer import ScoredAnswer
+from evals.agent.evaluators.answer import V0, ScoredAnswer
 from evals.agent.evaluators.labels import Feedback, example_id, feedback
 
 MUST_MENTION_KEY = "must_mention"
@@ -62,9 +63,14 @@ def _checked(example: Mapping[str, Any], entries: list[str], text: str, key: str
         raise ValueError(f"example {example_id(example)}: reference.{key}: {error}") from None
 
 
+def v0_of_compound(example: Mapping[str, Any], answer: ScoredAnswer) -> bool:
+    """True for a v0 run of a compound example: the mention checks do not apply to it (E9)."""
+    return answer.kind == V0 and bool((example.get("metadata") or {}).get("compound"))
+
+
 def must_mention(example: Mapping[str, Any], answer: ScoredAnswer) -> Feedback | None:
     entries = reference_list(example, MUST_MENTION_KEY)
-    if entries is None:
+    if entries is None or v0_of_compound(example, answer):
         return None
     found = _checked(example, entries, answer.text, MUST_MENTION_KEY)
     missing = [entry for entry in entries if entry not in found]
@@ -75,7 +81,7 @@ def must_mention(example: Mapping[str, Any], answer: ScoredAnswer) -> Feedback |
 
 def must_not_mention(example: Mapping[str, Any], answer: ScoredAnswer) -> Feedback | None:
     entries = reference_list(example, MUST_NOT_MENTION_KEY)
-    if entries is None:
+    if entries is None or v0_of_compound(example, answer):
         return None
     found = _checked(example, entries, answer.text, MUST_NOT_MENTION_KEY)
     if found:

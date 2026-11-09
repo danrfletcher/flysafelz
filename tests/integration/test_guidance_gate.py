@@ -14,7 +14,9 @@ from flysafelz.guidance.hit4 import load_questions
 MODEL = SETTINGS.embedding_model
 # Both questions are answered by section 1 of their document; the 'worse' snapshot lost the words of the second one.
 GOOD = [guidance_chunk("a", "1", "alpha beta gamma"), guidance_chunk("b", "1", "kappa lambda mu")]
-EXTRA = [guidance_chunk("0", str(n), f"filler{n} padding") for n in range(1, 6)]  # five chunks that share no word with a question; they sort before the others, so they fill the top four when nothing matches
+EXTRA = [
+    guidance_chunk("0", str(n), f"filler{n} padding") for n in range(1, 6)
+]  # five chunks that share no word with a question; they sort before the others, so they fill the top four when nothing matches
 WORSE = [guidance_chunk("a", "1", "alpha beta gamma"), guidance_chunk("b", "1", "unrelated words here")]
 QUESTIONS = (("alpha beta", [("a", "1")]), ("kappa lambda", [("b", "1")]))
 

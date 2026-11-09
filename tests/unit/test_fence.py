@@ -372,11 +372,7 @@ def test_the_verdict_sheet_defines_no_cut_point_logic_of_its_own():
 
 def test_the_cut_point_scan_catches_planted_uses():
     planted = ast.parse(
-        "from flysafelz.assess import active_intervals\n"
-        "import flysafelz.daylight as d\n"
-        "from flysafelz.daylight import daylight_edges as edges\n"
-        "a = active_intervals(x)\n"
-        "b = d.daylight_edges(y)\n"
+        "from flysafelz.assess import active_intervals\nimport flysafelz.daylight as d\nfrom flysafelz.daylight import daylight_edges as edges\na = active_intervals(x)\nb = d.daylight_edges(y)\n"
     )
     uses = [kind for _, kind in _cut_point_uses(planted)]
     assert sorted(uses) == [

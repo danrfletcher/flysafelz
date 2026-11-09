@@ -101,7 +101,10 @@ NOTAM_CASES = {
     "two_starts_same_minute_ab": ([over_lz("A1/26", utc(9, 20), utc(14)), over_lz("B2/26", utc(9, 20), utc(14))], None),
     "two_starts_same_minute_ba": ([over_lz("B2/26", utc(9, 20), utc(14)), over_lz("A1/26", utc(9, 20), utc(14))], None),
     "an_end_and_a_start_on_the_hour": ([over_lz("B2/26", utc(7), utc(10)), over_lz("A1/26", utc(10), utc(14))], None),
-    "a_notam_that_starts_at_the_window_start_does_not_rename_the_first_row": ([over_lz("X1/26", utc(8), utc(14))], [("08:00", "09:00", "window start"), ("09:00", "10:00", "hour"), ("10:00", "11:00", "hour"), ("11:00", "12:00", "hour")]),
+    "a_notam_that_starts_at_the_window_start_does_not_rename_the_first_row": (
+        [over_lz("X1/26", utc(8), utc(14))],
+        [("08:00", "09:00", "window start"), ("09:00", "10:00", "hour"), ("10:00", "11:00", "hour"), ("11:00", "12:00", "hour")],
+    ),
 }
 
 

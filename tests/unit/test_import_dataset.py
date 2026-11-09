@@ -83,11 +83,8 @@ def test_a_source_with_spaces_and_a_quote_in_its_path_works_because_it_comes_fro
 
 def test_a_source_path_with_spaces_and_a_quote_works_end_to_end_through_a_subprocess(tmp_path):
     """The real command line: the path reaches `python -m evals.agent.import_dataset` only through the environment."""
-    src = make_source(tmp_path / "in put's", name="my \"data\" set")
-    code = (
-        "import sys; from pathlib import Path; from evals.agent.import_dataset import main; "
-        f"sys.exit(main(dest=Path({str(tmp_path / 'out')!r})))"
-    )
+    src = make_source(tmp_path / "in put's", name='my "data" set')
+    code = f"import sys; from pathlib import Path; from evals.agent.import_dataset import main; sys.exit(main(dest=Path({str(tmp_path / 'out')!r})))"
     done = subprocess.run([sys.executable, "-c", code], cwd=REPO, env={**os.environ, "DATASET_SRC": str(src)}, capture_output=True, text=True, check=False)
     assert done.returncode == 0, done.stderr
     assert (tmp_path / "out" / "verdict_sheet.yaml").read_bytes() == BODIES["verdict_sheet.yaml"]

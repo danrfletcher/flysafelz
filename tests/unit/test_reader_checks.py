@@ -410,7 +410,10 @@ def test_g9_a_clean_reading_with_a_reason_and_its_quote_passes_every_check():
 
 def test_g9_an_empty_quote_says_so_and_names_the_reason():
     (sentence,) = broken_sentences(prohibitive_reason=ProhibitiveReason.LIVE_FIRING, prohibitive_quote="   ")
-    assert sentence == "your prohibitive_quote is empty but your prohibitive_reason is 'live firing'; quote the words of the NOTAM text the reason rests on, word for word, or answer prohibitive_reason none"
+    assert (
+        sentence
+        == "your prohibitive_quote is empty but your prohibitive_reason is 'live firing'; quote the words of the NOTAM text the reason rests on, word for word, or answer prohibitive_reason none"
+    )
     assert broken_sentences(prohibitive_reason=ProhibitiveReason.BYELAWS, prohibitive_quote=None) == [sentence.replace("live firing", "byelaws")]
 
 

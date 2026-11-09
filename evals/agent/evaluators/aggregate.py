@@ -12,9 +12,10 @@ Evaluation
     runs         one `RunScores` per scored run: example id, rep, {key: Feedback | None}
     skipped      the ids of the errored runs that were left out, in run order
     mean(key)    the mean score over the runs where the evaluator applied and gave a score; None when it did for none (never 0.0). A judge error (PR-7.F1) has no score
+    mean_text(key)   the mean as a percentage ("83%"), or "n/a" when there is none: a v0 experiment's nulled evaluators read n/a, never 0% (PR-9.F1, E5)
     applied(key) how many runs it applied to
     missed_blockers      `harmful_missed_blocker` as a count of runs with a miss, with the example ids named (once each, in order)
-    path_confusion       the 5 x (5 + unknown) path matrix over every scored run
+    path_confusion       the 5 x (5 + unknown) path matrix over every scored v1 run (a v0 run does no routing, so it is not in the matrix)
     action_confusion     the NotamAction x NotamAction matrix over the NOTAMs of every scored assess run with sheet labels
 """
 
@@ -22,7 +23,7 @@ from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
-from evals.agent.evaluators.answer import ScoredAnswer
+from evals.agent.evaluators.answer import V0, ScoredAnswer
 from evals.agent.evaluators.blocker import MISSED_BLOCKER_KEY, RECALL_KEY, hard_restriction_recall, harmful_missed_blocker
 from evals.agent.evaluators.form import CITED_KEY, DECISION_KEY, GUARD_KEY, RECHECK_KEY, WINDOW_KEY, cited, decision_first, guard_pass, recheck_stated, window_stated
 from evals.agent.evaluators.labels import Evaluator, Feedback, example_id
@@ -55,6 +56,9 @@ EVALUATORS: dict[str, Evaluator] = {
     MUST_MENTION_KEY: must_mention,
     MUST_NOT_MENTION_KEY: must_not_mention,
 }
+
+
+NOT_APPLICABLE = "n/a"
 
 
 @dataclass(frozen=True)
@@ -104,6 +108,10 @@ class Evaluation:
         found = self.scores(key)
         return sum(found) / len(found) if found else None
 
+    def mean_text(self, key: str) -> str:
+        found = self.mean(key)
+        return NOT_APPLICABLE if found is None else f"{found:.0%}"
+
     @property
     def missed_blockers(self) -> MissedBlockers:
         named = [s.example_id for s in self.runs if (found := s.feedback.get(MISSED_BLOCKER_KEY)) is not None and found["score"]]
@@ -121,7 +129,8 @@ def evaluate_runs(runs: Iterable[ScoredRun], evaluators: Mapping[str, Callable[[
             continue
         result.runs.append(score_run(run, evaluators))
         assert run.answer is not None
-        path_pairs.append(path_pair(run.example, run.answer))
+        if run.answer.kind != V0:
+            path_pairs.append(path_pair(run.example, run.answer))
         action_pair_list += action_pairs(run.example, run.answer) or []
     result.path_confusion = path_confusion(path_pairs)
     result.action_confusion = action_confusion(action_pair_list)
