@@ -1,0 +1,33 @@
+$ uv run pytest tests/unit/test_lz_allow_list.py -v --no-cov   (covers evals/online/seed_questions.yaml)
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0 -- /Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-10/.venv/bin/python
+network: --disable-socket in effect
+rootdir: /Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-10
+configfile: pyproject.toml
+plugins: langsmith-0.14.17, cov-7.1.0, socket-0.8.1, anyio-4.16.0
+collecting ... collected 22 items
+
+tests/unit/test_lz_allow_list.py::test_every_case_yaml_in_fixtures_is_on_the_allow_list PASSED [  4%]
+tests/unit/test_lz_allow_list.py::test_the_examples_and_the_verdict_sheet_and_the_seed_questions_are_on_the_allow_list PASSED [  9%]
+tests/unit/test_lz_allow_list.py::test_the_nine_points_are_the_ones_examples_yaml_holds PASSED [ 13%]
+tests/unit/test_lz_allow_list.py::test_west_sleekburns_case_yaml_matches_at_its_own_precision PASSED [ 18%]
+tests/unit/test_lz_allow_list.py::test_the_constructed_case_is_on_the_list_only_because_it_says_constructed_true PASSED [ 22%]
+tests/unit/test_lz_allow_list.py::test_an_invented_off_list_point_fails_naming_the_file_and_field_but_not_the_value PASSED [ 27%]
+tests/unit/test_lz_allow_list.py::test_an_off_list_point_inside_an_examples_style_flow_mapping_fails PASSED [ 31%]
+tests/unit/test_lz_allow_list.py::test_a_lat_from_one_point_with_a_lon_from_another_fails PASSED [ 36%]
+tests/unit/test_lz_allow_list.py::test_a_single_lat_or_lon_field_is_checked_on_its_own PASSED [ 40%]
+tests/unit/test_lz_allow_list.py::test_a_field_written_with_fewer_than_four_decimals_never_matches[53.80--0.09] PASSED [ 45%]
+tests/unit/test_lz_allow_list.py::test_a_field_written_with_fewer_than_four_decimals_never_matches[53.8--0.1] PASSED [ 50%]
+tests/unit/test_lz_allow_list.py::test_a_field_written_with_fewer_than_four_decimals_never_matches[54--1] PASSED [ 54%]
+tests/unit/test_lz_allow_list.py::test_four_decimals_is_enough_to_match PASSED [ 59%]
+tests/unit/test_lz_allow_list.py::test_a_point_a_whole_hundredth_away_does_not_match_at_four_decimals PASSED [ 63%]
+tests/unit/test_lz_allow_list.py::test_a_value_that_is_not_a_number_fails PASSED [ 68%]
+tests/unit/test_lz_allow_list.py::test_the_constructed_point_is_allowed_in_a_constructed_case_yaml PASSED [ 72%]
+tests/unit/test_lz_allow_list.py::test_the_constructed_point_fails_in_a_case_without_constructed_true PASSED [ 77%]
+tests/unit/test_lz_allow_list.py::test_the_constructed_point_fails_in_a_case_named_like_it_but_not_marked_constructed PASSED [ 81%]
+tests/unit/test_lz_allow_list.py::test_the_constructed_point_fails_in_a_constructed_case_that_is_not_the_named_one PASSED [ 86%]
+tests/unit/test_lz_allow_list.py::test_the_constructed_point_fails_in_any_other_file PASSED [ 90%]
+tests/unit/test_lz_allow_list.py::test_a_nested_point_is_read_in_the_dataset_files_but_not_in_a_case_yaml PASSED [ 95%]
+tests/unit/test_lz_allow_list.py::test_a_seed_questions_file_would_be_read_too PASSED [100%]
+
+============================== 22 passed in 0.42s ==============================

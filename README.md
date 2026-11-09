@@ -17,6 +17,8 @@ make setup   # uv sync; needs no API key
 make test    # uv run pytest, with sockets disabled
 make eval-reader   # the reader eval: the only target that calls the model, so it needs the READER_* settings
 make eval-guidance # hit@4 of guidance search on evals/guidance/questions.yaml; needs the embedding model `make setup` stored, no key, no network
+make online-seed   # asks the 11 seed questions through the agent on live data, traced into LangSmith; needs keys, runs only on Dan's Mac, never in `make test`
+make online-eval   # scores the production runs in LangSmith and posts the scores as feedback; needs LANGSMITH_API_KEY, never in `make test`
 ```
 
 Copy `.env.example` to `.env` for the openAIP key when fixtures are captured later. `.env` is gitignored. The NOTAM reader's model endpoint is four more lines in the same file (or in the environment, which wins): `READER_PROVIDER`, `READER_BASE_URL`, `READER_API_KEY` and `READER_MODEL`, any OpenAI-compatible endpoint. All four are required and nothing falls back to a default; only `src/flysafelz/reader/config.py` reads them, and only when the reader is first used. `make test` never needs them.
@@ -33,6 +35,23 @@ uv run python -m flysafelz.cli assess --lat 53.802797 --lon -0.086644 # live; ne
 One row per UTC hour (a segment edge inside an hour prints as sub-rows), then source statuses, flyable windows and the overall line. `--start` and `--end` (ISO 8601 with a timezone, end exclusive) narrow the window; `--debug` also lists the NOTAMs that were dropped or ignored, with the reason. A live run has no NOTAM readings, so a NOTAM over the LZ that needs one reads UNVERIFIED. There is no flag that changes a limit. The committed outputs for both cases are in `tests/golden/`; `uv run pytest --update-golden` rewrites them.
 
 Case mode and the age of the PIB. The archive the cases come from (Jonty/uk-notam-archive) snapshots the PIB only about twice a day, at roughly 02:20 and 09:30 UTC, so a case's captured bulletin can be about 5 h old at the case's `now`. Case mode therefore treats the captured PIB as current at `now`: the 3 h `pib_stale_hours` rule is not applied, the NOTAMs source reads `ok`, and its line shows the PIB's issued time with a "(case mode: captured PIB treated as current at the case's now)" note so the real age is visible. Live mode keeps the 3 h rule unchanged. A case can opt back in with `stale_rule: live` in its `case.yaml`; only `fixtures/stale_pib_constructed/` does, so the stale, UNVERIFIED path stays tested end to end. Any other value is a load error.
+
+## Production evals
+
+The offline evals (`make eval`, with Dan's labels) say whether the agent is right. The online eval says whether the runs it actually made look sound. It is a LangSmith SDK job, not a hosted evaluator, and it adds no metric of its own: it calls the offline evals' checks.
+
+What runs online, and why. A production run has no labels, so nothing can say what the verdict should have been. Missed blocker, verdict match, window overlap, noise and NOTAM action confusion all need a label, so they never run online, and the offline evals carry the safety claim. What does run is what can be read from the answer and its trace alone:
+
+- On every run: the guard's result (`online.guard_pass`), the verdict stated first (`online.decision_first`), the guidance cited when `search_guidance` was called (`online.cited_guidance`), the re-check time stated (`online.recheck_stated`), the assumed window stated (`online.assumed_window_stated`), no verdict beyond day 3 (`online.no_verdict_beyond_day3`), the step cap (`online.step_cap`) and no tool called on a decline (`online.decline_no_tools`).
+- On a sample: the offline judge's criteria for the run's own path (`online.judge.<criterion>`). With 50 or fewer runs to judge, all are judged; above that, 20% by a hash of the run id (`JUDGE_SAMPLE_PCT`), so a rerun picks the same runs.
+
+`make online-eval` reads the root runs of the LangSmith project (`LANGSMITH_PROJECT`, default `flysafelz`) that started in the last `SINCE` (default `7d`; `LIMIT`, default 500, caps how many are read). Only runs whose `source` is `pilot` or `online-seed` are scored: Studio and `make run` case runs, the judge's own calls, the v0 baseline and every eval experiment run are skipped and counted by source. It refuses the offline eval's held-out and dev experiment projects. Each score goes onto its run as feedback with a comment, and `online.evaluator_version` is posted last. A rerun posts only what a run is missing, so a second `make online-eval` posts nothing new. The summary, `evals/results/online-<date>.md`, has each check's pass rate with n, the judge's pass rates by path, the failing runs with links, the runs skipped, the evaluator version, and the line that missed blocker and verdict match need labels.
+
+The first runs were seeded, not organic. There was no pilot traffic to score, so `make online-seed` asks the 11 questions in `evals/online/seed_questions.yaml` through the agent on live data (4 assess, 3 explain, 2 clarify, 2 decline, at five landing zones, with relative times only) and tags each run `source: online-seed` with its `lz_name`. The questions are written by hand and edited by Dan before the first run; they are not labels, and the `intended_path` beside each is for reading and is never scored. The seed needs `LANGSMITH_API_KEY`, the agent's `AGENT_BASE_URL`, `AGENT_MODEL` and `AGENT_API_KEY`, and `OPENAIP_API_KEY`, and names any that is missing before it asks anything. Seeded runs show that the job works; they say nothing about how real pilots use the agent.
+
+How it would run in production. Nothing is scheduled here: no cron entry, no scheduled job and no alert is installed. In production the same command would run from cron or a scheduled job every day or so, and an alert would fire on `online.guard_pass` = 0, which means the guard did not pass the first draft (it was retried, or the pilot got the fallback answer).
+
+Next step after the UI: a pilot's thumbs up/down on an answer, posted to the same run as feedback, which is the first signal on whether an answer was right that does not need Dan's labels.
 
 ## Rules
 

@@ -224,6 +224,10 @@ class OnlineRecordingClient(RecordingClient):
         self.feedback.append(stored)
         return stored
 
+    def flush(self, timeout: float | None = None) -> None:
+        """The real client's `flush()`: sends what is queued. Recorded, nothing is sent."""
+        self._record("flush")
+
     def get_run_url(self, *, run: ls_schemas.Run, project_name: str | None = None, project_id: uuid.UUID | None = None, address: Any = None) -> str:
         """LangSmith's `get_run_url(run=, project_name=)`: a fixed url for the run, recorded. `fail_run_url` makes it raise (a client that cannot say)."""
         self._record("get_run_url", run_id=run.id, project_name=project_name)

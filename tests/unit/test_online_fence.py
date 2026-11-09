@@ -322,9 +322,13 @@ def test_f2_a_whole_pass_makes_only_the_four_calls_the_job_needs():
     assert set(client.methods_called()) == {"read_project", "list_runs", "list_feedback", "create_feedback"}
 
 
+SEED = ONLINE / "seed.py"  # reads `intended_path` from the seed file to check it (PR-5.F1), and nothing else of a label
+
+
 @pytest.mark.parametrize("path", ONLINE_FILES, ids=lambda p: p.name)
 def test_f7_online_code_names_no_label_field(path):
-    assert [name for name in LABEL_NAMES if name in code_words(path.read_text(encoding="utf-8"))] == []
+    labels = [name for name in LABEL_NAMES if name != "intended_path" or path != SEED]  # the seed is the one module that names `intended_path`, and it is held to its own test below
+    assert [name for name in labels if name in code_words(path.read_text(encoding="utf-8"))] == []
 
 
 def code_words(source: str) -> set[str]:
@@ -370,6 +374,9 @@ def test_f7_a_run_that_carries_label_fields_scores_exactly_as_one_that_does_not(
 NEW_FILES = [
     ONLINE / "job.py",
     ONLINE / "summary.py",
+    ONLINE / "seed.py",
+    ONLINE / "seed_questions.yaml",
+    ROOT / "tests" / "unit" / "test_readme_production_evals.py",
     ROOT / "tests" / "online_helpers.py",
     ROOT / "tests" / "online_summary_helpers.py",
     ROOT / "tests" / "online_job_helpers.py",
@@ -448,3 +455,85 @@ def test_f3_the_online_eval_target_is_in_phony_and_nothing_else_calls_it():
     assert not [line for line in recipes if "online-eval" in line.replace("online-eval:", "") and "evals.online.job" not in line]  # no recipe calls the target: the one recipe line runs the module
     test_recipe = re.search(r"^test:[^\n]*\n((?:\t[^\n]*\n?)+)", makefile, re.MULTILINE)
     assert test_recipe and "online-eval" not in test_recipe[1] and "evals.online.job" not in test_recipe[1]
+
+
+# --- PR-5.F1: the seed's fence (F1, F3, F7) -----------------------------------------------------------------------------------------------------------
+
+SEED_SCHEDULERS = re.compile(r"crontab|launchctl|\.plist|dagu", re.IGNORECASE)
+INTENDED_PATH_READ = re.compile(r"""["']intended_path["']|\.intended_path\b|\bintended_path\s*=""")
+
+
+def scheduling_hits(texts: dict[str, str]) -> dict[str, list[str]]:
+    return {name: found for name, text in texts.items() if (found := SEED_SCHEDULERS.findall(text))}
+
+
+def online_texts() -> dict[str, str]:
+    """Every file under evals/online (the Python, the seed file, anything else added later; not the bytecode cache) and the Makefile."""
+    files = [path for path in sorted(ONLINE.rglob("*")) if path.is_file() and "__pycache__" not in path.parts]
+    return {str(path.relative_to(ROOT)): path.read_text(encoding="utf-8") for path in [*files, ROOT / "Makefile"]}
+
+
+def test_f3_the_seed_adds_no_cron_launchctl_plist_or_dagu_entry_to_evals_online_or_the_makefile():
+    texts = online_texts()
+    assert {"evals/online/seed.py", "evals/online/seed_questions.yaml", "Makefile"} <= set(texts)
+    assert scheduling_hits(texts) == {}
+    assert not [path for path in ROOT.rglob("*.plist") if ".venv" not in path.parts and "node_modules" not in path.parts]
+
+
+@pytest.mark.parametrize("text", ["0 8 * * * crontab -l", "launchctl load ~/Library/LaunchAgents/x", "com.flysafelz.online.plist", "dagu start online-seed", "DAGU: nightly"])
+def test_f3_the_scan_does_catch_each_scheduler(text):
+    assert scheduling_hits({"somewhere": text}) == {"somewhere": [SEED_SCHEDULERS.search(text).group(0)]}
+
+
+def test_f3_the_seed_target_is_in_phony_and_nothing_calls_it():
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+    assert re.search(r"^\.PHONY:.*\bonline-seed\b", makefile, re.MULTILINE)
+    recipes = [line for line in makefile.splitlines() if line.startswith("\t")]
+    assert [line for line in recipes if "evals.online.seed" in line] == ["\t@uv run $(if $(wildcard .env),--env-file .env) python -m evals.online.seed"]
+    assert not [line for line in recipes if "online-seed" in line]  # no recipe runs the target, `test` included
+    test_recipe = re.search(r"^test:[^\n]*\n((?:\t[^\n]*\n?)+)", makefile, re.MULTILINE)
+    assert test_recipe and "online-seed" not in test_recipe[1] and "evals.online.seed" not in test_recipe[1]
+    comment = makefile[: makefile.index("\nonline-seed:")].rsplit("\n\n", 1)[-1]
+    assert "needs keys" in comment and "only on Dan's Mac" in comment and "`make test` never runs it" in comment
+
+
+def test_f7_no_module_in_evals_online_but_the_seed_reads_intended_path():
+    for path in ONLINE_FILES:
+        text = path.read_text(encoding="utf-8")
+        if path == SEED:
+            continue
+        assert "intended_path" not in code_words(text), path.name
+        assert INTENDED_PATH_READ.search(text) is None, path.name
+    assert "intended_path" in code_words(SEED.read_text(encoding="utf-8"))  # the seed does, to check the file
+
+
+@pytest.mark.parametrize("source", ["row['intended_path']", "row.intended_path", "intended_path = row", 'x = {"intended_path": 1}'])
+def test_f7_the_scan_does_catch_a_read_of_the_label(source):
+    assert INTENDED_PATH_READ.search(source) is not None or "intended_path" in code_words(source)
+
+
+def test_f7_the_seed_sends_intended_path_nowhere():
+    """Outside the file check, the seed's code does not hold the name: not in the request, the config or the metadata it builds, nor in the functions that ask."""
+    tree = ast.parse(SEED.read_text(encoding="utf-8"))
+    builders = {node.name: ast.unparse(node) for node in ast.walk(tree) if isinstance(node, ast.FunctionDef) and node.name in {"request_for", "config_for", "ask_question", "main", "default_entry"}}
+    assert set(builders) == {"request_for", "config_for", "ask_question", "main", "default_entry"}
+    assert [name for name, text in builders.items() if "intended_path" in code_words(text)] == []  # a docstring may say what the code does not do
+
+
+def test_f1_the_seed_imports_nothing_from_5as_evaluators_or_judge_and_defines_no_metric():
+    source = SEED.read_text(encoding="utf-8")
+    assert not [name for name in modules_imported(source) if name == "evals.agent" or name.startswith("evals.agent.")]
+    assert not [name for name in string_constants(source) if name.startswith(("online.", "judge.")) or name in {"guard_pass", "decision_first", "step_cap"}]
+    assert not {name for name in imports_of(source) if "feedback" in name.lower() or "evaluat" in name.lower()}
+
+
+def test_f1_the_seed_posts_no_feedback_and_calls_nothing_but_the_run_url_and_the_flush():
+    source = SEED.read_text(encoding="utf-8")
+    called = set(_names_called(source))
+    assert not called & {"create_feedback", "list_feedback", "list_runs", "read_project", "create_run", "update_run", *FORBIDDEN_CALLS}
+    assert {"get_run_url", "flush", "collect_runs", "tracing_v2_enabled"} <= called
+    assert not fence_violations(source) and client_constructions(source) == []
+
+
+def test_f1_nothing_under_evals_agent_changed_in_this_branch():
+    assert changed_since_dev("evals/agent") == []

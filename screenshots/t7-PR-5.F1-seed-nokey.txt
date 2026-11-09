@@ -1,0 +1,26 @@
+$ make online-seed   (no keys in the environment)
+make online-seed needs these variables, which are not set (in the environment or in .env):
+LANGSMITH_API_KEY
+AGENT_BASE_URL
+AGENT_MODEL
+AGENT_API_KEY
+make: *** [online-seed] Error 2
+exit code: 2
+
+$ python -m evals.online.seed   (the same command, with no .env file loaded and nothing in the environment: all five named)
+make online-seed needs these variables, which are not set (in the environment or in .env):
+LANGSMITH_API_KEY
+AGENT_BASE_URL
+AGENT_MODEL
+AGENT_API_KEY
+OPENAIP_API_KEY
+exit code: 2
+
+$ the five variables each set to an empty string, as .env.example ships them
+make online-seed needs these variables, which are not set (in the environment or in .env):
+LANGSMITH_API_KEY
+AGENT_BASE_URL
+AGENT_MODEL
+AGENT_API_KEY
+OPENAIP_API_KEY
+exit code: 2
