@@ -1,0 +1,23 @@
+$ uv run pytest tests/unit/test_readme_production_evals.py -v --no-cov
+tests/unit/test_readme_production_evals.py::test_the_section_exists_once_and_comes_right_after_assessing_a_landing_zone PASSED [  7%]
+tests/unit/test_readme_production_evals.py::test_the_section_makes_every_claim_gp6_lists PASSED [ 15%]
+tests/unit/test_readme_production_evals.py::test_each_claim_check_fires_when_its_phrase_is_taken_out[an alert on online.guard_pass = 0] PASSED [ 23%]
+tests/unit/test_readme_production_evals.py::test_each_claim_check_fires_when_its_phrase_is_taken_out[it would run from cron or a scheduled job] PASSED [ 30%]
+tests/unit/test_readme_production_evals.py::test_each_claim_check_fires_when_its_phrase_is_taken_out[pilot thumbs up/down is a next step] PASSED [ 38%]
+tests/unit/test_readme_production_evals.py::test_each_claim_check_fires_when_its_phrase_is_taken_out[production runs have no labels] PASSED [ 46%]
+tests/unit/test_readme_production_evals.py::test_each_claim_check_fires_when_its_phrase_is_taken_out[the first runs were seeded, not organic] PASSED [ 53%]
+tests/unit/test_readme_production_evals.py::test_each_claim_check_fires_when_its_phrase_is_taken_out[the label-needing metrics never run online] PASSED [ 61%]
+tests/unit/test_readme_production_evals.py::test_each_claim_check_fires_when_its_phrase_is_taken_out[the offline evals carry the safety claim] PASSED [ 69%]
+tests/unit/test_readme_production_evals.py::test_the_section_names_the_two_commands_the_seed_and_the_job_and_the_summary_file PASSED [ 76%]
+tests/unit/test_readme_production_evals.py::test_the_quickstart_block_lists_make_online_seed_and_make_online_eval PASSED [ 84%]
+tests/unit/test_readme_production_evals.py::test_the_section_says_nothing_is_scheduled_and_installs_nothing PASSED [ 92%]
+tests/unit/test_readme_production_evals.py::test_the_section_scan_is_not_fooled_by_a_heading_inside_a_code_block PASSED [100%]
+============================== 13 passed in 0.88s ==============================
+$ grep -n "^## \|^### " README.md  (Production evals position)
+19:## Quickstart
+43:### Using the agent
+52:### Assessing a landing zone from the terminal (deterministic core only)
+64:## Production evals
+81:## TL;DR
+91:## Where to look first
+99:## Data and licences

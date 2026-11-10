@@ -1,0 +1,12 @@
+$ git diff --stat c4511e1..HEAD
+ evals/online/job.py                         | 37 ++++++++++++++++++-----------
+ evals/online/reference.py                   |  5 ++--
+ evals/online/seed.py                        |  4 ++--
+ evals/online/summary.py                     | 22 ++++++++++-------
+ tests/integration/test_make_eval_targets.py |  6 ++++-
+ tests/integration/test_online_eval_job.py   | 37 +++++++++++++++++++++++++----
+ tests/integration/test_online_job_rerun.py  | 12 ++++++++++
+ tests/online_job_helpers.py                 | 13 +++++-----
+ tests/unit/test_online_judge_input.py       | 16 ++++++++++++-
+ tests/unit/test_online_summary.py           | 18 +++++++++++++-
+ 10 files changed, 131 insertions(+), 39 deletions(-)

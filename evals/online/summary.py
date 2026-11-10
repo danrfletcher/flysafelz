@@ -17,7 +17,7 @@ nothing reads the same feedback and writes the same file: there is no time of th
     Deterministic checks   per check: pass rate = passes / n, with n the runs with a score of 1 or 0. A null is left out of n and counted on its own, by reason (`no guard record`, `no assess`, `path unknown`, `not applicable`, `check error: <class>`)
     Judge                  per path and criterion (the criteria are 5a's table), then a separate `unknown` row; with the JUDGE_* names unset, those names instead of rates; and the runs marked `not_sampled`
     Failing runs           every scored run with a score of 0 on any key: run link (`client.get_run_url`), path, the launch zone's name, the failing keys. No answer, question or phone number
-    Runs skipped           the pull's skips, by source (`case`, `judge`, `v0`, `missing`) and by reason (`experiment`, `source`, `errored`), the runs fully scored at this version, and the runs with an error (E5)
+    Runs skipped           the pull's skips, by source (`case`, `judge`, `v0`, `missing`) and by reason (`experiment`, `source`, `errored`), the runs fully scored at this version (the deterministic keys and the marker, and for a path with judge criteria its judge keys or the `not_sampled` record), and the runs with an error (E5)
     Evaluator version      the 12 hex characters, SINCE, LIMIT, and a line when LIMIT was hit (G3)
     Not scored online      the fixed line: missed blocker and verdict match need labels, and window IoU, noise and NOTAM action confusion are offline-only too
 
@@ -146,8 +146,14 @@ def _is_scored(run: ScoredRun, version: str) -> bool:
     return bool(current_feedback(run.feedback, version))
 
 
-def _is_complete(held: Mapping[str, Any]) -> bool:
-    return job.VERSION_KEY in held and all(key in held for key in job.DETERMINISTIC_KEYS)
+def _is_complete(held: Mapping[str, Any], path: str) -> bool:
+    """Fully scored at this version: every deterministic key and the version marker, and, for a path the judge has criteria for, either all of its judge keys or the `not_sampled` record.
+
+    A run the judge has not reached (the JUDGE_* names unset, or its call raised) has neither, so a later pass can still fill it in and it is not counted."""
+    if job.VERSION_KEY not in held or not all(key in held for key in job.DETERMINISTIC_KEYS):
+        return False
+    judge_keys = job.judge_keys_for(path)
+    return not judge_keys or job.SAMPLED_KEY in held or all(key in held for key in judge_keys)
 
 
 def _order(runs: Iterable[ScoredRun]) -> list[ScoredRun]:
@@ -204,9 +210,7 @@ def _failing(runs: Sequence[ScoredRun], held: Sequence[Mapping[str, Any]], link:
 
 
 def _errors(runs: Sequence[ScoredRun]) -> list[dict[str, Any]]:
-    return [
-        {"run_id": run.run_id, "stage": run.error.stage, "key": run.error.key, "error_class": run.error.error_class} for run in runs if run.error is not None
-    ]
+    return [{"run_id": run.run_id, "stage": run.error.stage, "key": run.error.key, "error_class": run.error.error_class} for run in runs if run.error is not None]
 
 
 def build_report(data: ReportInput) -> dict[str, Any]:
@@ -234,7 +238,7 @@ def build_report(data: ReportInput) -> dict[str, Any]:
             "total": sum(data.skipped_by_reason.values()),
             "by_source": dict(sorted(data.skipped_by_source.items())),
             "by_reason": dict(sorted(data.skipped_by_reason.items())),
-            "fully_scored": sum(1 for found in held if _is_complete(found)),
+            "fully_scored": sum(1 for run, found in zip(scored, held, strict=True) if _is_complete(found, run.path)),
             "errors": _errors(ordered),
         },
         "offline_only": [OFFLINE_LABELS_LINE, OFFLINE_ONLY_LINE],
@@ -333,7 +337,9 @@ def render_markdown(report: Mapping[str, Any]) -> str:
 def summary_lines(report: Mapping[str, Any]) -> list[str]:
     """The lines printed to stdout, from the same dict."""
     skipped = report["skipped"]
-    lines = [f"online eval {report['date']}: {_plural(report['runs'], 'run')} scored at evaluator version {report['version']} (project {report['project']}, SINCE={report['since']}, LIMIT={report['limit']})"]
+    lines = [
+        f"online eval {report['date']}: {_plural(report['runs'], 'run')} scored at evaluator version {report['version']} (project {report['project']}, SINCE={report['since']}, LIMIT={report['limit']})"
+    ]
     for row in report["checks"]:
         lines.append(f"  {row['name']}: {_pct(row['rate'])} ({row['passed']}/{row['n']}), {row['null_count']} null")
     if report["judge"]["missing"]:

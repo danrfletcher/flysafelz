@@ -45,13 +45,13 @@ when feedback with its name carries the current version (in `extra`, else read f
 then `online.evaluator_version` last, and only if every key before it posted. A feedback from an older version is never edited or deleted, and a new version posts every key again. A run is `already scored` only when
 every applicable key and the version marker exist at this version; it then gets no write. If `create_feedback` raises, the run is reported (run id, key, error class), nothing after that key is posted for it
 (the version marker included), and the job goes on to the next run; a rerun posts only what is missing. If `list_feedback` raises, nothing is posted for that run (a blind post could duplicate a key) and the run is reported as errored.
-A trace that cannot be read or built into a reference is reported as errored too. `read_project` failing is not caught: with no project UUID nothing can be posted.
+A trace that cannot be read or built into a reference is reported as errored too (stage `read trace`), and so is a run whose check gives a score outside 1, 0 or null (stage `score`: a programming error in a check, with nothing posted for the run). `read_project` failing is not caught: with no project UUID nothing can be posted.
 
 The sampled judge (PR-3.F1, G8). 5a's judge is imported unchanged (`Judge`, `criteria_for`, `build_judge`) and called as `judge.judge(example, answer)`, once per judged run. It is given what 5a gives it for a labelled
 example, built from the run alone: `inputs.question` (the last pilot message of the run's inputs), `inputs.now`, `inputs.lat` and `inputs.lon`, and `reference.path`, which is the run's own path. The answer is the
 delivered answer with the path tag removed by ticket 4's `split_path`. 5a's `Judge.judge` takes no LZ name, so the run's `lz_name` is passed as the example's `fixtures.case`, which 5a turns into the place line
 (`lz_name_from_case`: the words are capitalised and an underscore is a space, so `Blue Mill` comes back as `Blue Mill`); with no `lz_name` there is no `fixtures`, and 5a writes the coordinates. A run with neither
-a name nor coordinates, or with no pilot question in its inputs, cannot be given to the judge: it is that run's judge error. Nothing reads a label, and no model output is written anywhere but LangSmith feedback.
+a usable name (one 5a reduces to nothing, such as `_` or a bare date, is not a name) nor coordinates, or with no pilot question in its inputs, cannot be given to the judge: it is that run's judge error. Nothing reads a label, and no model output is written anywhere but LangSmith feedback.
     key                          posted for
     online.judge.<criterion>     every criterion of the run's path in 5a's table (`criteria_for(path)`); a criterion 5a returns no grade for is a null, `no result from the judge`; 5a's own `judge error: ...` null is posted as it is
     online.judge.sampled         a run the sample left out: value `not_sampled`, score null, a comment holding the reason, `sample_pct=<n>` and the evaluator version
@@ -81,7 +81,7 @@ from evals.agent.evaluators.answer import UNKNOWN_PATH, V1, ScoredAnswer, ToolCa
 from evals.agent.evaluators.form import cited_guidance, decision_first, guard_pass, recheck_stated, window_stated
 from evals.agent.evaluators.safety import no_verdict_beyond_day3
 from evals.agent.evaluators.trajectory import forbidden_tools, step_cap_ok
-from evals.agent.judge import Judge, build_judge, criteria_for
+from evals.agent.judge import Judge, build_judge, criteria_for, lz_name_from_case
 from evals.agent.judge import feedback_key as judge_feedback_key
 from evals.agent.judge_config import missing_judge_settings
 from evals.online.pull import DEFAULT_SINCE, SINCE_VARIABLE, USAGE_EXIT, pull_runs, settings_from_env
@@ -120,7 +120,7 @@ NOT_APPLICABLE = "not applicable"
 CHECK_ERROR = "check error"
 
 SCORED, ALREADY_SCORED, ERRORED = "scored", "already scored", "errored"
-READ_TRACE, LIST_FEEDBACK, POST, JUDGE = "read trace", "list feedback", "post", "judge"  # where a run's error happened
+READ_TRACE, SCORE, LIST_FEEDBACK, POST, JUDGE = "read trace", "score", "list feedback", "post", "judge"  # where a run's error happened
 JUDGED, NOT_SAMPLED = "judged", "not_sampled"  # what the sample decided for an eligible run; NOT_SAMPLED is also the value of the `online.judge.sampled` feedback
 SAMPLED_KEY = PREFIX + "judge.sampled"
 SAMPLE_PCT_VARIABLE = "JUDGE_SAMPLE_PCT"
@@ -425,9 +425,9 @@ def judge_input(run: Any, reference: OnlineReference) -> tuple[dict[str, Any], S
 
     The place is the run's `lz_name` (as the example's `fixtures.case`, see the module text), else the run's coordinates, which 5a writes as `the launch zone at <lat>, <lon>`. ValueError when there is no
     pilot question, or neither a name nor coordinates."""
-    name = reference.lz_name
+    name = reference.lz_name if lz_name_from_case(reference.lz_name) is not None else None  # a name 5a reduces to nothing ('_', a bare date) is no name
     if name is None and (reference.lat is None or reference.lon is None):
-        raise ValueError("the run has no lz_name and no lat and lon in its inputs")
+        raise ValueError("the run has no usable lz_name and no lat and lon in its inputs")
     inputs = {"question": question_of(run), "now": reference.now.isoformat(), "lat": 0.0 if reference.lat is None else reference.lat, "lon": 0.0 if reference.lon is None else reference.lon}
     example: dict[str, Any] = {"id": str(getattr(run, "id", "run")), "inputs": inputs, "reference": {"path": reference.path}}
     if name is not None:
@@ -469,7 +469,10 @@ class JudgeSetup:
 
 
 def judge_setup_from_env(environ: Mapping[str, str] | None = None, build: Callable[[Mapping[str, str]], Judge] = build_judge) -> JudgeSetup:
-    """`JUDGE_SAMPLE_PCT` first (a bad value exits 2 naming it, before any client exists), then the judge: `build(environ)` only when every JUDGE_* variable is set, else the missing names and no judge."""
+    """`JUDGE_SAMPLE_PCT` first (a bad value exits 2 naming it, before any client exists), then the judge: `build(environ)` only when every JUDGE_* variable is set, else the missing names and no judge.
+
+    `JUDGE_SAMPLE_PCT` is read from `environ` only, not from the `.env` file; the four JUDGE_* settings are also read from `.env` (judge_config). `make online-eval` starts the job with `uv run --env-file .env`,
+    so a `JUDGE_SAMPLE_PCT` in `.env` reaches `environ` there; running `python -m evals.online.job` by hand does not load `.env`."""
     env = os.environ if environ is None else environ
     pct = parse_sample_pct(env[SAMPLE_PCT_VARIABLE]) if SAMPLE_PCT_VARIABLE in env else DEFAULT_SAMPLE_PCT
     missing = tuple(missing_judge_settings(env))
@@ -481,7 +484,7 @@ def judge_setup_from_env(environ: Mapping[str, str] | None = None, build: Callab
 
 @dataclass(frozen=True)
 class RunError:
-    stage: str  # READ_TRACE, LIST_FEEDBACK, POST or JUDGE
+    stage: str  # READ_TRACE, SCORE, LIST_FEEDBACK, POST or JUDGE
     error_class: str
     message: str
     key: str | None = None  # the key that failed to post
@@ -550,13 +553,12 @@ def _short(error: Exception) -> str:
     return str(error).replace("\n", " ")[:MESSAGE_LIMIT]
 
 
-def _read_and_score(client: Any, project: str, run: Any, result: RunResult) -> OnlineReference:
+def _read(client: Any, project: str, run: Any, result: RunResult) -> tuple[OnlineReference, list[Any]]:
     rows = client.list_runs(project_name=project, trace_id=getattr(run, "trace_id", None) or run.id)
     tree = [row for row in rows if row.id != run.id]
     reference = build_reference(run, tree)
     result.path, result.path_unknown = reference.path, reference.path == UNKNOWN_PATH
-    result.scores = score_run(run, reference, tree)
-    return reference
+    return reference, tree
 
 
 def _post(client: Any, run: Any, keys: Sequence[str], scores: Mapping[str, KeyScore], result: RunResult, session_id: UUID, version: str) -> None:
@@ -579,11 +581,16 @@ def _prepare(client: Any, project: str, run: Any) -> _Prepared:
     """Read the run's trace, score it, and read its existing feedback. A failure is the run's error, not the job's, and nothing is posted for it."""
     item = _Prepared(run, RunResult(run.id))
     try:
-        item.reference = _read_and_score(client, project, run, item.result)
+        reference, tree = _read(client, project, run, item.result)
     except Exception as error:  # noqa: BLE001 - a trace that cannot be read or built is this run's error, not the job's
-        item.reference = None
         item.result.status, item.result.error = ERRORED, RunError(READ_TRACE, type(error).__name__, _short(error))
         return item
+    try:
+        item.result.scores = score_run(run, reference, tree)
+    except Exception as error:  # noqa: BLE001 - a check that gives a score outside 1, 0 or None (normalise_score) is a programming error: named as its own stage, nothing is posted for the run
+        item.result.status, item.result.error = ERRORED, RunError(SCORE, type(error).__name__, _short(error))
+        return item
+    item.reference = reference
     try:
         item.existing = list(client.list_feedback(run_ids=[run.id]))
     except Exception as error:  # noqa: BLE001 - without the existing feedback a post could duplicate a key, so nothing is posted
@@ -700,7 +707,9 @@ def make_client(environ: Mapping[str, str] | None = None, factory: Callable[...,
     env = os.environ if environ is None else environ
     key = env.get(API_KEY_VARIABLE, "").strip()
     if not key:
-        _refuse(f"{API_KEY_VARIABLE} is not set: it is needed to read the production runs and post feedback on LangSmith. Nothing was sent. Set it in the environment or in .env, then run `make online-eval` again.")
+        _refuse(
+            f"{API_KEY_VARIABLE} is not set: it is needed to read the production runs and post feedback on LangSmith. Nothing was sent. Set it in the environment or in .env, then run `make online-eval` again."
+        )
     if factory is None:
         from langsmith import Client
 

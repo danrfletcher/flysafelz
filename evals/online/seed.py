@@ -43,7 +43,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.tracers.context import collect_runs, tracing_v2_enabled
 
 from evals.online.pull import guard_project
-from evals.online.reference import _path_of
+from evals.online.reference import path_of
 from flysafelz.agent import tracing
 from flysafelz.agent.config import AGENT_VARIABLES, LANGSMITH_KEY
 from flysafelz.agent.graph import build_graph
@@ -181,7 +181,7 @@ def ask_question(question: Question, entry: EntryPoint, client: Any) -> Any:
 
 def _line(question: Question, run: Any, client: Any, project: str, stdout: TextIO, stderr: TextIO) -> bool:
     """Print the question's line. False when there is no URL for it."""
-    path = _path_of(run)
+    path = path_of(run)
     try:
         url = client.get_run_url(run=run, project_name=project)
     except Exception as error:  # noqa: BLE001 - whatever the client raises, the run is there and the line still names it
