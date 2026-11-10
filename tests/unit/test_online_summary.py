@@ -227,8 +227,24 @@ def test_a_run_start_time_in_the_report_is_not_needed_for_the_date_and_the_repor
 
 
 def test_fully_scored_counts_the_runs_with_every_deterministic_key_and_the_marker_at_this_version():
-    runs = [scored_run("a", minutes=1), scored_run("b", marker=False, minutes=2), scored_run("c", only=["guard_pass"], minutes=3)]
+    runs = [
+        scored_run("a", judge=judge_all("assess"), minutes=1),
+        scored_run("b", judge=judge_all("assess"), marker=False, minutes=2),
+        scored_run("c", only=["guard_pass"], judge=judge_all("assess"), minutes=3),
+    ]
     assert report_for(runs)["skipped"]["fully_scored"] == 1
+
+
+def test_a_run_whose_path_has_judge_criteria_is_fully_scored_only_with_its_judge_keys_or_the_not_sampled_record():
+    # E4: the judge was never set up, so the job posted the marker with no judge key: a later run fills them in, so the run is not complete yet
+    unjudged = scored_run("a", minutes=1)
+    partly = scored_run("b", judge={name: 1 for name in list(judge_all("assess"))[:1]}, minutes=2)
+    judged = scored_run("c", judge=judge_all("assess"), minutes=3)
+    left_out = scored_run("d", extra=[posted(job.SAMPLED_KEY, None, "left out of the judge sample")], minutes=4)
+    no_criteria = scored_run("e", path="unknown", minutes=5)  # 5a has no judge criteria for `unknown`: its deterministic keys are all there is
+    assert len(judge_all("assess")) > 1
+    report = report_for([unjudged, partly, judged, left_out, no_criteria])
+    assert report["runs"] == 5 and report["skipped"]["fully_scored"] == 3
 
 
 def test_a_post_failure_is_listed_under_its_run_with_the_stage_key_and_class_and_no_message():

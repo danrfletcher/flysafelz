@@ -59,8 +59,22 @@ def test_a_name_without_coordinates_is_enough():
 def test_neither_a_name_nor_coordinates_cannot_be_given_to_the_judge():
     tree = judge_tree("nowhere")
     del tree.root.inputs["lat"], tree.root.inputs["lon"]
-    with pytest.raises(ValueError, match="no lz_name and no lat and lon"):
+    with pytest.raises(ValueError, match="no usable lz_name and no lat and lon"):
         given(tree)
+
+
+@pytest.mark.parametrize("name", ["_", "2026-10-31", "_2026-10-31_3day"])
+def test_a_name_5a_reduces_to_nothing_with_no_coordinates_cannot_be_given_to_the_judge_instead_of_showing_0_0(name):
+    tree = judge_tree("emptyname", lz_name=name)
+    del tree.root.inputs["lat"], tree.root.inputs["lon"]
+    with pytest.raises(ValueError, match="no usable lz_name and no lat and lon"):
+        given(tree)
+
+
+def test_a_name_5a_reduces_to_nothing_falls_back_to_the_run_s_coordinates():
+    tree = judge_tree("emptyname", lz_name="_")
+    assert "fixtures" not in given(tree)[0]
+    assert "\nLocation: the launch zone at 53.8028, -0.0866\n" in message_for(tree)
 
 
 # --- the answer ------------------------------------------------------------------------------------------------------------------------------

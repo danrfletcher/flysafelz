@@ -81,7 +81,8 @@ def _now_of(run: Any) -> datetime:
     return _utc(started)
 
 
-def _path_of(run: Any) -> str:
+def path_of(run: Any) -> str:
+    """The run's path: root metadata `path`, else root outputs `path`, else `unknown`. The one reading of it: `build_reference` and the seed's output lines both use it."""
     for source in (metadata_of(run), outputs_of(run)):
         path = normalise_path(source.get(PATH_KEY))
         if path != UNKNOWN_PATH:
@@ -150,7 +151,7 @@ def _assess_of(tree: Sequence[Any]) -> AssessedWindow | None:
 
 def build_reference(run: Any, tree: Sequence[Any]) -> OnlineReference:
     """The reference for one root run and the runs below it. Raises ValueError only for a run with no start_time and no usable `now` (a run LangSmith never gives)."""
-    path = _path_of(run)
+    path = path_of(run)
     inputs = inputs_of(run)
     assess = _assess_of(tree)
     return OnlineReference(

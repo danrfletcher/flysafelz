@@ -177,6 +177,18 @@ def test_e5_a_trace_that_cannot_be_read_is_reported_for_that_run_and_the_job_con
     assert [result.runs[1].status, result.runs[2].status] == [job.SCORED, job.SCORED]
 
 
+def test_a_check_that_scores_outside_1_0_or_none_is_a_score_error_not_a_read_trace_error(monkeypatch):
+    trees = three_runs()
+    client = client_for(trees)
+    monkeypatch.setitem(job.ONLINE_CHECKS, job.STEP_CAP, lambda example, answer: {"score": 0.5, "comment": "half"})
+    result = job.score_and_post(client, PROJECT, [tree.root for tree in trees], version=VERSION)
+    for item in result.runs:
+        assert item.status == job.ERRORED and item.error is not None and item.error.stage == job.SCORE
+        assert item.error.error_class == "ValueError" and item.posted == []
+    assert client.create_calls() == []  # no run got feedback
+    assert "errored at score: ValueError" in "\n".join(job.report_lines(result))
+
+
 def test_e2_a_run_with_no_path_is_flagged_path_unknown_in_its_record():
     tree = scored_tree("unk", path="unknown", answer=good_answer())
     client = client_for([tree])

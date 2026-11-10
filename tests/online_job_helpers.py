@@ -1,9 +1,9 @@
 """The fixtures `make online-eval`'s tests share (7 PR-4.F1): a project of fake runs on the online recording client, and the environment and clock the job is started with.
 
-    world(extra=...)     (client, trees): 11 seed runs (4 assess, 3 explain, 2 clarify, 2 decline), 2 pilot runs, and the runs the job must skip: 1 `case`, 1 `judge`, 1 errored, 1 with a `reference_example_id`
-    job_env(**kw)        the environment of the job: the project and the four JUDGE_* values (fake: no judge is built from them), and no LANGSMITH key (the client is passed in)
-    run_job(client, results_dir, ...)   `job.main` on that client with a fixed clock and a fake judge; returns (exit code, the judge)
-    results(results_dir) the files in the folder
+world(extra=...)     (client, trees): 11 seed runs (4 assess, 3 explain, 2 clarify, 2 decline), 2 pilot runs, and the runs the job must skip: 1 `case`, 1 `judge`, 1 errored, 1 with a `reference_example_id`
+job_env(**kw)        the environment of the job: the project and the four JUDGE_* values (fake: no judge is built from them), and no LANGSMITH key (the client is passed in)
+run_job(client, results_dir, ...)   `job.main` on that client with a fixed clock and a fake judge; returns (exit code, the judge)
+results(results_dir) the files in the folder
 """
 
 import uuid
@@ -18,7 +18,9 @@ from online_judge_helpers import FakeJudge, judge_client, judge_tree
 from evals.online import job
 
 PROJECT = "flysafelz"
-CLOCK = datetime(2026, 10, 31, 8, 0, tzinfo=UTC)  # an hour and a half after the fake runs started (the conftest `now`, 07:30, less the hour the runs are given); GMT, so the file is online-2026-10-31.md
+CLOCK = datetime(
+    2026, 10, 31, 8, 0, tzinfo=UTC
+)  # an hour and a half after the fake runs started (the conftest `now`, 07:30, less the hour the runs are given); GMT, so the file is online-2026-10-31.md
 SEED_PATHS = ["assess"] * 4 + ["explain"] * 3 + ["clarify"] * 2 + ["decline"] * 2
 LZ_NAMES = ["Blue Mill", "West Sleekburn", "Druridge Bay", "Buttermere", "Crookham"]
 FICTION_NUMBER = "01632 960123"  # the fiction range: never a real number
@@ -72,4 +74,3 @@ def posted_keys(client: OnlineRecordingClient) -> dict[Any, list[str]]:
 
 def expected_keys(path: str) -> list[str]:
     return [*job.DETERMINISTIC_KEYS, *job.judge_keys_for(path), job.VERSION_KEY]
-

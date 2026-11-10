@@ -4,9 +4,11 @@
 The 17 runs are 11 seed runs, 2 pilot runs, and the 4 the job must skip (a `case`, a `judge`, an errored one and one with a `reference_example_id`). The tests print what the evidence files hold (`-s` shows it).
 """
 
+import ast
 import hashlib
 import re
 from datetime import UTC, timedelta
+from pathlib import Path
 
 import pytest
 from online_helpers import OnlineRecordingClient
@@ -17,6 +19,8 @@ from evals.agent.loader import SPLITS, experiment_target
 from evals.online import job
 
 FILE = "online-2026-10-31.md"
+PROCESS_MODULES = ("subprocess", "git", "dulwich", "pygit2", "sh")
+PROCESS_CALLS = ("system", "popen", "exec", "spawn", "posix_spawn")
 SCORED = 13
 
 
@@ -160,9 +164,33 @@ def test_the_results_folder_is_made_when_it_is_missing_and_nothing_is_added_to_g
     folder = tmp_path / "evals" / "results"
     run_job(client, folder)
     assert results(folder) == [FILE]
-    from pathlib import Path
+    for module in sorted(Path(job.__file__).parent.glob("*.py")):  # the whole package: the job, the pull, the summary and the seed
+        assert process_or_git_use(module.read_text(encoding="utf-8")) == [], module.name
 
-    assert "git" not in (Path(job.__file__).read_text(encoding="utf-8").replace("guard_flow", "")).split("def main")[1].lower().replace("github", "")
+
+def process_or_git_use(source: str) -> list[str]:
+    """What in the module text starts a process or reaches git: an import of `subprocess` or a git library, a call to `os.system`, `os.popen` or `os.exec*`/`spawn*`, or a call with a string that begins with `git`."""
+    found = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            found += [alias.name for alias in node.names if alias.name.split(".")[0] in PROCESS_MODULES]
+        elif isinstance(node, ast.ImportFrom) and (node.module or "").split(".")[0] in PROCESS_MODULES:
+            found.append(node.module or "")
+        elif isinstance(node, ast.Call):
+            function = node.func
+            if isinstance(function, ast.Attribute) and isinstance(function.value, ast.Name) and function.value.id == "os" and function.attr.startswith(PROCESS_CALLS):
+                found.append(f"os.{function.attr}")
+            found += [f"call with {arg.value!r}" for arg in node.args if isinstance(arg, ast.Constant) and isinstance(arg.value, str) and arg.value.split(" ")[0] == "git"]
+    return found
+
+
+def test_the_scan_for_a_process_or_git_use_finds_each_kind_in_a_module_that_has_one():
+    assert process_or_git_use("import subprocess\n") == ["subprocess"]
+    assert process_or_git_use("from subprocess import run\n") == ["subprocess"]
+    assert process_or_git_use("import git\n") == ["git"]
+    assert process_or_git_use("import os\nos.system('ls')\n") == ["os.system"]
+    assert process_or_git_use("run('git add -A')\n") == ["call with 'git add -A'"]
+    assert process_or_git_use("import os\nos.environ.get('X')\nprint('github')\n") == []
 
 
 # --- the older version, the window and the experiments -------------------------------------------------------------------------------------
@@ -211,7 +239,7 @@ def test_e2_a_path_unknown_run_is_in_the_unknown_row_and_the_null_counts_and_is_
     assert code == 0 and len(judge.calls) == SCORED  # 14 scored runs; the unknown one has no judge criteria
     assert "14 runs scored" in text
     assert "| unknown | no judge criteria for this path (1 run) | n/a | 0 | 0 |" in text
-    assert "| decline_no_tools | 100.0% | 4/4 | 4 | 10 (path unknown: 1" in text or "path unknown: 1" in text
+    assert "| decline_no_tools | 0.0% | 0/2 | 2 | 12 (not applicable: 11, path unknown: 1) |" in text.splitlines()
     assert str(unknown.root.id) not in text and "unknown |" not in text.split("## Failing runs")[1].split("## Runs skipped")[0]
 
 
@@ -251,6 +279,7 @@ def test_e4_with_the_judge_variables_unset_every_deterministic_rate_is_there_and
     assert "The judge was not run: JUDGE_BASE_URL, JUDGE_MODEL not set." in text
     assert "| guard_pass | 100.0% | 13/13 | 13 | 0 |" in text and "online.judge" not in posted_text(client)
     assert all(f"| {key.removeprefix('online.')} |" in text for key in job.DETERMINISTIC_KEYS)
+    assert "- fully scored at this evaluator version: 0" in text  # the marker is posted, but no run has its judge keys yet: a later run fills them in
     assert "judge: not run, JUDGE_BASE_URL, JUDGE_MODEL not set" in capsys.readouterr().out
     # a later run with the judge set fills the judge keys in, and the file then shows rates
     run_job(client, tmp_path)
