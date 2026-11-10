@@ -24,6 +24,8 @@ make test      # all tests, no network
 make run       # the agent in the terminal
 make dev       # the LangGraph server and the UI (Studio works against the same server)
 make eval      # the agent eval on dev; SPLIT=held_out for held-out
+make online-seed   # asks the 11 seed questions through the agent on live data, traced into LangSmith; needs keys, runs only on Dan's Mac, never in `make test`
+make online-eval   # scores the production runs in LangSmith and posts the scores as feedback; needs LANGSMITH_API_KEY, never in `make test`
 ```
 Settings go in `.env` (copy `.env.example`, gitignored). The example file stays empty on purpose: a test fails if a value is ever committed to it. Each model role takes any OpenAI-compatible endpoint that supports tool calling and JSON-schema output.
 
@@ -58,6 +60,23 @@ uv run python -m flysafelz.cli assess --lat 53.802797 --lon -0.086644 # live; ne
 It prints the assessment hour by hour, then whether each data source worked, the flyable windows and the overall verdict. `--start` and `--end` pick a window (ISO 8601 with a timezone; the end is exclusive). `--debug` also lists the NOTAMs that were dropped and why. In a live run, `--reader live` has the model read the NOTAMs; without it, any NOTAM over the field that needs reading shows as UNVERIFIED. No flag changes a limit. The expected outputs for both cases are saved in `tests/golden/` (`uv run pytest --update-golden` rewrites them).
 
 A case replays a saved day. The NOTAM archive only saved the bulletin about twice a day, so a case treats its bulletin as current at the case's own time. In live mode, a bulletin more than 3 hours old makes the answer UNVERIFIED. One made-up case, `fixtures/stale_pib_constructed/`, keeps that rule on so it stays tested.
+
+## Production evals
+
+The offline evals (`make eval`, with Dan's labels) say whether the agent is right. The online eval says whether the runs it actually made look sound. It is a LangSmith SDK job, not a hosted evaluator, and it adds no metric of its own: it calls the offline evals' checks.
+
+What runs online, and why. A production run has no labels, so nothing can say what the verdict should have been. Missed blocker, verdict match, window overlap, noise and NOTAM action confusion all need a label, so they never run online, and the offline evals carry the safety claim. What does run is what can be read from the answer and its trace alone:
+
+- On every run: the guard's result (`online.guard_pass`), the verdict stated first (`online.decision_first`), the guidance cited when `search_guidance` was called (`online.cited_guidance`), the re-check time stated (`online.recheck_stated`), the assumed window stated (`online.assumed_window_stated`), no verdict beyond day 3 (`online.no_verdict_beyond_day3`), the step cap (`online.step_cap`) and no tool called on a decline (`online.decline_no_tools`).
+- On a sample: the offline judge's criteria for the run's own path (`online.judge.<criterion>`). With 50 or fewer runs to judge, all are judged; above that, 20% by a hash of the run id (`JUDGE_SAMPLE_PCT`), so a rerun picks the same runs.
+
+`make online-eval` reads the root runs of the LangSmith project (`LANGSMITH_PROJECT`, default `flysafelz`) that started in the last `SINCE` (default `7d`; `LIMIT`, default 500, caps how many are read). Only runs whose `source` is `pilot` or `online-seed` are scored: Studio and `make run` case runs, the judge's own calls, the v0 baseline and every eval experiment run are skipped and counted by source. It refuses the offline eval's held-out and dev experiment projects. Each score goes onto its run as feedback with a comment, and `online.evaluator_version` is posted last. A rerun posts only what a run is missing, so a second `make online-eval` posts nothing new. The summary, `evals/results/online-<date>.md`, has each check's pass rate with n, the judge's pass rates by path, the failing runs with links, the runs skipped, the evaluator version, and the line that missed blocker and verdict match need labels.
+
+The first runs were seeded, not organic. There was no pilot traffic to score, so `make online-seed` asks the 11 questions in `evals/online/seed_questions.yaml` through the agent on live data (4 assess, 3 explain, 2 clarify, 2 decline, at five landing zones, with relative times only) and tags each run `source: online-seed` with its `lz_name`. The questions are written by hand and edited by Dan before the first run; they are not labels, and the `intended_path` beside each is for reading and is never scored. The seed needs `LANGSMITH_API_KEY`, the agent's `AGENT_BASE_URL`, `AGENT_MODEL` and `AGENT_API_KEY`, and `OPENAIP_API_KEY`, and names any that is missing before it asks anything. Seeded runs show that the job works; they say nothing about how real pilots use the agent.
+
+How it would run in production. Nothing is scheduled here: no cron entry, no scheduled job and no alert is installed. In production the same command would run from cron or a scheduled job every day or so, and an alert would fire on `online.guard_pass` = 0, which means the guard did not pass the first draft (it was retried, or the pilot got the fallback answer).
+
+Next step after the UI: a pilot's thumbs up/down on an answer, posted to the same run as feedback, which is the first signal on whether an answer was right that does not need Dan's labels.
 
 ## TL;DR
 

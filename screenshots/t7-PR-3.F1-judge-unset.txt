@@ -1,0 +1,9 @@
+# E4: the JUDGE_* variables unset, then set
+unset: judge built=False missing=['JUDGE_PROVIDER', 'JUDGE_BASE_URL', 'JUDGE_API_KEY', 'JUDGE_MODEL'] pct=20
+unset pass: posts=117 judge keys posted=[] not_sampled posted=False judge_calls=0
+unset pass: every run holds the deterministic keys and the version marker only: True
+job result judge_missing=['JUDGE_PROVIDER', 'JUDGE_BASE_URL', 'JUDGE_API_KEY', 'JUDGE_MODEL']
+  judge not run: JUDGE_PROVIDER, JUDGE_BASE_URL, JUDGE_API_KEY, JUDGE_MODEL not set; the judge keys stay missing for a later pass
+set: judge built=True missing=[]
+set pass: judge_calls=13 new posts=33 deterministic posts=0 judge posts=33 version posts=0 judge_missing=[]
+set pass: keys posted are all judge keys: True

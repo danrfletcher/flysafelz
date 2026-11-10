@@ -1,0 +1,7 @@
+# E8: 120 eligible runs, JUDGE_SAMPLE_PCT default (20)
+first pass: eligible=120 judged=30 not_sampled=90 judge_calls=30 (judged + not_sampled = 120)
+judged set equals the run-id hash rule's set (bucket < 20): True
+a not_sampled record: key=online.judge.sampled value=not_sampled score=None
+  comment: left out of the judge sample: 120 eligible runs, more than 50, chosen by run-id hash at sample_pct=20 | evaluator_version=0123456789ab
+rerun: eligible=0 new judge calls=0 new posts=0 not_sampled records stored=90 (same 90)
+rerun statuses=['already scored']; judged set unchanged: True

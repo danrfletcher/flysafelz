@@ -1,0 +1,17 @@
+# GP5: the same driver, second pass over the same store and the same judge
+judge calls this pass=0, feedback posted=0, create_feedback calls=0
+statuses=['already scored'], eligible=0, duplicates=0
+project flysafelz, evaluator version 0123456789ab: 11 run(s)
+1fe0e752-5cb0-508e-8340-5abab30a5e21 already scored
+d2b0cc5b-2acf-566c-91fa-b5d64fbc89cd already scored
+e99bab98-e9b8-5216-8c4a-673fd99e99d0 already scored
+422023e0-494a-5a08-97ce-d24729ad8d49 already scored
+01b8f3e5-f2fc-51ba-88b5-e80a42775659 already scored
+d794a50b-ebe2-592b-8787-a3ce21e468bf already scored
+2b1116d9-19c5-5e55-a02f-a75a304a62f0 already scored
+f6392a6e-ca2d-53aa-8bed-19579d938d64 already scored
+6db0f306-e034-5f86-8f28-c3400009867b already scored
+1ec97cf5-1030-53bd-90ad-edba4dda3a59 already scored
+ef6f7d1a-0593-5db7-9c57-1fb11cdd3c2f already scored
+judge: 0 eligible, 0 judged (0 call(s)), 0 not sampled, at JUDGE_SAMPLE_PCT=20
+0 scored, 11 already scored, 0 errored; 0 feedback posted

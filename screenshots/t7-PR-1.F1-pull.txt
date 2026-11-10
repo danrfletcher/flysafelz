@@ -1,0 +1,18 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+network: --disable-socket in effect
+rootdir: /Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-10
+configfile: pyproject.toml
+plugins: langsmith-0.14.17, cov-7.1.0, socket-0.8.1, anyio-4.16.0
+collected 100 items / 99 deselected / 1 selected
+
+tests/unit/test_online_pull.py 
+read 12 root runs from flysafelz (since 7d, limit 500, limit_hit=False)
+list_runs called 1 time: {'project_name': 'flysafelz', 'is_root': True, 'start_time': datetime.datetime(2026, 10, 24, 7, 30, tzinfo=datetime.timezone.utc)}
+scorable (4): pilot-1, pilot-2, seed-1, seed-2
+skipped (8): case-1 [source], judge-1 [source], v0-1 [source], studio-1 [source], no-source-1 [source], experiment-1 [experiment], errored-1 [errored], no-answer-1 [errored]
+by reason: errored=2, experiment=1, source=5
+by source (reason 'source'): case=1, judge=1, missing=1, studio=1, v0=1
+.
+
+======================= 1 passed, 99 deselected in 0.48s =======================

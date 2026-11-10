@@ -1,0 +1,88 @@
+# The 11 questions `make online-seed` asks the agent on live data (7 PR-5.F1, G1). Written by the builder, for Dan to read and edit before the first run.
+#
+# 4 assess, 3 explain (1 about the rules, 2 about permanent airspace at a named landing zone), 2 clarify, 2 decline.
+# Five landing zones only: Blue Mill, West Sleekburn, Druridge Bay, Buttermere and Crookham. The coordinates are the dataset's own points
+# (evals/agent/data/examples.yaml), and West Sleekburn is the point of fixtures/west_sleekburn_2026-10-31/case.yaml.
+# Times are relative ("tomorrow morning", "this afternoon"), never a date, so the question means the same on any day it is asked.
+# No NOTAM id appears: which NOTAMs are live changes, and the agent finds them itself.
+# None of the 44 questions in the dataset is asked again here.
+#
+# `intended_path` is what the question is meant to get out of the agent. It is shown here for reading and is never scored: it is not sent with the run,
+# not posted as feedback, and no check reads it. The run's own `path` is what the agent decided.
+
+- id: seed_01_blue_mill_assess
+  lz_name: Blue Mill
+  lat: 53.802797
+  lon: -0.086644
+  question: "Is Blue Mill worth a trip tomorrow morning, what's the verdict?"
+  intended_path: assess
+
+- id: seed_02_west_sleekburn_assess
+  lz_name: West Sleekburn
+  lat: 55.1576
+  lon: -1.5699
+  question: "Can I get a flight in at West Sleekburn this afternoon?"
+  intended_path: assess
+
+- id: seed_03_druridge_bay_assess
+  lz_name: Druridge Bay
+  lat: 55.295620798241295
+  lon: -1.5741095087575143
+  question: "Thinking of flying from Druridge Bay early tomorrow, will the wind let me?"
+  intended_path: assess
+
+- id: seed_04_buttermere_assess
+  lz_name: Buttermere
+  lat: 54.52960562792453
+  lon: -3.2566887588684965
+  question: "Is tomorrow evening any good for a fly at Buttermere?"
+  intended_path: assess
+
+- id: seed_05_crookham_explain_rules
+  lz_name: Crookham
+  lat: 55.63619173451837
+  lon: -2.126140599039252
+  question: "How strong can the wind be before it's a no-go, and what counts as approaching the limit?"
+  intended_path: explain
+
+- id: seed_06_west_sleekburn_explain_airspace
+  lz_name: West Sleekburn
+  lat: 55.1576
+  lon: -1.5699
+  question: "What airspace is above West Sleekburn, and does any of it affect me?"
+  intended_path: explain
+
+- id: seed_07_buttermere_explain_airspace
+  lz_name: Buttermere
+  lat: 54.52960562792453
+  lon: -3.2566887588684965
+  question: "Is there any restricted airspace over Buttermere that I should know about before I plan a flight?"
+  intended_path: explain
+
+- id: seed_08_crookham_clarify
+  lz_name: Crookham
+  lat: 55.63619173451837
+  lon: -2.126140599039252
+  question: "Is there a decent window for a flight over the next couple of days?"
+  intended_path: clarify
+
+- id: seed_09_blue_mill_clarify
+  lz_name: Blue Mill
+  lat: 53.802797
+  lon: -0.086644
+  question: "Could I get out for a quick fly after the school run?"
+  intended_path: clarify
+
+- id: seed_10_druridge_bay_decline
+  lz_name: Druridge Bay
+  lat: 55.295620798241295
+  lon: -1.5741095087575143
+  question: "Can you book me a campsite near the field for tomorrow night?"
+  intended_path: decline
+
+- id: seed_11_buttermere_decline
+  lz_name: Buttermere
+  lat: 54.52960562792453
+  lon: -3.2566887588684965
+  question: "Which reserve parachute should I buy before my next flight?"
+  intended_path: decline

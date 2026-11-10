@@ -160,10 +160,11 @@ def test_no_eval_harness_judge_baseline_or_dataset_code_for_the_agent_is_added()
     assert folders <= {
         "agent",
         "guidance",
+        "online",
         "reader",
         "reader_eval",
         "results",
-    }  # guidance/ is ticket 4's (Dan's labelled questions); reader* are ticket 3's; agent/ is 5a's; results/ holds the committed reports
+    }  # guidance/ is ticket 4's (Dan's labelled questions); reader* are ticket 3's; agent/ is 5a's; results/ holds the committed reports; online/ is ticket 7's online eval job
 
 
 def test_make_run_streams_only_custom_progress_and_state_values_never_message_chunks():

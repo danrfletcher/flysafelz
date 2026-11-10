@@ -1,0 +1,11 @@
+$ LANGSMITH_PROJECT=flysafelz-held-out uv run python -c "from evals.online.pull import guard_project; guard_project()"; echo $?
+Refusing to read the LangSmith project flysafelz-held-out: it is the held-out project of the offline eval, and the online job never reads eval experiments or the held-out project. Set LANGSMITH_PROJECT to the production tracing project.
+2
+
+$ LANGSMITH_PROJECT=flysafelz-dev (5a's dev experiment project), same command
+Refusing to read the LangSmith project flysafelz-dev: it is the dev experiment project of the offline eval, and the online job never reads eval experiments or the held-out project. Set LANGSMITH_PROJECT to the production tracing project.
+2
+
+$ LANGSMITH_PROJECT=flysafelz (production), same command, prints the project it would read
+flysafelz
+0

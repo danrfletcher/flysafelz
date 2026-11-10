@@ -1,0 +1,117 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+network: --disable-socket in effect
+rootdir: /Users/danfletcher/.local/share/vector/tmp/worktrees/flysafelz-10
+configfile: pyproject.toml
+plugins: langsmith-0.14.17, cov-7.1.0, socket-0.8.1, anyio-4.16.0
+collected 32 items / 31 deselected / 1 selected
+
+tests/integration/test_online_eval_job.py project flysafelz, evaluator version b5b38c4c7e5a: 13 run(s)
+1fe0e752-5cb0-508e-8340-5abab30a5e21 scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+d2b0cc5b-2acf-566c-91fa-b5d64fbc89cd scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+e99bab98-e9b8-5216-8c4a-673fd99e99d0 scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+422023e0-494a-5a08-97ce-d24729ad8d49 scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+01b8f3e5-f2fc-51ba-88b5-e80a42775659 scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+d794a50b-ebe2-592b-8787-a3ce21e468bf scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+2b1116d9-19c5-5e55-a02f-a75a304a62f0 scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+f6392a6e-ca2d-53aa-8bed-19579d938d64 scored, posted 10: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.evaluator_version
+6db0f306-e034-5f86-8f28-c3400009867b scored, posted 10: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.evaluator_version
+1ec97cf5-1030-53bd-90ad-edba4dda3a59 scored, posted 11: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.good_decline, online.evaluator_version
+ef6f7d1a-0593-5db7-9c57-1fb11cdd3c2f scored, posted 11: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.good_decline, online.evaluator_version
+7e46d9a5-d7f9-5002-8640-cabca0cbede9 scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+878b77dd-4103-5695-a72c-64c8f57d4180 scored, posted 12: online.guard_pass, online.decision_first, online.cited_guidance, online.recheck_stated, online.assumed_window_stated, online.no_verdict_beyond_day3, online.step_cap, online.decline_no_tools, online.judge.answers_the_question, online.judge.prioritised, online.judge.actionable, online.evaluator_version
+judge: 13 eligible, 13 judged (13 call(s)), 0 not sampled, at JUDGE_SAMPLE_PCT=20
+13 scored, 0 already scored, 0 errored; 150 feedback posted
+online eval 2026-10-31: 13 runs scored at evaluator version b5b38c4c7e5a (project flysafelz, SINCE=7d, LIMIT=500)
+  guard_pass: 100.0% (13/13), 0 null
+  decision_first: 100.0% (5/5), 8 null
+  cited_guidance: 100.0% (13/13), 0 null
+  recheck_stated: 100.0% (5/5), 8 null
+  assumed_window_stated: 100.0% (5/5), 8 null
+  no_verdict_beyond_day3: 100.0% (5/5), 8 null
+  step_cap: 100.0% (13/13), 0 null
+  decline_no_tools: 0.0% (0/2), 11 null
+  judge: 33 graded, 0 not_sampled
+  failing runs: 11
+  skipped: 4; fully scored: 13; errors: 0
+summary written: /private/var/folders/lz/4lt5vlt56xl8bdv7x6k1jqz00000gn/T/pytest-of-danfletcher/pytest-3092/test_gp4_the_file_holds_every_0/online-2026-10-31.md
+
+--- online-2026-10-31.md
+# Online eval 2026-10-31
+
+13 runs scored at evaluator version b5b38c4c7e5a, from 17 runs read in the window.
+
+## Deterministic checks
+
+Pass rate = passes / n, with n the runs the check scored 1 or 0. A null is left out of n and counted on its own, with its reason. `n/a`: nothing was scored.
+
+| check | pass rate | passes/n | n | nulls (reason) |
+| --- | --- | --- | --- | --- |
+| guard_pass | 100.0% | 13/13 | 13 | 0 |
+| decision_first | 100.0% | 5/5 | 5 | 8 (not applicable: 8) |
+| cited_guidance | 100.0% | 13/13 | 13 | 0 |
+| recheck_stated | 100.0% | 5/5 | 5 | 8 (not applicable: 8) |
+| assumed_window_stated | 100.0% | 5/5 | 5 | 8 (not applicable: 8) |
+| no_verdict_beyond_day3 | 100.0% | 5/5 | 5 | 8 (not applicable: 8) |
+| step_cap | 100.0% | 13/13 | 13 | 0 |
+| decline_no_tools | 0.0% | 0/2 | 2 | 11 (not applicable: 11) |
+
+## Judge
+
+Runs marked not_sampled (left out of the judge's sample): 0
+
+| path | criterion | pass rate | n | nulls (reason) |
+| --- | --- | --- | --- | --- |
+| assess | answers_the_question | 100.0% | 5 | 0 |
+| assess | prioritised | 0.0% | 5 | 0 |
+| assess | actionable | 100.0% | 5 | 0 |
+| explain | answers_the_question | 100.0% | 4 | 0 |
+| explain | prioritised | 0.0% | 4 | 0 |
+| explain | actionable | 100.0% | 4 | 0 |
+| clarify | answers_the_question | 100.0% | 2 | 0 |
+| decline | answers_the_question | 100.0% | 2 | 0 |
+| decline | good_decline | 100.0% | 2 | 0 |
+| unknown | no judge criteria for this path (0 runs) | n/a | 0 | 0 |
+
+## Failing runs
+
+A scored run with a score of 0 on any check or judge criterion. A null is never a failure.
+
+| run | path | launch zone | failing keys |
+| --- | --- | --- | --- |
+| https://smith.example/o/org/projects/p/flysafelz/r/01b8f3e5-f2fc-51ba-88b5-e80a42775659 | explain | Crookham | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/1ec97cf5-1030-53bd-90ad-edba4dda3a59 | decline | Crookham | online.decline_no_tools |
+| https://smith.example/o/org/projects/p/flysafelz/r/1fe0e752-5cb0-508e-8340-5abab30a5e21 | assess | Blue Mill | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/2b1116d9-19c5-5e55-a02f-a75a304a62f0 | explain | West Sleekburn | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/422023e0-494a-5a08-97ce-d24729ad8d49 | assess | Buttermere | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/7e46d9a5-d7f9-5002-8640-cabca0cbede9 | assess | - | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/878b77dd-4103-5695-a72c-64c8f57d4180 | explain | - | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/d2b0cc5b-2acf-566c-91fa-b5d64fbc89cd | assess | West Sleekburn | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/d794a50b-ebe2-592b-8787-a3ce21e468bf | explain | Blue Mill | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/e99bab98-e9b8-5216-8c4a-673fd99e99d0 | assess | Druridge Bay | online.judge.prioritised |
+| https://smith.example/o/org/projects/p/flysafelz/r/ef6f7d1a-0593-5db7-9c57-1fb11cdd3c2f | decline | Blue Mill | online.decline_no_tools |
+
+## Runs skipped
+
+- skipped by the pull: 4
+  - by source (runs whose source is not `pilot` or `online-seed`): case: 1, judge: 1
+  - by reason: errored: 1, experiment: 1, source: 2
+- fully scored at this evaluator version: 13
+- runs with an error: 0
+
+## Evaluator version
+
+- evaluator version: b5b38c4c7e5a
+- project: flysafelz
+- SINCE: 7d
+- LIMIT: 500
+- LIMIT was not hit.
+
+## Not scored online
+
+Missed blocker and verdict match need labels, which production runs do not have: they are carried by the offline evals.
+Window IoU, noise and NOTAM action confusion are offline-only too.
+
+.
+
+======================= 1 passed, 31 deselected in 3.27s =======================

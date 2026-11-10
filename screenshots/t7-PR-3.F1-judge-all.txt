@@ -1,0 +1,53 @@
+# GP2/GP3: 11 seed runs, the judge on, 5a's recording client and a fake judge; per-run judge keys in posting order, version marker last
+eligible=11 judge_calls=11 (fake judge calls=11) not_sampled posted=0
+--- run 1fe0e752-5cb0-508e-8340-5abab30a5e21 (assess, Blue Mill)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.prioritised               score=1  fake reason for prioritised | evaluator_version=0123456789ab
+online.judge.actionable                score=1  fake reason for actionable | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run d2b0cc5b-2acf-566c-91fa-b5d64fbc89cd (assess, West Sleekburn)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.prioritised               score=1  fake reason for prioritised | evaluator_version=0123456789ab
+online.judge.actionable                score=1  fake reason for actionable | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run e99bab98-e9b8-5216-8c4a-673fd99e99d0 (assess, Druridge Bay)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.prioritised               score=1  fake reason for prioritised | evaluator_version=0123456789ab
+online.judge.actionable                score=1  fake reason for actionable | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run 422023e0-494a-5a08-97ce-d24729ad8d49 (assess, Buttermere)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.prioritised               score=1  fake reason for prioritised | evaluator_version=0123456789ab
+online.judge.actionable                score=1  fake reason for actionable | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run 01b8f3e5-f2fc-51ba-88b5-e80a42775659 (explain, Crookham)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.prioritised               score=1  fake reason for prioritised | evaluator_version=0123456789ab
+online.judge.actionable                score=1  fake reason for actionable | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run d794a50b-ebe2-592b-8787-a3ce21e468bf (explain, Blue Mill)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.prioritised               score=1  fake reason for prioritised | evaluator_version=0123456789ab
+online.judge.actionable                score=1  fake reason for actionable | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run 2b1116d9-19c5-5e55-a02f-a75a304a62f0 (explain, West Sleekburn)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.prioritised               score=1  fake reason for prioritised | evaluator_version=0123456789ab
+online.judge.actionable                score=1  fake reason for actionable | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run f6392a6e-ca2d-53aa-8bed-19579d938d64 (clarify, Druridge Bay)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run 6db0f306-e034-5f86-8f28-c3400009867b (clarify, Buttermere)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run 1ec97cf5-1030-53bd-90ad-edba4dda3a59 (decline, Crookham)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.good_decline              score=1  fake reason for good_decline | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+--- run ef6f7d1a-0593-5db7-9c57-1fb11cdd3c2f (decline, Blue Mill)
+online.judge.answers_the_question      score=1  fake reason for answers_the_question | evaluator_version=0123456789ab
+online.judge.good_decline              score=1  fake reason for good_decline | evaluator_version=0123456789ab
+last key posted                        online.evaluator_version
+check: judge keys are exactly the path's criteria, version marker last on every run: PASS
+create_feedback calls=126, session_id on all: True, duplicates=0
