@@ -18,6 +18,8 @@ test:
 # more days, or a different moment, go on a new case name.
 # Needs OPENAIP_API_KEY in the environment or in .env; the other two sources need no key.
 # CASE reaches the program through the environment, so it is never parsed by the shell.
+# When the program refuses (no key, a bad CASE, an existing case) it prints exactly one line and exits non-zero; make adds its own
+# "make: *** [fixtures] Error 1" line after it and exits 2. That line is make's and cannot be switched off for a failing recipe.
 fixtures:
 	@uv run python -m flysafelz.capture "$$CASE"
 

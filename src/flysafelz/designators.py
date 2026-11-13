@@ -14,7 +14,10 @@ designator, and neither does a three-letter suffix (EGD323ABC).
 import re
 
 _DESIGNATOR = r"(?:E?G?\s?)?([DRP])\s?(\d{3})([A-Z]{0,2})"
-_FIND = re.compile(rf"\b{_DESIGNATOR}\b", re.IGNORECASE)
+_FIND = re.compile(
+    r"\b(?:EG\s?(?P<k1>[DRP])\s?|(?P<k2>[DRP])(?:\s(?=\d{3}[A-Z]))?)(?P<n>\d{3})(?P<s>[A-Z]{0,2})\b(?P<more>(?:/[A-Z])+(?![A-Z0-9]))?",
+    re.IGNORECASE,
+)
 _WHOLE = re.compile(rf"\s*{_DESIGNATOR}\s*", re.IGNORECASE)
 
 
@@ -30,5 +33,10 @@ def normalise_designator(s: str) -> str | None:
 
 def find_designators(text: str) -> list[str]:
     """Every designator in the text, normalised, in order of first appearance, without repeats."""
-    found = (_canonical(*m.groups()) for m in _FIND.finditer(text))
+    found: list[str] = []
+    for m in _FIND.finditer(text):
+        kind, number, suffix = m.group("k1") or m.group("k2"), m.group("n"), m.group("s")
+        found.append(_canonical(kind, number, suffix))
+        if m.group("more") and len(suffix) == 1:  # "D323A/B": the letters after each slash are more suffixes
+            found.extend(_canonical(kind, number, letter) for letter in m.group("more").split("/")[1:])
     return list(dict.fromkeys(found))

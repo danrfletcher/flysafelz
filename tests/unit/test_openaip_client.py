@@ -186,6 +186,16 @@ def test_a_next_page_that_is_not_a_later_page_number_is_failed(following):
     assert result.status.state is SourceState.FAILED and "nextPage" in result.status.reason
 
 
+@pytest.mark.parametrize("last", [0, 2])
+def test_a_last_page_that_spells_no_next_page_as_a_number_is_the_end_only_when_total_pages_agrees(last):
+    pages = {"1": {"items": [], "nextPage": 2, "totalPages": 2}, "2": {"items": [], "nextPage": last, "totalPages": 2}}
+    server = Server(pages=pages)
+    assert fetch(server).status.state is SourceState.OK
+    assert [r.url.params["page"] for r in server.seen] == ["1", "2"]
+    early = Server(pages={"1": {"items": [], "nextPage": last, "totalPages": 5}})  # page 1 of 5: not the end, so fail loudly
+    assert fetch(early).status.state is SourceState.FAILED
+
+
 def test_without_a_nextpage_field_total_pages_decides_so_a_short_read_is_not_taken_for_the_country():
     server = Server(pages={"1": {"items": [], "totalPages": 2}, "2": {"items": [], "totalPages": 2}})
     assert fetch(server).status.state is SourceState.OK
@@ -374,6 +384,12 @@ def entry(day=0, start="08:00", end="18:00", **extra):
 def test_hours_of_operation_become_schedule_text(raw, text):
     area = parse_airspace(item(hoursOfOperation=raw))
     assert area.hours == text and area.hours_readable is True
+
+
+def test_the_day_of_week_numbers_are_in_the_codes_table_with_the_other_openaip_codes():
+    assert openaip.CODES["day_of_week"] == {0: "DAILY", 1: "MON", 2: "TUE", 3: "WED", 4: "THU", 5: "FRI", 6: "SAT", 7: "SUN"}
+    for day, word in openaip.CODES["day_of_week"].items():
+        assert parse_airspace(item(hoursOfOperation=hours(entry(day)))).hours == f"{word} 0800-1800"
 
 
 @pytest.mark.parametrize("raw", [hours(entry(9)), hours(entry(start="8am")), hours("never"), {"operatingHours": "daily"}])

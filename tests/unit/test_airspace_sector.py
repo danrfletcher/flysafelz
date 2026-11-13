@@ -12,6 +12,7 @@ from airspace_helpers import LZ, activation, amsl, assess, offset, only, reading
 from flysafelz.airspace import Outcome, TimeSpan
 from flysafelz.contracts import Circle, ContactKind
 from flysafelz.geo import COMPASS_POINTS, compass16, shape_edge_bearing_deg, shape_edge_distance_nm
+from flysafelz.rules import RULES
 
 TINY = 0.003  # half-width in NM: small enough that the nearest point is in the direction of the centre
 CENTRES = [(k * 22.5, COMPASS_POINTS[k]) for k in range(len(COMPASS_POINTS))]
@@ -103,6 +104,13 @@ def test_a_volume_exactly_at_the_local_area_is_within_and_a_hair_beyond_is_not()
     assert only(assess([area], rules=exact)).outcome is Outcome.AVOID_SECTOR
     assert assess([area], rules=with_rules(local_area=math.nextafter(edge, 0.0))).findings == []
     assert only(assess([area], rules=with_rules(local_area=3))).outcome is Outcome.AVOID_SECTOR
+
+
+def test_the_local_area_is_a_plain_radius_setting_and_a_volume_exactly_at_it_is_within():
+    # rules.yaml holds local_area as comparison "=" (a radius, read and not breached), so the cut-off is `distance > radius`.
+    assert RULES.local_area.comparison.value == "="
+    area = beside(45.0, 2.0, type_="ctr")
+    assert only(assess([area], rules=with_rules(local_area=shape_edge_distance_nm(*LZ, area.shape)))).outcome is Outcome.AVOID_SECTOR
 
 
 def test_the_shipped_local_area_decides_between_1_9_and_2_1_nm():

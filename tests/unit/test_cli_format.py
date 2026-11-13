@@ -324,3 +324,14 @@ def test_no_printed_line_has_the_bare_word_go():
         overall=Verdict.NO_GO,
     )
     assert not BARE_GO.search(printed(a, debug=True))
+
+
+def test_an_unread_notam_a_danger_area_line_already_names_prints_no_second_copy_of_its_text():
+    from flysafelz.contracts import NotamAction, NotamActionResult
+
+    action = NotamActionResult(notam_id="J3307/26", action=NotamAction.UNREAD_OVER_LZ, reason="NOTAM J3307/26 is over the LZ and has not been read: TDA TEXT")
+    owned = ["UNVERIFIED: Danger area EGD598B is activated by NOTAM J3307/26, which has not been read: TDA TEXT"]
+    assert cli.notam_line(action, owned) == "NOTAM J3307/26 UNREAD_OVER_LZ"
+    other = ["UNVERIFIED: Danger area EGD598B is activated by NOTAM J3307/260, which has not been read: TDA TEXT"]  # a longer id is another NOTAM
+    assert cli.notam_line(action, other) == f"NOTAM J3307/26 UNREAD_OVER_LZ: {action.reason}"
+    assert cli.notam_line(action, []) == f"NOTAM J3307/26 UNREAD_OVER_LZ: {action.reason}"

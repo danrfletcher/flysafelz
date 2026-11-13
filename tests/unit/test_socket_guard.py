@@ -5,6 +5,10 @@ from pathlib import Path
 
 PYPROJECT = Path(__file__).resolve().parents[2] / "pyproject.toml"
 
+# The inner test connects to 192.0.2.1 (TEST-NET-1, RFC 5737), not a hostname such as example.com: create_connection
+# resolves a name before pytest-socket can block the call, so offline a hostname would raise gaierror instead of
+# SocketBlockedError. An IP literal needs no lookup, so the guard is what stops it. This differs from the spec's
+# example.com on purpose.
 INNER_TEST = """
 import socket
 

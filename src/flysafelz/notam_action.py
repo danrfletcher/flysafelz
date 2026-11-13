@@ -6,7 +6,8 @@
 
 No network, no model, no state. Every reading is written by hand or by ticket 3's
 reader. Every number is a rules.yaml rule (local_area, band_low, band_high,
-ceiling_buffer, the FL conversion); the only constants here are definitions.
+ceiling_buffer, ceiling_left_no_go, the FL conversion); the only constants here are definitions and the
+1 ft rounding tolerance HEIGHT_AGREEMENT_FT.
 
 The table, first match wins (a NotamAction each; UNREAD_OVER_LZ is the UNVERIFIED of
 the unread path):
@@ -28,7 +29,8 @@ the unread path):
     3  CONTACT_FIRST  over the LZ, floor SFC, any other subject: cooperative, with a phone or
                       email contact
     4 AVOID_SECTOR    within the local area but not over the LZ; or over the LZ with a floor
-                      up to the low band ("stay below <floor QNH - buffer> ft QNH")
+                      up to the low band ("stay below <floor QNH - buffer> ft QNH", or "no room to fly under it"
+                      when that ceiling is under the site by less than the ceiling_left_no_go rule)
     5 AWARENESS       floor up to the high band (shown in the answer)
     6 AWARENESS_MAP   floor above the high band (map and collapsed list only)
 
@@ -52,7 +54,8 @@ that does not make a valid shape (Broken), a route (coordinates with times) and 
 no coordinates all use the Q-circle, which always contains the real area, so it can
 over-warn but never under-warn; the debug list says why a Broken one was not used. "Over
 the LZ" is inside or exactly on the edge. "Within" is the distance to the edge being at
-most the local_area rule. With no usable Q-circle the NOTAM is treated as over the LZ and
+most the local_area rule (a plain radius setting, comparison "=", so the cut-off is in code: a distance
+greater than the radius is beyond it and exactly at it is within). With no usable Q-circle the NOTAM is treated as over the LZ and
 the reason says so. (A route or no area in an area-wide NOTAM never gets this far: the
 sort in pib.sort_notam answers AWARENESS first.)
 
@@ -119,6 +122,10 @@ from flysafelz.schedule import Schedule, parse_schedule
 from flysafelz.sup_refs import sup_detail
 
 UNLIMITED_FL = 999  # a flight level of FL999 or more (Q-line, reading, or item F/G) means no upper limit
+# Two heights that differ by no more than this (feet QNH) are the same height in the E10 merge: it absorbs the rounding of a
+# flight level converted to feet and of metres to feet, and is not a flight threshold, so it is not in rules.yaml. It
+# applies only to whether the reading and item F/G agree; a bigger difference is a conflict and the more restrictive wins.
+HEIGHT_AGREEMENT_FT = 1.0
 SFC_LIMIT = Limit(value=0, unit=LimitUnit.FT, datum=Datum.SFC)
 DANGER_AREA = "RD"  # Q-code subject: a danger area, which the data never rules in
 RESTRICTED_SUBJECTS = {"RR": "restricted area", "RP": "prohibited area", "RT": "temporary restricted area"}  # row 2a
@@ -214,7 +221,7 @@ def _q_ceiling(parsed: ParsedNotam, lz: LandingZone, pressure: float, rules: Rul
 def _merge(side: str, reading: _Bound | None, fg: _Bound | None, q_line: _Bound, notes: list[str]) -> _Bound:
     """One side of E10: the reading's, else F/G, else the Q-line. On a conflict the more restrictive wins."""
     if reading is not None and fg is not None:
-        if math.isclose(reading.qnh, fg.qnh, abs_tol=1.0):
+        if math.isclose(reading.qnh, fg.qnh, abs_tol=HEIGHT_AGREEMENT_FT):
             return reading
         notes.append(f"reading and F/G disagree on the {side} ({reading.text} against {fg.text}); the more restrictive is used")
         return min(reading, fg, key=lambda b: b.qnh) if side == "floor" else max(reading, fg, key=lambda b: b.qnh)
@@ -311,8 +318,13 @@ def _where(parsed: ParsedNotam, lz: LandingZone, debug: list[str]) -> _Where:
 # --- schedule -----------------------------------------------------------------
 
 
+def _schedule_text(parsed: ParsedNotam, reading: NotamReading | None) -> str | None:
+    """The D text the schedule is worked out from: the reading's normalised schedule when it has one, else item D."""
+    return reading.schedule if reading and reading.schedule.strip() else parsed.item_d
+
+
 def _schedule(parsed: ParsedNotam, reading: NotamReading | None, lz: LandingZone, start: datetime, end: datetime) -> Schedule:
-    d_text = reading.schedule if reading and reading.schedule.strip() else parsed.item_d
+    d_text = _schedule_text(parsed, reading)
     b = max(parsed.valid_from, start)
     c = end if parsed.valid_to is None else min(parsed.valid_to, end)
     return parse_schedule(d_text, b, c, lz.lat, lz.lon)
@@ -391,9 +403,11 @@ def _not_for_paramotors(parsed: ParsedNotam, reading: NotamReading, exemptions: 
     return None
 
 
-def _result(parsed: ParsedNotam, action: NotamAction, reason: str, debug: list[str], extras: list[str] | None = None, bearing: float | None = None) -> ActionResult:
+def _result(
+    parsed: ParsedNotam, action: NotamAction, reason: str, debug: list[str], extras: list[str] | None = None, bearing: float | None = None, *, warning: bool = False
+) -> ActionResult:
     line = "; ".join([" ".join(reason.split()), *(extras or [])])
-    return ActionResult(notam_id=parsed.id, action=action, reason=line, bearing_deg=bearing, debug=list(debug))
+    return ActionResult(notam_id=parsed.id, action=action, reason=line, bearing_deg=bearing, warning=warning, debug=list(debug))
 
 
 def _sup_tail(parsed: ParsedNotam) -> str:
@@ -445,7 +459,7 @@ def _over_lz_from_sfc(parsed: ParsedNotam, reading: NotamReading, label: str, co
         radio = " (a radio frequency alone is not a contact)" if reading.contact.kind is ContactKind.RADIO_ONLY else ""
         return _result(parsed, NotamAction.NO_FLY, f"{here}: cooperative but there is no phone or email contact{radio}", debug, extras)
     when = f" ({schedule_text})" if schedule_text else ""
-    return _result(parsed, NotamAction.AWARENESS, f"{label}{when}: informational over the LZ from the surface, a warning and not a restriction", debug, extras)
+    return _result(parsed, NotamAction.AWARENESS, f"{label}{when}: informational over the LZ from the surface, a warning and not a restriction", debug, extras, warning=True)
 
 
 def notam_action(
@@ -469,7 +483,7 @@ def notam_action(
         return _result(parsed, NotamAction.IGNORE, not_for_us, debug)
     schedule = _schedule(parsed, reading, lz, segment.start, segment.end)
     if not schedule.intervals:
-        return _result(parsed, NotamAction.IGNORE, f"not active in this segment (schedule {parsed.item_d or 'none'})", debug)
+        return _result(parsed, NotamAction.IGNORE, f"not active in this segment (schedule {' '.join((_schedule_text(parsed, reading) or '').split()) or 'none'})", debug)
     if not schedule.parsed:
         extras.append("schedule not parsed")
         debug.append(schedule.note or "schedule not parsed")
@@ -511,6 +525,11 @@ def notam_action(
     # Over the LZ with a floor above the ground.
     if floor.qnh <= _number(rules.band_low):
         stay_below = floor.qnh - _number(rules.ceiling_buffer)
+        left = stay_below - lz.elevation_ft
+        if rules.ceiling_left_no_go.breached(left):  # the floor is so low that there is no room under it (E15)
+            room = f"only {_feet(max(left, 0))} ft above the site, minimum {_feet(_number(rules.ceiling_left_no_go))} ft"
+            reason = f"{label} over the LZ from {floor.text} ({_feet(floor.qnh)} ft QNH): no room to fly under it, {room}"
+            return _result(parsed, NotamAction.AVOID_SECTOR, reason, debug, extras)
         reason = f"{label} over the LZ from {floor.text} ({_feet(floor.qnh)} ft QNH): stay below {_feet(stay_below)} ft QNH"
         return _result(parsed, NotamAction.AVOID_SECTOR, reason, debug, extras)
     if floor.qnh <= _number(rules.band_high):

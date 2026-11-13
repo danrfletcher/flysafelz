@@ -342,6 +342,9 @@ class NotamActionResult(BaseModel):
     action: NotamAction
     reason: str
     bearing_deg: float | None = None
+    # An AWARENESS the pilot must be warned about as a condition (an informational NOTAM over the LZ from the surface, Q13),
+    # not just listed. Set by notam_action(), read by assess; left out of dumps so no output changes shape.
+    warning: bool = Field(default=False, exclude=True)
 
 
 # --- assessment -------------------------------------------------------------

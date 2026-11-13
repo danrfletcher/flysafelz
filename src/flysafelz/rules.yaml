@@ -311,13 +311,21 @@ notam_ignore_purpose:
   confidence: sourced
   note: "Purpose K marks a checklist or status NOTAM."
 
+notam_security_series:
+  value: [V]
+  unit: series
+  comparison: "in"
+  source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
+  confidence: best practice
+  note: "The NOTAM series that carries security advice and volcanic ash. Only in these series does notam_ignore_security_subjects apply."
+
 notam_ignore_security_subjects:
   value: [RO]
   unit: subject
   comparison: "in"
   source: "ICAO Doc 8126 / UK AIP GEN 3.1 §3.6.3.4"
   confidence: best practice
-  note: "In series V only: security advice to air operators. Series V with any other subject (e.g. volcanic ash) is kept."
+  note: "In the notam_security_series only: security advice to air operators. The same series with any other subject (e.g. volcanic ash) is kept."
 
 notam_restriction_subjects:
   value: [RD, RR, RP, RT]

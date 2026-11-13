@@ -199,7 +199,7 @@ def test_e21_egd496a_is_not_in_blue_mills_airspace_so_the_q_circle_fallback_appl
     its coded Q-circle, which holds the LZ.
     """
     areas = airspaces(BLUE_MILL)
-    assert not any(a.designator == "EGD496A" for a in areas)
+    assert not any("D496A" in "".join(c for c in f"{a.designator} {a.name}".upper() if c.isalnum()) for a in areas)  # by designator or name
     assert {a.designator for a in areas if a.type == "danger"} == {"EGD323K", "EGD323D"}
     _issued, notams = parse_pib((case_dir(BLUE_MILL) / "pib.xml").read_bytes())
     tda = next(n for n in notams if n.id == "J3857/26")

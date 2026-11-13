@@ -167,6 +167,16 @@ def test_r1_by_notam_with_unreadable_hours_is_active_and_noted():
     assert result.active and result.active_alone and result.notes
 
 
+def test_unreadable_openaip_hours_are_reported_as_unreadable_not_as_no_hours():
+    # parse_airspace gives hours=None and hours_readable=False for hours it cannot read.
+    area = blue_mill_tda(by_notam=False, hours=None, hours_readable=False)
+    result = danger_area_active(area, SEGMENT, [])
+    assert result.active and result.active_alone
+    assert result.reason == "published hours could not be read"
+    assert "could not be read" in result.notes[0] and "no published hours" not in result.notes[0]
+    assert danger_area_active(blue_mill_tda(by_notam=False, hours=None), SEGMENT, []).reason == "no published hours"
+
+
 def test_r1_by_notam_with_hours_and_no_designator_is_active_outside_the_hours_and_noted():
     area = blue_mill_tda(hours="DAILY 1000-1100", designator=None, name="MYSTERY TDA")
     result = danger_area_active(area, SEGMENT, [])

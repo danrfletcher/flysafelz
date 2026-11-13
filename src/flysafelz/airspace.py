@@ -346,10 +346,10 @@ def danger_area_active(area: Airspace, segment: Segment | TimeSpan, activations:
         if covering:
             return Activity(active=True, reason=f"activated by NOTAM {ids}", activations=covering)
         return Activity(active=False, reason="by NOTAM and no NOTAM activates it in this segment")
+    if not area.hours_readable:  # before the no-hours check: openAIP's unreadable hours arrive as hours=None, hours_readable=False
+        return Activity(active=True, active_alone=True, reason="published hours could not be read", activations=covering, notes=[f"{area.name}: published hours could not be read; treated as active"])
     if not has_hours:
         return Activity(active=True, active_alone=True, reason="no published hours", activations=covering, notes=[f"{area.name}: no published hours; treated as active"])
-    if not area.hours_readable:
-        return Activity(active=True, active_alone=True, reason="published hours could not be read", activations=covering, notes=[f"{area.name}: published hours could not be read; treated as active"])
     assert area.hours is not None  # has_hours
     lat, lon = _anchor(area.shape)
     schedule = parse_schedule(area.hours, segment.start, segment.end, lat, lon)
@@ -607,6 +607,8 @@ def assess_airspace(
         notes.append("no forecast pressure: flight levels are taken at the reference pressure")
     activations = list(activations)
     stand_ins, findings = _qcircle_areas(areas, activations, segment)
+    # local_area is a plain setting (comparison "=", a radius): rules.yaml holds the radius, and the cut-off is by design
+    # `distance > radius`, so a volume exactly at the radius is within, as for the NOTAM prefilter (pib.py) and notam_action.
     local_area = _value(rules.local_area)
     ceilings: list[tuple[float, Airspace]] = []
 

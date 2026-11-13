@@ -850,6 +850,8 @@ def test_q13_an_informational_reading_over_the_lz_from_sfc_is_a_warning_never_no
     assert result.action is A.AWARENESS  # shown in the answer, so PILOT DISCRETION - WITH CONDITIONS
     assert result.action not in (A.NO_FLY, A.IGNORE)
     assert result.reason.startswith("Fly-in at Garton (SR-SS): informational over the LZ from the surface")
+    assert result.warning is True  # assess reads this flag, not the wording above
+    assert act(notam(circle=circle_at(1.0)), reading(geometry=circle_at(1.0), category=Category.INFORMATIONAL)).warning is False
 
 
 def test_q13_an_informational_reading_within_or_above_the_lz_follows_the_rest_of_the_table():
@@ -1125,3 +1127,31 @@ def test_check_sup_has_no_bearing_and_the_result_round_trips():
     result = act(over(), read_over())
     assert result.bearing_deg is None
     assert ActionResult.model_validate_json(result.model_dump_json()) == result
+
+
+# --- the reason says what the decision used ------------------------------------------------------------------
+
+
+def test_the_inactive_reason_prints_the_schedule_the_decision_used():
+    # item D says 0800-1800 but the reading's normalised schedule is 1200-1300, so 09:00-10:00 is outside the reading's.
+    parsed = notam(circle=circle_at(0), item_d="0800-1800", item_f="SFC")
+    result = act(parsed, reading(geometry=circle_at(0), schedule="1200-1300"), segment(utc(9), utc(10)))
+    assert result.action is A.IGNORE
+    assert result.reason == "not active in this segment (schedule 1200-1300)"
+    unread = act(notam(circle=circle_at(0), item_d="1200-1800", item_f="SFC"), None, segment(utc(9), utc(10)))
+    assert unread.reason == "not active in this segment (schedule 1200-1800)"
+
+
+def test_a_floor_just_above_the_ground_says_there_is_no_room_not_a_negative_ceiling():
+    circle = circle_at(0)
+    parsed = notam(circle=circle, item_f="100FT AGL", item_g="1000FT AGL")  # floor 130 ft QNH at the 30 ft site
+    result = act(parsed, reading(geometry=circle, floor=None, ceiling=None))
+    assert result.action is A.AVOID_SECTOR
+    assert "no room to fly under it, only 0 ft above the site, minimum 300 ft" in result.reason
+    assert "stay below" not in result.reason and "-70" not in result.reason
+
+
+def test_a_floor_with_room_under_it_still_says_stay_below():
+    circle = circle_at(0)
+    parsed = notam(circle=circle, item_f="2000FT AGL")  # 2,030 ft QNH, ceiling 1,830, 1,800 ft above the site
+    assert "stay below 1,830 ft QNH" in act(parsed, reading(geometry=circle, floor=None)).reason

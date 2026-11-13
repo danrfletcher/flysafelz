@@ -128,7 +128,25 @@ def test_a_missing_closing_gust_is_missing_even_when_the_opening_gust_is_there()
     row = one_row(calm(gust_10m=20), calm(gust_10m=None))
     assert row.values.gust_10m is None
     assert row.missing_required == ["gust_10m"]
-    assert row.gust_spread == 15  # from the 09:00 timestamp alone; nothing is made up for 10:00
+    assert row.gust_spread is None  # not the 09:00 spread alone: a value missing at HH+1 is missing for the row
+
+
+def test_a_missing_closing_timestamp_makes_the_derived_values_missing_too():
+    [row] = build_rows(forecast_of({H: calm(wind_10m=5, gust_10m=20, wind_120m=25)}), START, END)  # no 10:00
+    assert row.gust_spread is None and row.gradient is None
+    assert [f.rule_id for f in check_row(row) if f.rule_id.startswith(("gust_spread", "gradient"))] == []
+
+
+def test_a_missing_input_at_one_timestamp_makes_the_derived_value_missing_for_the_row():
+    row = one_row(calm(wind_10m=5, gust_10m=20, wind_120m=25), calm(wind_10m=5, gust_10m=None, wind_120m=None))
+    assert row.gust_spread is None and row.gradient is None
+
+
+def test_a_spread_just_over_the_limit_is_not_rounded_away():
+    # Rounding to 0.1 mph would turn 6.04 into 6.0 and slip under "> 6"; the noise-only rounding keeps it.
+    row = one_row(calm(wind_10m=5.0, gust_10m=11.04), calm(wind_10m=5.0, gust_10m=11.04))
+    assert row.gust_spread == pytest.approx(6.04)
+    assert "gust_spread_no_go" in [f.rule_id for f in check_row(row)]
 
 
 def test_a_missing_optional_variable_adds_a_note_and_keeps_the_row_complete():

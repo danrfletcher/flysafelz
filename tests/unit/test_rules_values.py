@@ -43,6 +43,7 @@ EXPECTED = [
     ("notam_wide_ignore_subjects", ["AF"], "subject", "in"),
     ("notam_ignore_traffic", ["I"], "Q-line traffic", "in"),
     ("notam_ignore_purpose", ["K"], "Q-line purpose", "in"),
+    ("notam_security_series", ["V"], "series", "in"),
     ("notam_ignore_security_subjects", ["RO"], "subject", "in"),
     ("notam_restriction_subjects", ["RD", "RR", "RP", "RT"], "subject", "in"),
     ("notam_awareness_subjects", ["GW"], "subject", "in"),

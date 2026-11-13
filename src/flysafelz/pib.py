@@ -91,7 +91,6 @@ Window = tuple[datetime, datetime]  # [start, end): start is in, end is out
 
 CENTURY = 2000  # the PIB writes years as two digits
 MINUTES_PER_DEGREE = 60
-SECURITY_SERIES = "V"  # series V carries security advice (subject RO) and volcanic ash (kept)
 PERMANENT = "PERM"
 ESTIMATE = "EST"
 # The ok-status reason in case mode, where the stale rule is off: the archive snapshots the PIB only about twice a day.
@@ -353,39 +352,36 @@ def _number(rule: Rule) -> float:
     return rule.value
 
 
-def load_pib(
-    source: Source,
+def status_from_xml(
+    xml: bytes | str,
     now: datetime,
     *,
-    client: httpx.Client | None = None,
+    fetched_at: datetime | None = None,
+    sha: str | None = None,
     rules: Rules = RULES,
     stale_rule: bool = True,
     tz: str | None = None,
 ) -> PibResult:
-    """Fetch the PIB and read it. The status is ok, stale (issued too long before now) or failed.
+    """Read PIB bytes already in hand into the NOTAM source: its status (ok, stale or failed) and its NOTAMs.
 
-    A stale PIB still returns its NOTAMs, so the verdict step can let a NO_GO
-    from a working source win over UNVERIFIED. A failed one returns none.
+    This is the half of load_pib that needs no request, so a replay of a committed PIB applies the same stale check
+    and gets the same issued_at as a live fetch. `fetched_at` defaults to `now`; `sha` is the archive commit, if any.
 
     stale_rule: True (live mode) applies the pib_stale_hours rule. False (case mode) does not: the case's
     captured PIB is treated as current at the case's now, because the archive snapshots it only about twice
     a day. The status is then ok whatever the PIB's age, and its reason says so. A PIB that fails to read is
-    still failed.
+    still failed, with no NOTAMs. A stale PIB still returns its NOTAMs, so the verdict step can let a NO_GO
+    from a working source win over UNVERIFIED.
 
     tz is an IANA zone name for the time in the stale reason ("PIB issued 2026-10-31 07:00 GMT ..."); None writes UTC.
-    The request to the archive stays UTC either way, and so do the status's issued_at and fetched_at.
+    The status's issued_at and fetched_at stay UTC either way.
     """
     check_tz(tz)
-    fetched = fetch_pib(source, now, client=client)
-    if fetched.xml is None:
-        return PibResult(status=fetched.status)
-    fetched_at = fetched.status.fetched_at
+    fetched_at = fetched_at or now
     try:
-        issued, notams = read_notams(fetched.xml)
+        issued, notams = read_notams(xml)
     except PibError as exc:
-        failed = SourceStatus(
-            source=SourceName.NOTAMS, state=SourceState.FAILED, reason=str(exc), fetched_at=fetched_at, sha=fetched.status.sha
-        )
+        failed = SourceStatus(source=SourceName.NOTAMS, state=SourceState.FAILED, reason=str(exc), fetched_at=fetched_at, sha=sha)
         return PibResult(status=failed)
     kept, dropped = drop_superseded(notams)
 
@@ -397,10 +393,31 @@ def load_pib(
         state = SourceState.STALE
     else:
         reason, state = "", SourceState.OK
-    status = SourceStatus(
-        source=SourceName.NOTAMS, state=state, reason=reason, fetched_at=fetched_at, issued_at=issued, sha=fetched.status.sha
-    )
+    status = SourceStatus(source=SourceName.NOTAMS, state=state, reason=reason, fetched_at=fetched_at, issued_at=issued, sha=sha)
     return PibResult(status=status, notams=kept, superseded=dropped)
+
+
+def load_pib(
+    source: Source,
+    now: datetime,
+    *,
+    client: httpx.Client | None = None,
+    rules: Rules = RULES,
+    stale_rule: bool = True,
+    tz: str | None = None,
+) -> PibResult:
+    """Fetch the PIB and read it with status_from_xml. The status is ok, stale (issued too long before now) or failed.
+
+    A failed fetch returns no NOTAMs. stale_rule and tz are as for status_from_xml. The request to the archive
+    stays UTC whatever tz is.
+    """
+    check_tz(tz)
+    fetched = fetch_pib(source, now, client=client)
+    if fetched.xml is None:
+        return PibResult(status=fetched.status)
+    return status_from_xml(
+        fetched.xml, now, fetched_at=fetched.status.fetched_at, sha=fetched.status.sha, rules=rules, stale_rule=stale_rule, tz=tz
+    )
 
 
 # --- prefilter (G13) ---------------------------------------------------------------
@@ -480,7 +497,7 @@ def _ignore_reason(notam: ParsedNotam, rules: Rules) -> str | None:
     if notam.type is NotamType.CANCEL:
         target = f" {notam.replaces}" if notam.replaces else ""
         return f"NOTAMC cancelling{target}; a cancellation never produces an action"
-    if notam.series == SECURITY_SERIES and rules.notam_ignore_security_subjects.breached(subject):
+    if rules.notam_security_series.breached(notam.series) and rules.notam_ignore_security_subjects.breached(subject):
         return f"series {notam.series} subject {subject}: security advice to air operators"
     if rules.notam_wide_ignore_subjects.breached(subject) and rules.notam_area_wide_nm.breached(notam.radius_nm):
         return f"subject {subject} with radius {notam.radius_nm:g} NM: FIR-wide AIS admin"

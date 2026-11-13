@@ -15,6 +15,7 @@ SORT_RULES = {
     "notam_wide_ignore_subjects": ["AF"],
     "notam_ignore_traffic": ["I"],
     "notam_ignore_purpose": ["K"],
+    "notam_security_series": ["V"],
     "notam_ignore_security_subjects": ["RO"],
     "notam_restriction_subjects": ["RD", "RR", "RP", "RT"],
     "notam_awareness_subjects": ["GW"],

@@ -56,7 +56,24 @@ def test_the_lz_is_inside_j3857s_coded_q_circle_which_is_what_stands_in_for_egd4
     assert circle_over(*LZ, coded.centre_lat, coded.centre_lon, coded.radius_nm)
 
 
+def names_egd496a(area: Airspace) -> bool:
+    """True when the area is EGD496A by its designator or by its name. openAIP often leaves the designator empty and puts
+    the identity in the name ('EASINGTON'), so both are read, with the spaces and dashes taken out ('EG D 496A', 'D496A')."""
+    squashed = "".join(ch for text in (area.designator, area.name) for ch in (text or "").upper() if ch.isalnum())
+    return "D496A" in squashed
+
+
+@pytest.mark.parametrize(
+    ("designator", "name", "expected"),
+    [("EGD496A", None, True), (None, "EGD496A BLUE MILL", True), (None, "D 496A", True), (None, "EG-D496A", True), (None, "EASINGTON", False), ("EGD496B", "D496B", False), (None, None, False)],
+)
+def test_the_guard_finds_egd496a_by_designator_or_by_name(designator, name, expected):
+    _case, _forecast, airspace, _pib, _readings = cases.load(cases.BLUE_MILL)
+    area = airspace.areas[0].model_copy(update={"designator": designator, "name": name})
+    assert names_egd496a(area) is expected
+
+
 def test_egd496a_has_no_polygon_in_the_committed_capture():
     _case, _forecast, airspace, _pib, _readings = cases.load(cases.BLUE_MILL)
     areas: list[Airspace] = airspace.areas
-    assert not any(a.designator == "EGD496A" for a in areas)
+    assert not any(names_egd496a(a) for a in areas)
