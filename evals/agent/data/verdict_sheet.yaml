@@ -19,7 +19,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -37,7 +37,7 @@
     pib.xml: 976856978a94df29adef9f55528877c39c9ef3af9d5b42b5dab4c987942cca8a
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 7e03cad91324e9f31c91bc75ba8460ea39823f053e3e84d97c695c55dff6e969
-    seal: 1b612fcbf544c7ad1be6fe12ca736f6c75c5d12f0a746261ac39b77f6d862667
+    seal: 77910f8811863815a3abe6713023735ae0e1165a2f3a035e1c0a8db26abde5a0
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -120,7 +120,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -138,7 +138,7 @@
     pib.xml: 18b455098935c5fc434b3bc38e2534303216536f186744e48286408333ab1789
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: c9cef5c1c67eb819858d933090d1b7523c7c77bbb2ef7cf11de12a44fcf3eaa8
-    seal: aaddb4fe8b606fd660a6236dae0d487b87ff26c8531bd7781a3bf4b49f182161
+    seal: 267d47e08a5390a39c598c5ffb71628805764eec0dfcfc46847523da35f06c3c
   notam_actions:
     H5829/26: IGNORE
     H5874/26: IGNORE
@@ -281,7 +281,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -299,7 +299,7 @@
     pib.xml: a4a08a5ee8e103b4c50ed6ba21720a3e6295baba849cafb233246af036f9148b
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: a2d909a798c2d00557a525ba53d7e821cdee73000c6fc35158efd78fdda3861d
-    seal: 0d9a401e2fc7e76581593ec2d9da98ced4127351d0d231c7ecfdd1194cdf7082
+    seal: 6bd3e3d1c299f3b6272d1155b22f586411362b4a5d36187466d25f7e77b64190
   notam_actions:
     B1508/26: IGNORE
     H5914/26: IGNORE
@@ -365,7 +365,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -383,7 +383,7 @@
     pib.xml: 196e0798c65dbda4c8fcf389535e06649358440385ffd6691e10ffda343103ef
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: a9e10e25e323bdda2d82a72c9ec01efb3929c34ba57e281d8fc6d114de047c42
-    seal: f9a16e0fa892d44f141220f17999aa9f3fb2d9bcbcb95b4552b780dce406d45c
+    seal: 65ee136bd1c16984a1643092c611228151388f41b99a949b8e95dc9c25edd274
   notam_actions:
     H5829/26: CONTACT_FIRST
     H5874/26: IGNORE
@@ -441,7 +441,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -459,7 +459,7 @@
     pib.xml: c574f9769d1eb82712fca2611682042ce2ce1f2d18c4970301829616aad083e1
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 502f4dd3b23ed75ab3f738214076bedd8ee5897c571b2bf123f9347898a908ac
-    seal: 581df9cb75de15121b45162847ba00d0750a7e2f4698e4b7df1cee1170d1b2df
+    seal: b15917953003e02e3f6d40135484d94ad7b8d55242cd92ce28f7fa712e833317
   notam_actions:
     B1476/26: AWARENESS
     B1508/26: IGNORE
@@ -538,7 +538,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -556,7 +556,7 @@
     pib.xml: 783fa385b4b2db5d86f9bfa9c1eb0b52af7c829e782efdfda2f4a32ff168488b
     readings.yaml: 0d2a4e3afe27933e370f07473e25cb26969dfaeedcd8b1b0cb86ea1a6a64a26d
     labels: 213409e5cb829ed6ef4f88988404522b514575be006415a8c03186a927211cca
-    seal: 77e4dcb8f407c5a34e684810fc45cdd62cdc4639d77f994379f7e6f65edf6417
+    seal: e60fff77ae05034d5d04527391cfe53cf0dfc0ffa689ba9f0c26fd6d3847771e
   notam_actions:
     B1139/26: IGNORE
     B914/26: IGNORE
@@ -623,7 +623,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -641,7 +641,7 @@
     pib.xml: 976856978a94df29adef9f55528877c39c9ef3af9d5b42b5dab4c987942cca8a
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 1613e99ede9496bb4e8658a353c4d6b1d0cf579a56113251a9a80bf53530fccb
-    seal: ef30218dd4d7d44d73a95b56802d4669d7c4c1d192d16519e8a09f342278d364
+    seal: 7e34f23dcadaa34a7df54f0c77a9529bd3e2fd6309368755a912714289c9e00d
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -699,7 +699,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -717,7 +717,7 @@
     pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 828c3ceacfccaebd2a442832c91656cb6564d51133dc6190a7039fe2b4d6e9e8
-    seal: 8cbe1be06ea188a5b6cda5621f920b4a1003da1104c6fb6704dff4a3c348480f
+    seal: c27104c2237ab07f7fe8b6ceda1dc4106c4dedc63543dcef6f549c8fb5a79a67
   notam_actions:
     B1434/26: IGNORE
     B1563/26: IGNORE
@@ -768,7 +768,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -786,7 +786,7 @@
     pib.xml: bb99ec04266071d300ab341c3f18ea0616e4475ac2a70d6d552f1b580325bad4
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 17548ee7c87734d990cbda7d56efc303d0c718a6c581f0fc41a048b60f5e4286
-    seal: 3cd03d3c96aba2c103501b20b5d8880a57bea3b4eb27dbf3286a39980a8695ad
+    seal: 9da74f4d17410b5e2fe60b5f576ce11585d5830580219e686dec6e8565b0f9a7
   notam_actions:
     B1476/26: AVOID_SECTOR
     B1508/26: IGNORE
@@ -862,7 +862,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -880,7 +880,7 @@
     pib.xml: b35d3de8898f35c830655a32c4f445c5a089636f64c559545b2cd044ba68173a
     readings.yaml: a0d07c01e67c9b4be16e3bc5d93fcd815f216ea93e87b0339c2c7b33ddfbbdd1
     labels: 01000eb1ab285ca50dbfb3c93f6ed336c467e96c1cc57039c8fc3336af42fdaa
-    seal: 8dbc0bfb2b1a1d56448cbbf6231da3cb9f68fbadb46c39599d7258e8c98ac20d
+    seal: 568a99efb68784eac9d5000ab5342cd3b4f92c801b670a028c74c57de8b9e46f
   notam_actions:
     B1603/26: IGNORE
     B1623/26: IGNORE
@@ -993,7 +993,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1011,7 +1011,7 @@
     pib.xml: 390eba671f43c0aa387b2f45c8816448d6e4d17ac07197f381da1e62059b12a3
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 5ec9cc52bd09d4632f3341b1bd264a1b3aa0441d59e7434f4f65c64b413a8ce7
-    seal: 9618ec24cc6b333287ee913592ef65c16138dcfeac0f91ee7168bfdaa27c8692
+    seal: dadf91ec5d726bd78a1854ba1dccfe4dfddf116ce8be71daefedc5c7149358d4
   notam_actions:
     # ignored by code (add a line above to overrule):
     # H6627/26: ended 2026-10-06T16:00:00Z, at or before the window start 2026-10-10T06:00:00Z
@@ -1071,7 +1071,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1089,7 +1089,7 @@
     pib.xml: 059778f8161a6d1876f1338d3e78c864cc6549e488d17346307656691c091be6
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 6c27c1b0d9fdb50f15f16371f9aea614261796233596d336e838589814bc4ba2
-    seal: dab2a20e5906d8f74dddd71d2845a7c5c3dc918bc27bf6b3c987d2f280de77fd
+    seal: 2262edbf6d05d914b5ee477c14fcc3a919af09884b74e5e20e1f782d67b66946
   notam_actions:
     H3868/26: CONTACT_FIRST
     H3971/26: CONTACT_FIRST
@@ -1189,7 +1189,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1207,7 +1207,7 @@
     pib.xml: b04936bff2aaa05d765e2c66ac4068df13fefd0619daac834037b007ecfa47ea
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 98f97139ddb07cc24cc6db4940a79f474815b99b56d9f1135dbd03b69c0ea58f
-    seal: 745d6391e8ef359a794944099d9ac8bd3066f7d7deab43e7cbb4955422e2f4f7
+    seal: 88c4848ada0eeef4cc0a2730b9171e9dab7d675d01f5d152b7e3f6dd233265f3
   notam_actions:
     H5915/26: IGNORE
     H5918/26: IGNORE
@@ -1278,7 +1278,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1296,7 +1296,7 @@
     pib.xml: 53abcc0dc25fc6ce02bae45b87da674f889c1b5d944d816ed2ec6ce51e58f1ee
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: f6779284b6ad475cc0b8145b0c86be9715b11bbe480c6776bc8ea2018b23d419
-    seal: f004fca5567d86c4093e5ecd0c3be981ec02adcb63166ac651155a9c88009ea0
+    seal: 35507946fc49c0437d3ef548356609c2860bbd12d68588c14306af34d2191ac7
   notam_actions:
     H4821/26: AVOID_SECTOR
     H4878/26: AWARENESS
@@ -1369,7 +1369,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1387,7 +1387,7 @@
     pib.xml: fc82e1c3a4ba74420f9b24a7054d7bf5205708288a6022004b3eb2edc2a767d0
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: fd73e39173c3466fed851e4b393433d712e5cf5e123292841558dfc42556cbf4
-    seal: d8adbec7a7bb714faba1429080043a77581b7293398f9626d86db62da5c9b529
+    seal: 0784052813c3acfc4600ad8aa15604a72316ecdadaf1c7289c2ef35ea0d85fad
   notam_actions:
     # ignored by code (add a line above to overrule):
     # H4420/26: ended 2026-07-22T18:30:00Z, at or before the window start 2026-07-26T06:00:00Z
@@ -1474,7 +1474,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1492,7 +1492,7 @@
     pib.xml: 49f98f2d5967c2d73a8845cbe822ec354ce17cd05f2ab1fa705e034ad2e495a4
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 8650b8f2961565efd5b9d875f5035eb27f4bf03f00effb79f48ce4b9e3be5335
-    seal: 7ab55b49bdff8cb4e14bfbcdea0487ae52041b961c7fa75c184026173021ac0a
+    seal: ef21b1a4f05f895375157eea499692344a6ebf4f74c063da5361336856d2cd64
   notam_actions:
     H4701/26: IGNORE
     B1139/26: AWARENESS
@@ -1547,7 +1547,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1565,7 +1565,7 @@
     pib.xml: 575cb812de9def24a3fef27bfe0193570dfd2b6bcd13d9d53239390d0ab36e92
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 05a586c96555999d895b33be90d20154fcc571ad1bc1ed134edfdd81b20501f7
-    seal: a484f1cad9903975856e524eead2e393e519fd302d8f30b2989d14ce9e7a78d4
+    seal: ef9f066b3e1c7e5ba2a82aad26b1daf151eeffe2f45440bfecd5adb8c505c4a0
   notam_actions:
     H5829/26: IGNORE
     H6767/26: IGNORE
@@ -1740,7 +1740,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1758,7 +1758,7 @@
     pib.xml: b02b7d46fffbefaabce9130e06a350be44b775881b45dc7263350a74a74a889d
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 150763914b8a3861c4b5b1a035fe8b1d28b6a5415ddc481bd7999946120fb71f
-    seal: d211bb2575a8945d357f9f0946f2784edb65921695da05b0582ffd4f44b23e55
+    seal: 20a3c5e82bb16acf36d54436f3f9b920b4ad3ea47170b231ccbd6f4506b08141
   notam_actions:
     H1633/26: CONTACT_FIRST
     H3369/26: AVOID_SECTOR
@@ -1859,7 +1859,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1877,7 +1877,7 @@
     pib.xml: cd0f8f906f9653ef144d8d5ec070047b0e97d9ad7e85328f89b9c1cb53e828cd
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 1b9696b8f3e1b2cff95a1196e9ffae26bbb5249aacf31497aec0b492005311ea
-    seal: 4e95c61aaa4daeee7b45b07db8e47dbbe2434650cf1a1e14cd2eccd6d05dbc09
+    seal: 8f3218561fd31393a0feae8267bd63c7f2f3e3b62aa5eeda782f9ae605339604
   notam_actions:
     H6447/26: CONTACT_FIRST
     H6448/26: AVOID_SECTOR
@@ -1960,7 +1960,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -1978,7 +1978,7 @@
     pib.xml: 22b793d4603bb43bcd432032040338321b2b25901aefd8716d55e1c7adffcbfb
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: e2bdff4ddfcd65340c3c6a0feb9642e17aac19fb9e8695e5cc05e627b21ae8c9
-    seal: 7e9836d759a03c3273402e5a24ffecbfc07e0e4288ca2eba5d60bd4a84c99b28
+    seal: 549fabdd1d069076d500719a07ebef30de564a40a4097b6a7e04caf02dbdffdc
   notam_actions:
     H5078/26: AWARENESS
     # ignored by code (add a line above to overrule):
@@ -2039,7 +2039,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -2057,7 +2057,7 @@
     pib.xml: 1cf4a25433b3d0bff08059ea262dab2052a83229056e61393431fc4db9694172
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 00519bc208f2234500247493e85875a5b182f87f992868c510f257044bdb482e
-    seal: 2f652ece53e727e7fee0a9140171aab22d08eca1a76b5161afb472ae762a0503
+    seal: 0235bc01ba2e010c6d69197d3b4c239212c4a55a36695b6e071a11faeab67abe
   notam_actions:
     B1139/26: IGNORE
     H2483/26: IGNORE
@@ -2124,7 +2124,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -2142,7 +2142,7 @@
     pib.xml: 76c35ea66ca7b00cda77a2dae702fa2c6eeb854a1d646f80595a7e18460f58f2
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 940ec802e5e09893382ea631aaf9f2cc37eca19736664d02d540a6b9faa551f6
-    seal: bf534eb0cccda5b7e349ad73e24a7713bb4b47806068b13b057a87986b2e0173
+    seal: 99db07f1ef8f1f50ec62cb58c5d04b14381c7819a8f758c9f6c4c8809a51edf5
   notam_actions:
     H7171/26: AVOID_SECTOR
     J3857/26: CONTACT_FIRST
@@ -2486,7 +2486,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -2504,7 +2504,7 @@
     pib.xml: fd64ea7fcb7aa0f33a68aed6de95a0aed667e58abe1a0060fb7faab7810926af
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 7669af757b485dfa24a1f8745a2e06f3cd9e28077d5aaff0721415dbf7e371e2
-    seal: e276cb681719f9435c8bf5c391865830526cbff08b88780cca895b9ec3a8caef
+    seal: 786b8e8b01042eec38f9c3e198f7162046c61f3b804b52870132db01d27f0add
   notam_actions:
     J3220/26: AWARENESS
     H6449/26: IGNORE
@@ -2562,7 +2562,7 @@
       src/flysafelz/clients/openaip.py: c649a796475648da9561a8da62fabe0d725b15da9954447e5590e92d61fccb8a
       src/flysafelz/clients/pib_source.py: 9e66d786fb3c5b9037ed5661aadcea0958012280b0054e05d6caa1bdc487dfca
       src/flysafelz/contracts.py: b155c8a2868b4964001bd7bfd381327630c6e1eefd62d95430021440581e079c
-      src/flysafelz/daylight.py: 308eb9aeae554702cc939cafce7173d2e9ca63752a5e6ebb7140f080e65b4ab0
+      src/flysafelz/daylight.py: df8768705e3a574dd1d765f36f3f7d501e47ac3e6927a44a8b8c731d98bb2585
       src/flysafelz/designators.py: 9b501233ac6b7e07f83326db768660b55f81adbb8c95e0f714b65a9bc357ffc1
       src/flysafelz/geo.py: 70adc3ff823fee39bd53533df2fc3169e6e1e624aeb496761ddf2bfa98efd684
       src/flysafelz/notam_action.py: e6db1a6c5f3a0595c347f1dd0d684e0744d88675c447d1f4dea9f96cb6ebcc92
@@ -2580,7 +2580,7 @@
     pib.xml: 8c88bb840d8bebaa96c345e1fc62258a3473f0651d0f032016f5800b4818959e
     readings.yaml: 36b7583556bb4f799d19e6f4e2c96cb71881381370b5834a90f6d0ba6052050f
     labels: 6fb0eb93953e447f403f89dc7c8aa5380dd7326cf826d020f6d99afdbf033366
-    seal: d948c24f23d04c3f4a8f22197c0ed0c0235be071cc1d961dad8f41ad1f4cb704
+    seal: 926a5c6869c99254718714e5289f9c89a6e60ea293b96df5d55d8ca35b17841f
   notam_actions:
   rows:
   - start: '2026-10-10T09:00:00Z'

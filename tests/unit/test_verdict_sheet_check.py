@@ -146,6 +146,25 @@ def test_gp5_the_counts_split_labelled_unlabelled_incomplete_and_tier_only_rows(
     assert (report.rows, report.tier_rows, report.labelled, report.unlabelled, report.incomplete) == (3, 1, 1, 1, 1)
 
 
+@pytest.mark.parametrize("labels", [{"verdict": "NO_GO"}, {"approaching_limits": False}, {"verdict": "NO_GO", "approaching_limits": False}])
+def test_a_label_typed_on_a_tier_only_row_is_a_warning_naming_the_row_not_an_error(labels):
+    far = {"start": "2026-10-31T09:00:00Z", "end": "2026-10-31T10:00:00Z", "edge": "hour", "tier": "OUTLOOK", **labels}
+    entry = edited(
+        window={"start": "2026-10-31T07:30:00Z", "end": "2026-10-31T10:00:00Z"},
+        rows=[row("07:00", "08:00"), row("08:00", "09:00"), far],
+    )
+    report = checked(entry)
+    assert report.errors == [] and report.tier_rows == 1
+    (warning,) = report.warnings
+    assert "example e1, row 3 (2026-10-31T09:00:00Z)" in warning and "OUTLOOK" in warning and " and ".join(labels) in warning
+
+
+def test_a_tier_only_row_with_no_labels_or_null_labels_has_no_warning():
+    far = {"start": "2026-10-31T09:00:00Z", "end": "2026-10-31T10:00:00Z", "edge": "hour", "tier": "TOO_FAR", "verdict": None, "approaching_limits": None}
+    entry = edited(window={"start": "2026-10-31T07:30:00Z", "end": "2026-10-31T10:00:00Z"}, rows=[row("07:00", "08:00"), row("08:00", "09:00"), far])
+    assert checked(entry).warnings == []
+
+
 def test_unread_left_counts_every_unread_over_lz_action_and_is_not_an_error():
     report = checked(edited(actions_done=True, notam_actions={"A1/26": "UNREAD_OVER_LZ", "B2/26": "UNREAD_OVER_LZ", "C3/26": "NO_FLY"}))
     assert (report.unread_left, report.errors, report.actions_done) == (2, [], True)
@@ -244,6 +263,31 @@ def test_gp5_a_bad_verdict_prints_the_error_with_example_and_row_and_exits_1(bui
     (error,) = [line for line in out.splitlines() if line.startswith("error:")]
     assert "example e1, row 1 (2026-10-31T08:00:00Z)" in error and "'MAYBE'" in error
     assert out.splitlines()[-1].startswith("1 entries checked: 1 errors")
+
+
+def test_check_prints_a_warning_for_a_label_on_a_tier_only_row_and_still_exits_0(built, capsys):
+    """Edit the built sheet's last row into a tier-only one with a verdict typed on it."""
+    _root, _examples, sheet = built
+    text = sheet.read_text(encoding="utf-8")
+    start = text.rindex("  - start:") if "  - start:" in text else text.rindex("- start:")
+    last = text[start:]
+    last = last.replace("verdict: null", "tier: OUTLOOK\n    verdict: NO_GO").replace("    approaching_limits: null\n", "")
+    sheet.write_text(text[:start] + last, encoding="utf-8")
+    code, out, _err = run_check(built, capsys)
+    assert code == 0, out
+    (warning,) = [line for line in out.splitlines() if line.startswith("warning:")]
+    assert "example e1, row 3" in warning and "verdict" in warning and "ignored" in warning
+
+
+def test_check_notes_an_assess_example_that_has_no_entry_on_the_sheet_and_does_not_fail(built, capsys):
+    root, _examples, sheet = built
+    window = (utc(8), utc(11))
+    both = examples_file(root / "both.yaml", example("e1", "c", now=NOW, window=window), example("e2", "c", now=NOW, window=window))
+    code = main(["--check", "--examples", str(both), "--out", str(sheet)], root=root, environ={})
+    out, _err = capsys.readouterr()
+    assert code == 0
+    assert "note: example e2 is not on the sheet yet; run build_verdict_sheet to add it" in out.splitlines()
+    assert not any("example e1 is not on the sheet" in line for line in out.splitlines())
 
 
 def test_check_writes_nothing(built, capsys):

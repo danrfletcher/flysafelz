@@ -15,6 +15,7 @@ example's, never the order of the examples. `--blind` / `--draft` build only the
     stale_reasons(example, entry, ..) what changed since an entry was written ([] = nothing) (G6)
     append_entries(out, ...)         add new entries to the end of the sheet as text
     load_sheet(path)                 the labelled sheet as Spec section 4 data (verdict_sheet_check)
+                                     (load_sheet_skipping there loads the entries that validate and returns the others' errors)
     main(argv, root=...)             the command; scripts/build_verdict_sheet.py is a thin wrapper
 
 The examples file is a YAML list (or a mapping with an `examples:` list). An example is
@@ -277,6 +278,11 @@ def _at_hour_boundary(hour: datetime, lat: float, lon: float, near: list[ParsedN
 
     A daylight change or a NOTAM start or end at HH:00 is strictly inside the probe; a NOTAM running across HH:00
     is not cut by it. Both come from the same public helpers assess cuts an hour with.
+
+    This is not a call of notams_in_hour for the hour before the first window hour (the spec's G14 wording), though the
+    reasons are the same in every tested case. One difference remains: the probe's NOTAM set is sorted against
+    [HH-1m, HH+59m), not the [HH, HH+1h) span assess uses, so a NOTAM that sort_notam treats differently over those two
+    spans could be named differently here than in assess's own cut of that hour.
     """
     probe = hour - ONE_MINUTE
     in_probe = notams_in_hour(probe, near, readings, lz)
@@ -484,7 +490,8 @@ def ensure_case(example: Example, root: Path, *, environ: Mapping[str, str] | No
     """The case folder for the example. An existing one is returned untouched, never recaptured.
 
     A missing one gets a case.yaml and a capture (network and OPENAIP_API_KEY: only on Dan's Mac). When the
-    capture fails the folder made here is removed again and SheetError carries capture's own message.
+    capture fails the folder made here is removed again and SheetError carries capture's own message. Any other
+    exception, or a Ctrl-C, removes the folder too and is raised as it is, so a partial case never stays behind.
     """
     case_dir = root / FIXTURES_DIR / example.case
     try:
@@ -503,6 +510,9 @@ def ensure_case(example: Example, root: Path, *, environ: Mapping[str, str] | No
         _remove_new_folder(case_dir)
         message = str(exc) if isinstance(exc, CaptureError) else f"{case_dir}: cannot write ({type(exc).__name__})"
         raise SheetError(f"example {example.id}: {message.replace(key, '***') if key else message}") from None
+    except BaseException:  # any other error, or Ctrl-C: never leave a partial case for the next run to treat as an existing one
+        _remove_new_folder(case_dir)
+        raise
     return case_dir
 
 
@@ -687,6 +697,7 @@ def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path]
     """`--check`: one line per entry (GP5) and an error line for each problem. Exit 0 when the sheet validates, 1 otherwise.
 
     A stale entry (the 4b fingerprint) or an orphan (an id no longer in the examples file) is reported but is not an error.
+    So is an `assess` example with no entry yet (a note: a rerun adds it), and a label typed on a tier-only row (a warning: it is never loaded).
     An `actions_done: true` entry that is unfinalised, or finalised but stale (verdict_sheet_finalise.finalised_problems), is an
     error: `verdict sheet is stale (<part> changed): run make dataset`. An `actions_done: false` entry is reported as not finalised.
     """
@@ -719,12 +730,18 @@ def _check(args: argparse.Namespace, root: Path, build: Callable[[Example, Path]
             print(report_line(report, status, orphan=orphan))
         for message in report.errors:
             print(f"error: {message}")
+        for message in report.warnings:
+            print(f"warning: {message}")
         errors += len(report.errors)
         stale += status != "no"
         orphans += orphan
     for entry in entries:
         if entry.id is not None and isinstance(entry.data, dict) and entry.data.get("actions_done") is not True:
             print(f"note: example {entry.id} is {verdict_sheet_finalise.NOT_FINALISED}")
+    on_sheet = {entry.id for entry in entries if entry.id}
+    for example in examples:
+        if example.path == "assess" and example.id not in on_sheet:
+            print(f"note: example {example.id} is not on the sheet yet; run build_verdict_sheet to add it")
     print(f"{len(entries)} entries checked: {errors} errors, {stale} stale, {orphans} orphans")
     return 1 if errors else 0
 

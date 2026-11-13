@@ -133,7 +133,7 @@ def daylight_edges(lat: float, lon: float, start: datetime, end: datetime) -> li
 
 def london_day_offset(t_utc: datetime, now_utc: datetime) -> int:
     """Whole Europe/London calendar days from now to t. Day 0 is today in London."""
-    return (_utc(t_utc).astimezone(LONDON).date() - _utc(now_utc).astimezone(LONDON).date()).days
+    return (london_date(t_utc) - london_date(now_utc)).days
 
 
 def london_day_utc(day: date) -> tuple[datetime, datetime]:

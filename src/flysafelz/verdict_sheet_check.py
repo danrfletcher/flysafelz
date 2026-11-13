@@ -2,9 +2,10 @@
 
     SheetError                       one line, for anything wrong with the sheet file
     parse_sheet(text, name)          the sheet's entries, each with the exact text span it occupies in the file
-    check_entry(entry, ...)          validate one entry (G10) and count its rows: an EntryReport
+    check_entry(entry, ...)          validate one entry (G10) and count its rows: an EntryReport (errors, and warnings that are not errors)
     report_line(report, stale, ...)  the one line `--check` prints for an entry (GP5)
     load_sheet(path)                 the labelled sheet as Spec section 4 data, per example id (GP6)
+    load_sheet_skipping(path)        the same for every entry that validates, plus the errors of the entries left out
 
 The sheet is a YAML list, one entry per example (see verdict_sheet). Validation is shared by `--check` and
 load_sheet (G10):
@@ -15,6 +16,8 @@ load_sheet (G10):
     default window (--check does, from the examples file);
   * a row with a verdict but no `approaching_limits`, or the reverse, is incomplete: it is counted, it is not an
     error, and load_sheet skips it.
+  * a tier-only row (OUTLOOK / TOO_FAR) that carries a verdict or approaching_limits is a warning, not an error: the
+    labels on it are never loaded.
 Every error names the example id and the row (its 1-based number and its start), or the NOTAM id.
 
 load_sheet returns, per example id, and raises SheetError listing every error when the sheet does not validate:
@@ -23,7 +26,8 @@ load_sheet returns, per example id, and raises SheetError listing every error wh
     notam_actions        {NOTAM id: action} only when `actions_done` is true and no UNREAD_OVER_LZ is left (G4);
                          a null value loads as IGNORE, and so does any NOTAM id that is not listed
 Times are 'YYYY-MM-DDTHH:MM:SSZ' text, as in the sheet. An entry whose example has gone from the examples file
-(an orphan) still loads.
+(an orphan) still loads. load_sheet refuses the whole sheet for one bad entry; load_sheet_skipping loads the entries
+that validate and returns the errors of the others, so one typo does not stop the rest.
 """
 
 import re
@@ -127,6 +131,7 @@ class EntryReport:
     unread_left: int = 0
     actions_done: bool = False
     errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)  # something to look at that is not an error: a label typed on a tier-only row
     edge_errors: list[str] = field(default_factory=list)  # the errors in `errors` about where rows start and end: a gap, an overlap, a row not after its start, rows not covering the window
 
 
@@ -235,6 +240,9 @@ def _check_row(row: object, number: int, label: str, report: EntryReport, previo
         if row["tier"] not in TIER_ONLY:
             report.errors.append(f"{where}: tier {row['tier']!r} is not one of {', '.join(TIER_ONLY)}")
         report.tier_rows += 1
+        typed = [key for key in ("verdict", "approaching_limits") if row.get(key) is not None]
+        if typed:
+            report.warnings.append(f"{where}: {' and '.join(typed)} on a {row['tier']} row is ignored; only rows without a tier take labels")
         return bounds
     _count_labels(row, where, report)
     return bounds
@@ -323,6 +331,23 @@ def check_entries(entries: list[SheetEntry], defaults: dict[str, tuple[datetime,
             report.errors.append(f"example {entry.id}: duplicate id (entries #{first_at[entry.id]} and #{entry.position})")
         first_at.setdefault(entry.id, entry.position)
     return reports
+
+
+def load_sheet_skipping(path: str | Path) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    """load_sheet, except an entry with an error is left out instead of stopping the whole sheet.
+
+    Returns ({example id: data} for every entry that validates, the error lines of the entries left out). An entry
+    that has no usable id cannot be keyed, so it is left out with its error line. Raises SheetError only for a sheet
+    that is missing or is not valid YAML (nothing can be loaded then).
+    """
+    _text, entries = read_sheet(Path(path))
+    loaded: dict[str, dict[str, Any]] = {}
+    errors: list[str] = []
+    for entry, report in zip(entries, check_entries(entries), strict=True):
+        errors.extend(report.errors)
+        if not report.errors:
+            loaded[str(entry.id)] = _entry_data(entry)
+    return loaded, errors
 
 
 def load_sheet(path: str | Path) -> dict[str, dict[str, Any]]:

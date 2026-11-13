@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 
 from flysafelz.verdict_sheet import load_sheet as load_sheet_from_the_sheet_module
-from flysafelz.verdict_sheet_check import NotamActions, SheetError, load_sheet
+from flysafelz.verdict_sheet_check import NotamActions, SheetError, load_sheet, load_sheet_skipping
 
 SHEET = """\
 # Dan's sheet
@@ -180,3 +180,37 @@ def test_an_empty_sheet_loads_as_nothing(tmp_path):
     path = tmp_path / "empty.yaml"
     path.write_text("# nothing yet\n", encoding="utf-8")
     assert load_sheet(path) == {}
+
+
+def test_load_sheet_skipping_loads_the_entries_that_validate_and_returns_the_errors_of_the_rest(sheet):
+    text = sheet.read_text(encoding="utf-8").replace("edge: A1/26 starts, verdict: UNVERIFIED", "edge: A1/26 starts, verdict: MAYBE", 1)
+    sheet.write_text(text, encoding="utf-8")
+    with pytest.raises(SheetError):
+        load_sheet(sheet)  # one typo stops the whole load
+    loaded, errors = load_sheet_skipping(sheet)
+    assert sorted(loaded) == ["unread", "untouched"]
+    assert loaded["untouched"]["verdict_by_segment"][0]["verdict"] == "NO_GO"  # the same data load_sheet gives on a clean sheet
+    assert len(errors) == 1 and "example ready, row 3" in errors[0] and "'MAYBE'" in errors[0]
+
+
+def test_load_sheet_skipping_on_a_valid_sheet_is_load_sheet_with_no_errors(sheet):
+    loaded, errors = load_sheet_skipping(sheet)
+    assert errors == [] and loaded == load_sheet(sheet)
+
+
+def test_load_sheet_skipping_still_refuses_a_missing_sheet(tmp_path):
+    with pytest.raises(SheetError, match="no such file"):
+        load_sheet_skipping(tmp_path / "nowhere.yaml")
+
+
+def test_a_label_on_a_tier_only_row_does_not_stop_load_sheet_and_is_not_loaded(tmp_path):
+    path = tmp_path / "s.yaml"
+    path.write_text(
+        "- id: x\n  mode: blind\n  window: {start: '2026-10-31T07:00:00Z', end: '2026-10-31T09:00:00Z'}\n  actions_done: false\n  rows:\n"
+        "    - {start: '2026-10-31T07:00:00Z', end: '2026-10-31T08:00:00Z', verdict: NO_GO, approaching_limits: false}\n"
+        "    - {start: '2026-10-31T08:00:00Z', end: '2026-10-31T09:00:00Z', tier: OUTLOOK, verdict: GO, approaching_limits: false}\n",
+        encoding="utf-8",
+    )
+    entry = load_sheet(path)["x"]
+    assert [r["verdict"] for r in entry["verdict_by_segment"]] == ["NO_GO"]
+    assert entry["tier"] == [{"start": "2026-10-31T08:00:00Z", "end": "2026-10-31T09:00:00Z", "tier": "OUTLOOK"}]
