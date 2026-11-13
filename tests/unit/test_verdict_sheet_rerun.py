@@ -14,10 +14,10 @@ from pathlib import Path
 import pytest
 import yaml
 from factories import circle_at, notam
-from verdict_sheet_helpers import example, examples_file, write_case
+from verdict_sheet_helpers import LAT, LON, example, examples_file, write_case
 
 from flysafelz import verdict_sheet
-from flysafelz.verdict_sheet import main
+from flysafelz.verdict_sheet import Example, main
 from flysafelz.verdict_sheet_check import parse_sheet
 
 SRC = Path(verdict_sheet.__file__).parent
@@ -341,6 +341,42 @@ def test_an_existing_entrys_case_folder_gone_is_never_captured_again(root, capsy
     moved = example("a", "new_case_name", now=NOW, window=WINDOW)
     code, out, _err = run(root, moved, capsys=capsys)
     assert code == 0 and "example a: stale (inputs)" in out and sheet_bytes(root) == before
+
+
+def fresh_example():
+    """An example whose case folder does not exist yet, so ensure_case captures it."""
+    return Example(id="a", path="assess", lat=LAT, lon=LON, now=NOW, window=WINDOW, case="fresh")
+
+
+@pytest.mark.parametrize("error", [RuntimeError("boom"), KeyboardInterrupt()])
+def test_a_capture_that_dies_part_way_leaves_no_partial_case_folder(tmp_path, monkeypatch, error):
+    """Any exception from capture, a Ctrl-C included, removes the case.yaml and data files it had already written."""
+    from flysafelz import capture
+    from flysafelz.verdict_sheet import ensure_case
+
+    def dies(name, case_dir, key, client, today):
+        (case_dir / "weather.json").write_text("{}", encoding="utf-8")  # a partial case: case.yaml and one data file
+        raise error
+
+    monkeypatch.setattr(capture, "capture", dies)
+    with pytest.raises(type(error)):
+        ensure_case(fresh_example(), tmp_path, environ={"OPENAIP_API_KEY": "k"}, today=NOW)
+    assert not (tmp_path / "fixtures" / "fresh").exists()
+
+
+def test_a_capture_error_still_becomes_a_sheet_error_and_leaves_no_folder(tmp_path, monkeypatch):
+    from flysafelz import capture
+    from flysafelz.capture import CaptureError
+    from flysafelz.verdict_sheet import SheetError, ensure_case
+
+    def fails(name, case_dir, key, client, today):
+        (case_dir / "weather.json").write_text("{}", encoding="utf-8")
+        raise CaptureError("weather: HTTP 500")
+
+    monkeypatch.setattr(capture, "capture", fails)
+    with pytest.raises(SheetError, match="example a: weather: HTTP 500"):
+        ensure_case(fresh_example(), tmp_path, environ={"OPENAIP_API_KEY": "k"}, today=NOW)
+    assert not (tmp_path / "fixtures" / "fresh").exists()
 
 
 # --- F3: nothing of 5a in the sheet code ---------------------------------------------------------------------------

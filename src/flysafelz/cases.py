@@ -3,7 +3,7 @@
     load_case_inputs(case_dir)                      -> (Case, Forecast, AirspaceFetch, PibResult, readings)
     load_case_inputs_by_name(name, *, root=None)    the same for fixtures/<name>/ under the repository root
 
-The files are replayed through the real client code by sources.replay_files (the same path as
+The files are replayed through the real client code by sources._replay_files (the same path as
 sources.load_case_sources), so the openAIP filter and the PIB parser run as in a live fetch.
 
 `today` for the case's own check is the case's `now`: a committed case is never refused as
@@ -25,7 +25,7 @@ from flysafelz.clients.open_meteo import Forecast
 from flysafelz.clients.openaip import AirspaceFetch
 from flysafelz.contracts import NotamReading
 from flysafelz.pib import PibResult
-from flysafelz.sources import FIXTURES_DIR, SourceError, replay_files
+from flysafelz.sources import FIXTURES_DIR, SourceError, _replay_files
 
 CaseInputs = tuple[Case, Forecast, AirspaceFetch, PibResult, dict[str, NotamReading]]
 
@@ -48,7 +48,7 @@ def _own_now(case_yaml: Path) -> datetime:
 
 def _load(folder: Path, root: Path, readings_optional: bool = False) -> CaseInputs:
     case, _raw = load_case(folder / "case.yaml", today=_own_now(folder / "case.yaml"))
-    forecast, airspace, pib, readings = replay_files(case, folder, root, readings_optional=readings_optional)
+    forecast, airspace, pib, readings = _replay_files(case, folder, root, readings_optional=readings_optional)
     return case, forecast, airspace, pib, readings
 
 

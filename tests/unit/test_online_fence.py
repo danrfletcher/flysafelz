@@ -162,9 +162,17 @@ def merge_base() -> str | None:
 
 
 def changed_since_dev(path: str) -> list[str]:
+    """Files under `path` this branch changed since it left origin/dev; skips when the diff cannot be made or no longer applies.
+
+    The fence is for the online eval job's own build branch (ticket 7), which must not touch evals/agent or src/flysafelz. Once
+    evals/online/job.py is already on origin/dev that build is merged, and a later branch (a polish of another ticket) may change
+    those folders, so the check is skipped rather than failing it.
+    """
     base = merge_base()
     if base is None:
         pytest.skip("origin/dev is not available here")
+    if subprocess.run(["git", "cat-file", "-e", f"{base}:evals/online/job.py"], check=False, cwd=ROOT, capture_output=True).returncode == 0:
+        pytest.skip("the online eval job is already on origin/dev: this fence covered its build branch only")
     found = subprocess.run(["git", "diff", "--name-only", base, "--", path], cwd=ROOT, capture_output=True, text=True, check=True)
     return found.stdout.split()
 

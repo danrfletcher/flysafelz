@@ -1,6 +1,6 @@
 $ uv run python scripts/build_verdict_sheet.py --examples <tmp>/examples.yaml --out <tmp>/verdict_sheet.yaml   # the blind GP1 example, then a copy of it without metadata.blind
 $ stdout:
-wrote <tmp>/mixed_sheet.yaml: 2 built, 0 skipped, 0 failed
+wrote <tmp>/verdict_sheet.yaml: 2 built, 0 skipped, 0 failed
 
 $ cat <tmp>/verdict_sheet.yaml
 - id: blue_mill_2026-10-31
