@@ -205,7 +205,7 @@ def test_the_case_loader_used_by_the_tests_and_the_verdict_sheet_is_case_mode_to
 
 def test_only_replay_files_calls_the_pib_loader_in_case_mode():
     """No case path reaches the live rule by accident: every load_pib call in src is the live fetch, the CLI's live
-    `read`, or sources.replay_files, which passes stale_rule explicitly from the case."""
+    `read`, or sources._replay_files, which passes stale_rule explicitly from the case."""
     calls: dict[str, list[ast.Call]] = {}
     for path in sorted(SRC.rglob("*.py")):
         tree = ast.parse(path.read_text(encoding="utf-8"))
@@ -214,14 +214,14 @@ def test_only_replay_files_calls_the_pib_loader_in_case_mode():
                 name = call.func.attr if isinstance(call.func, ast.Attribute) else getattr(call.func, "id", "")
                 if name == "load_pib":
                     calls.setdefault(f"{path.name}:{fn.name}", []).append(call)
-    assert sorted(calls) == ["cli.py:run_read", "sources.py:fetch_live_sources", "sources.py:replay_files"]
+    assert sorted(calls) == ["cli.py:run_read", "sources.py:_replay_files", "sources.py:fetch_live_sources"]
     for key in ("cli.py:run_read", "sources.py:fetch_live_sources"):  # live: the default (the rule on)
         assert all("stale_rule" not in [k.arg for k in c.keywords] for c in calls[key])
-    replay = calls["sources.py:replay_files"]
+    replay = calls["sources.py:_replay_files"]
     assert len(replay) == 1 and "stale_rule" in [k.arg for k in replay[0].keywords]
-    # and the loaders that read a case folder both go through replay_files
+    # and the loaders that read a case folder both go through _replay_files
     for module in ("sources.py", "cases.py"):
-        assert "replay_files(" in (SRC / module).read_text(encoding="utf-8")
+        assert "_replay_files(" in (SRC / module).read_text(encoding="utf-8")
 
 
 # --- G15 live mode ----------------------------------------------------------------------------------------

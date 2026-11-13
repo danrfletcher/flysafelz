@@ -87,7 +87,7 @@ def _readings(path: Path, root: Path) -> dict[str, NotamReading]:
         raise SourceError(f"{_shown(path, root)}: not a list of valid NOTAM readings") from None
 
 
-def replay_files(
+def _replay_files(
     case: Case, folder: Path, root: Path, *, readings_optional: bool = False, with_readings: bool = True
 ) -> tuple[Forecast, AirspaceFetch, PibResult, dict[str, NotamReading]]:
     """Replay a case folder's weather.json, airspace.json, pib.xml and readings.yaml through the real client code.
@@ -121,7 +121,7 @@ def load_case_sources(name: str, *, root: Path | None = None, readings_optional:
     """Load fixtures/<name>/. `now` is the case's own; the wall clock is never read.
 
     readings_optional: a case with no readings.yaml has no readings (the NOTAM reader makes them) instead of being an error.
-    with_readings False: readings.yaml is never opened (see replay_files).
+    with_readings False: readings.yaml is never opened (see _replay_files).
     Raises SourceError with one line for an unknown case or a file that is missing or unreadable.
     """
     root = ROOT if root is None else root
@@ -133,7 +133,7 @@ def load_case_sources(name: str, *, root: Path | None = None, readings_optional:
         case, _raw = load_case(folder / "case.yaml", today=datetime.max.replace(tzinfo=UTC))
     except CaptureError as exc:
         raise SourceError(str(exc)) from None
-    forecast, airspace, notams, readings = replay_files(case, folder, root, readings_optional=readings_optional, with_readings=with_readings)
+    forecast, airspace, notams, readings = _replay_files(case, folder, root, readings_optional=readings_optional, with_readings=with_readings)
     if case.capture is not None and notams.status.state is not SourceState.FAILED:
         # The replay has no archive request to learn the commit from; case.yaml recorded it at capture.
         notams = notams.model_copy(update={"status": notams.status.model_copy(update={"sha": case.capture.sha})})

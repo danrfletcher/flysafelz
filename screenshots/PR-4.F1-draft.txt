@@ -1,6 +1,6 @@
 $ uv run python scripts/build_verdict_sheet.py --examples <tmp>/examples.yaml --out <tmp>/verdict_sheet.yaml   # one Blue Mill example, no metadata.blind
 $ stdout:
-wrote <tmp>/draft_sheet.yaml: 1 built, 0 skipped, 0 failed
+wrote <tmp>/verdict_sheet.yaml: 1 built, 0 skipped, 0 failed
 
 $ cat <tmp>/verdict_sheet.yaml   (the written entry)
 - id: blue_mill_2026-10-31
