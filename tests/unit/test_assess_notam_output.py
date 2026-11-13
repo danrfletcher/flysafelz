@@ -189,10 +189,10 @@ def test_a_check_sup_notam_beside_a_no_fly_notam_is_no_go_and_the_check_sup_cond
 
 def test_a_check_sup_notam_that_the_airspace_path_owns_adds_no_condition_here():
     result = NotamActionResult(notam_id="J4/26", action=NotamAction.CHECK_SUP, reason=GP4_CONDITION)
-    assert _notam_findings([result], {"J4/26"}) == ([], [], [])
-    assert _notam_findings([result], set()) == ([], [("check_sup", GP4_CONDITION)], [])
+    assert _notam_findings([result], {"J4/26"}, []) == ([], [], [])
+    assert _notam_findings([result], set(), []) == ([], [("check_sup", GP4_CONDITION)], [])
     contact = NotamActionResult(notam_id="J5/26", action=NotamAction.CONTACT_FIRST, reason="call them")
-    assert _notam_findings([contact], {"J5/26"}) == ([], [], [])  # as CONTACT_FIRST does today
+    assert _notam_findings([contact], {"J5/26"}, []) == ([], [], [])  # as CONTACT_FIRST does today
 
 
 def test_an_unread_danger_area_is_unverified_and_never_check_sup():
@@ -279,3 +279,27 @@ def test_g13_a_check_sup_beside_a_no_fly_activation_of_another_area_is_no_go_and
     assert seg.verdict is Verdict.NO_GO and display(seg) == "NO-GO"
     assert any("EGD496B" in b.text and "J5/26" in b.text and "byelaws" in b.text for b in seg.blockers)
     assert seg.conditions == [GP4_CONDITION]
+
+
+def test_an_unread_notam_that_activates_a_danger_area_adds_one_unverified_line_not_two():
+    area, parsed, _read = owned_danger("EGD496A", DANGER_E)
+    seg = only_segment(run_assess(window=(utc(9), utc(10)), airspace=airspace_fetch(area), pib=pib_result(parsed)))
+    assert seg.verdict is Verdict.UNVERIFIED
+    assert [a.action for a in seg.notam_actions] == [NotamAction.UNREAD_OVER_LZ]
+    [line] = seg.conditions  # the danger area owns it: the NOTAM's own "has not been read" line is not added again
+    assert line.startswith("UNVERIFIED: Danger area EGD496A is activated by NOTAM J4/26, which has not been read")
+
+
+def test_an_unread_notam_the_airspace_path_said_nothing_about_still_adds_its_own_unverified_line():
+    result = NotamActionResult(notam_id="J4/26", action=NotamAction.UNREAD_OVER_LZ, reason="NOTAM J4/26 is over the LZ and has not been read")
+    assert _notam_findings([result], {"J4/26"}, []) == ([], [], [result.reason])  # owned, but no airspace reason names it
+    assert _notam_findings([result], {"J4/26"}, ["Danger area EGD496A is activated by NOTAM J4/26, which has not been read"]) == ([], [], [])
+    assert _notam_findings([result], {"J4/26"}, ["a reason about NOTAM J4/260"]) == ([], [], [result.reason])  # a longer id is another NOTAM
+    assert _notam_findings([result], set(), ["NOTAM J4/26 named here"]) == ([], [], [result.reason])  # not owned
+
+
+def test_an_informational_warning_is_a_condition_whatever_its_reason_says_and_plain_awareness_is_not():
+    warn = NotamActionResult(notam_id="J5/26", action=NotamAction.AWARENESS, reason="reworded entirely", warning=True)
+    plain = NotamActionResult(notam_id="J6/26", action=NotamAction.AWARENESS, reason="informational over the LZ from the surface")
+    assert _notam_findings([warn, plain], set(), []) == ([], [("warning", "reworded entirely")], [])
+    assert "warning" not in warn.model_dump()  # the flag is internal: no output changes shape

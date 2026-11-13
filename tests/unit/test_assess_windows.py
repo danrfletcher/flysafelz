@@ -15,6 +15,7 @@ from factories import (
     wind,
 )
 
+from flysafelz import cli
 from flysafelz.assess import default_window
 from flysafelz.contracts import Category, Tier, Verdict
 
@@ -142,6 +143,9 @@ def test_a_live_run_with_the_window_wholly_in_the_past_has_no_hours_and_no_error
     assessment = run_assess(window=(utc(7), utc(9)), now=utc(12, 30), live=True, forecast=weather_forecast(utc(6), utc(10)))
     assert assessment.hours == []
     assert assessment.flyable_windows == []
+    assert assessment.overall_verdict is None and assessment.overall_tier is Tier.TOO_FAR  # the contract has no tier for "past"
+    assert any("has already ended: there is nothing left to assess" in note for note in assessment.assumptions)
+    assert cli.overall_line(assessment) == "Overall: No verdict: nothing left to assess in this window"
 
 
 # --- inputs that are refused (E16 and the window checks) -------------------------------------

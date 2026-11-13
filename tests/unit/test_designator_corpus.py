@@ -1,8 +1,8 @@
-"""No-drift check over every <ItemE> in the committed PIBs: the two-letter designator suffix and the SUP finder change nothing else.
+"""No-drift check over every <ItemE> in the committed PIBs: the designator finder and the SUP finder change nothing else.
 
-Rules, not rows: the old (one-letter) and new (0-2 letter) designator patterns are run over all item E text, and the only
-differences allowed are designators that carry a two-letter suffix. The committed PIBs hold none today, so the difference is empty and
-sort_notam's VIA_AIRSPACE decisions do not move. Reads only committed files.
+The old (one-letter suffix, optional spaces and prefix letters) and the current designator patterns are run over all item E text, and
+the differences are pinned: designators lost are approach-chart 'D 527' style false hits, designators gained are the siblings in a
+slash list such as 'EGD510A/B/C'. Reads only committed files.
 """
 
 import re
@@ -24,10 +24,9 @@ PIB_FILES = sorted(
     ]
 )
 
-# designators.py before this PR: an optional single-letter suffix.
+# designators.py before the slash-list and spacing fix: an optional single-letter suffix, optional spaces and prefix letters.
 _OLD_DESIGNATOR = r"(?:E?G?\s?)?([DRP])\s?(\d{3})([A-Z]?)"
 _OLD_FIND = re.compile(rf"\b{_OLD_DESIGNATOR}\b", re.IGNORECASE)
-_TWO_LETTER_SUFFIX = re.compile(r"EG[DRP]\d{3}[A-Z]{2}")
 _CANONICAL_SUP = re.compile(r"AIP SUP [0-9]{1,3}/[0-9]{2,4}")
 _SUP_DIGITS = re.compile(r"SUP\s*\d", re.IGNORECASE)
 _MISSPELT_SUP = re.compile(r"SUPPELEMENT", re.IGNORECASE)  # the pinned miss: 'AIP SUPPELEMENT 022/2026' (test_sup_refs.py)
@@ -55,21 +54,31 @@ def test_the_corpus_is_the_committed_pibs_and_is_not_empty(corpus):
     assert all(items for items in corpus.values())
 
 
-def test_the_new_pattern_differs_from_the_old_only_by_two_letter_suffixes(corpus):
+def test_the_new_pattern_differs_from_the_old_only_by_the_tightening(corpus):
+    """Lost: bare 'D 527' (an approach-chart category letter and a height) and 'D 125'. Gained: the siblings in 'EGD510A/B/C'."""
     gained, lost = set(), set()
     for items in corpus.values():
         for text in items:
             old, new = set(_old_find_designators(text)), set(find_designators(text))
             gained |= new - old
             lost |= old - new
-    assert lost == set()  # nothing the old pattern found is lost
-    assert all(_TWO_LETTER_SUFFIX.fullmatch(d) for d in gained), gained
+    assert gained == {"EGD510B", "EGD510C", "EGD395B"}
+    assert lost == {"EGD527", "EGD575", "EGD650", "EGD670", "EGD125", "EGD410", "EGD380"}
 
 
-def test_the_committed_corpus_has_no_two_letter_suffix_so_the_difference_is_empty(corpus):
-    """Pinned: today's PIBs hold no EGD323AB-style designator, so sort_notam's VIA_AIRSPACE decisions cannot move."""
-    differing = [text for items in corpus.values() for text in items if _old_find_designators(text) != find_designators(text)]
-    assert differing == []
+def test_every_designator_the_new_pattern_drops_was_a_category_letter_and_a_height(corpus):
+    """Each lost one sits in an instrument-approach item (a 'CAT D 125(94)' or 'A/B/C/D 670(632)'), never in a danger-area item."""
+    for items in corpus.values():
+        for text in items:
+            lost = set(_old_find_designators(text)) - set(find_designators(text))
+            if lost:
+                assert re.search(r"OCA|OCH|APPROACH", text), text[:80]
+                assert not re.search(r"DANGER AREA|TDA|AIP SUP", text), text[:80]
+
+
+def test_the_slash_lists_in_the_corpus_are_read_in_full(corpus):
+    found = {d for items in corpus.values() for text in items for d in find_designators(text)}
+    assert {"EGD510A", "EGD510B", "EGD510C", "EGD395A", "EGD395B"} <= found
 
 
 def test_the_old_and_new_patterns_both_find_designators_in_the_corpus(corpus):

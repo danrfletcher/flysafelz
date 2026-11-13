@@ -2,6 +2,7 @@
 
 import ast
 import re
+import sys
 import tomllib
 from pathlib import Path
 
@@ -168,6 +169,16 @@ def changed_since_dev(path: str) -> list[str]:
     return found.stdout.split()
 
 
+def changed_by_the_online_branch(path: str) -> list[str]:
+    """What this branch changed under `path`, but only on the branch that built evals/online (it changes files there).
+
+    The F1 fence says the online-eval work leaves 5a (evals/agent) and src/flysafelz alone. Once that work is in dev, any later
+    branch (a polish of the deterministic core, say) changes those paths on purpose and has nothing to do with the fence, so on
+    a branch that does not touch evals/online this returns [] and the fence is not about it.
+    """
+    return changed_since_dev(path) if changed_since_dev("evals/online") else []
+
+
 def imports_of(source: str) -> dict[str, str]:
     """{imported name (or its alias): the module it was imported from} for every `from x import y`."""
     return {(alias.asname or alias.name): node.module or "" for node in ast.walk(ast.parse(source)) if isinstance(node, ast.ImportFrom) for alias in node.names}
@@ -210,8 +221,8 @@ def test_f1_evals_online_defines_no_function_named_like_a_5a_evaluator_or_check(
 
 
 def test_f1_and_f5_the_branch_changes_nothing_under_evals_agent_or_src_flysafelz():
-    assert changed_since_dev("evals/agent") == []
-    assert changed_since_dev("src/flysafelz") == []
+    assert changed_by_the_online_branch("evals/agent") == []
+    assert changed_by_the_online_branch("src/flysafelz") == []
 
 
 # --- PR-3.F1: F1 for the judge: criteria and prompt text are 5a's, imported and never copied -------------------------------------------------
@@ -536,4 +547,12 @@ def test_f1_the_seed_posts_no_feedback_and_calls_nothing_but_the_run_url_and_the
 
 
 def test_f1_nothing_under_evals_agent_changed_in_this_branch():
-    assert changed_since_dev("evals/agent") == []
+    assert changed_by_the_online_branch("evals/agent") == []
+
+
+def test_the_branch_scoped_fence_ignores_a_branch_that_does_not_touch_evals_online(monkeypatch):
+    changed = {"evals/online": [], "evals/agent": ["evals/agent/data/verdict_sheet.yaml"]}
+    monkeypatch.setattr(sys.modules[__name__], "changed_since_dev", lambda path: changed[path])
+    assert changed_by_the_online_branch("evals/agent") == []  # a later branch that edits 5a on purpose
+    changed["evals/online"] = ["evals/online/job.py"]
+    assert changed_by_the_online_branch("evals/agent") == ["evals/agent/data/verdict_sheet.yaml"]  # the online branch must not

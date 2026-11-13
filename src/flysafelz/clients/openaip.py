@@ -60,10 +60,11 @@ FEET_PER_METRE = 3.280839895
 # The openAIP numeric codes, in one place. Each table lists the names in code
 # order, so a name's position is its openAIP code (None marks a code openAIP
 # does not use). They are the codes of the openAIP Core API schema (airspace
-# `type` and `icaoClass`, and a limit's `unit` and `referenceDatum`), written from
+# `type` and `icaoClass`, a limit's `unit` and `referenceDatum`, and an operating-hours
+# entry's `dayOfWeek`), written from
 # the published schema and not from a live capture: the real capture (PR-7)
 # is what confirms them. A code missing from a table is handled: type -> "other",
-# class -> unknown, unit or datum -> the limit is not read.
+# class -> unknown, unit or datum -> the limit is not read, day_of_week -> the hours are not read.
 CODES: dict[str, dict[int, str | None]] = {
     "type": dict(
         enumerate(
@@ -78,6 +79,10 @@ CODES: dict[str, dict[int, str | None]] = {
     "icao_class": dict(enumerate(("A", "B", "C", "D", "E", "F", "G", None, "SUA"))),
     "unit": dict(enumerate(("m", "ft", None, None, None, None, "FL"))),
     "datum": dict(enumerate(("GND", "AMSL", "STD"))),
+    # operatingHours dayOfWeek: 0 is every day and 1..7 are Monday..Sunday. Like the tables above this is from the
+    # published schema and is NOT yet confirmed by a live capture. If openAIP counts the days 0-6 from Monday, a single-day
+    # entry lands a day late (fail-open on that day), so check one real single-day entry before trusting it.
+    "day_of_week": dict(enumerate(("DAILY", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"))),
 }
 OTHER = "other"
 
@@ -152,7 +157,6 @@ def _read_limit(raw: object) -> tuple[Limit | None, str | None]:
 
 # --- hours --------------------------------------------------------------------
 
-DAY_WORDS = dict(enumerate(("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"), start=1))  # dayOfWeek 0 is every day
 END_OF_DAY = "2400"
 LAST_MINUTE = "2359"
 
@@ -174,7 +178,7 @@ def _hours_clause(entry: object) -> str | None:
     if not isinstance(entry, dict):
         return None
     day = entry.get("dayOfWeek", 0)
-    day_word = "DAILY" if day == 0 else DAY_WORDS.get(day) if isinstance(day, int) else None
+    day_word = CODES["day_of_week"].get(day) if isinstance(day, int) else None
     start = "SR" if entry.get("sunrise") else _clock(entry.get("startTime"))
     end = "SS" if entry.get("sunset") else _clock(entry.get("endTime"))
     if day_word is None or start is None or end is None:
@@ -385,13 +389,20 @@ def _next_page(payload: dict[str, Any], page: int) -> int | None | str:
     """The next page number, None when this was the last, or a one-line reason when the page cannot say.
 
     openAIP gives `nextPage` (empty on the last page). If a page has no `nextPage` at all, `totalPages` decides,
-    so a short read cannot pass for the whole country.
+    so a short read cannot pass for the whole country. How the last page spells "none" has not been seen on the live
+    API (the keyed capture will show it): null is the documented form, and a number that is not a later page (0, or
+    this page again) is accepted as "none" only when `totalPages` says this page is the last. Anywhere else it fails.
     """
     if "nextPage" in payload:
         following = payload["nextPage"]
         if following is None:
             return None
-        if isinstance(following, bool) or not isinstance(following, int) or following <= page:
+        if isinstance(following, bool) or not isinstance(following, int):
+            return "openAIP: nextPage is not a later page number"
+        if following <= page:
+            total = payload.get("totalPages")
+            if isinstance(total, int) and not isinstance(total, bool) and page >= total:
+                return None
             return "openAIP: nextPage is not a later page number"
         return following
     total = payload.get("totalPages", 1)

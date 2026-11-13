@@ -355,3 +355,48 @@ def test_the_clock_change_does_not_move_notam_times():
     """NOTAM times are UTC all year, so 0800-1700 is 08:00Z on both sides of 25 October."""
     schedule = run("0800-1700", ("2026-10-24 00:00", "2026-10-27 00:00"))
     assert [(s.hour, e.hour) for s, e in schedule.intervals] == [(8, 17)] * 3
+
+
+# 2026-10-31 is a Saturday; 2 Nov is a Monday.
+def test_two_day_sets_in_one_clause_each_keep_their_own_times():
+    result = run("MON-FRI 0800-1700 SAT 0900-1200", ("2026-10-31 00:00", "2026-11-03 00:00"))
+    assert result.parsed
+    assert result.intervals == iv(
+        ("2026-10-31 09:00", "2026-10-31 12:00"),  # Saturday: only the Saturday span
+        ("2026-11-02 08:00", "2026-11-02 17:00"),  # Monday: only the weekday span
+    )
+
+
+def test_two_dates_in_one_clause_each_keep_their_own_times():
+    result = run("OCT 26 0900-1200 27 1300-1500", ("2026-10-26 00:00", "2026-10-29 00:00"))
+    assert result.parsed
+    assert result.intervals == iv(("2026-10-26 09:00", "2026-10-26 12:00"), ("2026-10-27 13:00", "2026-10-27 15:00"))
+
+
+def test_a_new_day_set_after_times_can_name_a_month_and_several_days():
+    result = run("OCT 26 0900-1200 NOV 02 03 1300-1500", ("2026-10-26 00:00", "2026-11-04 00:00"))
+    assert result.intervals == iv(
+        ("2026-10-26 09:00", "2026-10-26 12:00"),
+        ("2026-11-02 13:00", "2026-11-02 15:00"),
+        ("2026-11-03 13:00", "2026-11-03 15:00"),
+    )
+
+
+def test_a_day_set_after_the_times_is_not_split_off():
+    # "0800-1700 MON-FRI" is times then days: one set, as before.
+    result = run("0800-1700 MON-FRI", ("2026-10-31 00:00", "2026-11-03 00:00"))
+    assert result.intervals == iv(("2026-11-02 08:00", "2026-11-02 17:00"))
+
+
+def test_trailing_days_with_no_times_of_their_own_stay_in_the_set():
+    result = run("MON 0800-1000 TUE", ("2026-10-31 00:00", "2026-11-04 00:00"))
+    assert result.intervals == iv(("2026-11-02 08:00", "2026-11-02 10:00"), ("2026-11-03 08:00", "2026-11-03 10:00"))
+
+
+def test_several_spans_after_one_day_set_still_share_it():
+    result = run("SAT 0800-0900 1300-1400 SUN 1000-1100", ("2026-10-31 00:00", "2026-11-02 00:00"))
+    assert result.intervals == iv(
+        ("2026-10-31 08:00", "2026-10-31 09:00"),
+        ("2026-10-31 13:00", "2026-10-31 14:00"),
+        ("2026-11-01 10:00", "2026-11-01 11:00"),
+    )

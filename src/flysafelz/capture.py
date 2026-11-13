@@ -38,7 +38,9 @@ from one historical-forecast request. pib.xml is still the one archive PIB at `n
 last London day has not ended yet is refused before any request: examples must be historical.
 
 A committed case is never recaptured or deleted (openAIP is live, so a recapture would change
-it). More days, or a different moment, go on a new case name, e.g. blue_mill_2026-10-31_3day.
+it): a case folder that already holds weather.json, airspace.json or pib.xml, or whose case.yaml has a
+`capture:` block, is refused with one line naming the case, before any request.
+More days, or a different moment, go on a new case name, e.g. blue_mill_2026-10-31_3day.
 
 readings.yaml is never overwritten: an existing file is left byte-identical and a missing one
 is created as an empty list with a header comment.
@@ -46,7 +48,7 @@ is created as an empty list with a header comment.
 All three sources are fetched before anything is written. Any failure is one line on stderr,
 a non-zero exit and nothing written. Files are written under a temporary name and renamed; if
 a rename fails part way the ones already swapped are put back, so a failed write leaves the
-previous fixture whole. Nothing is written if any output holds the openAIP key. case.yaml is
+folder as it was (a case being captured holds no fixture file yet, so they are removed again). Nothing is written if any output holds the openAIP key. case.yaml is
 edited in place (only its `capture:` block changes), so comments in it survive. Output is
 deterministic: JSON is written with sorted keys and two-space indent, and nothing in a fixture
 depends on the clock.
@@ -87,7 +89,7 @@ from flysafelz.clients.open_meteo import (
 )
 from flysafelz.clients.openaip import KEY_VARIABLE, Airspace, fetch_airspace, item_id
 from flysafelz.clients.openaip import URL as AIRSPACE_URL
-from flysafelz.clients.pib_source import ARCHIVE_RAW_URL, fetch_pib, utc_text
+from flysafelz.clients.pib_source import fetch_pib, fetch_pib_at, utc_text
 from flysafelz.contracts import Limit, SourceState
 from flysafelz.daylight import london_day_date, london_days_utc
 from flysafelz.geo import (
@@ -105,6 +107,7 @@ ROOT = Path(__file__).resolve().parent.parent.parent  # the repository root (thi
 
 ENV_FILE = ".env"  # at the repository root; gitignored
 USAGE = "usage: make fixtures CASE=<case>  (a folder under fixtures/)"
+FETCHED_FILES = ("weather.json", "airspace.json", "pib.xml")  # the files a capture writes besides case.yaml and readings.yaml
 TIMEOUT_SECONDS = 60  # the PIB is a few MB
 ONE_HOUR = timedelta(hours=1)
 ONE_DAY = timedelta(days=1)
@@ -426,7 +429,11 @@ def _outside_trim(notam: ET.Element, lz: tuple[float, float]) -> bool:
 
 
 def trim_pib(xml: bytes, lz: tuple[float, float]) -> tuple[bytes, int, int]:
-    """(trimmed XML, NOTAMs before, NOTAMs after). Only Notam elements are removed; everything else stays."""
+    """(trimmed XML, NOTAMs before, NOTAMs after). Only Notam elements are removed; everything else stays.
+
+    The file is written back by ElementTree, so it is re-serialised: XML comments (NATS' leading DISCLAIMER) are dropped and the
+    XML declaration is rewritten. Every element, AreaPIBHeader and Issued included, is kept, and parse_pib reads it as before.
+    """
     try:
         root = ET.fromstring(xml)
     except ET.ParseError as exc:
@@ -440,26 +447,12 @@ def trim_pib(xml: bytes, lz: tuple[float, float]) -> tuple[bytes, int, int]:
     return trimmed, len(notams), len(notams) - len(dropped)
 
 
-def _fetch_pinned(sha: str, client: httpx.Client) -> bytes:
-    """The archive file at a SHA that case.yaml pins. fetch_pib looks the commit up itself, so a pin skips it."""
-    what = f"GitHub archive: file at {sha}"
-    try:
-        response = client.get(ARCHIVE_RAW_URL.format(sha=sha))
-        response.raise_for_status()
-    except httpx.HTTPStatusError as exc:
-        raise CaptureError(f"{what}: HTTP {exc.response.status_code}") from None
-    except httpx.TimeoutException:
-        raise CaptureError(f"{what}: request timed out") from None
-    except httpx.HTTPError as exc:
-        raise CaptureError(f"{what}: {type(exc).__name__}") from None
-    return response.content
-
-
 def _fetch_pib(name: str, case: Case, client: httpx.Client) -> tuple[bytes, str]:
     """(raw XML, the SHA it came from)."""
-    if case.archive_sha:
-        return _fetch_pinned(case.archive_sha, client), case.archive_sha
-    fetched = fetch_pib("archive", case.now, client=client)
+    if case.archive_sha:  # a pinned commit skips the commits lookup, and the file comes through pib_source like any other
+        fetched = fetch_pib_at(case.archive_sha, case.now, client=client)
+    else:
+        fetched = fetch_pib("archive", case.now, client=client)
     if fetched.xml is None or fetched.status.sha is None:
         reason = fetched.status.reason
         if reason.startswith(_NO_COMMIT):
@@ -554,8 +547,8 @@ def case_yaml_bytes(text: str, raw: dict, fetched: Fetched) -> bytes:
     """case.yaml with the `capture:` block set. Everything else in the file stays as Dan wrote it.
 
     The existing top-level `capture:` block is replaced where it stands, or a new one is added at
-    the end; comments, key order and quoting elsewhere are not touched, so a recapture of an
-    unchanged case gives the same bytes. The result is read back and must equal the old mapping
+    the end; comments, key order and quoting elsewhere are not touched, so editing a file that
+    already has a block gives the same bytes again. The result is read back and must equal the old mapping
     plus the new block, otherwise the capture stops with one line and writes nothing.
     """
     block = {"sha": fetched.sha, "pib_issued": utc_text(fetched.pib_issued)}
@@ -659,6 +652,19 @@ def refuse_leftover_backups(case_dir: Path) -> None:
         )
 
 
+def refuse_a_committed_case(name: str, case_dir: Path, raw: dict | None = None) -> None:
+    """A case that already holds a capture is never recaptured: openAIP is live, so a second run would change it.
+
+    Called twice, before any request: once without `raw` (any of weather.json, airspace.json or pib.xml in the
+    folder) and once with the parsed case.yaml (a `capture:` block, which a finished capture always leaves).
+    """
+    held = [file for file in FETCHED_FILES if (case_dir / file).exists()]
+    if raw is not None and "capture" in raw:
+        held.append("case.yaml capture: block")
+    if held:
+        raise CaptureError(f"{name}: already captured ({', '.join(held)}); a committed case is never recaptured, so use a new case name")
+
+
 def refuse_a_day_that_has_not_ended(path: Path, case: Case, today: datetime) -> None:
     """E15: with `days`, the end of London day days-1 must not be after today. One line naming that London date."""
     if case.days is None:
@@ -672,7 +678,9 @@ def refuse_a_day_that_has_not_ended(path: Path, case: Case, today: datetime) -> 
 def capture(name: str, case_dir: Path, key: str, client: httpx.Client, *, today: datetime) -> list[str]:
     """Capture one case. Returns the summary lines. Raises CaptureError."""
     refuse_leftover_backups(case_dir)
+    refuse_a_committed_case(name, case_dir)
     case, raw = load_case(case_dir / "case.yaml", today=today)
+    refuse_a_committed_case(name, case_dir, raw)
     if case.constructed:
         raise CaptureError(f"{case_dir / 'case.yaml'}: constructed: true; a constructed case is made up and is never captured")
     refuse_a_day_that_has_not_ended(case_dir / "case.yaml", case, today)  # before any request

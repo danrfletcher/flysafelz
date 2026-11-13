@@ -23,6 +23,8 @@ Formats read (each comma-separated clause can carry different days):
     OCT 26 27 NOV 02 0900-2030     date lists; a month carries over to the bare days after it, even across commas
     SEP 29-OCT 05, OCT 25-JAN 01   ranges across months and into the next year
     27 0900-1600, 28 ...           bare days: any date in B-C with that day of the month
+    MON-FRI 0800-1700 SAT 0900-1200   several day sets in one clause: a day that follows a time span and has a span of its own
+                                   starts a new set (a day set after times, as in "0800-1700 MON-FRI", does not)
     1500-1600, 1900-2000           a clause with only times adds to the clause before it
 Spaces and newlines are interchangeable, spacing around "-" is free, and empty clauses are ignored.
 """
@@ -225,6 +227,29 @@ def _parse_clause(tokens: list[Token], month: int | None) -> tuple[_Clause, int 
     return clause, month
 
 
+_DAY_KINDS = ("weekday", "num", "month", "daily")
+_SPAN_KINDS = ("span", "h24")
+
+
+def _split_day_sets(tokens: list[Token]) -> list[list[Token]]:
+    """Split one clause where a new day set starts: "MON-FRI 0800-1700 SAT 0900-1200" is two sets, not one.
+
+    A day token starts a new set when it directly follows a time span, an earlier day token came before that span
+    (the clause is written days-then-times) and the new days have a time span of their own after them. Times followed
+    by days ("0800-1700 MON-FRI") and trailing days with no span ("MON 0800-1000 TUE") stay as one set.
+    """
+    pieces: list[list[Token]] = [[]]
+    seen_days = False
+    for i, token in enumerate(tokens):
+        kind = token[0]
+        starts_set = kind in _DAY_KINDS and seen_days and i > 0 and tokens[i - 1][0] in _SPAN_KINDS and any(later[0] in _SPAN_KINDS for later in tokens[i + 1 :])
+        if starts_set:
+            pieces.append([])
+        pieces[-1].append(token)
+        seen_days = seen_days or kind in _DAY_KINDS
+    return pieces
+
+
 def _groups(text: str) -> list[_Group]:
     """The day groups in the text. A clause with only times joins the group before it."""
     clauses: list[list[Token]] = [[]]
@@ -238,12 +263,13 @@ def _groups(text: str) -> list[_Group]:
     for tokens in clauses:
         if not tokens:
             continue
-        clause, month = _parse_clause(tokens, month)
-        spans = clause.spans or [ALL_DAY]
-        if not clause.has_days and not clause.excluded and groups:
-            groups[-1].spans.extend(spans)
-        else:
-            groups.append(_Group(clause.ranges, clause.weekdays, clause.excluded, spans))
+        for piece in _split_day_sets(tokens):
+            clause, month = _parse_clause(piece, month)
+            spans = clause.spans or [ALL_DAY]
+            if not clause.has_days and not clause.excluded and groups:
+                groups[-1].spans.extend(spans)
+            else:
+                groups.append(_Group(clause.ranges, clause.weekdays, clause.excluded, spans))
     return groups
 
 

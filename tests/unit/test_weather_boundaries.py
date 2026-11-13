@@ -57,6 +57,7 @@ EXPECTED_COMPARISONS = {
     "notam_wide_ignore_subjects": "in",
     "notam_ignore_traffic": "in",
     "notam_ignore_purpose": "in",
+    "notam_security_series": "in",
     "notam_ignore_security_subjects": "in",
     "notam_restriction_subjects": "in",
     "notam_awareness_subjects": "in",

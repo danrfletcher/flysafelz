@@ -2,6 +2,7 @@
 
     fetch_pib("live", now)      GET the NATS PIB
     fetch_pib("archive", now)   the PIB in the last commit to data/PIB.xml at or before `now`
+    fetch_pib_at(sha, now)      the PIB in one named archive commit (a case.yaml that pins its SHA): no commits lookup
 
 The archive is github.com/Jonty/uk-notam-archive. Two requests: the commits
 API (path=data/PIB.xml, until=now, newest first) for the SHA, then the raw file
@@ -88,14 +89,15 @@ def _last_commit_sha(commits: object, now: datetime) -> str | None:
     """The SHA of the newest commit at or before `now` in a newest-first commits list, else None.
 
     The API already filters with `until`; the time is checked here too, so a
-    commit after `now` is never used.
+    commit after `now` is never used. A commit whose time is missing or unreadable is
+    skipped (fail closed): it cannot be shown to be at or before `now`.
     """
     if not isinstance(commits, list):
         return None
     for commit in commits:
         sha = commit.get("sha") if isinstance(commit, dict) else None
         when = _commit_time(commit)
-        if isinstance(sha, str) and sha and (when is None or when <= now):
+        if isinstance(sha, str) and sha and when is not None and when <= now:
             return sha
     return None
 
@@ -120,6 +122,10 @@ def _fetch_archive(now: datetime, client: httpx.Client) -> PibFetch:
     sha = _last_commit_sha(commits, now)
     if sha is None:
         return _failed(f"no archive commit at or before {utc_text(now)}", now)
+    return _fetch_at(sha, now, client)
+
+
+def _fetch_at(sha: str, now: datetime, client: httpx.Client) -> PibFetch:
     raw = _get(client, ARCHIVE_RAW_URL.format(sha=sha), f"archive file at {sha}")
     if isinstance(raw, str):
         return _failed(raw, now, sha)
@@ -139,3 +145,15 @@ def fetch_pib(source: Source, now: datetime, *, client: httpx.Client | None = No
         return fetch(now, client)
     with httpx.Client(timeout=TIMEOUT_SECONDS, follow_redirects=True) as own_client:
         return fetch(now, own_client)
+
+
+def fetch_pib_at(sha: str, now: datetime, *, client: httpx.Client | None = None) -> PibFetch:
+    """The PIB in one archive commit, by its SHA: one request for the raw file, no commits lookup.
+
+    For a replay that pins the commit. `now` is only the fetched-at time. Failures are worded and returned as in
+    fetch_pib (`archive file at <sha>: HTTP 404`), and the status carries the SHA.
+    """
+    if client is not None:
+        return _fetch_at(sha, now, client)
+    with httpx.Client(timeout=TIMEOUT_SECONDS, follow_redirects=True) as own_client:
+        return _fetch_at(sha, now, own_client)

@@ -58,6 +58,7 @@ window times, hours, source times) stays UTC, and so do the day tiers, which cou
 conditions and their order are the same for any tz. Quoted NOTAM text is never reformatted.
 """
 
+import re
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Literal, get_args
@@ -111,10 +112,6 @@ CONDITION_ORDER = ("check_sup", "contact", "permission", "ceiling", "sector", "w
 
 # Worst first. The index decides which of two verdicts is the worse.
 WORST_FIRST = (Verdict.NO_GO, Verdict.UNVERIFIED, Verdict.PILOT_DISCRETION)
-
-# notam_action() words an informational NOTAM over the LZ from the surface like this (Q13).
-# It is a warning condition, not plain awareness. A test runs the real notam_action() against it.
-INFORMATIONAL_OVER_LZ = "informational over the LZ from the surface"
 
 UNVERIFIED_PREFIX = "UNVERIFIED: "
 
@@ -256,11 +253,14 @@ def _airspace_findings(
 
 
 def _notam_findings(
-    results: list[NotamActionResult], owned_by_airspace: set[str]
+    results: list[NotamActionResult], owned_by_airspace: set[str], airspace_reasons: list[str]
 ) -> tuple[list[Blocker], list[Condition], list[str]]:
     """Blockers, conditions and UNVERIFIED reasons from the NOTAM actions (G14).
 
-    A NOTAM that activates a danger area gets its condition from airspace.py, so it adds none here.
+    A NOTAM that activates a danger area gets its condition from airspace.py, so it adds none here. That includes the
+    UNVERIFIED line for an unread one, but only when airspace.py has already put a reason naming the NOTAM in
+    `airspace_reasons` (its UNVERIFIED reasons and blocker texts): an unread NOTAM that airspace.py said nothing about
+    (the area is not within the local area, say) still gets its own UNVERIFIED line, never silence.
     """
     blockers: list[Blocker] = []
     conditions: list[Condition] = []
@@ -269,7 +269,9 @@ def _notam_findings(
         if result.action is NotamAction.NO_FLY:
             blockers.append(Blocker(source="notam", text=f"NOTAM {result.notam_id}: {result.reason}"))
         elif result.action is NotamAction.UNREAD_OVER_LZ:
-            unverified.append(result.reason)
+            named = re.compile(rf"NOTAM {re.escape(result.notam_id)}(?!\d)")
+            if not (result.notam_id in owned_by_airspace and any(named.search(text) for text in airspace_reasons)):
+                unverified.append(result.reason)
         elif result.notam_id in owned_by_airspace:
             continue
         elif result.action is NotamAction.CHECK_SUP:
@@ -278,7 +280,7 @@ def _notam_findings(
             conditions.append(("contact", result.reason))
         elif result.action is NotamAction.AVOID_SECTOR:
             conditions.append(("sector" if result.bearing_deg is not None else "ceiling", result.reason))
-        elif result.action is NotamAction.AWARENESS and INFORMATIONAL_OVER_LZ in result.reason:
+        elif result.action is NotamAction.AWARENESS and result.warning:  # an informational NOTAM over the LZ (Q13): a warning condition
             conditions.append(("warning", result.reason))
     return blockers, conditions, unverified
 
@@ -305,7 +307,7 @@ def _notam_results(
             if action.action is NotamAction.IGNORE:
                 ignored.setdefault(notam.id, action.reason)
             else:
-                results.append(NotamActionResult(notam_id=action.notam_id, action=action.action, reason=action.reason, bearing_deg=action.bearing_deg))
+                results.append(NotamActionResult(notam_id=action.notam_id, action=action.action, reason=action.reason, bearing_deg=action.bearing_deg, warning=action.warning))
     return results
 
 
@@ -445,7 +447,7 @@ def _segment(
     air_blockers, air_conditions, air_unverified = _airspace_findings(airspace, lat, lon, span, lz.elevation_ft, pressure, activations, notes, tz)
     actions = _notam_results(notams, span, lz, readings, pressure, ignored, tz)
     owned = {a.notam_id for a in activations}
-    notam_blockers, notam_conditions, notam_unverified = _notam_findings(actions, owned)
+    notam_blockers, notam_conditions, notam_unverified = _notam_findings(actions, owned, air_unverified + [b.text for b in air_blockers])
 
     blockers = _dedupe(weather_blockers + daylight_blockers + air_blockers + notam_blockers)
     cautions = weather_cautions + daylight_cautions
@@ -569,6 +571,10 @@ def assess(
         raise ValueError(f"the window must start before it ends, got {stamp(start, tz)} to {stamp(end, tz)}")
 
     hour_starts = _hour_starts(start, end, now, live)
+    if not hour_starts:
+        # No hours left to assess is not "too far out": the contract has no tier for it (a tier is a property of an
+        # hour), so overall_tier stays TOO_FAR and this line gives the real reason, which every front end prints.
+        assumptions.append(f"The window {stamp(start, tz)} to {stamp(end, tz)} has already ended: there is nothing left to assess.")
 
     statuses = [forecast.status, airspace.status, _checked_notam_status(pib.status, now, stale_rule=live if stale_rule is None else stale_rule, tz=tz)]
     problems = _unavailable(statuses)

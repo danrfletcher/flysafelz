@@ -40,6 +40,7 @@ from flysafelz.clients.pib_source import utc_text
 from flysafelz.contracts import (
     Assessment,
     HourAssessment,
+    NotamAction,
     NotamActionResult,
     NotamReading,
     ParsedNotam,
@@ -218,11 +219,19 @@ class PhoneBook:
 
 
 def notam_line(action: NotamActionResult, conditions: list[str]) -> str:
-    """NOTAM <id> <ACTION> [bearing <deg>]: <reason>. The reason is left out when a condition already says it."""
+    """NOTAM <id> <ACTION> [bearing <deg>]: <reason>. The reason is left out when a condition already says it.
+
+    An unread NOTAM that a danger area owns has no UNVERIFIED line of its own: the danger-area line names it and quotes its
+    text (assess leaves the second one out), so the reason is left out there too and the E text is printed once.
+    """
     line = f"NOTAM {action.notam_id} {action.action.value}"
     if action.bearing_deg is not None:
         line += f" bearing {action.bearing_deg:.1f}{DEGREES}"
-    if action.reason and not any(action.reason in condition for condition in conditions):
+    named = re.compile(rf"NOTAM {re.escape(action.notam_id)}(?!\d)")
+    said = any(action.reason in condition for condition in conditions)
+    if action.action is NotamAction.UNREAD_OVER_LZ:
+        said = said or any(condition.startswith(UNVERIFIED_PREFIX) and named.search(condition) for condition in conditions)
+    if action.reason and not said:
         line += f": {action.reason}"
     return line
 
@@ -298,6 +307,8 @@ def overall_line(assessment: Assessment) -> str:
         return f"Overall: {overall_display(assessment)}"
     if assessment.overall_tier is Tier.OUTLOOK:
         return "Overall: No verdict: OUTLOOK only"
+    if not assessment.hours:
+        return "Overall: No verdict: nothing left to assess in this window"
     return "Overall: No verdict: too far out"
 
 
@@ -318,7 +329,12 @@ def footer_lines(assessment: Assessment) -> list[str]:
 
 
 def debug_lines(assessment: Assessment) -> list[str]:
-    """Every NOTAM the code dropped or ignored, with its reason. Printed only with --debug (G23)."""
+    """Every NOTAM the code dropped or ignored, with its reason. Printed only with --debug (G23).
+
+    Ignored means ignored in every segment checked: a NOTAM shown in any segment is not here. Only VERDICT hours are checked,
+    so a NOTAM that matters only in OUTLOOK or TOO_FAR hours is listed with its verdict-hour reason (usually "not active"), and with
+    no VERDICT hours at all a NOTAM that passed the prefilter is in neither the segments nor this list (README says so too).
+    """
     lines = [f"Dropped or ignored NOTAMs ({len(assessment.ignored_notams)})"]
     lines += [f"  {i.notam_id}: {i.reason}" for i in assessment.ignored_notams]
     return lines

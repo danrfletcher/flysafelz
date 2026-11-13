@@ -235,14 +235,14 @@ def test_read_env_file_handles_quotes_comments_and_junk(tmp_path):
 
 @pytest.mark.parametrize("status", [401, 403])
 def test_a_rejected_key_is_one_line_without_the_key_and_writes_nothing(tmp_path, capsys, status):
-    root = make_root(tmp_path, files={"airspace.json": b"old airspace"})
+    root = make_root(tmp_path)
     server = Server(fail={AIRSPACE_URL: httpx.Response(status)})
     assert run(root, server) == 1
     out, err = capsys.readouterr()
     assert out == ""
     assert err.count("\n") == 1 and "rejected" in err and f"HTTP {status}" in err
     assert FAKE_KEY not in err
-    assert listing(root / "fixtures" / CASE) == {"airspace.json": b"old airspace", "case.yaml": CASE_YAML.encode()}
+    assert listing(root / "fixtures" / CASE) == {"case.yaml": CASE_YAML.encode()}
 
 
 # --- the weather ---------------------------------------------------------------------------------------------
@@ -466,9 +466,8 @@ def test_a_missing_readings_file_is_created_as_an_empty_list_with_a_header_comme
     assert "readings.yaml: created" in capsys.readouterr().out
 
 
-def test_a_failed_capture_leaves_readings_and_every_old_fixture_byte_identical(tmp_path):
-    old = {"readings.yaml": b"- keep me\n", "weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib"}
-    root = make_root(tmp_path, files=old)
+def test_a_failed_capture_leaves_readings_and_case_yaml_byte_identical_and_writes_no_fixture(tmp_path):
+    root = make_root(tmp_path, files={"readings.yaml": b"- keep me\n"})
     before = listing(root / "fixtures" / CASE)
     assert run(root, Server(fail={raw_url(MIDDLE): httpx.Response(500)})) == 1
     assert listing(root / "fixtures" / CASE) == before
@@ -494,27 +493,27 @@ FAILURES = [
 
 @pytest.mark.parametrize(("name", "url", "outcome", "line"), FAILURES, ids=[f[0] for f in FAILURES])
 def test_a_source_error_is_one_line_naming_the_source_and_status_and_writes_nothing(tmp_path, capsys, name, url, outcome, line):
-    root = make_root(tmp_path, files={"weather.json": b"old"})
+    root = make_root(tmp_path)
     server = Server(fail={url: outcome})
     assert run(root, server) == 1
     out, err = capsys.readouterr()
     assert out == "" and err.count("\n") == 1
     assert line in err, err
     assert FAKE_KEY not in err
-    assert listing(root / "fixtures" / CASE) == {"case.yaml": CASE_YAML.encode(), "weather.json": b"old"}
+    assert listing(root / "fixtures" / CASE) == {"case.yaml": CASE_YAML.encode()}
 
 
 def test_a_pinned_sha_file_error_names_github_and_the_status(tmp_path, capsys):
     root = make_root(tmp_path, CASE_YAML + f"archive_sha: {NEWEST}\n")
     assert run(root, Server(fail={raw_url(NEWEST): httpx.Response(404)})) == 1
-    assert capsys.readouterr().err == f"GitHub archive: file at {NEWEST}: HTTP 404\n"
+    assert capsys.readouterr().err == f"GitHub archive: archive file at {NEWEST}: HTTP 404\n"
     root = make_root(tmp_path / "t", CASE_YAML + f"archive_sha: {NEWEST}\n")
     assert run(root, Server(fail={raw_url(NEWEST): httpx.ReadTimeout("slow")})) == 1
-    assert capsys.readouterr().err == f"GitHub archive: file at {NEWEST}: request timed out\n"
+    assert capsys.readouterr().err == f"GitHub archive: archive file at {NEWEST}: ReadTimeout\n"
 
 
-def test_a_write_that_fails_leaves_the_previous_fixture_intact_and_no_temp_file(tmp_path, capsys):
-    old = {"weather.json": b"old weather", "pib.xml": b"old pib", "airspace.json": b"old airspace"}
+def test_a_write_that_fails_leaves_the_folder_as_it_was_and_no_temp_file(tmp_path, capsys):
+    old = {"readings.yaml": b"- keep me\n"}
     root = make_root(tmp_path, files=old)
     case_dir = root / "fixtures" / CASE
     case_dir.chmod(stat.S_IRUSR | stat.S_IXUSR)  # the temp file cannot be created here
@@ -540,53 +539,32 @@ def fail_a_rename_into(monkeypatch, target_name: str) -> None:
 
 
 def test_a_rename_that_fails_part_way_puts_every_file_back_so_the_fixture_is_not_half_new(tmp_path, capsys, monkeypatch):
-    old = {"weather.json": b"old weather", "airspace.json": b"old airspace", "readings.yaml": b"- keep me\n"}  # no pib.xml yet
+    old = {"readings.yaml": b"- keep me\n"}
     root = make_root(tmp_path, files=old)
     case_dir = root / "fixtures" / CASE
     fail_a_rename_into(monkeypatch, "case.yaml")  # the last rename: weather, airspace and pib.xml are already swapped in
     assert run(root, Server()) == 1
     err = capsys.readouterr().err
     assert err.count("\n") == 1 and "cannot write" in err
-    assert listing(case_dir) == {**old, "case.yaml": CASE_YAML.encode()}  # old bytes back, the new pib.xml removed, no .tmp or .bak left
+    assert listing(case_dir) == {**old, "case.yaml": CASE_YAML.encode()}  # the three new files removed again, no .tmp or .bak left
 
 
 def test_a_rename_that_fails_on_the_first_file_leaves_the_rest_alone(tmp_path, monkeypatch):
-    old = {"weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib"}
+    old = {"readings.yaml": b"- keep me\n"}
     root = make_root(tmp_path, files=old)
     fail_a_rename_into(monkeypatch, "weather.json")
     assert run(root, Server()) == 1
     assert listing(root / "fixtures" / CASE) == {**old, "case.yaml": CASE_YAML.encode()}
 
 
-def test_a_failed_restore_keeps_the_backup_and_names_it_in_the_error_line(tmp_path, capsys, monkeypatch):
-    old = {"weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib"}
-    root = make_root(tmp_path, files=old)
-    case_dir = root / "fixtures" / CASE
-    fail_a_rename_into(monkeypatch, "case.yaml")  # the last rename fails ...
-    real = capture.os.replace  # already wrapped by fail_a_rename_into
-
-    def replace(src, dst, *args, **kwargs):
-        if Path(src).name == ".weather.json.bak":  # ... and so does putting weather.json back
-            raise OSError(5, "Input/output error", str(dst))
-        return real(src, dst, *args, **kwargs)
-
-    monkeypatch.setattr(capture.os, "replace", replace)
-    assert run(root, Server()) == 1
-    err = capsys.readouterr().err
-    backup = case_dir / ".weather.json.bak"
-    assert err.count("\n") == 1 and "cannot write" in err and str(backup) in err
-    assert backup.read_bytes() == b"old weather"  # the old bytes survive for Dan to copy back
-    assert not (case_dir / ".airspace.json.bak").exists() and not (case_dir / ".pib.xml.bak").exists()  # restored, so cleaned up
-    assert (case_dir / "airspace.json").read_bytes() == b"old airspace"
-    assert (case_dir / "pib.xml").read_bytes() == b"old pib"
+NEW_FILES = {"weather.json": b"new weather", "airspace.json": b"new airspace", "pib.xml": b"new pib", "case.yaml": b"new case"}
+OLD_FILES = {"weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib", "case.yaml": b"old case"}
 
 
-def test_a_rerun_refuses_while_a_kept_backup_is_there_and_leaves_it_alone(tmp_path, capsys, monkeypatch):
-    old = {"weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib"}
-    root = make_root(tmp_path, files=old)
-    case_dir = root / "fixtures" / CASE
+def break_the_last_rename_and_the_first_restore(monkeypatch) -> None:
+    """The last rename (into case.yaml) fails, and so does putting weather.json back from its backup."""
     fail_a_rename_into(monkeypatch, "case.yaml")
-    real = capture.os.replace
+    real = capture.os.replace  # already wrapped by fail_a_rename_into
 
     def replace(src, dst, *args, **kwargs):
         if Path(src).name == ".weather.json.bak":
@@ -594,8 +572,31 @@ def test_a_rerun_refuses_while_a_kept_backup_is_there_and_leaves_it_alone(tmp_pa
         return real(src, dst, *args, **kwargs)
 
     monkeypatch.setattr(capture.os, "replace", replace)
-    assert run(root, Server()) == 1
-    capsys.readouterr()
+
+
+# A committed case is refused before write_files, so a folder that already holds old bytes reaches it only
+# when called directly: these two tests give write_files the old files and the new ones explicitly.
+def test_a_failed_restore_keeps_the_backup_and_names_it_in_the_error_line(tmp_path, monkeypatch):
+    root = make_root(tmp_path, files=OLD_FILES)
+    case_dir = root / "fixtures" / CASE
+    break_the_last_rename_and_the_first_restore(monkeypatch)
+    with pytest.raises(CaptureError) as caught:
+        capture.write_files(case_dir, NEW_FILES)
+    err = str(caught.value)
+    backup = case_dir / ".weather.json.bak"
+    assert "\n" not in err and "cannot write" in err and str(backup) in err
+    assert backup.read_bytes() == b"old weather"  # the old bytes survive for Dan to copy back
+    assert not (case_dir / ".airspace.json.bak").exists() and not (case_dir / ".pib.xml.bak").exists()  # restored, so cleaned up
+    assert (case_dir / "airspace.json").read_bytes() == b"old airspace"
+    assert (case_dir / "pib.xml").read_bytes() == b"old pib"
+
+
+def test_a_rerun_refuses_while_a_kept_backup_is_there_and_leaves_it_alone(tmp_path, capsys, monkeypatch):
+    root = make_root(tmp_path, CASE_YAML, files={k: v for k, v in OLD_FILES.items() if k != "case.yaml"})
+    case_dir = root / "fixtures" / CASE
+    break_the_last_rename_and_the_first_restore(monkeypatch)
+    with pytest.raises(CaptureError):
+        capture.write_files(case_dir, {**NEW_FILES, "case.yaml": CASE_YAML.encode() + b"# new\n"})
     monkeypatch.undo()  # the disk works again, but weather.json is half new and the .bak still holds the old bytes
     before = listing(case_dir)
     assert before[".weather.json.bak"] == b"old weather" and before["weather.json"] != b"old weather"
@@ -606,10 +607,6 @@ def test_a_rerun_refuses_while_a_kept_backup_is_there_and_leaves_it_alone(tmp_pa
     assert err.count("\n") == 1 and str(case_dir / ".weather.json.bak") in err and "copy each one back" in err
     assert server.seen == []  # refused before any request
     assert listing(case_dir) == before  # nothing written, the old copy is untouched
-
-    (case_dir / ".weather.json.bak").unlink()  # Dan has dealt with it: the next capture goes through
-    assert run(root, Server()) == 0
-    assert not list(case_dir.glob(".*.bak"))
 
 
 COMMENTED_CASE = """\
@@ -624,21 +621,21 @@ window:
 """
 
 
-def test_a_recapture_keeps_the_comments_and_layout_dan_wrote_in_case_yaml(tmp_path):
+def test_a_capture_keeps_the_comments_and_layout_dan_wrote_in_case_yaml(tmp_path):
     root = make_root(tmp_path, COMMENTED_CASE)
     path = root / "fixtures" / CASE / "case.yaml"
     assert run(root, Server()) == 0
     first = path.read_text(encoding="utf-8")
     assert first.startswith(COMMENTED_CASE)  # every line he wrote is still there, untouched
     assert yaml.safe_load(first)["capture"] == {"pib_issued": "2026-10-31T07:00:37Z", "sha": MIDDLE}
-    # a capture block in the middle of the file, from an earlier run, is replaced where it stands
+
+
+def test_case_yaml_bytes_replaces_a_capture_block_in_the_middle_of_the_file_where_it_stands():
+    fetched = capture.Fetched({}, MIDDLE, datetime(2026, 10, 31, 7, 0, 37, tzinfo=UTC), 1, 1, [])
     stale = COMMENTED_CASE.replace("window:", "capture:\n  pib_issued: '2026-10-30T00:00:00Z'\n  sha: '" + "0" * 40 + "'\n# about the window\nwindow:")
-    path.write_text(stale, encoding="utf-8")
-    assert run(root, Server()) == 0
-    second = path.read_text(encoding="utf-8")
+    second = capture.case_yaml_bytes(stale, yaml.safe_load(stale), fetched).decode("utf-8")
     assert second == stale.replace("  pib_issued: '2026-10-30T00:00:00Z'\n  sha: '" + "0" * 40 + "'", "  pib_issued: '2026-10-31T07:00:37Z'\n  sha: " + MIDDLE)
-    assert run(root, Server()) == 0
-    assert path.read_text(encoding="utf-8") == second  # and a rerun changes nothing
+    assert capture.case_yaml_bytes(second, yaml.safe_load(second), fetched).decode("utf-8") == second  # and a second edit changes nothing
 
 
 def test_a_case_yaml_with_no_final_newline_still_gets_its_capture_block(tmp_path):
@@ -648,10 +645,10 @@ def test_a_case_yaml_with_no_final_newline_still_gets_its_capture_block(tmp_path
     assert case["capture"]["sha"] == MIDDLE and case["lat"] == 53.802797
 
 
-def test_a_one_line_flow_style_capture_block_is_replaced_in_place(tmp_path):
-    root = make_root(tmp_path, CASE_YAML + "capture: {sha: abc, pib_issued: '2026-01-01T00:00:00Z'}\n")
-    assert run(root, Server()) == 0
-    text = (root / "fixtures" / CASE / "case.yaml").read_text(encoding="utf-8")
+def test_a_one_line_flow_style_capture_block_is_replaced_in_place():
+    fetched = capture.Fetched({}, MIDDLE, datetime(2026, 10, 31, 7, 0, 37, tzinfo=UTC), 1, 1, [])
+    old = CASE_YAML + "capture: {sha: abc, pib_issued: '2026-01-01T00:00:00Z'}\n"
+    text = capture.case_yaml_bytes(old, yaml.safe_load(old), fetched).decode("utf-8")
     assert text.count("capture") == 1 and yaml.safe_load(text)["capture"]["sha"] == MIDDLE
 
 
@@ -661,15 +658,50 @@ def test_case_yaml_bytes_refuses_a_result_that_does_not_read_back_as_the_old_fie
         capture.case_yaml_bytes("lat: 1\n", {"lat": 2}, fetched)  # the text and the mapping disagree
 
 
-def test_a_rerun_is_idempotent(tmp_path, capsys):
+def test_a_second_run_on_a_captured_case_is_refused_with_one_line_before_any_request_and_changes_nothing(tmp_path, capsys):
     root = make_root(tmp_path)
     assert run(root, Server()) == 0
     first = listing(root / "fixtures" / CASE)
     capsys.readouterr()
-    assert run(root, Server()) == 0
+    server = Server()
+    assert run(root, server) == 1
+    out, err = capsys.readouterr()
+    assert out == "" and err.count("\n") == 1 and CASE in err and "already captured" in err and "new case name" in err
+    assert server.seen == []
     assert listing(root / "fixtures" / CASE) == first
-    out = capsys.readouterr().out
-    assert out.count(": unchanged") == 4 and ": written" not in out  # weather, airspace, pib, case.yaml
+
+
+@pytest.mark.parametrize("held", ["weather.json", "airspace.json", "pib.xml"])
+def test_a_case_that_holds_any_fetched_file_is_refused_before_any_request_and_nothing_is_overwritten(tmp_path, capsys, held):
+    root = make_root(tmp_path, files={held: b"committed bytes"})
+    before = listing(root / "fixtures" / CASE)
+    server = Server()
+    assert run(root, server) == 1
+    out, err = capsys.readouterr()
+    assert out == "" and err.count("\n") == 1 and CASE in err and held in err
+    assert server.seen == []
+    assert listing(root / "fixtures" / CASE) == before
+
+
+def test_a_case_yaml_with_a_capture_block_is_refused_even_with_no_fixture_files(tmp_path, capsys):
+    root = make_root(tmp_path, CASE_YAML + "capture: {sha: abc, pib_issued: '2026-01-01T00:00:00Z'}\n")
+    before = listing(root / "fixtures" / CASE)
+    server = Server()
+    assert run(root, server) == 1
+    err = capsys.readouterr().err
+    assert err.count("\n") == 1 and CASE in err and "capture: block" in err
+    assert server.seen == [] and listing(root / "fixtures" / CASE) == before
+
+
+def test_a_committed_case_in_the_repository_is_refused_by_the_real_command(capsys):
+    """The reported case: make fixtures CASE=blue_mill_2026-10-31 on a folder from the repository. No transport is given, so a request would fail the test."""
+    repo = Path(capture.__file__).resolve().parents[2]
+    committed = repo / "fixtures" / "blue_mill_2026-10-31"
+    before = listing(committed)
+    assert main([committed.name], root=repo, environ={KEY_VARIABLE: FAKE_KEY}, today=TODAY) == 1
+    err = capsys.readouterr().err
+    assert err.count("\n") == 1 and committed.name in err and "already captured" in err
+    assert listing(committed) == before
 
 
 # --- the summary ---------------------------------------------------------------------------------------------------------------
@@ -756,7 +788,7 @@ class EchoesKey(Server):
 
 
 def test_f6_a_capture_whose_output_would_hold_the_key_is_refused_and_writes_nothing(tmp_path, capsys):
-    old = {"weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib"}
+    old = {"readings.yaml": b"- keep me\n"}
     root = make_root(tmp_path, files=old)
     assert run(root, EchoesKey()) == 1
     out, err = capsys.readouterr()

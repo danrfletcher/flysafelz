@@ -235,9 +235,9 @@ def test_weather_json_is_the_existing_shape_and_open_meteo_parse_response_reads_
     assert (body["model"], body["timezone"], body["wind_speed_unit"]) == ("ukmo_seamless", "UTC", "mph")
 
 
-def test_a_body_missing_the_end_hour_is_one_line_and_the_old_fixture_stays_byte_identical(tmp_path, capsys):
+def test_a_body_missing_the_end_hour_is_one_line_and_the_folder_stays_byte_identical(tmp_path, capsys):
     _start, end, _ = expected_span(GMT_NOW, 5)
-    old = {"weather.json": b"old weather", "airspace.json": b"old airspace", "pib.xml": b"old pib", "readings.yaml": b"- keep me\n"}
+    old = {"readings.yaml": b"- keep me\n"}
     root = make_root(tmp_path, NAME, whole_span_case(GMT_NOW, 5), files=old)
     before = listing(root / "fixtures" / NAME)
     assert run(root, NAME, server_for(GMT_NOW, drop={end})) == 1
@@ -285,15 +285,14 @@ DAY_END = utc(2026, 11, 2, 0, 0)  # the end of London day 1 (GMT)
 
 
 def test_e15_a_day_that_ends_a_minute_after_today_is_refused_with_one_line_and_nothing_written(tmp_path, capsys):
-    old = {"weather.json": b"old weather"}
-    root = make_root(tmp_path, NAME, E15_CASE, files=old)
+    root = make_root(tmp_path, NAME, E15_CASE)
     server = server_for(GMT_NOW)
     assert run(root, NAME, server, today=DAY_END - timedelta(minutes=1)) == 1
     out, err = capsys.readouterr()
     assert out == "" and err.count("\n") == 1
     assert "days:" in err and "2026-11-01" in err and "has not ended" in err and FAKE_KEY not in err
     assert server.seen == []
-    assert listing(root / "fixtures" / NAME) == {"case.yaml": E15_CASE.encode(), "weather.json": b"old weather"}
+    assert listing(root / "fixtures" / NAME) == {"case.yaml": E15_CASE.encode()}
 
 
 @pytest.mark.parametrize("delta", [timedelta(0), timedelta(minutes=1)], ids=["exactly-at-the-end", "a-minute-after"])
@@ -336,15 +335,16 @@ def test_e15_the_replay_path_never_refuses(tmp_path):
 # --- reruns and case.yaml -----------------------------------------------------------------------------------
 
 
-def test_a_rerun_of_a_days_case_with_an_unchanged_server_is_idempotent(tmp_path, capsys):
+def test_a_second_run_of_a_days_case_is_refused_before_any_request_and_changes_nothing(tmp_path, capsys):
     root = make_root(tmp_path, NAME, whole_span_case(GMT_NOW, 5))
     assert run(root, NAME, server_for(GMT_NOW)) == 0
     first = listing(root / "fixtures" / NAME)
     capsys.readouterr()
-    assert run(root, NAME, server_for(GMT_NOW)) == 0
-    assert listing(root / "fixtures" / NAME) == first
-    out = capsys.readouterr().out
-    assert out.count(": unchanged") == 4 and ": written" not in out  # weather, airspace, pib, case.yaml
+    server = server_for(GMT_NOW)
+    assert run(root, NAME, server) == 1
+    out, err = capsys.readouterr()
+    assert out == "" and err.count("\n") == 1 and NAME in err and "already captured" in err
+    assert server.seen == [] and listing(root / "fixtures" / NAME) == first
 
 
 COMMENT = "# Blue Mill, five days. Keep this note.\n"
@@ -359,12 +359,7 @@ def test_the_capture_edit_of_case_yaml_keeps_dans_comments_and_the_days_line(tmp
     assert first.startswith(original)  # every line he wrote, the days line included, is still there
     assert "days: 5   # London days, day 0 is today\n" in first
     assert yaml.safe_load(first)["capture"] == {"pib_issued": "2026-10-31T07:00:37Z", "sha": MIDDLE}
-    stale = original.replace("window:", "capture:\n  pib_issued: '2026-10-30T00:00:00Z'\n  sha: '" + "0" * 40 + "'\n# about the window\nwindow:")
-    path.write_text(stale, encoding="utf-8")
-    assert run(root, NAME, server_for(GMT_NOW)) == 0  # a capture block in the middle is replaced where it stands
-    second = path.read_text(encoding="utf-8")
-    assert second == stale.replace("  pib_issued: '2026-10-30T00:00:00Z'\n  sha: '" + "0" * 40 + "'", "  pib_issued: '2026-10-31T07:00:37Z'\n  sha: " + MIDDLE)
-    assert yaml.safe_load(second)["days"] == 5
+    assert yaml.safe_load(first)["days"] == 5
 
 
 # --- source errors during a days capture --------------------------------------------------------------------
@@ -373,14 +368,14 @@ def test_the_capture_edit_of_case_yaml_keeps_dans_comments_and_the_days_line(tmp
 @pytest.mark.parametrize(("name", "url", "outcome", "line"), FAILURES, ids=[f[0] for f in FAILURES])
 def test_a_source_error_during_a_days_capture_is_one_line_and_writes_nothing(tmp_path, capsys, name, url, outcome, line):
     case_text = whole_span_case(GMT_NOW, 5)
-    root = make_root(tmp_path, NAME, case_text, files={"weather.json": b"old"})
+    root = make_root(tmp_path, NAME, case_text)
     server = server_for(GMT_NOW, fail={url: outcome})
     assert run(root, NAME, server) == 1
     out, err = capsys.readouterr()
     assert out == "" and err.count("\n") == 1
     assert line in err, err
     assert FAKE_KEY not in err
-    assert listing(root / "fixtures" / NAME) == {"case.yaml": case_text.encode(), "weather.json": b"old"}
+    assert listing(root / "fixtures" / NAME) == {"case.yaml": case_text.encode()}
 
 
 # --- the code path uses the London-day helpers and nothing hand-rolled (E17) ---------------------------------

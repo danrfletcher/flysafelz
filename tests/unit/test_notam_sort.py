@@ -135,6 +135,14 @@ def test_only_via_airspace_carries_designators():
     assert run(parsed(subject="WU", item_e="EGD496A MENTIONED")).designators == []
 
 
+def test_the_security_series_comes_from_rules_yaml():
+    q_security = parsed("Q34/26", subject="RO", radius_nm=999.0)
+    assert run(q_security).action is not IGNORE  # RO outside series V is not security advice
+    assert run(q_security, rules=with_rules(notam_security_series=["Q"])).action is IGNORE
+    v_security = parsed("V34/26", subject="RO", radius_nm=999.0)
+    assert run(v_security, rules=with_rules(notam_security_series=["Q"])).action is not IGNORE
+
+
 def test_no_series_letter_is_ignored_on_its_own():
     # Series Q is not ignored (UK military NOTAMs are series Q from 1 Nov 2026, U6768/26). V is judged by subject.
     for series in "ABCDEGHIJLMNQRU":

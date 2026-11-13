@@ -13,6 +13,7 @@ forecast's HH and HH+1 timestamps:
                    (|120 m wind - 10 m wind|)
                    -> worked out at each timestamp first, then the worse of
                    the two. max(gust) - max(wind) would be a different number.
+                   Missing when either timestamp lacks an input.
 
 Nothing is interpolated or filled forward. A value that is missing at HH or at
 HH+1 (including a timestamp the response lacks) is missing for the row.
@@ -82,8 +83,8 @@ class WeatherRow(BaseModel):
 
     hour: AwareDatetime
     values: WeatherValues
-    gust_spread: float | None = None  # mph, worse of the two timestamps
-    gradient: float | None = None  # mph, worse of the two timestamps
+    gust_spread: float | None = None  # mph, worse of the two timestamps; None if either is missing
+    gradient: float | None = None  # mph, worse of the two timestamps; None if either is missing
     missing_required: list[str] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
     # Set by build_rows from the whole response: this hour is after its last complete hour.
@@ -121,6 +122,23 @@ def _get(sample: WeatherValues | None, field: str) -> float | None:
     return None if sample is None else getattr(sample, field)
 
 
+FLOAT_NOISE_PLACES = 8
+
+
+def _spread(sample: WeatherValues | None) -> float | None:
+    """Gust minus 10 m wind at one timestamp, or None when the timestamp or either number is missing."""
+    if sample is None or sample.gust_10m is None or sample.wind_10m is None:
+        return None
+    return round(sample.gust_10m - sample.wind_10m, FLOAT_NOISE_PLACES)
+
+
+def _gradient(sample: WeatherValues | None) -> float | None:
+    """|120 m wind - 10 m wind| at one timestamp, or None when the timestamp or either number is missing."""
+    if sample is None or sample.wind_120m is None or sample.wind_10m is None:
+        return None
+    return round(abs(sample.wind_120m - sample.wind_10m), FLOAT_NOISE_PLACES)
+
+
 def _row(hour: datetime, forecast: Forecast) -> WeatherRow:
     here = forecast.samples.get(hour)
     closing = forecast.samples.get(hour + ONE_HOUR)
@@ -133,24 +151,21 @@ def _row(hour: datetime, forecast: Forecast) -> WeatherRow:
         values[field] = _get(closing, field)
     values["direction_10m"] = _get(here, "direction_10m")
 
-    # Derived values come from each timestamp's own numbers. Rounded to the data's 0.1 mph
-    # so that 12.3 - 6.3 is 6.0 and not 6.000000000000001 (which would break "> 6").
+    # Derived values come from each timestamp's own numbers and, like every other value, are missing for the row when
+    # either timestamp lacks an input. Rounded to FLOAT_NOISE_PLACES to drop float noise (12.3 - 6.3 is
+    # 6.000000000000001, which would break "> 6") without hiding a real fraction: a 6.04 mph spread stays 6.04.
     spreads, gradients = [], []
     for sample in (here, closing):
-        if sample is None:
-            continue
-        if sample.gust_10m is not None and sample.wind_10m is not None:
-            spreads.append(round(sample.gust_10m - sample.wind_10m, 1))
-        if sample.wind_120m is not None and sample.wind_10m is not None:
-            gradients.append(round(abs(sample.wind_120m - sample.wind_10m), 1))
+        spreads.append(_spread(sample))
+        gradients.append(_gradient(sample))
 
     missing = [name for name in REQUIRED if values[name] is None]
     notes = [text for name, text in OPTIONAL_NOTES.items() if values[name] is None]
     return WeatherRow(
         hour=hour,
         values=WeatherValues(**values),
-        gust_spread=max(spreads, default=None),
-        gradient=max(gradients, default=None),
+        gust_spread=None if None in spreads else max(spreads),
+        gradient=None if None in gradients else max(gradients),
         missing_required=missing,
         notes=notes,
     )

@@ -126,6 +126,7 @@ class Rules(BaseModel):
     notam_wide_ignore_subjects: Rule
     notam_ignore_traffic: Rule
     notam_ignore_purpose: Rule
+    notam_security_series: Rule
     notam_ignore_security_subjects: Rule
     notam_restriction_subjects: Rule
     notam_awareness_subjects: Rule

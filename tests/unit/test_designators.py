@@ -122,3 +122,32 @@ def test_lower_case_text_is_found():
 def test_results_keep_the_order_of_first_appearance_and_drop_repeats():
     text = "EGR106 THEN D323B THEN EGD323A THEN D323B AGAIN AND EGR 106"
     assert find_designators(text) == ["EGR106", "EGD323B", "EGD323A"]
+
+
+@pytest.mark.parametrize("text", ["P 500 FT", "THE D 100 AREA", "ED123", "XD123", "R 106", "D 323 A"])
+def test_text_that_only_looks_like_a_designator_gives_none(text):
+    assert find_designators(text) == []
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("D323A/B", ["EGD323A", "EGD323B"]),
+        ("EGD323A/B/C ACTIVE", ["EGD323A", "EGD323B", "EGD323C"]),
+        ("TDA EGD 323A/B AND EGR106", ["EGD323A", "EGD323B", "EGR106"]),
+        ("EGD323A/B/EGD323A", ["EGD323A", "EGD323B"]),
+        ("EGD323A/BC", ["EGD323A"]),
+        ("EGD323AB/C", ["EGD323AB"]),
+    ],
+)
+def test_a_slash_suffix_list_gives_every_designator(text, expected):
+    assert find_designators(text) == expected
+
+
+def test_a_designator_after_the_word_and_a_prefix_with_a_space_is_still_found():
+    assert find_designators("AREA EG D323A ACTIVE, EGR 106 AND d496a") == ["EGD323A", "EGR106", "EGD496A"]
+
+
+def test_a_bare_letter_takes_a_space_only_with_a_suffix_letter():
+    assert find_designators("TDA D 496A ACTIVE") == ["EGD496A"]
+    assert find_designators("TDA D 496 ACTIVE") == []

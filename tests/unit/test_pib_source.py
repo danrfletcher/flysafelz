@@ -7,7 +7,7 @@ import pytest
 from pib_helpers import ISSUED, NOW, TRIMMED, notam_xml, pib_xml, with_rules
 
 from flysafelz.clients import pib_source
-from flysafelz.clients.pib_source import ARCHIVE_COMMITS_URL, LIVE_URL, fetch_pib
+from flysafelz.clients.pib_source import ARCHIVE_COMMITS_URL, LIVE_URL, fetch_pib, fetch_pib_at
 from flysafelz.contracts import SourceName, SourceState
 from flysafelz.pib import load_pib
 
@@ -121,10 +121,20 @@ def test_a_commit_after_now_is_never_used_even_if_the_api_returns_it():
     assert got.status.sha == MIDDLE
 
 
-def test_a_commit_without_a_readable_time_is_trusted_to_the_api_filter():
+def test_a_commit_without_a_readable_time_is_skipped_not_trusted():
     listing = httpx.Response(200, json=[{"sha": NEWEST}])
     got = fetch_pib("archive", NOW, client=Server(commits_response=listing, files={NEWEST: XML}).client())
-    assert (got.status.sha, got.status.state) == (NEWEST, SourceState.OK)
+    assert got.xml is None and got.status.state is SourceState.FAILED
+    assert "no archive commit at or before" in got.status.reason
+
+
+@pytest.mark.parametrize("date", [None, "", "not a time", 12])
+def test_an_unreadable_commit_time_is_skipped_and_the_next_readable_commit_is_used(date):
+    listing = httpx.Response(200, json=[{"sha": NEWEST, "commit": {"committer": {"date": date}}}, *commits_json([(MIDDLE, "2026-10-31T01:23:00Z")])])
+    server = Server(commits_response=listing, files={MIDDLE: XML})
+    got = fetch_pib("archive", NOW, client=server.client())
+    assert got.status.sha == MIDDLE
+    assert str(server.seen[-1].url) == raw_url(MIDDLE)
 
 
 def test_a_commit_time_without_a_zone_is_read_as_utc():
@@ -349,3 +359,55 @@ def test_a_failed_archive_fetch_passes_through_with_its_sha():
 
 def test_the_issued_header_constant_matches_the_builder():
     assert datetime.fromisoformat(ISSUED) == datetime(2026, 10, 31, 7, 0, 37, tzinfo=UTC)
+
+
+# --- status_from_xml: the half of load_pib that needs no request ---------------------------------------------------
+
+
+def test_status_from_xml_gives_the_same_status_as_load_pib_for_the_same_bytes():
+    from flysafelz.pib import status_from_xml
+
+    fetched = load_pib("archive", datetime(2026, 10, 31, 8, 0, tzinfo=UTC), client=Server().client())
+    direct = status_from_xml(XML, datetime(2026, 10, 31, 8, 0, tzinfo=UTC), fetched_at=fetched.status.fetched_at, sha=NEWEST)
+    assert direct.status == fetched.status
+    assert [n.id for n in direct.notams] == [n.id for n in fetched.notams]
+
+
+def test_status_from_xml_applies_the_stale_check_and_the_case_mode_switch():
+    from flysafelz.pib import CASE_MODE_NOTE, status_from_xml
+
+    issued = datetime.fromisoformat(ISSUED)
+    late = issued + timedelta(hours=3, minutes=1)
+    stale = status_from_xml(XML, late)
+    assert stale.status.state is SourceState.STALE and stale.status.issued_at == issued and stale.status.fetched_at == late
+    assert stale.notams  # a stale PIB still returns its NOTAMs
+    case = status_from_xml(XML, late, stale_rule=False)
+    assert case.status.state is SourceState.OK and case.status.reason == CASE_MODE_NOTE
+
+
+def test_status_from_xml_fails_on_unreadable_bytes_and_keeps_the_sha():
+    from flysafelz.pib import status_from_xml
+
+    got = status_from_xml(b"<not a pib", NOW, sha=NEWEST)
+    assert got.status.state is SourceState.FAILED and got.status.sha == NEWEST and got.notams == []
+
+
+# --- fetch_pib_at: a pinned archive commit ----------------------------------------------------------------------------
+
+
+def test_fetch_pib_at_gets_the_raw_file_at_the_sha_and_asks_no_commits_api():
+    server = Server()
+    got = fetch_pib_at(OLDEST, NOW, client=server.client())
+    assert (got.xml, got.status.sha, got.status.state, got.status.fetched_at) == (XML, OLDEST, SourceState.OK, NOW)
+    assert [str(r.url) for r in server.seen] == [raw_url(OLDEST)]
+
+
+def test_fetch_pib_at_words_a_failure_as_fetch_pib_does_and_keeps_the_sha():
+    got = fetch_pib_at(NEWEST, NOW, client=Server(files={}).client())
+    assert got.xml is None and got.status.state is SourceState.FAILED and got.status.sha == NEWEST
+    assert got.status.reason == f"archive file at {NEWEST}: HTTP 404"
+    timed_out = fetch_pib_at(NEWEST, NOW, client=Server(raise_on={raw_url(NEWEST): httpx.ReadTimeout("slow")}).client())
+    assert timed_out.status.reason == f"archive file at {NEWEST}: ReadTimeout"
+    # the same file through the commits lookup is worded the same way
+    via_lookup = fetch_pib("archive", datetime(2026, 10, 31, 8, 0, tzinfo=UTC), client=Server(files={}).client())
+    assert via_lookup.status.reason == f"archive file at {NEWEST}: HTTP 404"

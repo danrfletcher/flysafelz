@@ -25,10 +25,7 @@ def test_rules_prints_header_and_one_row_per_rule(capsys):
     for cells, rule in zip(rows, RULES.all(), strict=True):
         assert len(cells) == len(HEADER)
         assert cells[0] == rule.id
-        if isinstance(rule.value, list):
-            assert cells[1] == ", ".join(rule.value)
-        else:
-            assert float(cells[1]) == rule.value
+        assert cells[1] == cli.format_value(rule)
         assert cells[2] == rule.unit
         assert cells[3] == rule.comparison.value
         assert cells[4] == rule.source
